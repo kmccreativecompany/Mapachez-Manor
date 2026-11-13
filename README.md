@@ -43,6 +43,16 @@ rules and their own guest scenarios, then share them as a code or file. Spanish
 is built in, and `python3 tools/build_demo.py` makes a free demo night copy.
 Everything stays offline and on the device. See [setup notes](docs/setup.md).
 
+## Rush hour, regulars, the lily mystery and surprise nights
+
+From the third quick shift, **rush hour** sometimes brings three guests at once: choose
+who to help first (safety first) while a gentle lantern counts down for a bonus pin, or
+switch to relaxed with no timer. **Regulars** remember how you treated them and grow
+four hearts, each unlocking a little story. A **mystery** (who keeps moving the lobby
+lilies?) drops one clue a day, solved in the **Manor notebook**. **Surprise nights**
+(storm, wedding, power cut) change the map and the guests three days in seven. Best
+answers wiggle the raccoon and build a chiming combo. See [fun notes](docs/fun.md).
+
 ## Original repository baseline
 Imported from the saved October 24, 2026 file:
 cMapachez_Manor_Midnight_Rehearsal_Offline_anticipation.html
