@@ -28,8 +28,20 @@ press **E** to answer a Silver Key moment. Answers fill the Guest trust, Care &
 safety and Teamwork bars through Bronze, Silver, Gold, Silver Key and Legend.
 Press **Q** (or choose **Quick shift**) for five guests in about three minutes.
 Missed moments come back for a second chance, nights in a row build a streak,
-and 32 pins plus unlockable outfits live in the Memory Book. See
+and 36 pins plus unlockable outfits live in the Memory Book. See
 [growth notes](docs/growth.md).
+
+## Play for fun or train with your hotel
+
+On the first visit the game asks how you are playing. **Just for fun** goes
+straight to a first guest with no sign-up. **Training with my hotel** asks for a
+name, a role (front desk, housekeeping, dining, night shift, or a bit of
+everything) and an optional hotel pack from the manager. Players get a skills
+report, printable certificates per role, and a score code for a friendly weekly
+team board. Managers use the **Manager corner** to add their hotel name, house
+rules and their own guest scenarios, then share them as a code or file. Spanish
+is built in, and `python3 tools/build_demo.py` makes a free demo night copy.
+Everything stays offline and on the device. See [setup notes](docs/setup.md).
 
 ## Original repository baseline
 Imported from the saved October 24, 2026 file:
