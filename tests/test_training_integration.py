@@ -51,6 +51,8 @@ class TrainingIntegration(unittest.TestCase):
 
     def setUp(self):
         self.context = self.browser.new_context(viewport={'width':1440, 'height':1000}, reduced_motion='reduce')
+        # Returning-player fixture: skip the first-visit welcome choice (covered in test_setup.py).
+        self.context.add_init_script("try{if(!localStorage.getItem('mapachez_profile_v1'))localStorage.setItem('mapachez_profile_v1',JSON.stringify({version:1,mode:'solo',lang:'en',hooked:true}))}catch(e){}")
         self.page = self.context.new_page()
         self.errors = []
         self.requests = []
