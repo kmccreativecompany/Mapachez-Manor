@@ -43,6 +43,36 @@ body.reduce-motion .seal-pop{transform:translate(-50%,0)}
 .meter{grid-template-columns:112px 1fr}
 .next-step{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 6px}.next-step .primary-button{flex:1 1 260px;justify-content:space-between;text-align:left}.next-step .primary-button small{display:block;font-weight:400;font-size:11px;opacity:.85;margin-top:2px}
 @media(max-width:800px){.shift-clock>.overline{max-width:96px;letter-spacing:.12em}.shift-clock p{max-width:150px}} /* KMC-ADD ux v1: phone clock layout */
+/* KMC-ADD silver key v1 */
+.sk-card{margin:14px 0 4px;padding:11px 14px 11px 40px;border:1px solid #c9ad74;border-left:4px solid #8a6d34;border-radius:6px;background:#fbf5e6;position:relative;font:13px/1.5 Arial,sans-serif;color:#2f3a2c}
+.sk-card:before{content:"";position:absolute;left:12px;top:13px;width:16px;height:16px;border-radius:50%;border:2px solid #8a6d34;box-sizing:border-box;box-shadow:inset 0 0 0 3px #fbf5e6,inset 0 0 0 8px #c9ad74}
+.sk-card .overline{display:block;font-size:11px;letter-spacing:.12em;color:#7a6331;margin-bottom:2px}
+.sk-card b{display:block;font-size:14px;margin-bottom:2px}.sk-card q{font-style:italic}
+.sk-list{display:grid;gap:10px}.sk-list .sk-card{margin:0}
+/* Southern grounds: the manor's palette, with room to gather and quiet edges. */
+.festival-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.festival-toolbar button{min-height:44px;padding:9px 13px;font-size:12px}.festival-toolbar label{display:flex;align-items:center;gap:8px;font-size:12px}.festival-toolbar input{width:95px;accent-color:var(--green)}
+.festival-now{flex:1 1 200px;font-size:12px;line-height:1.5}.festival-now small{display:block;color:var(--muted)}
+.festival-aside{grid-column:1/-1}.festival-aside h2{font:normal 29px/1.15 Georgia,serif;margin:12px 0}.festival-aside p{font-size:13px;line-height:1.7}.festival-aside .secondary-button{width:100%;margin-top:8px}
+.festival-tag{display:inline-block;font-size:11px;line-height:1.4;padding:5px 9px;border:1px solid #c4cdb6;border-radius:20px;background:#edf0df;color:#365543}
+.festival-note{font-size:12px;line-height:1.7;color:#5a6655;padding:13px 0;margin:0}.festival-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
+.exhibitor-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:1px solid #c4cbb7;background:#fffdf5;border-radius:7px;padding:18px;color:var(--ink);min-height:140px;gap:9px}.exhibitor-card:hover{background:#edf0df;border-color:#7d946c}.exhibitor-card b{font:normal 22px Georgia,serif}.exhibitor-card small{font-size:12px;line-height:1.6;color:#5a6655}.exhibitor-card svg{width:36px;height:36px}
+.festival-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0}.festival-tabs button{min-height:44px;padding:8px 14px;border:1px solid #c4cbb7;background:var(--paper);color:var(--ink);border-radius:5px}.festival-tabs button[aria-pressed="true"]{background:var(--green);color:var(--paper)}
+.concert-poster{position:relative;overflow:hidden;padding:30px 24px;background:linear-gradient(145deg,#173e36,#326054);color:#f7ecd1;border:1px solid #b79a61;border-radius:8px;margin:16px 0}.concert-poster::after{content:"✦";position:absolute;right:20px;top:14px;color:#d6bd7b;font-size:64px;opacity:.5}.concert-poster h3{font:normal 32px/1.15 Georgia,serif;max-width:80%;margin:12px 0}.concert-poster p{font-size:13px;line-height:1.7;max-width:90%;margin-bottom:0}.concert-poster .overline{color:#e0ce9d}
+.concert-progress{width:100%;height:8px;accent-color:#b08b45}.concert-time{display:flex;justify-content:space-between;font-size:12px;margin:8px 0}.concert-caption{font:italic 18px/1.6 Georgia,serif;margin:16px 0;padding:14px 17px;border-left:2px solid #b89c64;background:#eeeddf}.programme-slot{padding:16px;border:1px solid var(--line);border-radius:6px;margin:16px 0;background:#fffdf5}.programme-slot h3{font:normal 23px Georgia,serif;margin-bottom:10px}.programme-slot p{font-size:13px;line-height:1.7;margin-bottom:0}
+.festival-art{width:100%;height:auto;display:block;border:1px solid #c3c6ac;border-radius:6px}.festival-art-caption{font:normal 17px Georgia,serif;margin-top:8px}.festival-book{font:normal 21px/1.8 Georgia,serif;padding:24px;background:#eeeddf;border-radius:6px;margin:18px 0}.world-footer{flex-wrap:wrap;gap:8px}.world-footer>.text-button{min-height:44px}
+.talent-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border:0;padding:0;margin:18px 0}.talent-options legend{font-weight:700;margin-bottom:10px}.talent-options label{display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:#fffdf5;font-size:14px}.talent-options input{width:20px;height:20px;accent-color:var(--green)}.talent-help{font-size:12px;line-height:1.7;color:var(--muted);margin:9px 0}
+.exhibitor-card{min-width:0}.exhibitor-card b,.festival-tag,#modal-heading,.scene-copy{overflow-wrap:anywhere}.festival-tabs button{max-width:100%;overflow-wrap:anywhere}
+body.large-text .festival-note,body.large-text .festival-aside p,body.large-text .exhibitor-card small{font-size:15px}
+@media(max-width:600px){.festival-grid{grid-template-columns:1fr}.festival-toolbar{gap:8px}.festival-now{flex-basis:100%}.festival-toolbar button{flex:1}.festival-toolbar label{justify-content:center;flex:1}.concert-poster{padding:24px 18px}.concert-poster h3{font-size:28px}}
+/* The Memory Book keeps only the little things the player has discovered. */
+.memory-intro{padding:20px 22px;border:1px solid #c9bd9c;border-left:6px solid #b69b60;border-radius:4px 10px 10px 4px;background:linear-gradient(120deg,#e9edda,#f8f0dd);margin:18px 0}.memory-intro p{font:italic 20px/1.6 Georgia,serif;margin:0}.memory-pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;list-style:none;padding:0;margin:20px 0}.memory-page{min-width:0;padding:22px;border:1px solid #d0c7ae;border-radius:4px 12px 5px 4px;background:#fffdf5;box-shadow:0 5px 12px #173c3409;overflow-wrap:anywhere}.memory-page>svg{color:#a58a4e;width:27px;height:27px;margin-bottom:14px}.memory-page h3{font:normal 23px/1.2 Georgia,serif;margin-bottom:12px}.memory-page p{font:normal 17px/1.7 Georgia,serif;margin-bottom:10px}.memory-page small{display:block;font-size:12px;line-height:1.6;color:#5a6655}.memory-page .action-row{margin-top:16px}.memory-empty{padding:26px;border:1px dashed #b9bea8;border-radius:7px;font:normal 20px/1.7 Georgia,serif;color:#5a6655}.memory-saved[aria-pressed="true"]{background:#e5ecd9;border-color:#8fa57b}.memory-storage{font-size:12px;line-height:1.7;color:#5a6655}.memory-storage[role="alert"]{color:#865432}
+body.large-text .memory-page p,body.large-text .memory-page small,body.large-text .memory-storage{font-size:18px}
+@media(max-width:800px){.game-header{height:auto;min-height:67px;flex-wrap:wrap;padding:12px 16px;row-gap:6px}.header-tools{margin-left:auto}}
+@media(max-width:600px){.memory-pages{grid-template-columns:1fr}.memory-page{padding:20px}.memory-intro{padding:18px}.memory-tabs button{flex:1 1 120px}}
+.lobby-chatter{position:absolute;top:0;left:0;z-index:2;width:min(224px,calc(100% - 20px));pointer-events:none;--tail-x:50%}.lobby-bubble{position:relative;display:block;width:100%;min-height:44px;padding:10px 13px;border:1px solid #aa9265;border-radius:14px 14px 14px 4px;background:#fff9e9;color:var(--ink);box-shadow:0 5px 14px #143d3526;text-align:left;pointer-events:auto}.lobby-bubble::after{content:"";position:absolute;left:var(--tail-x);bottom:-8px;width:13px;height:13px;background:#fff9e9;border-right:1px solid #aa9265;border-bottom:1px solid #aa9265;transform:translateX(-50%) rotate(45deg)}.lobby-bubble:hover,.lobby-bubble:focus-visible{background:#fff3d3;border-color:#7c704e}.lobby-bubble:hover::after,.lobby-bubble:focus-visible::after{background:#fff3d3}.bubble-speaker{display:block;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:#75613b;margin-bottom:4px}.bubble-line{display:block;font:normal 16px/1.35 Georgia,serif}.bubble-hint{display:block;font-size:11px;color:#536449;margin-top:6px}.overheard-dialogue{list-style:none;padding:0;display:grid;gap:14px;margin:22px 0}.overheard-dialogue li{max-width:90%;padding:16px 19px;border:1px solid #c7cbb2;border-radius:12px 12px 12px 3px;background:#fffdf4;font:normal 20px/1.6 Georgia,serif}.overheard-dialogue li:nth-child(even){margin-left:auto;background:#e9eedc;border-radius:12px 12px 3px 12px}.overheard-dialogue b{display:block;font:normal 12px/1.5 Arial,sans-serif;color:#5a6655;margin-bottom:5px}.overheard-stage{font:italic 18px/1.7 Georgia,serif;padding:13px 17px;border-left:2px solid #baa16b;background:#f0eddd}.lobby-replay{display:block;margin-top:6px}body.large-text .bubble-line{font-size:19px}body.large-text .overheard-dialogue li{font-size:23px}body.large-text .bubble-speaker,body.large-text .bubble-hint{font-size:13px}
+@media(max-width:600px){.lobby-chatter{width:176px}.overheard-dialogue li{max-width:95%;font-size:19px;padding:13px 15px}}
+@media(max-width:360px){.lobby-chatter{width:132px}.bubble-speaker,.bubble-hint{display:none}}
 </style>
   
 </head>
@@ -71,7 +101,7 @@ body.reduce-motion .seal-pop{transform:translate(-50%,0)}
       <p class="chapter-label">CHAPTER ONE</p>
       <h2>The Midnight Rehearsal</h2>
       <p class="title-copy">A quiet hotel. Three unfinished stories.<br>Some nights are worth staying up for.</p>
-      <div class="title-actions"><button id="begin" class="primary-button">Begin your night <svg><use href="#arrow"/></svg></button><button id="continue" class="glass-button" hidden>Continue your evening</button></div>
+      <div class="title-actions"><button id="begin" class="primary-button">Begin your night <svg><use href="#arrow"/></svg></button><button id="continue" class="glass-button" hidden>Continue your evening</button><button id="explore-festival" class="glass-button">Explore the festival <svg><use href="#arrow"/></svg></button><button id="title-memories" class="glass-button" aria-keyshortcuts="M">Memory Book</button></div>
       <p class="title-foot">Explore. Listen. Leave things a little better.</p>
     </div>
     <div class="title-bottom"><span>ONE STORY SHIFT · PLAY AT YOUR PACE</span><span>Original world &amp; characters · Silver Key Games</span></div>
@@ -80,16 +110,32 @@ body.reduce-motion .seal-pop{transform:translate(-50%,0)}
   <main id="game-shell" class="game-shell" hidden>
     <header class="game-header">
       <button id="home" class="wordmark" aria-label="Return to title"><span class="crest">M</span><span>Mapáchez Manor<small>THE MIDNIGHT REHEARSAL</small></span></button>
-      <div class="header-tools"><button id="ledger-button" class="header-button" aria-label="House ledger"><svg><use href="#book"/></svg><span>House ledger</span><kbd>L</kbd></button><button id="journal-button" class="header-button" aria-label="Shift journal"><svg><use href="#radio"/></svg><span>Shift journal</span><kbd>J</kbd></button><button id="settings-button" class="icon-button light" aria-label="Comfort and sound settings"><svg><use href="#gear"/></svg></button></div>
+      <div class="header-tools"><button id="ledger-button" class="header-button" aria-label="House ledger"><svg><use href="#book"/></svg><span>House ledger</span><kbd>L</kbd></button><button id="journal-button" class="header-button" aria-label="Shift journal"><svg><use href="#radio"/></svg><span>Shift journal</span><kbd>J</kbd></button><button id="memory-button" class="header-button" aria-label="Manor Memory Book" aria-keyshortcuts="M" title="Memory Book (M)"><svg><use href="#key"/></svg><span>Memory Book</span><kbd>M</kbd></button><button id="settings-button" class="icon-button light" aria-label="Comfort and sound settings"><svg><use href="#gear"/></svg></button></div>
     </header>
     <div class="play-layout">
       <section class="world-panel" aria-label="Walkable manor">
-        <div class="world-caption"><div><span class="overline">THE MANOR AFTER HOURS</span><h2 id="location-name">The Grand Foyer</h2></div><span class="weather"><svg><use href="#moon"/></svg> A clear, quiet night</span></div>
-        <div class="canvas-wrap" id="canvas-wrap"><canvas id="world" tabindex="0" aria-label="Manor map. Use WASD or arrow keys to walk, E to interact, or choose a request to walk there automatically."></canvas><div class="world-vignette"></div><button id="interact" class="interact-button" hidden><kbd>E</kbd><span>Interact</span><svg><use href="#arrow"/></svg></button><div class="travel-tag" id="travel-tag" hidden>On your way...</div></div>
-        <div class="world-footer"><span class="movement-hint"><span class="key-cap">W A S D</span> or click to walk <span class="dot-sep">·</span> <span class="key-cap">E</span> interact</span><button class="text-button" id="places-button">Visit a place <svg><use href="#arrow"/></svg></button></div>
+        <div class="world-caption"><div><span class="overline" id="area-caption">THE MANOR AFTER HOURS</span><h2 id="location-name">The Grand Foyer</h2></div><span class="weather"><svg><use href="#moon"/></svg> A clear, quiet night</span></div>
+        <div class="canvas-wrap" id="canvas-wrap"><canvas id="world" tabindex="0" aria-label="Manor map. Use WASD or arrow keys to walk, E to interact, or choose a request to walk there automatically."></canvas><div class="world-vignette"></div><div id="lobby-chatter" class="lobby-chatter" role="group" aria-label="An optional conversation near reception" hidden><button id="lobby-bubble" class="lobby-bubble"><span id="lobby-speaker" class="bubble-speaker">Guest in blue</span><span id="lobby-line" class="bubble-line"></span><span id="lobby-hint" class="bubble-hint">Listen in</span></button></div><button id="interact" class="interact-button" hidden><kbd>E</kbd><span>Interact</span><svg><use href="#arrow"/></svg></button><div class="travel-tag" id="travel-tag" hidden>On your way...</div></div>
+        <div id="festival-toolbar" class="festival-toolbar" hidden>
+          <div class="festival-now"><b id="festival-now" role="status">Earbuds ready. Choose a performance.</b><small id="festival-elapsed">Choose a performance when you are ready.</small></div>
+          <button id="festival-stop" class="secondary-button" disabled>Stop music</button>
+          <label>Volume <input id="festival-volume" type="range" min="0" max="100" value="30" aria-label="Festival volume"></label>
+        </div>
+        <div class="world-footer"><span class="movement-hint"><span class="key-cap">W A S D</span> or click to walk <span class="dot-sep">·</span> <span class="key-cap">E</span> interact</span><button class="text-button" id="festival-button">Festival grounds <svg><use href="#arrow"/></svg></button><button class="text-button" id="places-button">Visit a place <svg><use href="#arrow"/></svg></button></div>
         <section class="pocket-bar" aria-label="Items you are carrying"><span><svg><use href="#bag"/></svg> YOUR POCKETS</span><div id="inventory">Nothing to carry. Plenty to notice.</div><span id="save-status" class="saved-status">Saved on this device</span></section>
       </section>
       <aside class="shift-sidebar">
+        <section id="festival-sidebar" class="festival-aside" hidden>
+          <span class="overline">THE SOUTHERN GROUNDS</span><h2>Yaupon<br>Silent Sessions</h2>
+          <span class="festival-tag">Festival preview · creator booths</span>
+          <p>Lanterns, little discoveries, and music for your ears. The rest of the island keeps its quiet.</p>
+          <button id="festival-stage-shortcut" class="secondary-button">Visit the stage</button>
+          <button id="festival-directory-shortcut" class="secondary-button">Browse the booths</button>
+          <button id="festival-programme-shortcut" class="secondary-button">Festival programme</button>
+          <div class="programme-slot"><span class="overline">ON THE PROGRAMME</span><p id="festival-sidebar-programme">Instrumental soundchecks, whenever you wish.</p></div>
+          <p class="festival-note">Exploring the grounds never advances your hotel shift. Everyone has pretend earbuds. Listen with your usual speakers or headphones.</p>
+          <button id="festival-return" class="secondary-button">Return to the manor</button>
+        </section>
         <div class="shift-clock"><span class="overline">YOUR FIRST NIGHT</span><div><time id="clock">11:40 PM</time><svg><use href="#moon"/></svg></div><p>The clock advances when you act.<br>Take your time reading.</p></div>
         <section class="requests-section"><div class="section-caption"><h2>Threads to follow</h2><span id="task-count" class="count-pill">1</span></div><div id="tasks" class="task-list"></div></section>
         <section class="evening-progress"><div><span>AN EVENING, WELL TENDED</span><b id="progress-count">0 / 6</b></div><div class="progress-track"><i id="progress-fill"></i></div><!-- KMC-ADD polish v1 --><div id="meters" class="meters" aria-label="How the evening is going"></div><span id="streak" class="streak-pill" hidden></span></section>
@@ -122,7 +168,8 @@ const STATIONS = {
   r203: {x:590,y:365,name:'Room 203 · Lady Vesper',short:'203'},
   r204: {x:750,y:365,name:'Room 204 · Ms. Vale',short:'204'},
   r205: {x:910,y:365,name:'Room 205',short:'205'},
-  r206: {x:1070,y:365,name:'Room 206 · M. Nine',short:'206'}
+  r206: {x:1070,y:365,name:'Room 206 · M. Nine',short:'206'},
+  festival: {x:272,y:721,name:'Southern festival gate',short:'Festival'}
 };
 const GUESTS = [
   {id:'finch',room:'202',name:'Mr. Finch',given:'Elias Finch',color:'#bb837e',hair:'#294644',skin:'#c7b2d9',initials:'EF',stay:'Tonight · departing tomorrow',features:['Quiet','Garden view'],note:'A performer traveling with a surprisingly small instrument case.',preference:'Ask before arranging an audience. No room-number disclosures.',status:'In house'},
@@ -157,9 +204,13 @@ function advance(s,n) {
     s.flags.hazard='reported';
     log(s,'M. Nine: water is spreading at the conservatory doorway. Keep people clear and arrange help.','radio');
   }
-  if(s.minute>=30 && !s.flags.supperServed && !s.late.includes('supper')) {
+  // Quoted deadlines are optional so saves from before Silver Key still load.
+  const supperLate=Number.isFinite(s.flags.supperDueAt)
+    ? (s.flags.supperServed?s.flags.servedAt:s.minute)>s.flags.supperDueAt
+    : s.minute>=30&&!s.flags.supperServed;
+  if(supperLate && !s.late.includes('supper')) {
     s.late.push('supper');gain(s,'trust',-7);
-    log(s,'Lady Vesper is waiting longer than expected. The supper request remains open; an honest update can help.','attention');
+    log(s,s.flags.supperServed?'Lady Vesper’s supper arrived after the time you quoted. Keep delivery promises in view.':(s.flags.quoted?'Lady Vesper’s supper is now past the time you quoted. ':'Lady Vesper is waiting longer than expected. ')+'The request remains open; an honest update from the front desk can help.','attention');
   }
   if(s.flags.hazard==='reported' && s.minute>=20 && !s.late.includes('hazard')) {
     s.late.push('hazard');gain(s,'care',-9);
@@ -177,8 +228,9 @@ function transition(previous,action,payload={}) {
       log(s,'Delores: one supper, a lost score, and a nervous performer. Start with a guest; keep your promises small and your eyes open.','radio');break;
     case 'requestSupper':
       need(f.briefed&&!f.supperRequested,'This request has already been taken.');
+      if(payload.line!==undefined||payload.quote!==undefined){need(payload.line==='allergy',SK_COACH[payload.line]||SK_COACH.close);need(payload.quote==='specific',SK_COACH[payload.quote]||SK_COACH.vague);f.quoted=true;f.supperDueAt=s.minute+25;} /* KMC-ADD silver key v1 */
       f.supperRequested=true;cost=2;
-      log(s,'Lady Vesper ordered pumpkin soup, water, and two spoons. Review her record before the kitchen prepares it.');break;
+      log(s,'Lady Vesper ordered pumpkin soup, water, and two spoons. Review her record before the kitchen prepares it.'+(Number.isFinite(f.supperDueAt)?' Quoted delivery by '+clock({minute:f.supperDueAt})+'.':''));break;
     case 'reviewRecord':
       need(f.briefed,'Take the shift briefing first.');
       need(payload.guest==='vesper','Choose Lady Vesper’s record for this supper.');
@@ -267,8 +319,9 @@ function transition(previous,action,payload={}) {
       log(s,f.finchPlan==='midnight'?'Set a quiet rehearsal space with a clear access route and an invitation-only sign.':'Prepared a discreet morning handoff for the rehearsal; left the conservatory quiet.');gain(s,'team',3);break;
     case 'promiseUpdate':
       need(f.supperRequested&&!f.supperServed&&!f.promiseUpdated,'There is no overdue supper promise to update.');
+      if(payload.line!==undefined){need(payload.line==='own',SK_COACH[payload.line]||SK_COACH.hope);f.supperDueAt=s.minute+10;} /* KMC-ADD silver key v1 */
       f.promiseUpdated=true;cost=1;
-      log(s,'Gave Lady Vesper an honest supper update and a revised expectation. The order remains your responsibility.');gain(s,'trust',4);break;
+      log(s,'Gave Lady Vesper an honest supper update and a revised expectation. The order remains your responsibility.'+(Number.isFinite(f.supperDueAt)?' Revised delivery by '+clock({minute:f.supperDueAt})+'.':''));gain(s,'trust',4);break;
     case 'wait':
       need(f.briefed,'Take the briefing first.');cost=2;log(s,'Checked the radio and let two quiet minutes pass.');break;
     case 'finale':
@@ -349,6 +402,161 @@ function ending(s) {
 }
 
 
+// festival-model.js — owner-provided creator persona and fictional demo exhibits.
+const FESTIVAL_POINTS={
+  stage:{x:640,y:336,name:'Lantern stage'},
+  programme:{x:640,y:432,name:'Programme board'},
+  music:{x:240,y:528,name:'Stargazer Katie · creator booth'},
+  gallery:{x:1040,y:528,name:'Tide & Fern · gallery'},
+  books:{x:240,y:688,name:'Little Island Press · books'},
+  welcome:{x:1040,y:688,name:'Festival welcome desk'},
+  manor:{x:640,y:704,name:'Path back to the manor'}
+};
+const FESTIVAL_FLOORS=[{x:76,y:300,w:1128,h:448}];
+const FESTIVAL_FURNITURE=[{x:140,y:418,w:200,h:76},{x:940,y:418,w:200,h:76},{x:140,y:578,w:200,h:76},{x:940,y:578,w:200,h:76},{x:590,y:382,w:100,h:26},{x:480,y:520,w:86,h:46},{x:714,y:520,w:86,h:46}];
+const FESTIVAL_TRACKS={
+  lantern:{title:'Lantern Interlude',artist:'The Lantern Trio',duration:48,bpm:80,notes:[69,72,76,74,72,69,67,64,65,69,72,71,67,64,62,64],bass:[45,41,43,45],caption:'A soft bell melody rests over a low, steady accompaniment. Three lanterns sway above the empty music stands.'},
+  moon:{title:'Quiet Current',artist:'Moss & Moon',duration:40,bpm:72,notes:[72,74,76,79,76,74,72,67,69,72,74,76,74,72,69,67],bass:[48,45,41,43],caption:'A gentle, rounded melody rises and falls like water beside the island. The garden remains quiet outside your earbuds.'}
+};
+const FESTIVAL_EXHIBITORS=[
+  {id:'lantern',name:'The Lantern Trio',talents:['Musician'],point:'stage',line:'A little light, a little music.',about:'Three music stands, three lanterns, and a very small soundcheck. Meet the demonstration ensemble on the main stage.'},
+  {id:'moon',name:'Moss & Moon',talents:['Musician'],point:'stage',line:'Small melodies for a quiet island.',about:'An imagined independent musician sharing a short instrumental soundcheck on the demonstration stage.'},
+  {id:'fern',name:'Tide & Fern Studio',talents:['Artist'],point:'gallery',line:'Windows onto somewhere peaceful.',about:'An imagined island studio exhibiting three small landscapes. Browse the pictures at your own pace.'},
+  {id:'press',name:'Little Island Press',talents:['Writer'],point:'books',line:'Stories with room for a cup of tea.',about:'An imagined independent press sharing a short story opening. The bookmark is, for once, exactly where it belongs.'},
+  {id:'stargazer',name:'Stargazer Katie',talents:['Musician','Artist','Writer'],creator:true,point:'music',about:'',links:[]}
+];
+const FESTIVAL_TALENT_OPTIONS=[
+  {label:'Musician',category:'Music',display:'Music'},
+  {label:'Artist',category:'Art',display:'Art'},
+  {label:'Writer',category:'Books',display:'Writing'},
+  {label:'Poet',category:'Poetry',display:'Poetry'},
+  {label:'Photographer',category:'Photography',display:'Photography'},
+  {label:'Craftsperson',category:'Crafts',display:'Crafts'},
+  {label:'Performer',category:'Performance',display:'Performance'}
+];
+function normaliseFestivalTalents(values,limit=8){
+  if(!Array.isArray(values))return [];
+  const result=[],seen=new Set;
+  for(const value of values){
+    if(typeof value!=='string')continue;
+    const text=value.trim().replace(/\s+/g,' ').slice(0,40);if(!text||text.toLowerCase()==='all')continue;
+    const known=FESTIVAL_TALENT_OPTIONS.find(x=>x.label.toLowerCase()===text.toLowerCase()||x.category.toLowerCase()===text.toLowerCase()||x.display.toLowerCase()===text.toLowerCase());
+    const label=known?.label||text,key=label.toLowerCase();if(seen.has(key))continue;
+    result.push(label);seen.add(key);if(result.length>=limit)break;
+  }
+  return result;
+}
+function festivalWithTalents(exhibitor,values=exhibitor.talents){
+  const talents=normaliseFestivalTalents(values),known=talents.map(t=>FESTIVAL_TALENT_OPTIONS.find(x=>x.label===t));
+  const categories=[...new Set(talents.map((t,i)=>known[i]?.category||t))];
+  return {...exhibitor,talents,categories,label:talents.map((t,i)=>known[i]?.display||t).join(' · ')||'Creator',line:exhibitor.creator?talents.join(' · ')||'Creator':exhibitor.line};
+}
+function festivalExhibitors(category='All',overrides={}){
+  return FESTIVAL_EXHIBITORS.map(x=>festivalWithTalents(x,Array.isArray(overrides?.[x.id])?overrides[x.id]:x.talents)).filter(x=>category==='All'||x.categories.includes(category));
+}
+function festivalCategories(exhibitors){
+  const categories=new Set(exhibitors.flatMap(x=>x.categories)),ordered=FESTIVAL_TALENT_OPTIONS.map(x=>x.category);
+  return ['All',...ordered.filter(x=>categories.has(x)),...[...categories].filter(x=>!ordered.includes(x)).sort((a,b)=>a.localeCompare(b))];
+}
+function festivalPerformanceUrl(value){
+  if(typeof value!=='string'||value.length>2048)return null;
+  try{const url=new URL(value.trim());return url.protocol==='https:'&&url.hostname&&!url.username&&!url.password?url.href:null;}catch{return null;}
+}
+function festivalEventState(startsAt,duration,now=Date.now()){
+  if(!Number.isFinite(startsAt)||startsAt<=0||!Number.isFinite(duration)||duration<=0||!Number.isFinite(now))return {phase:'unscheduled',offset:0,remaining:0};
+  const seconds=(now-startsAt)/1000;
+  if(seconds<0)return {phase:'upcoming',offset:0,remaining:Math.ceil(-seconds)};
+  if(seconds>=duration)return {phase:'finished',offset:duration,remaining:0};
+  return {phase:'playing',offset:seconds,remaining:Math.ceil(duration-seconds)};
+}
+function festivalSamples(track,sampleRate=22050){
+  const samples=new Float32Array(Math.round(track.duration*sampleRate)),beat=60/track.bpm;
+  const hz=midi=>440*Math.pow(2,(midi-69)/12);
+  for(let i=0;i<samples.length;i++){
+    const t=i/sampleRate,note=Math.floor(t/beat),local=t%beat;
+    const envelope=Math.min(1,local/.035)*Math.pow(Math.max(0,1-local/beat),1.7);
+    const freq=hz(track.notes[note%track.notes.length]);
+    const melody=(Math.sin(2*Math.PI*freq*local)+.18*Math.sin(4*Math.PI*freq*local))*envelope;
+    const bassTime=t%(beat*4),bassEnvelope=Math.min(1,bassTime/.08)*Math.max(0,1-bassTime/(beat*4));
+    const bass=Math.sin(2*Math.PI*hz(track.bass[Math.floor(note/4)%track.bass.length])*bassTime)*bassEnvelope;
+    const fade=Math.min(1,t/.15,(track.duration-t)/.6);
+    samples[i]=(.19*melody+.10*bass)*fade;
+  }
+  return samples;
+}
+
+// memories-model.js — a separate collection that survives starting another evening.
+const MEMORY_PAGES=[
+  {id:'supper',kind:'care',title:'Both spoons send their regards',from:'A note from Lady Vesper',text:'“The soup was lovely. Both spoons have asked to return.” A small supper, followed all the way through.'},
+  {id:'folio',kind:'care',title:'A story in its owner’s hands',from:'A quiet moment with Ms. Vale',text:'You returned something important and let its owner decide what to share. Some things feel lighter when they are safely home.'},
+  {id:'courage',kind:'care',title:'Room for a little courage',from:'An evening with Mr. Finch',text:'A nervous guest had a plan he could trust. You made room for him without making a spectacle.'},
+  {id:'repair',kind:'care',title:'A dry floor, confirmed',from:'A little peace of mind',text:'The barrier stayed until engineering confirmed the repair. M. Nine found the resulting absence of a lake deeply reassuring.'},
+  {id:'handoff',kind:'care',title:'A good beginning for someone else',from:'A note from Delores',text:'“Someone else will start their evening with one less thing to worry about.” You left the next shift a clear handoff.'},
+  {id:'umbrella',kind:'care',title:'Ready for the next rainy day',from:'A kindness nobody had to ask for',text:'M. Nine’s umbrella was dried and returned. An ordinary object, a small kindness, and one less puddle in the foyer.'},
+  {id:'glasses',kind:'care',title:'The crossword can wait',from:'A kindness nobody had to ask for',text:'The reading glasses went back with the newspaper. There was no need to solve the crossword to make someone’s evening easier.'},
+  {id:'lamp',kind:'care',title:'A brighter way back',from:'A kindness nobody had to ask for',text:'A portable light made the step easier to see while engineering had the lamp on its list. Care began before anyone asked.'},
+  {id:'pot',kind:'care',title:'A hand, and a little breathing room',from:'A moment with Chef Mirelle',text:'You carried the heavy stockpot and covered for a break. Looking after the team is part of looking after the manor.'},
+  {id:'gallery',kind:'festival',title:'Three little windows',from:'Tide & Fern · fictional demonstration',text:'You lingered over an imagined island in three paintings. The hotel clock waited while you took a look.'},
+  {id:'umbrella-story',kind:'festival',title:'Correspondence, slightly damp',from:'Little Island Press · fictional demonstration',text:'An umbrella requested a garden view and left a damp thank-you note. Reception filed what it could.'},
+  {id:'fern-seat',kind:'manor',title:'The hat comes back after dessert',from:'Overheard by the lobby chairs',text:'A very serious seating dispute ended with room for everyone. The fern kept the hat until dessert. Nobody asked what it had ordered.'}
+];
+function createMemoryBook(){return {version:1,moments:[],favorites:[]};}
+function normaliseMemoryBook(value){
+  const book=createMemoryBook();if(!value||value.version!==1)return book;
+  if(Array.isArray(value.moments))for(const entry of value.moments){
+    if(!entry||!MEMORY_PAGES.some(page=>page.id===entry.id)||!Number.isFinite(entry.seed)||book.moments.some(x=>x.id===entry.id))continue;
+    book.moments.push({id:entry.id,seed:entry.seed});
+  }
+  if(Array.isArray(value.favorites))for(const id of value.favorites){
+    if(FESTIVAL_EXHIBITORS.some(person=>person.id===id)&&!book.favorites.includes(id))book.favorites.push(id);
+  }
+  return book;
+}
+function keepMemory(previous,id,seed){
+  const book=normaliseMemoryBook(previous);
+  if(Number.isFinite(seed)&&MEMORY_PAGES.some(page=>page.id===id)&&!book.moments.some(entry=>entry.id===id))book.moments.push({id,seed});
+  return book;
+}
+function collectEveningMemories(previous,s){
+  let book=normaliseMemoryBook(previous);if(!s||!Number.isFinite(s.seed)||!s.flags)return book;
+  const f=s.flags,earned=[];
+  if(f.trayReturned===true)earned.push('supper');
+  if(f.musicReturned===true)earned.push('folio');
+  if(f.finaleSeen===true&&f.venueReady===true)earned.push('courage');
+  if(f.hazard==='fixed')earned.push('repair');
+  if(f.handoff===true)earned.push('handoff');
+  if(s.sideStories?.fern===true)earned.push('fern-seat');
+  for(const id of ['umbrella','glasses','lamp','pot'])if(Array.isArray(s.anticipated)&&s.anticipated.includes(id))earned.push(id);
+  for(const id of earned)book=keepMemory(book,id,s.seed);
+  return book;
+}
+function toggleMemoryFavorite(previous,id){
+  const book=normaliseMemoryBook(previous);if(!FESTIVAL_EXHIBITORS.some(person=>person.id===id))return book;
+  if(book.favorites.includes(id))book.favorites=book.favorites.filter(x=>x!==id);else book.favorites.push(id);
+  return book;
+}
+function returningGuestMemory(book,s,guest){
+  if(guest!=='vesper'||!s||s.flags?.supperRequested||(Array.isArray(s.memoryGreetings)&&s.memoryGreetings.includes(guest)))return null;
+  const remembered=normaliseMemoryBook(book).moments.find(entry=>entry.id==='supper'&&entry.seed!==s.seed);
+  return remembered?'Lady Vesper gives you a small, approving nod. “You remembered both spoons last time. They spoke very highly of you.”':null;
+}
+// lobby-scene.js — a low-stakes conversation, available before the briefing.
+const LOBBY_SCENE={id:'lobby-conversation',point:{x:332,y:680,name:'Listen by the lobby chairs'},
+  actors:[{x:328,y:650,name:'Guest in blue',color:'#638a9d',hair:'#533d34',skin:'#d4b292'},{x:396,y:656,name:'Companion',color:'#ad7e85',hair:'#555846',skin:'#bdc8a6'}],
+  teaser:[{speaker:0,text:'You gave my seat to her?'},{speaker:1,text:'She got here first.'},{speaker:0,text:'She’s wearing my hat.'}],
+  outcome:[{speaker:0,text:'You’ve invited a fern to dinner.'},{speaker:1,text:'She’s had a difficult pruning.'},{speaker:0,text:'Fine. The hat comes back after dessert.'},{speaker:1,text:'I’ll let her know.'}]
+};
+function lobbySceneAvailable(s){return !!s&&s.phase==='playing';}
+function lobbySceneHeard(s){return s?.sideStories?.fern===true;}
+function lobbyTeaser(elapsed,heard=false,calm=false){
+  if(heard)return {speaker:0,text:'The hat comes back after dessert.'};
+  const ms=Number.isFinite(elapsed)?Math.max(0,elapsed):0;
+  return LOBBY_SCENE.teaser[calm?0:Math.floor(ms/7000)%LOBBY_SCENE.teaser.length];
+}
+function finishLobbyConversation(previous){
+  if(!lobbySceneAvailable(previous))return previous;
+  const s=structuredClone(previous);if(!s.sideStories||typeof s.sideStories!=='object'||Array.isArray(s.sideStories))s.sideStories={};s.sideStories.fern=true;return s;
+}
 // world.js
 const W=1280,H=800,CELL=16;
 const rooms=[270,430,590,750,910,1070];
@@ -438,7 +646,7 @@ class ManorWorld {
     addEventListener('keydown',e=>{
       if(!options.active()||options.paused()||e.ctrlKey||e.altKey||e.metaKey||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
       const k=e.key.toLowerCase();
-      if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)){e.preventDefault();this.keys.add(k);this.path=[];this.destination=null;}
+      if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(k)){e.preventDefault();this.keys.add(k);this.path=[];this.destination=null;this.options.travel(null);}
       if(k==='e'){e.preventDefault();if(this.nearest)options.interact(this.nearest);}
     });
     addEventListener('keyup',e=>this.keys.delete(e.key.toLowerCase()));
@@ -452,8 +660,10 @@ class ManorWorld {
   camera(snap){const p=this.options.state()?.player;if(!p)return;const fit=(view,world,center)=>world<=view?(view-world)/2:Math.min(0,Math.max(view-world,view/2-center));const tx=fit(this.width,W*this.scale,p.x*this.scale),ty=fit(this.height,H*this.scale,p.y*this.scale);const k=snap||!this.camReady?1:.18;this.ox+=(tx-this.ox)*k;this.oy+=(ty-this.oy)*k;this.camReady=true;}
   walkable(x,y) {
     const s=this.options.state();
-    if(!floors.some(r=>x>r.x+8&&x<r.x+r.w-8&&y>r.y+8&&y<r.y+r.h-8))return false;
-    if(furniture.some(r=>x>r.x-9&&x<r.x+r.w+9&&y>r.y-9&&y<r.y+r.h+9))return false;
+    const outdoors=this.options.festival?.(),ground=outdoors?FESTIVAL_FLOORS:floors,obstacles=outdoors?FESTIVAL_FURNITURE:furniture;
+    if(!ground.some(r=>x>r.x+8&&x<r.x+r.w-8&&y>r.y+8&&y<r.y+r.h-8))return false;
+    if(obstacles.some(r=>x>r.x-9&&x<r.x+r.w+9&&y>r.y-9&&y<r.y+r.h+9))return false;
+    if(outdoors)return true;
     if(s?.flags.hazard&&s.flags.hazard!=='fixed'&&x>966&&x<1167&&y>452&&y<492)return false;
     return true;
   }
@@ -485,8 +695,8 @@ class ManorWorld {
     while(cursor){path.push(cursor);cursor=visited.get(key(cursor.x,cursor.y));}
     return path.reverse();
   }
-  pt(id){return STATIONS[id]||(this.options.extras?.()||[]).find(e=>e.id===id);} /* KMC-ADD clues v1 */
-  allPoints(){return [...Object.entries(STATIONS),...(this.options.extras?.()||[]).map(e=>[e.id,e])];}
+  pt(id){return this.allPoints().find(([key])=>key===id)?.[1];}
+  allPoints(){return [...Object.entries(this.options.festival?.()?FESTIVAL_POINTS:STATIONS),...(this.options.extras?.()||[]).map(e=>[e.id,e])];}
   go(id,auto=true) {
     const t=this.pt(id);if(!t)return false;
     this.keys.clear();this.path=this.route(t.x,t.y);this.destination=id;this.autoOpen=auto;
@@ -532,7 +742,7 @@ class ManorWorld {
         }
         if(!manual&&!this.path.length&&this.moved){this.options.moved();this.moved=false;}
       } else this.keys.clear();
-      this.nearby();this.draw(t);
+      this.nearby();this.draw(t);this.options.overlay?.(t,this);
     }
     requestAnimationFrame(time=>this.frame(time));
   }
@@ -540,13 +750,62 @@ class ManorWorld {
     const p=this.options.state().player;let nearest=null,d=61;
     for(const [id,t] of this.allPoints()){const n=Math.hypot(p.x-t.x,p.y-t.y);if(n<d){d=n;nearest=id;}}
     if(nearest!==this.nearest){this.nearest=nearest;this.options.near(nearest);}
-    const name=p.y<465?'The East Wing':p.x<455?'The Grand Foyer':p.x<835?'The Service Kitchen':'The Conservatory';
+    const name=this.options.festival?.()?'Yaupon Festival Garden':p.y<465?'The East Wing':p.x<455?'The Grand Foyer':p.x<835?'The Service Kitchen':'The Conservatory';
     this.options.location(name);
+  }
+  drawFestival(time,calm){
+    const c=this.ctx;
+    rect(c,0,0,W,H,'#244e3d');
+    rect(c,70,294,1140,459,'#648561',30);stroke(c,70,294,1140,459,'#b09a63',3,30);
+    for(let i=0;i<120;i++){const x=88+random(i+600)*1100,y=308+random(i+890)*421;ellipse(c,x,y,1.4,1.4,i%3?'#8d9d6c':'#ddd29b');}
+    // A gentle loop leaves the centre open and gives each booth its own edge.
+    c.lineCap='round';c.strokeStyle='#cebd92';c.lineWidth=64;c.beginPath();c.moveTo(640,730);c.bezierCurveTo(565,634,535,550,640,470);c.bezierCurveTo(750,391,775,367,640,325);c.stroke();
+    c.lineWidth=39;c.beginPath();c.moveTo(640,630);c.bezierCurveTo(270,725,120,550,300,525);c.bezierCurveTo(440,505,450,447,640,470);c.bezierCurveTo(830,447,840,505,980,525);c.bezierCurveTo(1160,550,1010,725,640,630);c.stroke();
+    ellipse(c,640,458,119,70,'#d9ccaa');stroke(c,560,430,160,55,'#b3ab7e',1,25);
+    for(let i=0;i<14;i++){const x=85+i*86;rect(c,x,144,8,153,'#6d6946');ellipse(c,x+4,132,43,52,'#366146');ellipse(c,x-10,112,30,39,'#4b7650');ellipse(c,x+21,130,31,40,'#3e6b49');}
+    // Stage backed by the grove, with a sheltered canopy and warm footlights.
+    rect(c,408,232,464,71,'#9d835c',6);rect(c,420,241,440,50,'#d9c394',4);stroke(c,420,241,440,50,'#ab8c54',2,4);
+    for(let x=432;x<860;x+=24)rect(c,x,243,1,45,'#c3ad7e');
+    for(const x of [427,853])rect(c,x,113,9,137,'#b49c65');
+    c.fillStyle='#e0cfaa';c.beginPath();c.moveTo(399,121);c.quadraticCurveTo(640,25,881,121);c.lineTo(864,151);c.quadraticCurveTo(640,100,416,151);c.closePath();c.fill();
+    c.fillStyle='#416650';c.beginPath();c.moveTo(408,122);c.quadraticCurveTo(640,46,872,122);c.quadraticCurveTo(640,89,408,122);c.fill();
+    text(c,'Y A U P O N   S I L E N T   S E S S I O N S',640,187,15,'#f4e6be','Georgia');
+    for(const [i,x] of [540,640,740].entries()){drawPerson(c,x,256,{color:['#ba8c7b','#d0bb85','#7ca59b'][i],skin:'#c6b9ad'},0,'down',false,1.5);rect(c,x+20,244,2,32,'#4e5949');rect(c,x+9,239,25,15,'#e5d6ad',2);lamp(c,x,216,true);}
+    for(const x of [460,820]){rect(c,x-12,262,24,25,'#315846',4);ellipse(c,x,275,5,5,'#a9b18d');}
+    for(const x of [447,520,760,833])lamp(c,x,295,true);
+    const booth=(x,y,label,color,mark)=>{
+      rect(c,x,y,200,76,'#8b7958',4);rect(c,x+8,y+8,184,59,'#d9c9a5',3);rect(c,x+18,y+10,164,33,'#315744');
+      for(let i=0;i<8;i++)rect(c,x+i*25,y-23,25,25,i%2?'#e8d5b2':color,2);
+      for(const dx of [6,190])rect(c,x+dx,y-12,4,81,'#b69c66');
+      text(c,mark,x+100,y+36,25,'#e5d2a2','Georgia');text(c,label,x+100,y+91,13,'#f6ebcf','Georgia');
+    };
+    booth(140,418,(this.options.musicBoothName?.()||'Stargazer Katie').toUpperCase().slice(0,24),'#839b89','✦');booth(940,418,'TIDE & FERN','#b58b7b','▧');
+    booth(140,578,'LITTLE ISLAND PRESS','#9b9d75','Aa');booth(940,578,'WELCOME & GUIDE','#b19a69','?');
+    rect(c,590,382,100,26,'#3d5a45',3);stroke(c,590,382,100,26,'#d4bb7e',2,3);text(c,'PROGRAMME',640,400,10,'#f6e8c5');
+    for(const x of [523,757]){ellipse(c,x,543,45,25,'#99845c');ellipse(c,x,538,43,23,'#e0cda5');plant(c,x,532,.7);for(const dx of [-55,55]){rect(c,x+dx-11,533,22,19,'#cfbb91',5);}}
+    ellipse(c,180,276,67,24,'#b5a474');ellipse(c,180,273,57,17,'#a0b6a1');ellipse(c,180,273,42,11,'#6f9b91');plant(c,115,296,1.3);plant(c,245,296,1.3);
+    for(const [x,y] of [[104,392],[1178,392],[104,704],[1178,704],[380,602],[900,602]]){plant(c,x,y,1.4);lamp(c,x+22,y+7);}
+    c.strokeStyle='#c4af78';c.lineWidth=2;c.beginPath();c.moveTo(130,345);c.quadraticCurveTo(640,413,1150,345);c.stroke();
+    for(let i=0;i<17;i++){const x=130+i*63.75,y=345+Math.sin(i/16*Math.PI)*33;lamp(c,x,y,true);}
+    rect(c,594,725,92,27,'#214b3e',4);text(c,'TO THE MANOR',640,742,10,'#f3dfb0');
+    for(const [id,p] of Object.entries(FESTIVAL_POINTS)){if(id!=='manor'&&id!=='programme')plaque(c,id==='stage'?'Lantern stage':id==='music'?'Creator booth':id==='gallery'?'Gallery':id==='books'?'Books':'Welcome',p.x,p.y+19);}
+    if(!calm)for(let i=0;i<14;i++)ellipse(c,110+random(i+71)*1050,320+random(i+94)*390,1.6,1.6,'rgba(247,224,151,'+(.25+.2*Math.sin(time/1200+i))+')');
+    this.drawVisitor(time,calm);
+  }
+  drawVisitor(time,calm){
+    const c=this.ctx,s=this.options.state();
+    if(this.path.length>1){c.strokeStyle='#c5ad6577';c.lineWidth=2;c.setLineDash([2,9]);c.beginPath();c.moveTo(s.player.x,s.player.y);for(const p of this.path)c.lineTo(p.x,p.y);c.stroke();c.setLineDash([]);}
+    drawPerson(c,s.player.x,s.player.y,{},this.step,this.dir,!this.options.festival?.()&&s.inventory.length>0,1.25);
+    if(this.options.festival?.()){
+      const p=s.player;ellipse(c,p.x-10,p.y-20,2,3,'#f2e7cb');ellipse(c,p.x+10,p.y-20,2,3,'#f2e7cb');
+    }
+    if(this.nearest&&!this.options.paused()&&this.pt(this.nearest)){const t=this.pt(this.nearest);c.strokeStyle='#faefd6';c.lineWidth=2;c.beginPath();c.arc(t.x,t.y-22,4,0,Math.PI*2);c.stroke();}
   }
   draw(time) {
     const c=this.ctx,s=this.options.state(),calm=this.options.settings().motion;
     if(this.zoomed)this.camera(calm);LABELS=!this.zoomed;
     c.setTransform(this.dpr,0,0,this.dpr,0,0);rect(c,0,0,this.width,this.height,'#315743');c.translate(this.ox,this.oy);c.scale(this.scale,this.scale);
+    if(this.options.festival?.()){this.drawFestival(time,calm);return;}
     rect(c,0,0,W,H,'#426a4d');
     for(let i=0;i<190;i++){const x=random(i+1)*W,y=random(i+330)*H;if(x>35&&x<1240&&y>50&&y<765)continue;rect(c,x,y,5+random(i+60)*10,4+random(i+9)*8,['#547850','#718c55','#375f45'][i%3],2);}
     rect(c,40,52,1200,706,'#234b3c',7);stroke(c,45,57,1190,696,'#ba9e5f',3,5);
@@ -560,6 +819,7 @@ class ManorWorld {
     rect(c,171,507,148,34,'#8a7050',12);rect(c,176,507,138,25,'#efe2bb',10);stroke(c,174,512,142,28,'#b99a58',2,10);
     rect(c,221,514,31,18,'#375e50',2);rect(c,225,517,23,11,'#b9cbbb');rect(c,232,532,11,4,'#8c734b');lamp(c,193,513,true);rect(c,280,516,17,12,'#c9b17d');ellipse(c,289,515,8,3,'#f3e5b6');
     plaque(c,'Front desk',244,580);
+    rect(c,240,732,64,14,'#234c3c',3);text(c,'FESTIVAL ↓',272,742,8,'#eddbb3');
     ellipse(c,173,678,43,37,'#ad9c77');ellipse(c,173,675,35,29,'#c8dbba');ellipse(c,173,673,27,22,'#9ab7a1');
     ellipse(c,173,669,17,13,'#d7c9a1');rect(c,169,646,8,25,'#b6a278');ellipse(c,173,646,15,6,'#d6bf8a');ellipse(c,173,643,11,4,'#b6d0b2');
     if(!calm){c.strokeStyle='#e7ecc877';c.lineWidth=1;c.beginPath();c.ellipse(173,673,25+Math.sin(time/700)*3,18,0,0,Math.PI*2);c.stroke();}
@@ -582,9 +842,7 @@ class ManorWorld {
     }
     const focus=this.options.focus(),target=STATIONS[focus];
     if(target){const pulse=calm?0:Math.sin(time/280)*3;c.strokeStyle='#d4b568';c.lineWidth=2;c.beginPath();c.ellipse(target.x,target.y,22+pulse,11+pulse/2,0,0,Math.PI*2);c.stroke();ellipse(c,target.x,target.y,4,3,'#c9a456');}
-    if(this.path.length>1){c.strokeStyle='#c5ad6577';c.lineWidth=2;c.setLineDash([2,9]);c.beginPath();c.moveTo(s.player.x,s.player.y);for(const p of this.path)c.lineTo(p.x,p.y);c.stroke();c.setLineDash([]);}
-    drawPerson(c,s.player.x,s.player.y,{},this.step,this.dir,s.inventory.length>0,1.25);
-    if(this.nearest&&!this.options.paused()&&this.pt(this.nearest)){const t=this.pt(this.nearest);c.strokeStyle='#faefd6';c.lineWidth=2;c.beginPath();c.arc(t.x,t.y-22,4,0,Math.PI*2);c.stroke();}
+    this.drawVisitor(time,calm);
     if(!calm)for(let i=0;i<9;i++){const x=20+random(i+40)*1240,y=i%2?29:778,alpha=.25+.25*Math.sin(time/900+i);ellipse(c,x,y,1.5,1.5,'rgba(248,226,141,'+alpha+')');}
   }
 }
@@ -594,14 +852,23 @@ class ManorWorld {
 const $=id=>document.getElementById(id);
 const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icon=name=>'<svg aria-hidden="true"><use href="#'+name+'"/></svg>';
-const SAVE='mapachez_midnight_rehearsal_v1',SETTINGS='mapachez_comfort_v1';
+const SAVE='mapachez_midnight_rehearsal_v1',SETTINGS='mapachez_comfort_v1',MEMORIES='mapachez_memories_v1';
 let state=null,resume=null,focused=null,titleVisible=true,storageOK=true,toastTimer,saveTimer,lastLocation='',audio=null;
+let memoryBook=createMemoryBook(),memoryStorageOK=true;
 let settings={sound:false,narration:false,motion:matchMedia('(prefers-reduced-motion: reduce)').matches,large:false,quick:false};
+let festivalActive=false,festivalPosition={x:640,y:664};
+const lobbyView={elapsed:0,last:null,line:''};
+const festivalPlayback={context:null,gain:null,source:null,track:null,offset:0,started:0,playing:false,waiting:false,premiere:false,token:0,volume:.3,buffers:new Map};
 try{const saved=JSON.parse(localStorage.getItem(SAVE)||'null');if(validState(saved))resume=saved;const savedSettings=JSON.parse(localStorage.getItem(SETTINGS)||'null');if(savedSettings)for(const k of Object.keys(settings))if(typeof savedSettings[k]==='boolean')settings[k]=savedSettings[k];}catch{storageOK=false;}
+try{memoryBook=normaliseMemoryBook(JSON.parse(localStorage.getItem(MEMORIES)||'null'));}catch{memoryStorageOK=false;}
+if(resume)rememberEvening(resume);
 function applySettings(){document.body.classList.toggle('large-text',settings.large);document.body.classList.toggle('reduce-motion',settings.motion);try{localStorage.setItem(SETTINGS,JSON.stringify(settings));}catch{}}
 applySettings();$('continue').hidden=!resume;
 if(resume)$('continue').textContent=resume.phase==='ended'?'Read your evening’s ending':'Continue your evening';
-function save(){if(!state)return;try{localStorage.setItem(SAVE,JSON.stringify(state));resume=structuredClone(state);storageOK=true;$('save-status').textContent='Saved on this device';}catch{storageOK=false;$('save-status').textContent='Saving unavailable';} }
+function save(){if(!state)return;rememberEvening(state);try{localStorage.setItem(SAVE,JSON.stringify(state));resume=structuredClone(state);storageOK=true;$('save-status').textContent='Saved on this device';}catch{storageOK=false;$('save-status').textContent='Saving unavailable';} }
+function storeMemoryBook(next){memoryBook=next;try{localStorage.setItem(MEMORIES,JSON.stringify(memoryBook));memoryStorageOK=true;}catch{memoryStorageOK=false;}}
+function rememberEvening(s){const next=collectEveningMemories(memoryBook,s);if(!memoryStorageOK||JSON.stringify(next)!==JSON.stringify(memoryBook))storeMemoryBook(next);}
+function rememberDiscovery(id){if(!state)return;const next=keepMemory(memoryBook,id,state.seed);if(JSON.stringify(next)!==JSON.stringify(memoryBook))storeMemoryBook(next);}
 function announce(message){$('announcements').textContent=message;}
 /* KMC-ADD polish v1: toasts now render above open dialogs (top layer) */
 function raise(el){if(el.showPopover){try{el.hidePopover();}catch{}try{el.showPopover();}catch{}}}
@@ -621,6 +888,7 @@ function speak(){if(!('speechSynthesis'in window)){toast('Read-aloud is unavaila
 $('narrate').onclick=speak;$('narrate').disabled=!('speechSynthesis'in window);
 function openModal(html,wide=false){
   if('speechSynthesis'in window)speechSynthesis.cancel();
+  $('lobby-chatter').hidden=true;
   body.innerHTML=html;modal.classList.toggle('wide',wide);
   if(!modal.open)modal.showModal();
   modal.scrollTop=0;narrativeText=body.innerText;
@@ -638,10 +906,12 @@ function choices(options,salt='scene'){
   sorted.forEach((o,i)=>{const b=document.createElement('button');b.className='choice';b.dataset.choice=String(i+1);b.innerHTML='<span>'+(i+1)+'</span><span><b>'+esc(o.text)+'</b>'+(o.detail?'<small>'+esc(o.detail)+'</small>':'')+'</span>'+icon('arrow');b.onclick=o.run;host.append(b);});
   body.append(host);narrativeText=body.innerText;return host;
 }
-function scene({title,guest,kicker,text,context,options}){
+function scene({title,guest,kicker,text,context,options,standard}){
   const person=GUESTS.find(g=>g.id===guest);
+  const remembered=!titleVisible&&!festivalActive&&state?.phase==='playing'?returningGuestMemory(memoryBook,state,guest):null;
+  if(remembered){text=[remembered,...text];state.memoryGreetings=Array.isArray(state.memoryGreetings)?state.memoryGreetings:[];state.memoryGreetings.push(guest);save();}
   const header=person?'<div class="scene-head"><div class="portrait"><canvas id="portrait" width="66" height="66" aria-hidden="true"></canvas></div><div><span class="overline">'+esc(kicker||'ROOM '+person.room)+'</span><h2 id="modal-heading">'+esc(title||person.name)+'</h2></div></div>':titleHTML(title,kicker);
-  openModal(header+'<div class="scene-copy">'+text.map(pHTML).join('')+'</div>'+(context?noteHTML(context):''));
+  openModal(header+'<div class="scene-copy">'+text.map(pHTML).join('')+'</div>'+(context?noteHTML(context):'')+(standard?skCard(standard):''));
   if(person){const c=$('portrait').getContext('2d');c.scale(1.8,1.8);drawPerson(c,18,26,person,0,'down');}
   if(options)choices(options,title);
   narrativeText=body.innerText;
@@ -656,7 +926,7 @@ function done(title,text,next){
   const row=document.createElement('div');row.className='next-step';
   const go=document.createElement('button');go.className='primary-button';go.dataset.choice='1';
   go.innerHTML='<span><span>Next: '+esc(task?.title||STATIONS[station].name)+'</span><small>Walk to '+esc(STATIONS[station].name)+'</small></span>'+icon('arrow');
-  go.onclick=()=>{if(task)focused=task.id;closeModal();renderHUD();world.go(station);};
+  go.onclick=()=>{if(task)focused=task.id;closeModal();renderHUD();visit(station);};
   const stay=document.createElement('button');stay.className='secondary-button';stay.dataset.choice='2';stay.textContent='I’ll choose my own way';stay.onclick=closeModal;
   row.append(go,stay);body.append(row);narrativeText=body.innerText;
   $('modal-hint').textContent='Enter or 1 to continue · Esc to choose';
@@ -669,6 +939,52 @@ function done(title,text,next){
    x,y = spot on the map (must be a walkable floor tile). sprite: umbrella | glasses | lamp | pot.
    cost = minutes the kind action takes. gains = meter changes. */
 const NIGHTLY_CLUES=3;
+/* KMC-ADD silver key v1 · KMC-EDIT: Katie — these are adapted from the Butler Training Hub with
+   property names removed. Change any wording or number here; the game reads everything from this block. */
+const SILVER_KEY={
+  ask:{title:'Ask before you order',text:'Ask every guest directly, every time, even if the record already shows something.',say:'Before I place the order, may I confirm whether anyone has allergies or dietary restrictions we should be aware of?'},
+  ticket:{title:'A complete ticket',text:'Guest name, room, delivery time, guest count, special requests, and allergies.'},
+  quote:{title:'Quote a time, then beat it',text:'Give a specific delivery time. Arrive in the 5 minutes before it, never after.'},
+  early:{title:'Ready early? Call first',text:'If the order is ready early, call the guest and ask whether an early delivery is convenient.'},
+  unsure:{title:'Never guess on allergens',text:'If you are not certain, verify with the kitchen or a manager. Tell the guest you will check and follow up promptly.'},
+  door:{title:'At the door',text:'Knock and announce “In-Room Dining.” No answer? Knock again and wait a few moments. Note any knock preference the guest gives you.'},
+  table:{title:'At the table',text:'Name and briefly describe each dish as you set it down. Remove covers unless the guest prefers otherwise.'},
+  recover:{title:'When it goes wrong',text:'Listen, repeat the core concern, apologize without arguing about fault, then own the next step.',say:'I understand, and I am sorry this has been frustrating. Let me take care of the next step for you. I am going to [action], and I will follow up with [timing].'},
+  pickup:{title:'Close the loop',text:'Collect within 5 minutes of the agreed pickup time. Any pickup still open goes in the handoff.'},
+  handoff:{title:'Room first, then who does what next',text:'Allergies, open pickups, and every promise you made go to the next shift in writing.'},
+  timing:{title:'Timing guide (draft)',text:'Breakfast within 30 minutes. Lunch and dinner within 40 minutes.'} // KMC-EDIT: set your own numbers
+};
+const SK_COACH={ // KMC-EDIT: what Delores says when a standard is missed
+  assume:'The record is a backup, not a substitute. Ask the guest directly, every time. Plans and guests change.',
+  close:'A warm close, but the allergy question never got asked. Ask before you place any order.',
+  rush:'A promise the kitchen can’t keep becomes an apology later. Quote a specific time you can beat.',
+  vague:'“Shortly” means something different to every guest. Give a specific time so you both know what “on time” means.',
+  blame:'Blaming the kitchen hands the guest someone else’s problem. Apologize without arguing about fault, then own the next step.',
+  hope:'Hope isn’t an update. Say what you are doing next and when you will follow up.'
+};
+function skCard(id){const k=SILVER_KEY[id];if(!k)return '';return '<div class="sk-card"><span class="overline">SILVER KEY STANDARD</span><b>'+esc(k.title)+'</b>'+esc(k.text)+(k.say?'<br><q>'+esc(k.say)+'</q>':'')+'</div>';}
+function orderScene(){
+  scene({guest:'vesper',title:'Lady Vesper',text:['“A little pumpkin soup, water, and two spoons, please.”','“Yes, two spoons. No, that is not an invitation to investigate my personal life.”'],context:'Before the order goes to the kitchen, what do you say?',options:[
+    {text:'“Before I place the order, may I confirm whether anyone has allergies or dietary restrictions we should be aware of?”',detail:'Ask directly, every time.',run:quoteScene},
+    {text:'“Lovely. Your record will show any allergies, so I’ll place it now.”',detail:'Rely on the guest record.',run:()=>act('requestSupper',{line:'assume'})},
+    {text:'“Wonderful. Anything else for you this evening?”',detail:'A warm, friendly close.',run:()=>act('requestSupper',{line:'close'})}
+  ]});
+}
+function quoteScene(){
+  scene({guest:'vesper',title:'A question worth asking',text:['“Sesame,” she says. “Thank you for asking. Most people assume.”','She looks at the clock. “And when may I expect it?”'],standard:'quote',options:[
+    {text:'“Your supper will be with you in twenty-five minutes.”',detail:'A specific time you can keep.',run:()=>act('requestSupper',{line:'allergy',quote:'specific'},()=>done('An order worth checking','Sesame allergy, two spoons, twenty-five minutes. Check her record, then let the kitchen verify the preparation.','desk'))},
+    {text:'“Right away. Five minutes!”',detail:'Keep her happy now.',run:()=>act('requestSupper',{line:'allergy',quote:'rush'})},
+    {text:'“It’ll be up shortly.”',detail:'Leave yourself room.',run:()=>act('requestSupper',{line:'allergy',quote:'vague'})}
+  ]});
+}
+function recoveryScene(){
+  scene({guest:'vesper',title:'An honest update',kicker:'HOUSE PHONE · ROOM 203',text:['You call Room 203. Lady Vesper answers on the first ring. “I was beginning to think the soup had eloped.”'],standard:'recover',options:[
+    {text:'“I understand, and I’m sorry for the wait. I’m going to the kitchen now, and I’ll be back with your supper within ten minutes.”',detail:'Own it, name the next step, and give a time.',run:()=>act('promiseUpdate',{line:'own'},()=>done('A promise, kept in view','Lady Vesper appreciates the honest update. Now keep the new promise.'))},
+    {text:'“I’m so sorry. The kitchen is completely slammed tonight.”',detail:'Explain why it’s late.',run:()=>act('promiseUpdate',{line:'blame'})},
+    {text:'“It should be up any minute now.”',detail:'Reassure her.',run:()=>act('promiseUpdate',{line:'hope'})}
+  ]});
+}
+/* end KMC-ADD silver key v1 */
 const CLUE_TIP='Not every need is on the list. Keep an eye out as you walk the manor.';
 const CLUES=[
   {id:'umbrella',sprite:'umbrella',x:104,y:705,title:'A damp umbrella',
@@ -708,6 +1024,37 @@ function anticipate(clue){
   if(!before&&state.flags.hazard)setTimeout(()=>{sound('radio');toast('Radio: M. Nine reports water at the conservatory doorway.');},1200);
   else if(attention)setTimeout(()=>{sound('attention');toast(attention.text);},1200);
 }
+function drawLobbyScene(c){
+  if(!lobbySceneAvailable(state))return;
+  rect(c,351,631,29,30,'#947d62',5);rect(c,354,635,23,15,'#c6b58e',3);rect(c,354,657,4,7,'#75644c');rect(c,373,657,4,7,'#75644c');
+  plant(c,366,637,1.12);
+  ellipse(c,366,610,17,4,'#b58a53');rect(c,355,598,22,13,'#cba76b',4);rect(c,355,607,22,3,'#866479');
+  for(const [i,person] of LOBBY_SCENE.actors.entries())drawPerson(c,person.x,person.y,person,0,i?'left':'right',false,1.2);
+}
+function updateLobbyOverlay(time,view){
+  const box=$('lobby-chatter'),button=$('lobby-bubble');
+  if(titleVisible||festivalActive||!lobbySceneAvailable(state)||modal.open||document.hidden){box.hidden=true;lobbyView.last=null;return;}
+  const p=state.player,near=Math.hypot(p.x-LOBBY_SCENE.point.x,p.y-LOBBY_SCENE.point.y)<330;
+  const dt=lobbyView.last===null?0:Math.max(0,Math.min(250,time-lobbyView.last));lobbyView.last=time;
+  if(!near){box.hidden=true;lobbyView.last=null;return;}
+  if(!settings.motion&&!button.matches(':hover')&&document.activeElement!==button)lobbyView.elapsed+=dt;
+  const line=lobbyTeaser(lobbyView.elapsed,lobbySceneHeard(state),settings.motion),person=LOBBY_SCENE.actors[line.speaker];
+  const x=view.ox+person.x*view.scale,y=view.oy+(person.y-31)*view.scale;
+  if(x<8||x>view.width-8||y<0||y>view.height-15){box.hidden=true;lobbyView.last=null;return;}
+  const key=line.speaker+line.text+String(lobbySceneHeard(state));
+  if(lobbyView.line!==key){$('lobby-speaker').textContent=person.name;$('lobby-line').textContent='“'+line.text+'”';$('lobby-hint').textContent=lobbySceneHeard(state)?'Hear it again':'Listen in';button.setAttribute('aria-label',person.name+': '+line.text+' '+(lobbySceneHeard(state)?'Hear the conversation again.':'Listen to the conversation by the lobby chairs.'));lobbyView.line=key;}
+  box.hidden=false;const width=box.offsetWidth,height=box.offsetHeight;
+  const left=Math.max(10,Math.min(view.width-width-10,x-36)),top=Math.max(8,Math.min(view.height-height-12,y-height-16));
+  box.style.transform='translate('+left+'px,'+top+'px)';box.style.setProperty('--tail-x',Math.max(18,Math.min(width-18,x-left))+'px');
+}
+function openLobbyConversation(){
+  if(festivalActive||!lobbySceneAvailable(state))return;
+  const heard=lobbySceneHeard(state),lines=heard?[...LOBBY_SCENE.teaser,...LOBBY_SCENE.outcome]:LOBBY_SCENE.teaser;
+  const dialogue=parts=>'<ol class="overheard-dialogue">'+parts.map(line=>'<li><b>'+esc(LOBBY_SCENE.actors[line.speaker].name)+'</b>“'+esc(line.text)+'”</li>').join('')+'</ol>';
+  openModal(titleHTML('A matter of seating','OVERHEARD BY RECEPTION')+'<p class="modal-description">Two guests are having a very quiet disagreement. You can listen for a moment, or carry on with your evening.</p>'+dialogue(lines.slice(0,3))+(heard?'<p class="overheard-stage">Between them, a potted fern occupies an upholstered chair. It is wearing a rather good hat.</p>'+dialogue(lines.slice(3)):'')+'<p class="festival-note">Listening never advances the hotel clock.</p>');
+  choices(heard?[{text:'Return to your evening',run:closeModal},{text:'Open Memory Book',detail:'Keep a little moment from the manor.',run:()=>openMemoryBook('manor')}]:[{text:'Keep listening',detail:'See how this very serious disagreement ends.',run:()=>{state=finishLobbyConversation(state);save();openLobbyConversation();}},{text:'Let them sort it out',detail:'The conversation will still be here.',run:closeModal}],'lobby-conversation');
+  narrativeText=body.innerText;
+}
 function drawClues(c,time,calm){
   if(!state)return;const p=state.player;
   for(const clue of activeClues()){
@@ -726,7 +1073,7 @@ function drawClues(c,time,calm){
 const METERS=[['trust','Guest trust'],['care','Care & safety'],['team','Teamwork']];
 const SEALS={supper:'Supper, start to finish',music:'A belonging, returned',route:'The route, kept safe',repair:'A repair, verified',rehearsal:'The evening, gathered',handoff:'A clean handoff'};
 const SEAL_ON={returnTray:'supper',returnMusic:'music',secureHazard:'route',confirmRepair:'repair',finale:'rehearsal',handoff:'handoff'};
-const SLIP_THREAD={packTray:'supper',findFolio:'music',handoff:'handoff'}; // judgment slips only; "too early" waits never count
+const SLIP_THREAD={requestSupper:'supper',promiseUpdate:'supper',packTray:'supper',findFolio:'music',handoff:'handoff'}; // judgment slips only; "too early" waits never count
 /* KMC-EDIT: Delores's closing line, chosen by the strongest meter. Draft wording — replace with your own voice. */
 const DELORES_CLOSING={
   trust:'“Every guest tonight felt heard. That is the whole job, dear. The rest is plumbing.”',
@@ -764,20 +1111,198 @@ function act(action,payload={},callback){
     if(thread&&state&&state.phase==='playing'){polish(state);state.slips[thread]++;state.streak=0;save();renderHUD();}
     let el=body.querySelector('.inline-error');if(!el){el=document.createElement('div');el.className='inline-error';el.setAttribute('role','alert');body.append(el);}el.textContent=error.message;el.scrollIntoView({block:'nearest'});return false;}
 }
+// Festival visits keep a separate walking position; the saved hotel position is untouched.
+function festivalData(){if(!state.festival||typeof state.festival!=='object')state.festival={};return state.festival;}
+function festivalBoothTalents(){const data=festivalData();if(!data.talents||typeof data.talents!=='object'||Array.isArray(data.talents))data.talents={};return data.talents;}
+function festivalDirectoryItems(category='All'){
+  const overrides=festivalBoothTalents(),items=festivalExhibitors('All',overrides),preview=localPerformancePreview();
+  if(preview)items.push(festivalWithTalents({id:'local-preview',name:preview.name,creator:true,point:'music',talents:['Musician']},Array.isArray(overrides['local-preview'])?overrides['local-preview']:['Musician']));
+  return items.filter(x=>category==='All'||x.categories.includes(category));
+}
+function openFestivalTalents(id){
+  const exhibitor=festivalDirectoryItems().find(x=>x.id===id);if(!exhibitor){openFestivalDirectory();return;}
+  const custom=exhibitor.talents.filter(t=>!FESTIVAL_TALENT_OPTIONS.some(x=>x.label===t));
+  openModal(titleHTML('What would you like to show?',exhibitor.name+' · DISPLAYED TALENTS')+'<p class="modal-description">Choose the talents shown on this booth. One profile can appear in several catalogue categories. These edits are previews saved on this device.</p><form id="booth-talents-form"><fieldset class="talent-options" id="booth-talent-options"><legend>Displayed talents</legend></fieldset><label for="custom-talents">Other talents, separated by commas</label><input id="custom-talents" class="guest-search" maxlength="320" placeholder="For example: Digital sculptor, Dancer" value="'+esc(custom.join(', '))+'"><p class="talent-help">Show up to eight talents. Leave everything unselected to display simply “Creator.”</p><div class="action-row"><button type="submit" class="primary-button">Save displayed talents</button><button id="reset-booth-talents" type="button" class="secondary-button">Reset to original talents</button><button id="cancel-booth-talents" type="button" class="secondary-button">Cancel</button></div><p id="booth-talents-error" class="inline-error" role="alert" hidden></p></form>');
+  for(const talent of FESTIVAL_TALENT_OPTIONS){const label=document.createElement('label'),input=document.createElement('input');input.type='checkbox';input.name='talent';input.value=talent.label;input.checked=exhibitor.talents.includes(talent.label);label.append(input,document.createTextNode(talent.label));$('booth-talent-options').append(label);}
+  const returnToProfile=()=>id==='local-preview'?openLocalPerformanceProfile():openFestivalProfile(id);
+  $('booth-talents-form').onsubmit=e=>{e.preventDefault();const checked=[...body.querySelectorAll('input[name="talent"]:checked')].map(x=>x.value),values=normaliseFestivalTalents([...checked,...$('custom-talents').value.split(',')],9);if(values.length>8){$('booth-talents-error').hidden=false;$('booth-talents-error').textContent='Choose up to eight talents to display.';return;}festivalBoothTalents()[id]=values;save();returnToProfile();announce('Displayed talents saved for '+exhibitor.name+'.');};
+  $('reset-booth-talents').onclick=()=>{delete festivalBoothTalents()[id];save();returnToProfile();};$('cancel-booth-talents').onclick=returnToProfile;narrativeText=body.innerText;
+}
+function festivalElapsed(){const p=festivalPlayback;return Math.min(FESTIVAL_TRACKS[p.track]?.duration||0,p.offset+(p.playing&&p.context?p.context.currentTime-p.started:0));}
+function festivalTime(seconds){return Math.floor(seconds/60)+':'+String(Math.floor(seconds%60)).padStart(2,'0');}
+function stopFestivalAudio(reset=true){
+  const p=festivalPlayback;p.token++;
+  const elapsed=festivalElapsed(),source=p.source;p.source=null;
+  if(source){source.onended=null;try{source.stop();}catch{}source.disconnect();}
+  p.playing=false;p.waiting=false;p.offset=reset?0:elapsed;
+  if(reset){p.track=null;p.premiere=false;}
+  updateFestivalControls();
+}
+async function festivalAudioContext(){
+  const p=festivalPlayback;
+  if(!p.context){const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)throw Error('Audio is unavailable in this browser. The programme and performance descriptions are still available.');p.context=new Audio;p.gain=p.context.createGain();p.gain.gain.value=p.volume;p.gain.connect(p.context.destination);}
+  await p.context.resume();return p.context;
+}
+async function playFestivalTrack(id,offset=0,premiere=false){
+  const track=FESTIVAL_TRACKS[id];if(!festivalActive||!track)return;
+  stopFestivalAudio();const p=festivalPlayback,token=p.token;
+  try{
+    const context=await festivalAudioContext();
+    if(token!==p.token||!festivalActive||document.hidden)return;
+    if(!p.buffers.has(id)){const samples=festivalSamples(track),buffer=context.createBuffer(1,samples.length,22050);buffer.copyToChannel(samples,0);p.buffers.set(id,buffer);}
+    if(premiere){const event=festivalEventState(festivalData().premiereAt,track.duration);if(event.phase!=='playing'){toast('This rehearsal has finished. You can still play the soundcheck.');return;}offset=event.offset;}
+    if(offset>=track.duration){toast('This rehearsal has finished. You can still play the soundcheck.');return;}
+    const source=context.createBufferSource();source.buffer=p.buffers.get(id);source.connect(p.gain);
+    Object.assign(p,{source,track:id,offset:Math.max(0,offset),started:context.currentTime,playing:true,premiere});
+    source.onended=()=>{if(p.source!==source)return;source.disconnect();p.source=null;p.playing=false;p.offset=track.duration;updateFestivalControls();};
+    source.start(0,p.offset);updateFestivalControls();
+  }catch(error){stopFestivalAudio();toast(error.message);}
+}
+async function joinFestivalPremiere(){
+  const event=festivalEventState(festivalData().premiereAt,48);
+  if(event.phase==='playing'){await playFestivalTrack('lantern',event.offset,true);return;}
+  if(event.phase!=='upcoming'){toast('Schedule a private rehearsal first, or play the soundcheck anytime.');return;}
+  stopFestivalAudio();const p=festivalPlayback,token=p.token;
+  try{await festivalAudioContext();if(token!==p.token||!festivalActive||document.hidden)return;p.waiting=true;p.premiere=true;p.track='lantern';updateFestivalControls();}catch(error){toast(error.message);}
+}
+function updateFestivalControls(){
+  const p=festivalPlayback,track=FESTIVAL_TRACKS[p.track];
+  $('festival-stop').disabled=!p.playing&&!p.waiting;
+  const status=p.waiting?'Tuned in for the private premiere':p.playing?'Listening: '+track.title:'Earbuds ready. Choose a performance.';
+  if($('festival-now').textContent!==status)$('festival-now').textContent=status;
+  $('festival-toolbar').dataset.playback=p.waiting?'waiting':p.playing?'playing':'stopped';
+  $('festival-elapsed').textContent=track?festivalTime(festivalElapsed())+' / '+festivalTime(track.duration)+' · '+track.artist:'Choose a performance when you are ready.';
+  const progress=$('concert-progress');if(progress){progress.max=track?.duration||48;progress.value=festivalElapsed();$('concert-elapsed').textContent=festivalTime(festivalElapsed());$('concert-caption').textContent=track?.caption||'A garden full of visitors. A stage waiting for its first note. Your earbuds are quiet until you choose to listen.';}
+}
+function updateFestivalProgramme(){
+  if(!festivalActive||!state)return;
+  const p=festivalPlayback,event=festivalEventState(festivalData().premiereAt,48);
+  let description='Instrumental soundchecks, whenever you wish.';
+  if(event.phase==='upcoming')description='Private premiere rehearsal begins in '+event.remaining+' seconds.';
+  if(event.phase==='playing')description='Private premiere rehearsal in progress · '+event.remaining+' seconds remaining.';
+  if(event.phase==='finished')description='Private rehearsal complete. The soundcheck remains available.';
+  $('festival-sidebar-programme').textContent=description;
+  if($('premiere-status'))$('premiere-status').textContent=description;
+  if($('premiere-listen'))$('premiere-listen').disabled=!['upcoming','playing'].includes(event.phase);
+  if(p.waiting){if(event.phase==='playing'&&!document.hidden){p.waiting=false;void playFestivalTrack('lantern',event.offset,true);}else if(event.phase==='finished'){stopFestivalAudio();}}
+  updateFestivalControls();
+}
+function updateFestivalArea(){
+  if(festivalActive)$('lobby-chatter').hidden=true;
+  $('festival-toolbar').hidden=!festivalActive;$('festival-sidebar').hidden=!festivalActive;
+  document.querySelectorAll('.shift-sidebar > :not(#festival-sidebar)').forEach(el=>el.hidden=festivalActive);
+  $('area-caption').textContent=festivalActive?'THE SOUTHERN FESTIVAL GROUNDS':'THE MANOR AFTER HOURS';
+  $('festival-button').innerHTML=(festivalActive?'Festival guide':'Festival grounds')+' '+icon('arrow');
+  $('world').setAttribute('aria-label',(festivalActive?'Festival garden':'Manor')+' map. Use WASD or arrow keys to walk, E to interact, or Visit a place to choose a destination.');
+  lastLocation='';world.camReady=false;world.nearest=null;world.options.near(null);updateFestivalControls();
+}
+function enterFestival(){
+  if(!state)return;closeModal();world.stop();festivalActive=true;festivalPosition={x:640,y:664};updateFestivalArea();updateFestivalProgramme();
+  toast('Welcome to Yaupon Silent Sessions. Your pretend earbuds are ready. Choose any performance to listen.');
+}
+function leaveFestival(){
+  closeModal();stopFestivalAudio();festivalActive=false;world.stop();updateFestivalArea();renderHUD();save();
+  if(state.phase==='ended')showEnding();
+}
+function openFestivalDirectory(category='All'){
+  const categories=festivalCategories(festivalDirectoryItems());if(!categories.includes(category))category='All';
+  openModal(titleHTML('A little island of discoveries','THE FESTIVAL BOOTHS')+'<p class="modal-description">Meet Stargazer Katie alongside fictional demonstration exhibitors. Music, pictures, and pages to linger over.</p><div id="festival-tabs" class="festival-tabs" aria-label="Exhibit categories"></div><div id="festival-exhibitors" class="festival-grid"></div><button id="festival-preview-link" class="secondary-button">Preview a performance link</button>',true);
+  for(const label of categories){const button=document.createElement('button');button.textContent=label;button.setAttribute('aria-pressed',String(label===category));button.onclick=()=>openFestivalDirectory(label);$('festival-tabs').append(button);}
+  for(const exhibitor of festivalDirectoryItems(category)){
+    const button=document.createElement('button');button.className='exhibitor-card';button.dataset.exhibitor=exhibitor.id;button.innerHTML='<span class="festival-tag">'+esc(exhibitor.label)+(exhibitor.id==='local-preview'?' · local preview':'')+'</span><b>'+esc(exhibitor.name)+'</b><small>'+esc(exhibitor.line)+'</small>';button.onclick=()=>exhibitor.id==='local-preview'?openLocalPerformanceProfile():openFestivalProfile(exhibitor.id);$('festival-exhibitors').append(button);
+  }
+  $('festival-preview-link').onclick=openPerformancePreview;narrativeText=body.innerText;
+}
+function openFestivalProfile(id){
+  const exhibitor=festivalExhibitors('All',festivalBoothTalents()).find(x=>x.id===id);if(!exhibitor)return;
+  openModal(titleHTML(exhibitor.name,exhibitor.label+' · FESTIVAL EXHIBITOR')+'<span class="festival-tag">'+(exhibitor.creator?'Creator persona':'Fictional exhibitor · demonstration')+'</span><p class="scene-copy" style="margin-top:18px">'+esc(exhibitor.line)+'</p>'+(exhibitor.about?'<p class="modal-description">'+esc(exhibitor.about)+'</p>':'')+'<p class="modal-description">'+(exhibitor.creator?'Visiting Yaupon Island':'<b>Serving:</b> Yaupon Island')+'</p><div id="exhibitor-actions" class="action-row"></div>');
+  const add=(label,handler)=>{const b=document.createElement('button');b.className='secondary-button';b.textContent=label;b.onclick=handler;$('exhibitor-actions').append(b);};
+  if(id==='moon'||id==='lantern')add('Listen to soundcheck',()=>{void playFestivalTrack(id==='moon'?'moon':'lantern');});
+  if(id==='fern')add('View the exhibition',openFestivalGallery);
+  if(id==='press')add('Read an excerpt',openFestivalBook);
+  for(const link of exhibitor.links||[]){const url=festivalPerformanceUrl(link.url);if(!url)continue;const a=document.createElement('a');a.className='primary-button';a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=link.label||'Visit website';a.onclick=()=>stopFestivalAudio();$('exhibitor-actions').append(a);}
+  if(exhibitor.creator)add('Preview a performance link',()=>openPerformancePreview(exhibitor.name));
+  addMemoryFavorite(exhibitor,$('exhibitor-actions'));
+  add('Edit displayed talents',()=>openFestivalTalents(id));
+  add('Walk to '+(exhibitor.point==='stage'?'the stage':'the booth'),()=>{closeModal();world.go(exhibitor.point);});
+  add('Browse other exhibitors',()=>openFestivalDirectory());narrativeText=body.innerText;
+}
+function openFestivalGallery(){
+  rememberDiscovery('gallery');
+  const paintings=[['The sheltered cove','#d4d9bd','#8eafa0','#3c6657'],['A window left open','#e7d8af','#afc4aa','#627d5a'],['Lanterns by the water','#c8c2a3','#7c9b8c','#345b4b']];
+  openModal(titleHTML('Three windows onto the island','TIDE & FERN · DEMONSTRATION EXHIBITION')+'<p class="modal-description">A small imagined collection. Take as long as you like.</p><div id="festival-paintings" class="festival-grid"></div><button id="gallery-profile" class="secondary-button">Meet the exhibitor</button>',true);
+  for(const [name,sky,water,land] of paintings){const figure=document.createElement('figure');figure.style.margin='0';figure.innerHTML='<svg class="festival-art" viewBox="0 0 300 210" role="img" aria-label="'+esc(name)+'"><rect width="300" height="210" fill="'+sky+'"/><circle cx="222" cy="49" r="23" fill="#f4e7ba"/><path d="M0 100 Q70 65 140 104 T300 92 V210 H0Z" fill="'+land+'"/><path d="M0 137 Q90 110 165 146 T300 131 V210 H0Z" fill="'+water+'"/><path d="M55 169 Q155 150 241 173 M70 182 Q150 167 230 184" fill="none" stroke="#eee1b6" stroke-width="2"/><path d="M35 165 Q37 100 60 91 M38 143 L19 119 M42 127 L68 111" fill="none" stroke="'+land+'" stroke-width="6"/><rect x="9" y="9" width="282" height="192" rx="3" fill="none" stroke="#c4a873" stroke-width="5"/></svg><figcaption class="festival-art-caption">'+esc(name)+'</figcaption>';$('festival-paintings').append(figure);}
+  $('gallery-profile').onclick=()=>openFestivalProfile('fern');narrativeText=body.innerText;
+}
+function openFestivalBook(){
+  rememberDiscovery('umbrella-story');
+  openModal(titleHTML('The umbrella that stayed','LITTLE ISLAND PRESS · DEMONSTRATION EXCERPT')+'<span class="festival-tag">Original sample text</span><div class="festival-book"><p>The umbrella arrived without a guest.</p><p>It stood patiently beside reception until someone offered it a room. By morning, it had requested a garden view and left a very damp thank-you note.</p><p>The night associate filed the note under correspondence. There was no sensible place to file the umbrella.</p></div><button id="book-profile" class="secondary-button">Meet the exhibitor</button>');
+  $('book-profile').onclick=()=>openFestivalProfile('press');narrativeText=body.innerText;
+}
+function localPerformancePreview(){const preview=festivalData().preview,url=festivalPerformanceUrl(preview?.url);return url&&typeof preview.name==='string'&&preview.name.trim()?{name:preview.name.slice(0,80),url}:null;}
+function performanceLinkHTML(){
+  const preview=localPerformancePreview();if(!preview)return '';
+  return '<div class="programme-slot"><span class="festival-tag">Local booth preview</span><h3 style="margin-top:12px">'+esc(preview.name)+'</h3><a id="external-performance" class="primary-button" href="'+esc(preview.url)+'" target="_blank" rel="noopener noreferrer">Listen to silent concert ↗</a><p>Opens on the artist’s chosen website. Playback is controlled in that tab.</p></div>';
+}
+function bindPerformanceLink(){const link=$('external-performance');if(link)link.onclick=()=>{stopFestivalAudio();updateFestivalControls();};}
+function openLocalPerformanceProfile(){
+  const preview=localPerformancePreview();if(!preview){openFestivalDirectory();return;}
+  const exhibitor=festivalDirectoryItems().find(x=>x.id==='local-preview');
+  openModal(titleHTML(preview.name,'YOUR CREATOR BOOTH')+'<p class="scene-copy">'+esc(exhibitor.line)+'</p>'+performanceLinkHTML()+'<p class="modal-description">Visible only in your game on this device. This has not been submitted or approved for a public festival.</p><div class="action-row"><button id="edit-preview-talents" class="secondary-button">Edit displayed talents</button><button id="edit-performance-preview" class="secondary-button">Edit or remove this preview</button><button id="walk-to-preview" class="secondary-button">Walk to the creator booth</button><button id="preview-directory" class="secondary-button">Browse other exhibitors</button></div>');
+  $('edit-preview-talents').onclick=()=>openFestivalTalents('local-preview');$('edit-performance-preview').onclick=openPerformancePreview;$('walk-to-preview').onclick=()=>{closeModal();world.go('music');};$('preview-directory').onclick=()=>openFestivalDirectory();bindPerformanceLink();narrativeText=body.innerText;
+}
+function openPerformancePreview(suggestedName){
+  const preview=festivalData().preview||{};
+  const name=typeof suggestedName==='string'?suggestedName:typeof preview.name==='string'?preview.name:'';
+  const url=(!suggestedName||typeof suggestedName!=='string'||name===preview.name)&&typeof preview.url==='string'?preview.url:'';
+  openModal(titleHTML('Your performance, at the festival','LOCAL BOOTH PREVIEW')+'<p class="modal-description">Try an artist’s video link on this device. This preview is not a public listing or an application. Shared submissions and owner approval will come with the online festival.</p><form id="performance-preview-form"><label for="performance-name">Artist or act name</label><input class="guest-search" id="performance-name" maxlength="80" required value="'+esc(name)+'"><label for="performance-url" style="display:block;margin-top:16px">Performance link (HTTPS)</label><input class="guest-search" id="performance-url" type="url" maxlength="2048" required placeholder="https://…" value="'+esc(url)+'"><div class="action-row"><button class="primary-button" type="submit">Preview my performance link</button><button class="secondary-button" id="clear-performance-preview" type="button">Remove this local preview</button></div><p id="performance-preview-error" class="inline-error" role="alert" hidden></p></form>'+performanceLinkHTML());
+  $('performance-preview-form').onsubmit=e=>{e.preventDefault();const name=$('performance-name').value.trim(),url=festivalPerformanceUrl($('performance-url').value);if(!name||!url){$('performance-preview-error').hidden=false;$('performance-preview-error').textContent='Add an artist name and an HTTPS video link without login details.';return;}if(name!==preview.name)delete festivalBoothTalents()['local-preview'];festivalData().preview={name:name.slice(0,80),url};save();openLocalPerformanceProfile();};
+  $('clear-performance-preview').onclick=()=>{delete festivalData().preview;delete festivalBoothTalents()['local-preview'];save();openPerformancePreview();announce('The local performance preview has been removed.');};bindPerformanceLink();narrativeText=body.innerText;
+}
+function openFestivalStage(){
+  openModal(titleHTML('A little music. A quiet island.','THE LANTERN STAGE')+'<div class="concert-poster"><span class="overline">YAUPON SILENT SESSIONS</span><h3>The Lantern Interlude</h3><p>A 48-second instrumental soundcheck.<br>Original generated audio · fictional demonstration ensemble.</p></div><progress id="concert-progress" class="concert-progress" value="0" max="48" aria-label="Soundcheck playback progress"></progress><div class="concert-time"><span id="concert-elapsed">0:00</span><span>Your earbuds. Your choice of music.</span></div><p id="concert-caption" class="concert-caption"></p><div class="action-row"><button id="festival-soundcheck" class="primary-button">Listen to soundcheck</button><button id="concert-stop" class="secondary-button">Stop soundcheck</button><button id="stage-artist" class="secondary-button">Meet the artist</button></div><div class="programme-slot"><h3>Try a scheduled premiere</h3><p id="premiere-status"></p><p class="festival-note">A private rehearsal on this device. Schedule it 15 seconds ahead, then tune in. The rehearsal clock is separate from your hotel shift.</p><div class="action-row"><button id="schedule-premiere" class="secondary-button">Schedule a rehearsal</button><button id="premiere-listen" class="secondary-button">Tune in to premiere</button></div></div>'+performanceLinkHTML()+'<button id="stage-preview-link" class="text-button">Preview an artist’s video link ↗</button>',true);
+  $('festival-soundcheck').onclick=()=>{void playFestivalTrack('lantern');};$('concert-stop').onclick=()=>stopFestivalAudio();$('stage-artist').onclick=()=>openFestivalProfile('lantern');
+  $('schedule-premiere').onclick=()=>{stopFestivalAudio();festivalData().premiereAt=Date.now()+15000;save();updateFestivalProgramme();announce('Private premiere rehearsal scheduled in fifteen seconds. Tune in when ready.');};
+  $('premiere-listen').onclick=()=>{void joinFestivalPremiere();};$('stage-preview-link').onclick=openPerformancePreview;bindPerformanceLink();updateFestivalProgramme();narrativeText=body.innerText;
+}
+function festivalInteract(id){
+  if(id==='manor'){leaveFestival();return;}
+  if(id==='stage'||id==='programme'){openFestivalStage();return;}
+  if(id==='music'){if(localPerformancePreview())openLocalPerformanceProfile();else openFestivalProfile('stargazer');return;}
+  if(id==='gallery'){openFestivalProfile('fern');return;}
+  if(id==='books'){openFestivalProfile('press');return;}
+  if(id==='welcome'){
+    scene({title:'Music for your ears',kicker:'THE FESTIVAL WELCOME DESK',text:['Your pretend earbuds are already with you. Choose a performance whenever you want to listen. Your usual speakers or headphones will work.','“Please leave the quiet exactly as you found it,” says the little sign.'],context:'Soundchecks play only after you choose to listen. Use Stop music whenever you wish. Artist video links open in a separate tab with their own playback controls.',options:[{text:'Browse the festival programme',run:openFestivalStage},{text:'Browse the booths',run:()=>openFestivalDirectory()}]});
+  }
+}
+$('festival-stop').onclick=()=>stopFestivalAudio();
+$('festival-volume').oninput=e=>{const p=festivalPlayback;p.volume=Number(e.target.value)/100;if(p.gain)p.gain.gain.setTargetAtTime(p.volume,p.context.currentTime,.03);};
+$('festival-stage-shortcut').onclick=()=>{closeModal();world.go('stage');};
+$('festival-directory-shortcut').onclick=()=>openFestivalDirectory();$('festival-programme-shortcut').onclick=openFestivalStage;$('festival-return').onclick=leaveFestival;
+$('festival-button').onclick=()=>{if(festivalActive)openFestivalDirectory();else if(state?.phase==='ended')enterFestival();else world.go('festival');};
+$('explore-festival').onclick=()=>{enterGame(resume?structuredClone(resume):createState());enterFestival();save();};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&(festivalPlayback.playing||festivalPlayback.waiting))stopFestivalAudio(false);});
+addEventListener('pagehide',()=>stopFestivalAudio());
+setInterval(updateFestivalProgramme,250);
+
 const world=new ManorWorld($('world'),{
-  state:()=>state,active:()=>!!state&&!titleVisible,
-  paused:()=>modal.open||state?.phase==='ended',
-  focus:()=>getTasks(state||createState(1)).find(t=>t.id===focused)?.station,
+  state:()=>festivalActive?{...state,player:festivalPosition}:state,active:()=>!!state&&!titleVisible,
+  festival:()=>festivalActive,
+  musicBoothName:()=>localPerformancePreview()?.name||'Stargazer Katie',
+  paused:()=>modal.open||(!festivalActive&&state?.phase==='ended'),
+  focus:()=>festivalActive?null:getTasks(state||createState(1)).find(t=>t.id===focused)?.station,
   settings:()=>settings,
   interact:id=>interact(id),message:toast,
   moved:()=>{clearTimeout(saveTimer);saveTimer=setTimeout(save,250);},
   near:id=>{const b=$('interact');b.hidden=!id;if(id)b.innerHTML='<kbd>E</kbd><span>'+esc(world.pt(id)?.name||'Look closer')+'</span>'+icon('arrow');},
-  extras:()=>activeClues().map(c=>({id:'clue:'+c.id,x:c.x,y:c.y,name:'Something catches your eye'})),
-  drawExtras:(c,time,calm)=>drawClues(c,time,calm),
+  extras:()=>festivalActive?[]:[...activeClues().map(c=>({id:'clue:'+c.id,x:c.x,y:c.y,name:'Something catches your eye'})),...(lobbySceneAvailable(state)?[{id:LOBBY_SCENE.id,...LOBBY_SCENE.point}]:[])],
+  drawExtras:(c,time,calm)=>{drawClues(c,time,calm);drawLobbyScene(c);},
+  overlay:(time,view)=>updateLobbyOverlay(time,view),
   location:name=>{if(name!==lastLocation){lastLocation=name;$('location-name').textContent=name;}},
   travel:name=>{$('travel-tag').hidden=!name;$('travel-tag').textContent=name?'Walking to '+name+'...':'';}
 });
 $('interact').onclick=()=>{if(world.nearest)interact(world.nearest);};
+$('lobby-bubble').onclick=()=>world.go(LOBBY_SCENE.id);
 function renderHUD(){
   if(!state)return;
   const tasks=getTasks(state);if(!tasks.some(t=>t.id===focused))focused=tasks[0]?.id||null;
@@ -786,7 +1311,7 @@ function renderHUD(){
   for(const task of tasks){
     const button=document.createElement('button');button.className='task-card'+(task.id===focused?' focus':'')+(task.priority==='urgent'?' urgent':'');
     button.innerHTML='<span class="task-meta"><span>'+(task.priority==='urgent'?esc('PRIORITY · CLEAR THE ROUTE'):task.id==='supper'&&state.late.includes('supper')&&!state.flags.supperServed?'<span class="late-tag">RUNNING LATE · '+esc(STATIONS[task.station].short)+'</span>':esc(STATIONS[task.station].short))+'</span><span>'+esc(task.id==='supper'?'SERVICE':task.id==='music'?'A LOST THING':task.id==='finch'?'A LITTLE COURAGE':'TONIGHT')+'</span></span><strong>'+esc(task.title)+'</strong><p>'+esc(task.detail)+'</p><span class="go-label">Follow this thread '+icon('arrow')+'</span>';
-    button.onclick=()=>{focused=task.id;renderHUD();world.go(task.station);};$('tasks').append(button);
+    button.onclick=()=>{if(festivalActive)leaveFestival();focused=task.id;renderHUD();world.go(task.station);};$('tasks').append(button);
   }
   const count=progress(state);$('progress-count').textContent=count+' / 6';$('progress-fill').style.width=count/6*100+'%';
   $('inventory').innerHTML=state.inventory.length?state.inventory.map(x=>'<span class="inventory-chip">'+esc(x)+'</span>').join(''):'Nothing to carry. Plenty to notice.';
@@ -798,32 +1323,39 @@ function renderHUD(){
   for(const [k] of METERS){const bar=document.querySelector('.meter[data-k="'+k+'"] .bar');if(bar){bar.firstChild.style.width=state.metrics[k]+'%';bar.setAttribute('aria-valuenow',state.metrics[k]);}}
   $('streak').hidden=state.streak<1;$('streak').textContent='SEAMLESS STREAK · '+state.streak;
 }
-function enterGame(s){state=polish(s);focused=null;titleVisible=false;$('title-screen').hidden=true;$('game-shell').hidden=false;renderHUD();world.resize();if(state.phase==='ended')showEnding();else if(!state.flags.briefed)toast('Choose “Take the night briefing” to walk to the desk.');}
+function enterGame(s){world.stop();stopFestivalAudio();festivalActive=false;state=polish(s);rememberEvening(state);lobbyView.elapsed=0;lobbyView.last=null;lobbyView.line='';focused=null;titleVisible=false;$('title-screen').hidden=true;$('game-shell').hidden=false;updateFestivalArea();renderHUD();world.resize();if(state.phase==='ended')showEnding();else if(!state.flags.briefed)toast('Choose “Take the night briefing” to walk to the desk.');}
 function beginNew(){
   if(resume&&resume.phase==='playing'){
-    scene({title:'A fresh evening?',text:['Your current evening is saved on this device. Starting again replaces that saved shift.'],options:[{text:'Continue my saved evening',run:()=>{closeModal();enterGame(structuredClone(resume));}},{text:'Begin a fresh evening',run:()=>{closeModal();enterGame(createState());save();}}]});
+    scene({title:'A fresh evening?',text:['Your current evening is saved on this device. Starting again replaces that saved shift. Your Memory Book stays with you.'],options:[{text:'Continue my saved evening',run:()=>{closeModal();enterGame(structuredClone(resume));}},{text:'Begin a fresh evening',run:()=>{closeModal();enterGame(createState());save();}}]});
   }else{enterGame(createState());save();}
 }
 $('begin').onclick=beginNew;
 $('continue').onclick=()=>{if(resume)enterGame(structuredClone(resume));};
-$('home').onclick=()=>{world.stop();save();titleVisible=true;$('title-screen').hidden=false;$('game-shell').hidden=true;$('continue').hidden=!resume;if(resume)$('continue').textContent=resume.phase==='ended'?'Read your evening’s ending':'Continue your evening';};
+$('home').onclick=()=>{world.stop();stopFestivalAudio();festivalActive=false;updateFestivalArea();save();titleVisible=true;$('lobby-chatter').hidden=true;$('title-screen').hidden=false;$('game-shell').hidden=true;$('continue').hidden=!resume;if(resume)$('continue').textContent=resume.phase==='ended'?'Read your evening’s ending':'Continue your evening';};
 $('ledger-button').onclick=()=>openLedger();
 $('journal-button').onclick=openJournal;
+$('memory-button').onclick=()=>openMemoryBook();$('title-memories').onclick=()=>openMemoryBook();
 $('settings-button').onclick=openSettings;$('title-settings').onclick=openSettings;
 $('places-button').onclick=()=>{
   openModal(titleHTML('A place for everything','FIND YOUR WAY')+'<p class="modal-description">Choose a place to walk there. Every destination also works by keyboard or tap.</p>');
-  choices(['desk','kitchen','pantry','garden','r202','r203','r204','r206'].map(id=>({text:STATIONS[id].name,run:()=>{closeModal();world.go(id);}})),'places');
+  const places=festivalActive?FESTIVAL_POINTS:Object.fromEntries(['desk','kitchen','pantry','garden','r202','r203','r204','r206','festival'].map(id=>[id,STATIONS[id]]));
+  if(!festivalActive&&lobbySceneAvailable(state))places[LOBBY_SCENE.id]=LOBBY_SCENE.point;
+  choices(Object.entries(places).map(([id,point])=>({text:point.name,run:()=>{closeModal();world.go(id);}})),'places');
 };
 addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
   if(modal.open){if(/^[1-9]$/.test(e.key)){const choice=body.querySelector('[data-choice="'+e.key+'"]');if(choice){e.preventDefault();choice.click();}}return;}
+  if(e.key.toLowerCase()==='m'){e.preventDefault();openMemoryBook();return;}
   if(titleVisible||!state)return;
   if(e.key.toLowerCase()==='l'){e.preventDefault();openLedger();}
   if(e.key.toLowerCase()==='j'){e.preventDefault();openJournal();}
 });
-function visit(id){closeModal();world.go(id);}
+function visit(id){if(festivalActive&&!FESTIVAL_POINTS[id])leaveFestival();closeModal();world.go(id);}
 function interact(id){
+  if(festivalActive){festivalInteract(id);return;}
+  if(id==='festival'){enterFestival();return;}
   if(!state||state.phase==='ended')return;
+  if(id===LOBBY_SCENE.id)return openLobbyConversation();
   if(String(id).startsWith('clue:')){if(state.flags.briefed)return clueScene(id.slice(5));} /* KMC-ADD clues v1 */
   if(!state.flags.briefed){if(id==='desk')briefing();else scene({title:'First, a word from Delores',text:['The radio at the front desk crackles. Your first evening deserves a proper beginning.'],options:[{text:'Walk to the front desk',run:()=>visit('desk')}]});return;}
   const f=state.flags;
@@ -847,20 +1379,20 @@ function desk(){
   ];
   if(f.musicRequested&&!f.archiveRead)options.unshift({text:'Check Ms. Vale’s archive entry',detail:'Find the exact folio identifier.',run:()=>act('readArchive',{},()=>done('A name in the ledger','Green folio. A. Vale. Accession AV-26. The cabinet is beside the service kitchen.','pantry'))});
   if(f.hazard==='secured')options.unshift({text:'Check engineering’s repair status',detail:state.minute>=f.repairDue?'Engineering has a clearance update.':'The call is accepted; clearance has not arrived yet.',run:()=>act('confirmRepair',{},()=>done('A confirmed repair','Engineering confirms the leak is repaired and the floor is dry. The doorway can reopen.'))});
-  if(f.supperRequested&&!f.supperServed&&!f.promiseUpdated)options.push({text:'Update Lady Vesper about her supper',detail:'Communicate what is known and keep ownership of the order.',run:()=>act('promiseUpdate',{},()=>done('A promise, kept in view','Lady Vesper appreciates the honest update. You still need to complete the order.'))});
+  if(f.supperRequested&&!f.supperServed&&!f.promiseUpdated)options.push({text:'Update Lady Vesper about her supper',detail:'Communicate what is known and keep ownership of the order.',run:recoveryScene});
   if(f.finaleSeen)options.unshift({text:'Prepare the shift handoff',detail:'Leave facts, permissions, and clear ownership.',run:openHandoff});
   scene({title:'The front desk',kicker:'WHERE THE THREADS MEET',text:['A brass lamp warms the ledger. The radio is mercifully quiet, which generally means it is gathering its thoughts.'],options});
 }
 function vesper(){
   const f=state.flags;
-  if(!f.supperRequested)return scene({guest:'vesper',title:'Lady Vesper',text:['“A little pumpkin soup, water, and two spoons, please. I have a sesame allergy.”','“Yes, two spoons. No, that is not an invitation to investigate my personal life.”'],context:'Take the order, review the guest’s record, and have the kitchen verify this preparation before delivery.',options:[{text:'Confirm the order and check her requirements',detail:'Soup, water, two spoons, and a kitchen check for the recorded allergy.',run:()=>act('requestSupper',{},()=>done('An order worth checking','Lady Vesper settles back into her chair. The guest ledger has the details you need.','desk'))}]});
-  if(f.trayPacked&&!f.supperServed)return scene({guest:'vesper',title:'A quiet delivery',text:['You knock, identify yourself, and wait. Lady Vesper opens the door just far enough to inspect your expression.','“Wonderful. Something has gone according to plan. How unsettling.”'],context:'The supper has been checked by the kitchen. Confirm the placement with her, then allow time before pickup.',options:[
-    {text:'Ask permission to place it on the sideboard',detail:'She invites you in and shows you where she would like it.',run:()=>act('deliverSupper',{place:'sideboard'},()=>done('A supper, properly settled','You confirm the order and place it where she requests. The second spoon remains unexplained.'))},
+  if(!f.supperRequested)return orderScene(); /* KMC-ADD silver key v1 (original order scene replaced) */
+  if(f.trayPacked&&!f.supperServed)return scene({guest:'vesper',title:'A quiet delivery',standard:'table',text:['You knock and announce, “In-Room Dining.” You wait. Lady Vesper opens the door just far enough to inspect your expression.','“Wonderful. Something has gone according to plan. How unsettling.”'],context:'The supper has been checked by the kitchen. Confirm the placement with her, then allow time before pickup.',options:[
+    {text:'Ask permission to place it on the sideboard',detail:'She shows you where she would like it. Name the soup as you set it down and lift the cover.',run:()=>act('deliverSupper',{place:'sideboard'},()=>done('A supper, properly settled','You confirm the order and place it where she requests. The second spoon remains unexplained.'))},
     {text:'Offer a discreet delivery at the doorway',detail:'She agrees, takes the tray, and confirms receipt.',run:()=>act('deliverSupper',{place:'door'},()=>done('Privacy, with follow-through','Lady Vesper accepts the tray at the doorway. You agree to check later before collecting it.'))}
   ]});
   if(f.supperServed&&!f.trayCollected){
     if(state.minute<f.servedAt+4)return scene({guest:'vesper',title:'Let supper be supper',text:['Through the door: “I’m still enjoying it. The soup is excellent. The spoons are getting along beautifully.”'],options:[{text:'Give her time and take another request',run:closeModal},{text:'Wait two quiet minutes before checking again',detail:'Only this choice advances the clock.',run:()=>act('wait',{},()=>vesper())}]});
-    return scene({guest:'vesper',title:'Close the service loop',text:['You check whether she has finished before offering to collect the tray.','“Yes, thank you. Both spoons have completed their duties.”'],options:[{text:'Collect the tray with her permission',detail:'Return it to the service kitchen to finish the request.',run:()=>act('collectTray',{},()=>done('One final step','The used tray is with you. Return it to the kitchen so the request is fully closed.','kitchen'))}]});
+    return scene({guest:'vesper',title:'Close the service loop',standard:'pickup',text:['You check whether she has finished before offering to collect the tray.','“Yes, thank you. Both spoons have completed their duties.”'],options:[{text:'Collect the tray with her permission',detail:'Return it to the service kitchen to finish the request.',run:()=>act('collectTray',{},()=>done('One final step','The used tray is with you. Return it to the kitchen so the request is fully closed.','kitchen'))}]});
   }
   if(f.supperServed&&f.finchPlan==='midnight'&&!f.vesperInviteHandled)return scene({guest:'vesper',title:'An invitation, not an assumption',text:['Mr. Finch has agreed that you may invite Lady Vesper to the small rehearsal, if she wishes.','“Is there going to be a speech?” she asks. “No? An extremely promising programme.”'],context:'You may offer the invitation, or keep the audience smaller and leave her evening undisturbed.',options:[{text:'Offer the invitation and let her decide',detail:'She chooses to attend. Her place in the audience is now agreed.',run:()=>act('inviteVesper',{invite:true},()=>done('A place, freely chosen','Lady Vesper accepts the invitation. Nobody will be surprised by the guest list.'))},{text:'Keep the audience smaller',detail:'Leave Lady Vesper’s quiet evening undisturbed.',run:()=>act('inviteVesper',{invite:false},()=>done('A quiet evening, respected','Lady Vesper remains in her room. The rehearsal will have a smaller audience.'))}]});
   if(f.trayReturned)return scene({guest:'vesper',title:'A guest, well tended',text:['“The soup was lovely. Your discretion was almost suspiciously good.”',f.vesperAttending?'“I shall see you at the rehearsal. I trust the no-speech policy is being enforced.”':'She settles into her chair. “A quiet evening. How wonderfully unfashionable.”'],options:[{text:'Wish her a restful evening',run:closeModal}]});
@@ -871,9 +1403,9 @@ function kitchen(){
   const f=state.flags;
   if(f.trayCollected&&!f.trayReturned)return scene({title:'Back where it belongs',kicker:'THE SERVICE KITCHEN',text:['Chef Mirelle makes a space at the clearing station. “A delivery is a beginning. A returned tray is a full stop.”'],options:[{text:'Return and clear the used tray',detail:'Close the supper request.',run:()=>act('returnTray',{},()=>done('A full stop','The tray is returned. Nothing is left for another person to discover in a hallway.'))}]});
   if(f.supperRequested&&!f.recordViewed)return scene({title:'Before the kitchen begins',kicker:'CHEF MIRELLE',text:['“Before I make anything, what does the guest’s record say?”'],options:[{text:'Review Lady Vesper’s record',run:()=>openLedger('guests','vesper')}]});
-  if(f.supperRequested&&f.recordViewed&&!f.chefVerified)return scene({title:'A check, not an assumption',kicker:'CHEF MIRELLE',text:['You relay the order and the sesame allergy. Chef Mirelle checks the ingredients for this batch and reviews how it will be prepared.','“I can prepare this modified soup for her order. Confirm that with the guest. Don’t turn one verified order into a promise about every meal.”'],context:'The kitchen’s confirmation applies to this order. Any future order needs its own review.',options:[{text:'Record the kitchen’s confirmation',detail:'Then set and inspect the tray.',run:()=>act('chefCheck',{},openTray)}]});
+  if(f.supperRequested&&f.recordViewed&&!f.chefVerified)return scene({title:'A check, not an assumption',kicker:'CHEF MIRELLE',text:['You relay the order and the sesame allergy. Chef Mirelle checks the ingredients for this batch and reviews how it will be prepared.','“I can prepare this modified soup for her order. Confirm that with the guest. Don’t turn one verified order into a promise about every meal.”'],context:'The kitchen’s confirmation applies to this order. Any future order needs its own review.',standard:'unsure',options:[{text:'Record the kitchen’s confirmation',detail:'Then set and inspect the tray.',run:()=>act('chefCheck',{},openTray)}]});
   if(f.chefVerified&&!f.trayPacked)return openTray();
-  if(f.trayPacked&&!f.supperServed)return scene({title:'The tray is ready',text:['The checked supper is with you. Its destination is Room 203.'],options:[{text:'Walk to Lady Vesper’s room',run:()=>visit('r203')}]});
+  if(f.trayPacked&&!f.supperServed)return scene({title:'The tray is ready',standard:'early',text:['The checked supper is with you. Its destination is Room 203.'],options:[{text:'Walk to Lady Vesper’s room',run:()=>visit('r203')}]});
   scene({title:'A kitchen with good timing',kicker:'A SMALL MOMENT',text:['Rosemary, warm linen, and the soft clink of china. Chef Mirelle is labeling tomorrow’s ingredients with the gravity of someone signing a peace treaty.'],options:[{text:'Return to the manor',run:closeModal}]});
 }
 const trayIcons={
@@ -961,7 +1493,7 @@ function playFinale(){
 function openLedger(tab='guests',guestId='vesper'){
   if(!state)return;
   openModal(titleHTML('The house ledger','CHECK BEFORE YOU PROMISE')+'<div class="ledger-tabs" id="ledger-tabs"></div><div id="ledger-content"></div>',true);
-  for(const [id,label] of [['guests','Guest records'],['rooms','Room plan'],['notices','Property notice']]){
+  for(const [id,label] of [['guests','Guest records'],['rooms','Room plan'],['notices','Property notice'],['standards','Silver Key']]){
     const b=document.createElement('button');b.textContent=label;b.classList.toggle('active',tab===id);b.setAttribute('aria-pressed',String(tab===id));b.onclick=()=>openLedger(id,guestId);$('ledger-tabs').append(b);
   }
   const host=$('ledger-content');
@@ -983,6 +1515,7 @@ function openLedger(tab='guests',guestId='vesper'){
     }
     $('guest-search').oninput=filter;filter();
   }else if(tab==='rooms')renderRoomPlan(host);
+  else if(tab==='standards')host.innerHTML='<p class="modal-description">The Mapáchez Manor way. Every guest, every time.</p><div class="sk-list">'+Object.keys(SILVER_KEY).map(skCard).join('')+'</div>'; /* KMC-ADD silver key v1 */
   else{
     host.innerHTML='<div class="notice-card"><span class="overline">TONIGHT · EFFECTIVE AT MIDNIGHT</span><h3>A small rehearsal. A quiet manor.</h3><p>Quiet hours begin at midnight. The enclosed conservatory is approved for a brief, invitation-only rehearsal.</p><p>The open terrace is closed. Confirm guests’ permission before inviting anyone or sharing a score.</p><p><b>Access update:</b> '+esc(state.flags.hazard==='fixed'?'Engineering has cleared the conservatory doorway.':state.flags.hazard==='secured'?'Wet doorway secured. Use the alternate entrance until engineering confirms clearance.':state.flags.hazard==='reported'?'Water reported at the doorway. Keep people clear and arrange engineering.':'No access issue reported.')+'</p></div>';
     const b=document.createElement('button');b.className='primary-button';b.textContent=state.flags.noticesRead?'Notice saved in your journal':'Read & record this notice';b.disabled=state.flags.noticesRead;b.onclick=()=>act('readNotices',{},()=>openLedger('notices'));host.append(b);
@@ -1003,6 +1536,37 @@ function renderRoomPlan(host){
   }
   for(const id of ['accessible-filter','quiet-filter','garden-filter','room-logic'])$(id).onchange=update;update();
 }
+function addMemoryFavorite(exhibitor,host){
+  const button=document.createElement('button');button.className='secondary-button memory-saved';button.id='memory-favorite';
+  const update=()=>{const kept=memoryBook.favorites.includes(exhibitor.id);button.textContent=kept?'Saved to Memory Book':'Keep in Memory Book';button.setAttribute('aria-pressed',String(kept));button.setAttribute('aria-label',(kept?'Remove '+exhibitor.name+' from':'Keep '+exhibitor.name+' in')+' my Memory Book');};
+  button.onclick=()=>{storeMemoryBook(toggleMemoryFavorite(memoryBook,exhibitor.id));update();narrativeText=body.innerText;toast(memoryStorageOK?(memoryBook.favorites.includes(exhibitor.id)?exhibitor.name+' kept in your Memory Book.':'Favorite removed from your Memory Book.'):'Your choice is kept for this visit. Saving the Memory Book is unavailable.');};update();host.append(button);
+}
+function visitRememberedBooth(id){
+  if(titleVisible||!state){closeModal();enterGame(resume?structuredClone(resume):createState());}
+  if(!festivalActive)enterFestival();
+  openFestivalProfile(id);save();
+}
+function openMemoryBook(tab='care'){
+  const manorMoments=memoryBook.moments.some(entry=>MEMORY_PAGES.some(page=>page.id===entry.id&&page.kind==='manor'));
+  const tabs={care:'Small kindnesses',...(manorMoments?{manor:'Manor moments'}:{}),festival:'Festival discoveries',favorites:'Favorite creators'};if(!Object.hasOwn(tabs,tab))tab='care';
+  openModal(titleHTML('Little things, kept','YOUR MANOR MEMORY BOOK')+'<div class="memory-intro"><p>A few small things the manor didn’t forget.</p></div><p class="modal-description">Moments you have lived, and creators you have chosen. This book stays with you when you begin another evening.</p><div id="memory-tabs" class="festival-tabs memory-tabs" aria-label="Memory Book pages"></div><div id="memory-contents"></div><p class="memory-storage"'+(memoryStorageOK?'':' role="alert"')+'>'+(memoryStorageOK?'Saved in this browser across evenings. Clearing browser data also clears this book.':'Your book is available for this visit. Saving is unavailable, so new memories may be lost when you close the page.')+'</p><div id="memory-actions" class="action-row"><button id="close-memory-book" class="secondary-button">Close book</button></div>',true);
+  for(const [key,label] of Object.entries(tabs)){const button=document.createElement('button');button.textContent=label;button.setAttribute('aria-pressed',String(key===tab));button.onclick=()=>openMemoryBook(key);$('memory-tabs').append(button);}
+  const list=document.createElement('ul');list.className='memory-pages';$('memory-contents').append(list);
+  if(tab==='favorites'){
+    const profiles=festivalExhibitors('All',state?.festival?.talents||resume?.festival?.talents||{});
+    for(const id of memoryBook.favorites){const creator=profiles.find(x=>x.id===id);if(!creator)continue;const card=document.createElement('li');card.className='memory-page';card.dataset.favorite=id;
+      card.innerHTML=icon('book')+'<h3>'+esc(creator.name)+'</h3><p>'+esc(creator.line)+'</p><small>'+(creator.creator?'Creator persona':'Fictional demonstration exhibitor')+'</small><div class="action-row"><button class="secondary-button" data-visit-favorite>Visit booth</button><button class="secondary-button" data-remove-favorite>Remove favorite</button></div>';
+      card.querySelector('[data-visit-favorite]').onclick=()=>visitRememberedBooth(id);card.querySelector('[data-remove-favorite]').onclick=()=>{storeMemoryBook(toggleMemoryFavorite(memoryBook,id));openMemoryBook('favorites');announce(creator.name+' removed from favorites.');};list.append(card);
+    }
+  }else for(const entry of [...memoryBook.moments].reverse()){
+    const page=MEMORY_PAGES.find(x=>x.id===entry.id&&x.kind===tab);if(!page)continue;const card=document.createElement('li');card.className='memory-page';card.dataset.memory=page.id;
+    card.innerHTML=icon(page.kind==='care'?'key':'book')+'<h3>'+esc(page.title)+'</h3><p>'+esc(page.text)+'</p><small>'+esc(page.from)+'</small>';list.append(card);
+  }
+  if(!list.children.length){const empty=document.createElement('p');empty.className='memory-empty';empty.textContent=tab==='favorites'?'Someone catch your interest? Choose “Keep in Memory Book” at a festival booth.':tab==='festival'?'The festival has pictures and pages to linger over. Discover something at your own pace.':'Your first little kindness is still ahead. Follow a guest’s request through, or notice someone who could use a hand.';$('memory-contents').append(empty);}
+  $('close-memory-book').onclick=closeModal;
+  if(!titleVisible&&!festivalActive&&state?.phase==='ended'){const button=document.createElement('button');button.className='primary-button';button.textContent='Back to your evening’s ending';button.onclick=showEnding;$('memory-actions').append(button);}
+  narrativeText=body.innerText;
+}
 function openJournal(){
   if(!state)return;
   openModal(titleHTML('What the manor remembers','YOUR SHIFT JOURNAL')+'<p class="modal-description">A record of what happened, what was verified, and what still belongs to you.</p><div id="journal-entries"></div>');
@@ -1013,15 +1577,15 @@ function openJournal(){
 function openHandoff(){
   if(!state.flags.finaleSeen)return;
   const notes=getHandoffNotes(state);
-  openModal(titleHTML('Leave the next shift a good beginning','THE LAST ACT OF CARE')+'<p class="modal-description">Select the notes to pass on. Include the current access status, the allergy requirement, and the rehearsal commitment. The wording reflects what actually happened.</p><div id="handoff-notes"></div><div class="action-row"><button class="primary-button" id="finish-shift">Save handoff &amp; finish the evening</button></div>');
+  openModal(titleHTML('Leave the next shift a good beginning','THE LAST ACT OF CARE')+'<p class="modal-description">Select the notes to pass on. Include the current access status, the allergy requirement, and the rehearsal commitment. The wording reflects what actually happened.</p>'+skCard('handoff')+'<div id="handoff-notes"></div><div class="action-row"><button class="primary-button" id="finish-shift">Save handoff &amp; finish the evening</button></div>');
   for(const n of notes){const label=document.createElement('label');label.className='handoff-item';label.innerHTML='<input type="checkbox" value="'+n.id+'"><span><b>'+esc(n.title)+'</b>'+esc(n.text)+(n.required?'<br><em>Needed for a complete handoff</em>':'')+'</span>';$('handoff-notes').append(label);}
   $('finish-shift').onclick=()=>act('handoff',{notes:[...body.querySelectorAll('input:checked')].map(x=>x.value)},showEnding);
 }
 function anticipationHTML(s){polish(s);const total=nightClues(s).length,n=s.anticipated.length;return '<p class="ending-delores" style="font-style:normal;font-family:Arial,sans-serif;font-size:13px">'+(n?'You noticed '+n+' of '+total+' unspoken needs tonight'+(n<total?'. One or two went unnoticed — they may be somewhere else next evening.':'. Every one of them.'):'Tonight’s unspoken needs went unnoticed. They’re out there, waiting to be seen.')+'</p>';} /* KMC-ADD clues v1 */
 function showEnding(){
   const e=ending(state);
-  openModal('<div class="ending-ornament">'+icon('key')+'</div><span class="overline" style="text-align:center">YOUR FIRST EVENING AT MAPÁCHEZ MANOR</span><h2 id="modal-heading" class="ending-heading">'+esc(e.title)+'</h2><p class="ending-line">'+esc(e.line)+'</p><p class="ending-delores">Delores: '+esc(closingLine(state))+'</p><div class="ending-seals">'+polish(state).seals.map(x=>'<div>'+waxHTML(x.gold)+esc(SEALS[x.id])+'</div>').join('')+'</div><div class="meters ending-meters">'+metersHTML(state)+'</div>'+(state.bestStreak>1?'<p class="modal-description" style="text-align:center">Best seamless streak: '+state.bestStreak+'</p>':'')+anticipationHTML(state)+'<ul class="ending-facts">'+e.observations.map(x=>'<li>'+icon('check')+'<span>'+esc(x)+'</span></li>').join('')+'</ul><p class="modal-description" style="text-align:center">There are other ways this evening can unfold.<br>Thank you for tending to this little corner of the world.</p><div class="action-row ending-actions"><button id="ending-journal" class="secondary-button">Read your journal</button><button id="replay" class="primary-button">Another evening '+icon('arrow')+'</button></div>');
-  $('ending-journal').onclick=openJournal;$('replay').onclick=()=>{closeModal();enterGame(createState());save();};
+  openModal('<div class="ending-ornament">'+icon('key')+'</div><span class="overline" style="text-align:center">AN EVENING AT MAPÁCHEZ MANOR</span><h2 id="modal-heading" class="ending-heading">'+esc(e.title)+'</h2><p class="ending-line">'+esc(e.line)+'</p><p class="ending-delores">Delores: '+esc(closingLine(state))+'</p><div class="ending-seals">'+polish(state).seals.map(x=>'<div>'+waxHTML(x.gold)+esc(SEALS[x.id])+'</div>').join('')+'</div><div class="meters ending-meters">'+metersHTML(state)+'</div>'+(state.bestStreak>1?'<p class="modal-description" style="text-align:center">Best seamless streak: '+state.bestStreak+'</p>':'')+anticipationHTML(state)+'<ul class="ending-facts">'+e.observations.map(x=>'<li>'+icon('check')+'<span>'+esc(x)+'</span></li>').join('')+'</ul><p class="modal-description" style="text-align:center">There are other ways this evening can unfold.<br>Thank you for tending to this little corner of the world.</p><div class="action-row ending-actions"><button id="ending-journal" class="secondary-button">Read your journal</button><button id="ending-memories" class="secondary-button">Open Memory Book</button><button id="replay" class="primary-button">Another evening '+icon('arrow')+'</button></div>');
+  $('ending-journal').onclick=openJournal;$('ending-memories').onclick=()=>openMemoryBook();$('replay').onclick=()=>{closeModal();enterGame(createState());save();};
 }
 function openSettings(){
   openModal(titleHTML('Make yourself comfortable','YOUR EVENING, YOUR PACE')+'<p class="modal-description">Story choices advance the clock. Reading, exploring, and opening these settings never do.</p><div id="settings-list"></div>');
