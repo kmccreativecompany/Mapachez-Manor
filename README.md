@@ -21,6 +21,16 @@ The world and training remain playable from one offline HTML file.
 See [integration notes](docs/silver-key-integration.md) for saves, source files,
 and browser regression checks.
 
+## Guest moments, growth bars and pins
+
+After the briefing, a guest with a gold **!** waits in the manor. Walk over and
+press **E** to answer a Silver Key moment. Answers fill the Guest trust, Care &
+safety and Teamwork bars through Bronze, Silver, Gold, Silver Key and Legend.
+Press **Q** (or choose **Quick shift**) for five guests in about three minutes.
+Missed moments come back for a second chance, nights in a row build a streak,
+and 32 pins plus unlockable outfits live in the Memory Book. See
+[growth notes](docs/growth.md).
+
 ## Original repository baseline
 Imported from the saved October 24, 2026 file:
 cMapachez_Manor_Midnight_Rehearsal_Offline_anticipation.html
