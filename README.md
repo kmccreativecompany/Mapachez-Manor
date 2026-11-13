@@ -2,7 +2,7 @@
 A cozy hotel game by Silver Key Games / KMC Creative Company.
 
 ## Play the prototype
-Download index.html and open it in a modern browser. The imported game is a standalone HTML file with embedded assets.
+Download index.html and open it in a modern browser. The game is a standalone HTML file with embedded assets and training.
 
 For development:
 ```sh
@@ -10,11 +10,22 @@ python3 -m http.server 8000
 ```
 Open http://localhost:8000.
 
-## Starting version
+## Integrated Silver Key practice desk
+
+The current `index.html` combines the owner's latest walkable manor (including
+the outdoor festival booths and Memory Book) with Silver Key hospitality
+practice. Choose **Training desk**, press **T**, or open it at the front desk or
+festival welcome desk. Return to the manor or festival from the practice window.
+The world and training remain playable from one offline HTML file.
+
+See [integration notes](docs/silver-key-integration.md) for saves, source files,
+and browser regression checks.
+
+## Original repository baseline
 Imported from the saved October 24, 2026 file:
 cMapachez_Manor_Midnight_Rehearsal_Offline_anticipation.html
 
-The import preserves the original game code. Uploading it does not certify gameplay correctness. FIRST_TASK.md defines the initial browser verification.
+That initial import preserved the original game code. FIRST_TASK.md records the initial browser-verification assignment; the integration notes describe the current build and its regression checks.
 
 ## Agent setup
 - AGENTS.md contains creative direction and working rules.
