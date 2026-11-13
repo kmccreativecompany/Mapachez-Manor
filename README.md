@@ -28,7 +28,7 @@ press **E** to answer a Silver Key moment. Answers fill the Guest trust, Care &
 safety and Teamwork bars through Bronze, Silver, Gold, Silver Key and Legend.
 Press **Q** (or choose **Quick shift**) for five guests in about three minutes.
 Missed moments come back for a second chance, nights in a row build a streak,
-and 36 pins plus unlockable outfits live in the Memory Book. See
+and 40 pins plus unlockable outfits live in the Memory Book. See
 [growth notes](docs/growth.md).
 
 ## Play for fun or train with your hotel
@@ -57,3 +57,10 @@ That initial import preserved the original game code. FIRST_TASK.md records the 
 - Review changes and test results before merging.
 
 This repository does not itself start an agent or create a recurring schedule. A cloud environment and a launched task are still required.
+
+## Clean comedy
+
+Every guest moment (but one tender one) has a clearly silly extra choice and a
+funny line from the guest when you get it right. Running gags unfold between
+guests, Delores closes each quick shift with a one-liner, and a new comment card
+arrives each day. See [comedy notes](docs/comedy.md).

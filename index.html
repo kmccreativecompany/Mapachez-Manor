@@ -208,6 +208,13 @@ button,.choice,.mode-card,.role-btn,a{touch-action:manipulation}
 .growth-medal{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;font-size:22px;background:radial-gradient(circle at 35% 30%,#fff3d2,#e8ce92);box-shadow:inset 0 -3px 0 #0002,0 0 0 4px #e9d7a9}
 .growth-confetti{position:fixed;inset:0;width:100vw;height:100vh;margin:0;padding:0;border:0;background:transparent;pointer-events:none;overflow:visible}
 @media (max-width:820px){.growth-card:not(.in-modal){grid-column:1/-1}.gm-summary b{font-size:20px}}
+/* COMEDY v1 */
+.gm-quip{margin:0;padding:10px 12px;border-radius:6px;background:#fbf1d6;font:italic 15px/1.5 Georgia,serif;color:var(--ink);animation:gmBeat .5s .7s both}
+.gm-silly-note{margin:0;font-size:13px;color:var(--ink)}.gm-silly-note small,.gm-meanwhile small,.gm-card small{display:block;font-style:normal;font-size:9px;line-height:1.4;letter-spacing:.14em;color:#7a6331;margin-bottom:3px}
+.gm-meanwhile{margin:0;padding:8px 12px;border-left:3px solid #c9a254;font-size:12px;line-height:1.55;color:#4c5a4c;animation:gmBeat .5s 1.2s both}
+.gm-card{margin:4px 0 12px;padding:12px 14px;border:1px dashed #c9ad6b;border-radius:8px;background:#fffaf0;transform:rotate(-.6deg)}
+.gm-card p{margin:0;font:italic 15px/1.5 Georgia,serif;color:var(--ink)}.gm-card .gm-card-foot{margin:6px 0 0;letter-spacing:0;font-size:10px;color:#5a6655}
+@keyframes gmBeat{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 /* ART NOUVEAU v1: forest green, walnut and antique gold, lily and whiplash ornaments.
    Pure CSS and tiny inline SVG, no images or fonts are downloaded. */
 :root{--green:#163f33;--green2:#2a5a47;--gold:#cfae6a;--walnut:#6b4428;--paper:#fbf6e8;--cream:#f1e8d2;--line:#e0d2ad;
@@ -2283,6 +2290,281 @@ addEventListener('keydown',e=>{
 setupPins(); /* SETUP v1 */
 renderGrowth();checkPins();
 /* ==== end GROWTH v1 ==== */
+/* ==== COMEDY v1: clean comedy for guest moments, shifts and pins ====
+   All words live in COMEDY_TEXT so they can be translated in one place (add an `es` block
+   beside `en`). Nothing is generated at play time. House rule: laugh with people, never at
+   them. No jokes about accents, looks, bodies or real groups. Tender moments stay tender.
+   Craft notes: harmless surprises (something is off, but nobody is hurt), the funny word
+   last, rules of three, running gags that escalate and pay off, and jokes that come from
+   who each character already is. Comedy never hides the lesson: the Silver Key way is
+   always shown after a silly pick, and silly picks count as a miss so the guest returns. */
+const COMEDY_TEXT={en:{
+  sillyKicker:'Raccoon instinct',
+  sillyWay:'Here’s the Silver Key way.',
+  meanwhile:'MEANWHILE IN THE MANOR',
+  cardKicker:'COMMENT CARD OF THE DAY',
+  cardFoot:'A new card arrives tomorrow.',
+  delores:'Delores',
+  /* One clearly absurd choice per moment, keyed by moment title. Missing title = no silly choice. */
+  silly:{
+    'The phone rings at 8:12 PM':'Read her the entire menu out loud, including the copyright line.',
+    'The profile is already telling you':'Ask the tray to memorize her notes, then trust the tray completely.',
+    'Quiet outdoors after dark':'Recommend the noon sunbathing contest. First prize is more sun.',
+    'Juniper hears the unsaid thing':'Hand them a megaphone and the sign-up sheet for the conga line.',
+    'Maya catches the handoff gap':'Fold all three notes into a paper airplane and let fate decide.',
+    'Harold waits before helping':'Crouch behind the potted fern and observe the guest like a nature documentary.',
+    'The comfort kit':'Assign a bellhop to follow her all day with a very large umbrella, humming.',
+    'The invisible name test':'Greet them as “Mr. and Mrs. Guest” with tremendous confidence.',
+    'The catch of the day question':'Say “fish,” then hang up before she can ask which one.',
+    'The lighter dinner gap':'Suggest the dessert menu. Technically, sorbet is mostly water.',
+    "Marcel's soup lecture":'Hand the phone to Marcel and back away slowly. He has forty minutes of material.',
+    'The entree is ready early':'Eat it yourself, so technically it is never early.',
+    'Final cart inspection':'Tell the guest the water spot is a tiny piece of modern art.',
+    'The rim check':'Let the fries cross the rim. They have earned their freedom.',
+    'The quiet facility miss':'Arrange the crumb neatly in the center and call it a garnish.',
+    'Evelyn sees the thing':'Challenge Evelyn to an ironing duel at dawn.',
+    'At the door':'Announce each dish like a sports commentator. “And the soup is IN!”',
+    'Jasper remembers the dog':'Ask the dog to sign for the amenity. Lovely handwriting, too.',
+    'The last sentence matters':'Leave the room walking backwards and bowing, like the end of a royal visit.',
+    'Sparkling water at the table':'Give the bottle a good shake first, for extra sparkle.',
+    'The beverage clock':'Send the empty glasses up first, as a preview.',
+    'The moonlight call':'Whisper “the manor is closed” and pretend to be a friendly ghost.',
+    'Curved-line recovery':'“You have changed your order twice. This is now a matter for the lawyers.”',
+    'The guest who apologizes for needing help':'Offer to make the lobby quieter by asking everyone in it to mime.',
+    'The impossible heartfelt request':'Write the poem yourself. Every line rhymes with “soup.”',
+    'No curiosity tax':'Present each dish with a drumroll you play on the cart.',
+    'Library desk clarity':'Offer to sit quietly in their room for two hours and cheer them on.',
+    'Stained-glass night focus':'Call in a movie-trailer voice: “In a world… where the tea is late…”',
+    'Lily lounge warmth':'Make it extra sweet as a fun surprise. Surprise!',
+    'Gold-line polish':'Explain that the chef had a dream about a swan, and leave it there.',
+    'The strange cart sound':'Name the noise Gerald and hope he settles down.',
+    'The new hire shadows you':'Say “ancient secret” and wink until they stop asking.',
+    'The scenic detour':'Join in with a history lesson of your own. Yours is about raccoons.',
+    'The planner at the edge':'Hide the cart behind the planner. Problem solved, mostly.',
+    'Gideon after the miss':'Blame the cart. It has a history.',
+    'The seventeen-minute breakfast':'Delay the airport car by telling the driver a very long story.',
+    'A missing condiment':'Offer her a single blueberry from your pocket. It has been in there a while.',
+    'Gwendolyn has a new obsession':'Organize a real parade, with a small brass band. Of spoons.',
+    'The pickup that cannot drift':'Leave the dishes as a gift. Who doesn’t love plates?',
+    'Duchess hears the luggage cart':'Bark back politely, to open a dialogue.',
+    'Miso Vale is not secured yet':'Slide a note under the door addressed to the cat.',
+    'Admiral and the beautiful long walk':'Offer Admiral a ride down the hallway on the luggage cart.',
+    'Pickle does not need a greeting committee':'Introduce the two dogs formally, with business cards.',
+    'Mochi needs special, not messy':'Send a glitter bath bomb. For the dog. Right before photos.',
+    'Muffin raises a policy question':'Ask Muffin directly whether she is allowed, then wait for her answer.',
+    "Muffin's water tastes tired":'Ask Muffin to describe the flavor notes in her own words.',
+    'A room move touches more than one profile':'Let Pippa, the cat and the moon vote. The moon abstains.',
+    'The barking complaint':'Tell the neighbor it is a very realistic barking podcast.',
+    'Animal guest care does not erase allergies':'Hand the allergic guest a box of tissues and a motivational speech.',
+    'Berries before tea':'Say yes, then test the berries yourself. All of them.',
+    'The first feed cup':'Explain the bird rules with a puppet show. It runs ninety minutes.'
+    /* 'The flower that matters' has no silly choice on purpose: grief is not a punchline. */
+  },
+  /* What the guest says after a best answer: the reward that lands a beat later. */
+  win:{
+    'The phone rings at 8:12 PM':'“You remembered the lemon goes on the side. I may never stay anywhere else. Possibly for centuries.”',
+    'The profile is already telling you':'“No garlic, no silver and not one question. You people are a marvel.”',
+    'Quiet outdoors after dark':'“Bats, stars and no crowds. You’ve described my perfect evening, and most of my family reunions.”',
+    'Juniper hears the unsaid thing':'“The porch, a pot of tea and absolutely no karaoke. Perfect.”',
+    'Maya catches the handoff gap':'Maya: “One handoff, one timeline, one owner. I may color-code this out of pure joy.”',
+    'Harold waits before helping':'Harold: “See? Like birdwatching. Patience, and nobody gets startled into the fountain.”',
+    'The comfort kit':'“A hat, dark glasses and serious SPF. Whoever packed this knows me better than my mirror does.”',
+    'The invisible name test':'Mrs. Calder: “Twenty-five years, and the hotel remembered faster than he did.” Mr. Calder: “That’s fair.”',
+    'The catch of the day question':'“Sea bass with lemon and herbs. Thank you for checking. The last hotel told me it was ‘probably a fish.’”',
+    'The lighter dinner gap':'Ms. Okafor: “Light, delicious and a fancy drink. My trainer will be thrilled, and slightly suspicious.”',
+    "Marcel's soup lecture":'Marcel, from the kitchen: “One sentence?! …It was a very good sentence. Sir Rise-a-Lot approves.”',
+    'The entree is ready early':'“You called to ask? I didn’t know food could ask permission. Ten more minutes would be perfect.”',
+    'Final cart inspection':'“The lemon, the linen, the sparkling glass. This cart is dressed better than I am.”',
+    'The rim check':'“This burger looks like it’s posing for a magazine. I almost feel bad eating it. Almost.”',
+    'The quiet facility miss':'“Not a crumb, not a scratch. I tried to find something wrong, as a hobby, and failed.”',
+    'Evelyn sees the thing':'Evelyn: “Thank you. I was going to fix it alone at 2 AM, which, said out loud, is a terrible plan.”',
+    'At the door':'Mr. Alvarez, covering the phone: “Right there is perfect, thank you.” Into the phone: “No, not you, Mom. You’re also perfect.”',
+    'Jasper remembers the dog':'Jasper: “Name, room, luggage, and the dog still likes me. Today is a great day.”',
+    'The last sentence matters':'“That was the most elegant goodbye I’ve had since my wedding. The food was good too.”',
+    'Sparkling water at the table':'“Poured, in a real glass. I feel like I’m in a movie where nobody spills anything.”',
+    'The beverage clock':'“Wine now, cocktail after? You’ve invented the dinner trailer. I love it.”',
+    'The moonlight call':'“Towels first, tea in twenty minutes, and a real time? It’s 1 AM and I feel organized. Remarkable.”',
+    'Curved-line recovery':'“Honey on the side… you’re right, it is easy. I might change my order again just to hear you say that.”',
+    'The guest who apologizes for needing help':'“The library fire? Oh, that’s perfect. I live there now. Please forward my mail.”',
+    'The impossible heartfelt request':'“A card from the whole team? My husband will think I planned this. I’m going to let him.”',
+    'No curiosity tax':'“Dinner, a thank-you and no questions. You’d be amazed how rare that is at my… age.”',
+    'Library desk clarity':'“No knocking until 1:30. You understand me. Please tell the coffee it’s my best friend now.”',
+    'Stained-glass night focus':'“Thank you for calling before I worried. I was about to start a search party for my tea.”',
+    'Lily lounge warmth':'“You remembered ‘less sweet’? I don’t even remember what I had for lunch.”',
+    'Gold-line polish':'“Citrus, cream and an almond tuile. I’ll describe it exactly like that at parties and take full credit.”',
+    'The strange cart sound':'Maintenance: “Left rear wheel, tagged out, clear notes. I may smile. Don’t tell anyone.”',
+    'The new hire shadows you':'New hire: “The rims are my job now? I am going to check them so hard.”',
+    'The scenic detour':'Driver: “Fine, one tip: sit on the left for the waterfall. My other forty stories can wait.”',
+    'The planner at the edge':'Planner: “Two vegan settings, a clear corridor and a runner. I’m going to cry, but the happy kind, and only after breakfast.”',
+    'Gideon after the miss':'Gideon: “Facts, a fix and nobody thrown under the bus. Put that on a poster. A tasteful one.”',
+    'The seventeen-minute breakfast':'Ms. Chen: “Thank you for telling me now. I can work with ‘late.’ I can’t work with ‘surprise.’”',
+    'A missing condiment':'Ms. Chen: “Preserves in two minutes? I’ve never been this happy about jam.”',
+    'Gwendolyn has a new obsession':'Gwendolyn: “Three polished spoons and a note! I shall name them. This one is Reginald.”',
+    'The pickup that cannot drift':'“Right on time. I set a reminder for you, actually. You beat it.”',
+    'Duchess hears the luggage cart':'Lavinia: “Duchess has stopped barking and is now judging the hallway in silence. That’s her highest compliment.”',
+    'Miso Vale is not secured yet':'Dr. Vale: “Thank you for calling. Miso is in the bathroom, pretending she has always lived there.”',
+    'Admiral and the beautiful long walk':'Basil: “Near the elevator, with a soft bed? Admiral just sighed the happiest sigh of his whole life.”',
+    'Pickle does not need a greeting committee':'Sunny: “Thank you. Pickle loves people. Other dogs, she treats like bad reviews.”',
+    'Mochi needs special, not messy':'Zinnia: “Clean bowl, fresh mat, no frosting on her face. Mochi is ready for her close-up.”',
+    'Muffin raises a policy question':'Cece: “Muffin appreciates your discretion. She is a very private cat. Some days she pretends to be asleep for hours.”',
+    "Muffin's water tastes tired":'Cece: “A glass bottle! Muffin is purring. Well. Making a sound. She is very happy.”',
+    'A room move touches more than one profile':'Pippa: “We’re keeping the room with the play corner? Good. I already told my bear it was ours.”',
+    'The barking complaint':'Neighbor: “Quiet in five minutes. Do you also take requests for my husband’s snoring?”',
+    'Animal guest care does not erase allergies':'“A room away from the fur, and nobody made it weird. I haven’t sneezed once. I’m almost bored.”',
+    'Berries before tea':'“Berries at four, tea at half past, and dry shoes? You planned my afternoon better than I plan my week.”',
+    'The first feed cup':'Parent: “Approved feed, clean hands, and the bird picked HIM. He’ll talk about this until he’s forty.”'
+  },
+  /* Kind reactions when the silly choice is picked. The lesson always follows. */
+  sillyReplies:[
+    'Bold. Very bold. The guest blinked twice.',
+    'Delores just put her tea down. Gently.',
+    'A choice was made! Not this one, though.',
+    'Somewhere in the lobby, a fern sighed.',
+    'Creative! Also, no.',
+    'Your tail made that decision, not you.',
+    'The guest is still waiting, but now they have a great story.'
+  ],
+  /* Running gags: each beat escalates, and the last beat pays it off. */
+  gags:[
+    {id:'fern',beats:[
+      'The lobby fern has been moved again. Someone left it a small apology note.',
+      'The fern is by the piano now. Nobody admits to moving it. The apology notes have doubled.',
+      'The fern turned up in the library, next to a book called “Finding Your Place.”',
+      'The fern is back in the lobby, wearing a tiny luggage tag. Delores refuses to comment.',
+      'Mystery solved: Jasper moves the fern every morning “so it can see the sunrise.” He apologized to it again.'
+    ]},
+    {id:'room13',beats:[
+      'The desk phone rings. The screen says Room 13. The manor does not have a Room 13.',
+      'Room 13 called again, asking for extra towels. Maya wrote it down, with a question mark.',
+      'Room 13 called to say the towels were lovely. Nobody delivered any towels.',
+      'Room 13 would like a late checkout. Gideon is reading the floor plan very, very slowly.',
+      'Mystery solved: “Room 13” is the old house phone in the linen closet. Evelyn was testing it. The towels really were lovely.'
+    ]},
+    {id:'triangle',beats:[
+      'Mr. Finch is practicing the triangle. One note. Then, after some thought, the same note.',
+      'Mr. Finch asks whether the lobby has better acoustics. He is still holding the triangle.',
+      'Mr. Finch has played the same note for an hour. A guest just asked if it was the doorbell.',
+      'Mr. Finch tried a brand new note. The whole lobby gasped. He went back to the old one.',
+      'Mr. Finch played his one note at exactly the right moment, and the lobby applauded. He calls it “mostly rehearsal.”'
+    ]},
+    {id:'raccoon',beats:[
+      'Raccoon instinct report: you washed the room key again. It is spotless. It no longer opens the door.',
+      'You walked past the breakfast buffet three times. The croissants felt watched.',
+      'A hallway bin tipped over. You were near it. You were, technically, the nearest witness.',
+      'You found something shiny and pocketed it “for safekeeping.” It was Gideon’s cufflink. He would like it back.',
+      'Delores slid you one croissant on a napkin. “For not eating the buffet,” she said. “I noticed.”'
+    ]}
+  ],
+  /* Delores at the end of a quick shift. The first line in each list is the original. */
+  deloresPerfect:[
+    'Not a single guest left wanting. I may frame this.',
+    'Five guests, five happy endings. I need to sit down before I get emotional.',
+    'Flawless. I checked twice. Then I checked the fern, just in case.',
+    'Perfect shift. Even Mr. Finch stopped playing to listen. Well. He paused.',
+    'Every guest got your best. Go home and put your feet up. Or your paws.'
+  ],
+  deloresSteady:[
+    'Every shift teaches the next one. The guests you missed will be back, and so will you.',
+    'A smile costs nothing, dear. The towels, however, are inventory.',
+    'Good work. Not perfect work, but perfect work makes the rest of us look bad.',
+    'Mistakes are just lessons wearing a funny hat. We’ll take the hat off tomorrow.',
+    'Hospitality is mostly listening, and partly knowing where the extra pillows are.',
+    'The guest is always right. Even the one who asked for a room with less Tuesday.',
+    'Keep your promises small and your tea hot. The rest follows.',
+    'You did well. Also, the buffet is still whole, and I’m proud of you for that too.'
+  ],
+  /* Comment card of the day: one absurd, affectionate review, the same for everyone that day. */
+  cards:[
+    'Five stars. The pillow menu had more choices than my last restaurant. I chose “cloud.” — Room 4',
+    'Rated the elevator 8 out of 10. It lost points for having no snacks. — Room 7',
+    'Lovely stay. Could the sunrise happen a bit later? Around noon? — Room 9',
+    'Four stars. I asked for a room with less Tuesday and you gave me a Wednesday. Close enough. — Room 21',
+    'The raccoon at the desk was very professional. It only looked at my sandwich once. — Room 2',
+    'Asked for 40 pillows. Received 40 pillows. I live in a fort now. Ten out of ten. — Room 17',
+    'Thank you for the wake-up call for our cat. She was up and ready by six. We were not. — Room 11',
+    'The lobby fern was in a different spot every day. Is it okay? Please tell it I said hi. — Room 5',
+    'Someone kept apologizing to a plant. I found this very calming. — Room 10',
+    'Only complaint: the bed was so comfortable I missed breakfast twice. Please make it worse. — Room 16',
+    'Five stars for the staff. One star for the seagull, who was not staff but acted like it. — Room 3',
+    'The lobby music was one note on a triangle. It was a very good note. — Room 19',
+    'The chef told me about the soup for twenty minutes. I feel close to the soup now. — Room 14',
+    'Ten stars. I know the scale only goes to five. I’m not changing it. — Room 8',
+    'The towels were folded into swans. My son named them both. We are not taking them home. Probably. — Room 12',
+    'I asked where the quiet room was, and your staff whispered the answer. Respect. — Room 6',
+    'I tried to complain, but everyone was so nice I ended up complimenting the carpet instead. — Room 15',
+    'Room 13 called to say hello. Lovely people. Where is Room 13? — Room 18',
+    'My husband rated the elevator, then the stairs, then me. I got a 9. Fair. — Room 20',
+    'The spa was so relaxing I forgot my own room number. Your staff remembered it. Helpful, slightly spooky. — Room 1',
+    'I came for one night and stayed for four. My cat is furious. She’s also invited next time. — Room 22'
+  ],
+  pins:{
+    buffet:['Did Not Eat the Buffet','Finish 3 quick shifts. The croissants are watching.'],
+    retreat:['Strategic Retreat','Some answers are not in any handbook.'],
+    room13:['Answered Room 13','Some calls come from rooms that are not on the map.'],
+    fern:['Fern Whisperer','Follow something green on its travels.']
+  }
+}};
+const COMEDY=COMEDY_TEXT[document.documentElement.lang]||COMEDY_TEXT.en;
+PINS.push(
+  {id:'buffet',icon:'🥐',name:COMEDY.pins.buffet[0],hint:COMEDY.pins.buffet[1],test:g=>g.shifts>=3},
+  {id:'strategic-retreat',icon:'🙈',name:COMEDY.pins.retreat[0],secret:true,hint:COMEDY.pins.retreat[1],test:g=>!!g.flags.silly},
+  {id:'room-13',icon:'📞',name:COMEDY.pins.room13[0],secret:true,hint:COMEDY.pins.room13[1],test:g=>!!g.flags['gag-room13']},
+  {id:'fern-whisperer',icon:'🪴',name:COMEDY.pins.fern[0],secret:true,hint:COMEDY.pins.fern[1],test:g=>!!g.flags['gag-fern']}
+);
+/* A running-gag beat after every second answer, rotating between gags, so each gag
+   pays off around answer 40. Derived from the answer count: nothing new is saved. */
+function comedyBeat(answers){
+  if(answers<2||answers%2)return null;
+  const n=answers/2-1,gags=COMEDY.gags,gag=gags[n%gags.length],step=Math.floor(n/gags.length)%gag.beats.length;
+  return {id:gag.id,text:gag.beats[step],last:step===gag.beats.length-1};
+}
+function comedyDay(){const d=new Date();return Math.floor(new Date(d.getFullYear(),d.getMonth(),d.getDate(),12).getTime()/864e5);}
+let comedySillyPick=false;
+const growthOpenGuestMoment=openGuestMoment;
+openGuestMoment=function(i=nextMoment(),mode='world'){
+  growthOpenGuestMoment(i,mode);
+  const m=GUEST_MOMENTS[i],silly=m&&COMEDY.silly[m.title],hosts=body.querySelectorAll('.choices'),host=hosts[hosts.length-1];
+  if(!silly||!host)return;
+  const worst=m.choices.reduce((w,c,k)=>c[1]<m.choices[w][1]?k:w,0);
+  const b=document.createElement('button');b.className='choice gm-silly';
+  b.innerHTML='<span></span><span><b>'+esc(silly)+'</b></span>'+icon('arrow');
+  b.onclick=()=>{comedySillyPick=true;showMomentResult(i,worst,mode,host);};
+  const at=Math.random()*(host.children.length+1)|0;host.insertBefore(b,host.children[at]||null);
+  [...host.children].forEach((c,n)=>{c.dataset.choice=String(n+1);c.firstElementChild.textContent=String(n+1);});
+  narrativeText=body.innerText;
+};
+const growthShowMomentResult=showMomentResult;
+showMomentResult=function(i,k,mode,host){
+  const silly=comedySillyPick;comedySillyPick=false;
+  if(silly)growth.flags.silly=true;
+  const beat=comedyBeat(growth.answers+1);if(beat&&beat.last)growth.flags['gag-'+beat.id]=true;
+  growthShowMomentResult(i,k,mode,host);
+  const box=body.querySelector('.gm-result'),m=GUEST_MOMENTS[i];if(!box)return;
+  const verdict=box.querySelector('.gm-verdict');
+  if(silly&&verdict){
+    const lines=COMEDY.sillyReplies,line=lines[growth.answers%lines.length];
+    verdict.innerHTML='<span aria-hidden="true">🦝</span> '+esc(line);
+    verdict.insertAdjacentHTML('afterend','<p class="gm-silly-note"><small>'+esc(COMEDY.sillyKicker.toUpperCase())+'</small>'+esc(COMEDY.sillyWay)+'</p>');
+  }
+  const win=box.classList.contains('best')&&COMEDY.win[m.title];
+  if(win&&verdict)verdict.insertAdjacentHTML('afterend','<p class="gm-quip">'+esc(win)+'</p>');
+  const row=box.querySelector('.action-row');
+  if(beat&&row)row.insertAdjacentHTML('beforebegin','<p class="gm-meanwhile"><small>'+esc(COMEDY.meanwhile)+'</small>'+esc(beat.text)+'</p>');
+  narrativeText=body.innerText;
+};
+const growthFinishShift=finishShift;
+finishShift=function(){
+  const s=shift,perfect=!!s&&s.best===s.list.length;
+  growthFinishShift();
+  const p=body.querySelector('.modal-description');
+  if(p){const list=perfect?COMEDY.deloresPerfect:COMEDY.deloresSteady,n=perfect?growth.perfect-1:growth.shifts-growth.perfect-1;
+    p.textContent=COMEDY.delores+': “'+list[Math.max(0,n)%list.length]+'”';}
+  const row=$('shift-actions'),card=COMEDY.cards[comedyDay()%COMEDY.cards.length];
+  if(row)row.insertAdjacentHTML('beforebegin','<div class="gm-card"><small>📝 '+esc(COMEDY.cardKicker)+'</small><p>'+esc(card)+'</p><small class="gm-card-foot">'+esc(COMEDY.cardFoot)+'</small></div>');
+  narrativeText=body.innerText;
+};
+renderGrowth();checkPins();
+/* ==== end COMEDY v1 ==== */
 
 /* ==== SETUP v1 UI: play for fun or with your hotel, 60-second first guest, role tracks,
    reports and certificates, hotel packs, score codes and the team board ==== */
