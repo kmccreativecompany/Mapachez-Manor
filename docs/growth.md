@@ -17,7 +17,7 @@ single offline `index.html`: no server, account, network request or paid service
 - **Second chances.** A missed moment comes back three answers later, marked
   "second chance", until the player gets it right.
 - **Nightly streak.** Playing on consecutive days counts nights in a row.
-- **36 pins** in the Memory Book under **Pins & wardrobe** (four come from the [comedy layer](comedy.md)), including six secret pins
+- **40 pins** (32 here, four role pins from [setup](setup.md) and four from the [comedy layer](comedy.md)) in the Memory Book under **Pins & wardrobe**, including six secret pins
   that stay hidden until earned. Story milestones (finishing an evening, all six seals,
   noticing something unasked, visiting the festival) count too.
 - **Wardrobe.** Each level reached on any bar unlocks a coat colour for the player.
