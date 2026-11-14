@@ -1,6 +1,6 @@
 # Character kit
 
-Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 31 KB inside, player picker included, `index.html`.
+Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 33 KB inside, player picker included, `index.html`.
 
 ![Sample cast](screenshots/cast-sheet.jpg)
 
@@ -8,6 +8,7 @@ Every character in Mapáchez Manor is drawn with code from a short recipe. There
 
 - **Delores and her family are always raccoons.** The family list is `CAST_FAMILY`. Add a name there to make that character a raccoon.
 - **Players choose what they are.** The "Who are you?" button on the title screen opens one simple screen. Players pick Raccoon, Person, Fae folk, Monster, Alien or Robot, tap a few ↻ buttons and a colour, or hit 🎲 Randomize. Raccoon is the default, so anyone can skip it, and existing players stay raccoons. The choice is saved under `mapachez_player_v1`. Their wardrobe coat is still their vest.
+- **Pronouns are optional.** On the same screen, players can tap she/her, he/him and they/them, choosing more than one, or type their own (for example xe/xem/xyr). Anyone who skips it is called "they". In Spanish, skipping means no gendered word at all: Delores says "esta persona". Choosing they/them gives "elle". With more than one pronoun, the game uses a different one each night. Pronouns stay on the player's device only and never go into score codes or the team report. For now they're used in Delores's welcome line, and `playerPronouns()` is there for future lines.
 
 ![Who are you?](screenshots/cast-player-picker.jpg)
 - **Everyone else is random.** A character's name picks their kind and look. The kind can be a person, a folklore being, a monster, an alien or a gentle robot. Folklore beings include fauns with goat horns and hooves, dryads with antlers or leaf crowns, fairies with wings, and pale glowing ones. The look covers body (round, tall, blob or wiggly), eyes (one, two or three), hairdo, extras and outfit (vest, scarf, bow, cardigan or hat). Mythology stays with folklore creatures, never gods people worship today.
@@ -51,4 +52,4 @@ Nobody says what Muffin is, and the game doesn't either. A test checks that the 
 
 ## Checks
 
-`python tests/test_cast.py` (set `CHROMIUM_PATH`). It checks that the kit stays small, that the family are raccoons, that named looks never change, that 300 random beings and every creator choice draw cleanly in all four directions, and that Muffin and Cece work.
+`python tests/test_cast.py` (set `CHROMIUM_PATH`). It checks that the kit stays small, that the family are raccoons, that named looks never change, that 300 random beings and every creator choice draw cleanly in all four directions, that Muffin and Cece work, and that the picker and pronouns (English and Spanish) save and read correctly.

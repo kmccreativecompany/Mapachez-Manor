@@ -22,7 +22,7 @@ Object.defineProperty(window,'castTest',{get:()=>({
  look:(k,b)=>castLook(k,b||{}),drawPerson,muffin,spot:()=>muffinSpot(0),points:()=>world.options.extras().map(p=>p.id),
  interact:id=>interact(id),player:()=>playerLook().recipe,festival:festivalActive
 })});
-window.castTestOptions=()=>CAST_OPTIONS;window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
+window.castTestOptions=()=>CAST_OPTIONS;window.deloresWelcomeTest=()=>deloresWelcome();window.profileTestLang=l=>{profile.lang=l;};window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
 """
 TEST_HTML = HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
 
@@ -143,6 +143,35 @@ class Cast(unittest.TestCase):
         self.page.locator('[data-kind="raccoon"]').click()
         self.page.locator('#pp-done').click()
         self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon')
+
+    def welcome(self):
+        return self.page.evaluate('deloresWelcomeTest()')
+
+    def test_08_pronouns_are_optional_plural_or_your_own(self):
+        self.assertIn('Look after them. Their coat', self.welcome(), 'No choice means they')
+        self.page.locator('#title-who').click()
+        self.page.locator('[data-pro="she"]').click()
+        self.page.locator('[data-pro="they"]').click()
+        self.page.locator('#pp-done').click()
+        self.assertIn(self.page.locator('#toast').inner_text().split('“')[1][:16], ['Look after her. ', 'Look after them.'])
+        self.assertEqual(self.page.evaluate("JSON.parse(localStorage.getItem('mapachez_player_v1')).pronouns"), ['she', 'they'])
+        self.page.locator('#title-who').click()
+        self.page.locator('[data-pro="she"]').click()
+        self.page.locator('[data-pro="they"]').click()
+        self.page.locator('#pp-own').fill('xe/xem/xyr')
+        self.page.locator('#pp-done').click()
+        self.assertIn('Look after xem. Xyr coat', self.welcome())
+        others = self.page.evaluate("Object.keys(localStorage).filter(k=>k!=='mapachez_player_v1').map(k=>localStorage.getItem(k)).join(' ')")
+        self.assertNotIn('xem', others, 'Pronouns stay in the player save only')
+
+    def test_09_spanish_is_neutral_by_default(self):
+        self.page.evaluate("profileTestLang('es')")
+        self.assertIn('Cuida de esta persona.', self.welcome())
+        self.page.locator('#title-who').click()
+        self.assertIn('¿Quién eres esta noche?', self.page.locator('#modal-heading').inner_text())
+        self.page.locator('[data-pro="they"]').click()
+        self.page.locator('#pp-done').click()
+        self.assertIn('Cuida de elle.', self.welcome())
 
 
 if __name__ == '__main__':

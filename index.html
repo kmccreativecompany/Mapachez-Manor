@@ -976,6 +976,21 @@ function playerRecipe(coat){
   const v=playerChoice;if(!v||v.kind==='raccoon')return castLook('player',{color:coat});
   const k=JSON.stringify(v)+coat;if(playerRecipe.k!==k){playerRecipe.k=k;playerRecipe.r=castMake({...v,color:coat,outfit:'vest',extra2:''});}return playerRecipe.r;
 }
+/* Pronouns are optional and stay on this device (never in score codes or team reports).
+   Pick several, type your own, or skip: skipping means "they" in English and no gendered words in Spanish. */
+const PRONOUNS={she:['she/her','ella',['she','her','her']],he:['he/him','él',['he','him','his']],they:['they/them','elle',['they','them','their']]};
+function playerPronouns(){
+  const v=playerChoice||{},list=[...(v.pronouns||[]).filter(p=>PRONOUNS[p]),...(v.own?['own']:[])];
+  if(!list.length)return {set:false,en:PRONOUNS.they[2],es:'esta persona'};
+  const p=list[((castNight()%list.length)+list.length)%list.length];
+  if(p!=='own')return {set:true,en:PRONOUNS[p][2],es:PRONOUNS[p][1]};
+  const w=String(v.own).split(/[\/,\s]+/).filter(Boolean).slice(0,3);return {set:true,en:[w[0],w[1]||w[0],w[2]||w[1]||w[0]],es:w[0]};
+}
+function deloresWelcome(){
+  const p=playerPronouns(),cap=x=>x.charAt(0).toUpperCase()+x.slice(1);
+  if(profile.lang==='es')return 'Delores, al conserje de noche: “Cuida de '+p.es+'. Lleva el abrigo impecable.”';
+  return 'Delores, to the night porter: “Look after '+p.en[1]+'. '+cap(p.en[2])+' coat is very well pressed.”';
+}
 function randomPlayer(kind){
   const pick=a=>a[Math.floor(Math.random()*a.length)],k=kind||pick(PLAYER_KINDS)[0];
   return {kind:k,body:pick(['round','tall','blob','wiggly']),eyes:pick([1,2,3]),extra:PLAYER_EXTRAS[k]?pick(PLAYER_EXTRAS[k]):'',hairdo:pick(CAST_OPTIONS.hairdo),skin:pick(playerSkins(k)),hair:pick(CAST_HAIR)};
@@ -988,22 +1003,28 @@ function openPlayerPicker(){
     if(k==='monster'||k==='alien')parts.push(['body','Shape',CAST_OPTIONS.body],['eyes','Eyes',[1,2,3]]);
     if(k==='human'||k==='fae')parts.push(['hairdo','Hair',CAST_OPTIONS.hairdo],['hair','Hair colour',CAST_HAIR]);
     if(PLAYER_EXTRAS[k])parts.push(['extra',k==='fae'?'Magic':'Extra',PLAYER_EXTRAS[k]]);
-    const chip=(on,label,attr)=>'<button class="'+(on?'primary-button':'secondary-button')+'" style="flex:0 0 auto;padding:8px 12px" '+attr+'>'+esc(label)+'</button>';
-    openModal(titleHTML('Who are you tonight?','YOUR LOOK')+
+    const chip=(on,label,attr)=>'<button class="'+(on?'primary-button':'secondary-button')+'" style="flex:0 0 auto;padding:8px 12px" '+attr+(on?' aria-pressed="true"':'')+'>'+esc(t(label))+'</button>',es=profile.lang==='es',pro=v.pronouns||[];
+    openModal(titleHTML(t('Who are you tonight?'),t('YOUR LOOK'))+
       '<div style="display:flex;justify-content:center"><canvas id="pp-view" width="320" height="260" style="width:160px;height:130px" aria-hidden="true"></canvas></div>'+
-      '<p class="scene-context" style="text-align:center">Pick anything. You can change it any time from the title screen.</p>'+
-      '<div class="action-row" style="justify-content:center">'+PLAYER_KINDS.map(([id,l])=>chip(v.kind===id,l,'data-kind="'+id+'"')).join('')+'</div>'+
-      (k==='raccoon'?'':'<div class="action-row" style="justify-content:center">'+parts.map(([f,l])=>chip(false,l+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
-      '<div class="action-row" style="justify-content:center">'+playerSkins(k).map(c=>'<button data-skin="'+c+'" aria-label="Colour" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+(v.skin===c?'#4b2f1c':'#fff')+';background:'+c+'"></button>').join('')+'</div>')+
-      '<div class="action-row" style="justify-content:center">'+chip(false,'🎲 Randomize','id="pp-random"')+'<button id="pp-done" class="primary-button" style="flex:0 0 auto">That’s me</button></div>');
+      '<p class="scene-context" style="text-align:center">'+esc(t('Pick anything. You can change it any time from the title screen.'))+'</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+PLAYER_KINDS.map(([id,l])=>chip(v.kind===id,l,'data-kind="'+id+'"')).join('')+'</div>'+
+      (k==='raccoon'?'':'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+parts.map(([f,l])=>chip(false,t(l)+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+playerSkins(k).map(c=>'<button data-skin="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+(v.skin===c?'#4b2f1c':'#fff')+';background:'+c+'"></button>').join('')+'</div>')+
+      '<h3 style="text-align:center;margin:22px 0 4px;font:normal 18px Georgia,serif">'+esc(t('What should guests call you? Optional.'))+'</h3>'+
+      '<p style="text-align:center;margin:0;font-size:13px;color:#5a6655">'+esc(t('Pick any, or none. Skip it and everyone says “they”.'))+'</p>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+Object.entries(PRONOUNS).map(([id,p])=>chip(pro.includes(id),es?p[1]:p[0],'data-pro="'+id+'"')).join('')+
+      '<input id="pp-own" maxlength="24" autocomplete="off" aria-label="'+esc(t('Your own words'))+'" placeholder="'+esc(t('Type your own, like xe/xem'))+'" value="'+esc(v.own||'')+'" style="flex:1 1 180px;max-width:240px;padding:9px 12px;border:1px solid #cbd0bb;border-radius:5px;font:inherit"></div>'+
+      '<div class="action-row" style="justify-content:center">'+chip(false,'🎲 Randomize','id="pp-random"')+'<button id="pp-done" class="primary-button" style="flex:0 0 auto">'+esc(t('That’s me'))+'</button></div>');
     const c=$('pp-view').getContext('2d');c.scale(2,2);
     drawBeing(c,80,104,v.kind==='raccoon'?castLook('player',{color:currentLook().coat}):castMake({...v,color:currentLook().coat,outfit:'vest',extra2:''}),0,'down',false,2.5);
     const body=$('pp-view').closest('dialog')||document;
-    body.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.kind;v=id==='raccoon'?{kind:id}:{...randomPlayer(id),...(v.kind===id?v:{})};draw();});
+    body.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.kind;v={...(id==='raccoon'?{kind:id}:{...randomPlayer(id),...(v.kind===id?v:{})}),pronouns:v.pronouns,own:v.own};draw();});
     body.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{const f=b.dataset.cycle,p=parts.find(x=>x[0]===f);cycle(f,p[2]);});
     body.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{v.skin=b.dataset.skin;draw();});
-    $('pp-random').onclick=()=>{v=randomPlayer();draw();};
-    $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(v.kind==='raccoon'?'A raccoon it is. Delores approves.':'Delores looks you up and down. “Welcome to the family.”');};
+    body.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();});
+    $('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24).trim();};
+    $('pp-random').onclick=()=>{v={...randomPlayer(),pronouns:v.pronouns,own:v.own};draw();};
+    $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(deloresWelcome());};
   }
   draw();
 }
@@ -2626,7 +2647,12 @@ world.options.extras=()=>[...storyExtras(),...(guestMomentAvailable()?[{id:'gues
 world.options.drawExtras=(c,time,calm)=>{storyDrawExtras(c,time,calm);drawGrowthWorld(c,time,calm);};
 /* Muffin and Cece in the Festival Garden: optional, no points (CHARACTER KIT v1). */
 const castExtras=world.options.extras;world.options.extras=()=>[...castExtras(),...muffinPoints()];
-{const b=document.createElement('button');b.id='title-who';b.className='glass-button';b.textContent='Who are you?';$('title-memories')?.after(b);b.onclick=openPlayerPicker;}
+Object.assign(WORDS.es||{},{'Who are you?':'¿Quién eres?','Who are you tonight?':'¿Quién eres esta noche?','YOUR LOOK':'TU ASPECTO','Pick anything. You can change it any time from the title screen.':'Elige lo que quieras. Puedes cambiarlo cuando quieras desde la pantalla de inicio.',
+ 'Raccoon':'Mapache','Person':'Persona','Fae folk':'Hada','Monster':'Monstruo','Alien':'Extraterrestre','Robot':'Robot','Shape':'Forma','Eyes':'Ojos','Hair':'Pelo','Hair colour':'Color de pelo','Magic':'Magia','Extra':'Detalle','Colour':'Color',
+ '🎲 Randomize':'🎲 Al azar','That’s me':'Soy yo','What should guests call you? Optional.':'¿Cómo quieres que te nombren? Es opcional.','Pick any, or none. Skip it and everyone says “they”.':'Elige los que quieras, o ninguno. Si lo dejas en blanco, nadie usará un género para ti.',
+ 'Your own words':'Tus propias palabras','Type your own, like xe/xem':'Escribe los tuyos'});
+{const b=document.createElement('button');b.id='title-who';b.className='glass-button';b.textContent=t('Who are you?');$('title-memories')?.after(b);b.onclick=openPlayerPicker;
+ const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent=t('Who are you?');return r;};}
 const castInteract=interact;interact=function(id){if(festivalActive&&muffinInteract(id))return;return castInteract.apply(this,arguments);};
 $('title-quick').onclick=startQuickShift;
 addEventListener('keydown',e=>{
