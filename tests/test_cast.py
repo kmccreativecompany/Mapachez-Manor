@@ -20,7 +20,7 @@ KIT = HTML[HTML.index('/* CHARACTER KIT v1'):HTML.index('function plant(c,x,y,s=
 INSPECTOR = """
 Object.defineProperty(window,'castTest',{get:()=>({
  look:(k,b)=>castLook(k,b||{}),drawPerson,muffin,spot:()=>muffinSpot(0),points:()=>world.options.extras().map(p=>p.id),
- interact:id=>interact(id),player:()=>castLook(castKey(playerLook()),playerLook()),festival:festivalActive
+ interact:id=>interact(id),player:()=>playerLook().recipe,festival:festivalActive
 })});
 window.castTestOptions=()=>CAST_OPTIONS;window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
 """
@@ -73,7 +73,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 30_000, 'The kit should stay under 30 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 34_000, 'The kit and player picker should stay under 34 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -125,6 +125,24 @@ class Cast(unittest.TestCase):
             spot = self.page.evaluate('window.castTest.spot()')
             self.assertEqual(spot['key'], scene)
             self.assertTrue(70 <= spot['x'] <= 1210 and 200 <= spot['y'] <= 750, spot)
+
+
+    def test_07_player_picks_what_they_are_and_it_sticks(self):
+        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon', 'Existing players stay raccoons')
+        self.page.locator('#title-who').click()
+        self.page.wait_for_selector('#pp-view')
+        self.page.locator('[data-kind="alien"]').click()
+        self.page.locator('[data-cycle="eyes"]').click()
+        self.page.locator('#pp-random').click()
+        self.page.locator('[data-kind="fae"]').click()
+        self.page.locator('#pp-done').click()
+        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'fae')
+        self.page.reload()
+        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'fae', 'The choice is saved')
+        self.page.locator('#title-who').click()
+        self.page.locator('[data-kind="raccoon"]').click()
+        self.page.locator('#pp-done').click()
+        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon')
 
 
 if __name__ == '__main__':

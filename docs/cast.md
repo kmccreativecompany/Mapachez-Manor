@@ -1,19 +1,24 @@
 # Character kit
 
-Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 26 KB inside `index.html`.
+Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 31 KB inside, player picker included, `index.html`.
 
 ![Sample cast](screenshots/cast-sheet.jpg)
 
 ## Who is what
 
-- **Delores, her family and the player are always raccoons.** The family list is `CAST_FAMILY`. Add a name there to make that character a raccoon.
+- **Delores and her family are always raccoons.** The family list is `CAST_FAMILY`. Add a name there to make that character a raccoon.
+- **Players choose what they are.** The "Who are you?" button on the title screen opens one simple screen. Players pick Raccoon, Person, Fae folk, Monster, Alien or Robot, tap a few ↻ buttons and a colour, or hit 🎲 Randomize. Raccoon is the default, so anyone can skip it, and existing players stay raccoons. The choice is saved under `mapachez_player_v1`. Their wardrobe coat is still their vest.
+
+![Who are you?](screenshots/cast-player-picker.jpg)
 - **Everyone else is random.** A character's name picks their kind and look. The kind can be a person, a folklore being, a monster, an alien or a gentle robot. Folklore beings include fauns with goat horns and hooves, dryads with antlers or leaf crowns, fairies with wings, and pale glowing ones. The look covers body (round, tall, blob or wiggly), eyes (one, two or three), hairdo, extras and outfit (vest, scarf, bow, cardigan or hat). Mythology stays with folklore creatures, never gods people worship today.
 - **Named characters keep their look.** The same name always gives the same look, so Mr. Finch looks the same every night. Characters who already had colours in the game keep them as their body and outfit colours.
 - **Unnamed guests are new each time.** A guest moment without a guest name gets a fresh look.
 - **To fix a look by hand**, add it to `CAST_PINS`, for example `finch:{kind:'alien',body:'tall',eyes:3}`.
 - **Nothing is labelled.** The game never says who is a monster or an alien, in line with the "show, don't label" rule in AGENTS.md.
 
-**Ready for a character creator.** `CAST_OPTIONS` lists every choice a player could make (kind, body, eyes, hairdo, extra, outfit and colours). `castMake({...choices})` turns those choices into a look that `drawBeing` can draw. The creator screen itself isn't built yet.
+Behind the picker, `CAST_OPTIONS` lists every choice, and `castMake({...choices})` turns choices into a look `drawBeing` can draw. Unlockable outfits or a photo booth could build on this later.
+
+A few older lines still assume the player is a raccoon, such as "Raccoon instinct" and "The raccoon at the desk". They read as a fond running joke even for a robot, so they were left as they are.
 
 To give a festival booth a staffer later, use any name, such as `drawPerson(c,x,y,{cast:'booth:Tide & Fern'})` or `castLook('booth:Tide & Fern')`. That booth then has one fixed being.
 

@@ -764,7 +764,7 @@ function ellipse(c,x,y,rx,ry,color){c.fillStyle=color;c.beginPath();c.ellipse(x,
 function text(c,s,x,y,size=12,color='#365443',font='Arial',align='center'){c.font=(font==='Georgia'?'':'600 ')+size+'px '+font;c.textAlign=align;c.fillStyle=color;c.fillText(s,x,y);}
 function random(n){return Math.abs(Math.sin(n*127.1+311.7)*43758.5453)%1;}
 function drawPerson(c,x,y,person={},step=0,dir='down',carrying=false,scale=1) {
-  const being=castKey(person)&&castLook(castKey(person),person);if(being)return drawBeing(c,x,y,being,step,dir,carrying,scale);
+  const being=person.recipe||castKey(person)&&castLook(castKey(person),person);if(being)return drawBeing(c,x,y,being,step,dir,carrying,scale);
   const skin=person.skin||'#c5b1d3',hair=person.hair||'#3c344e',coat=person.color||'#32736b',u=scale;
   c.save();c.translate(Math.round(x),Math.round(y));c.scale(u,u);
   ellipse(c,0,10,12,4,'#123b303b');
@@ -785,10 +785,10 @@ function drawPerson(c,x,y,person={},step=0,dir='down',carrying=false,scale=1) {
    antennae, tentacles, glow) and an outfit (vest, scarf, bow, cardigan, hat).
    - Named characters get a look picked at random from their name, so it is the same every visit.
    - Guests without a name get a fresh look each time.
-   - Delores, her family and the player are always raccoons.
+   - Delores and her family are always raccoons. The player is a raccoon unless they pick otherwise (WHO ARE YOU below).
    - Any string works as a name, so a festival booth can be given a staffer later: castLook('booth:Tide & Fern').
    To fix someone's look by hand, add it to CAST_PINS, e.g. 'finch':{kind:'alien',body:'tall',eyes:3}. */
-const CAST_FAMILY=['delores','player']; // Delores and her family. Add a family member's name here to make them a raccoon.
+const CAST_FAMILY=['delores','player']; // Delores and her family ('player' is the default raccoon look). Add a family member's name here to make them a raccoon.
 const CAST_PINS={
   delores:{color:'#6f5a86',outfit:'cardigan',specs:1,pearls:1,tuft:1,brooch:1},
   player:{outfit:'vest'},
@@ -964,6 +964,49 @@ function drawBeing(c,x,y,r,step=0,dir='down',carrying=false,scale=1){
   c.restore();
 }
 
+/* WHO ARE YOU: the player's own look. A raccoon unless they choose otherwise; one tap to keep it.
+   Saved under mapachez_player_v1. Existing players stay raccoons until they change it. */
+const PLAYER_KEY='mapachez_player_v1';
+const PLAYER_KINDS=[['raccoon','Raccoon'],['human','Person'],['fae','Fae folk'],['monster','Monster'],['alien','Alien'],['construct','Robot']];
+const PLAYER_EXTRAS={fae:['wings','antlers','leaves','goat','glow'],monster:['horns','ears','fur','tail','spots'],alien:['antennae','tentacles','glow','spots']};
+let playerChoice=null;try{const v=JSON.parse(localStorage.getItem(PLAYER_KEY)||'null');if(v&&CAST_OPTIONS.kind.includes(v.kind))playerChoice=v;}catch{}
+function savePlayerChoice(v){playerChoice=v;try{localStorage.setItem(PLAYER_KEY,JSON.stringify(v));}catch{}}
+function playerSkins(kind){return kind==='human'?CAST_SKIN:kind==='fae'?CAST_FAE:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
+function playerRecipe(coat){
+  const v=playerChoice;if(!v||v.kind==='raccoon')return castLook('player',{color:coat});
+  const k=JSON.stringify(v)+coat;if(playerRecipe.k!==k){playerRecipe.k=k;playerRecipe.r=castMake({...v,color:coat,outfit:'vest',extra2:''});}return playerRecipe.r;
+}
+function randomPlayer(kind){
+  const pick=a=>a[Math.floor(Math.random()*a.length)],k=kind||pick(PLAYER_KINDS)[0];
+  return {kind:k,body:pick(['round','tall','blob','wiggly']),eyes:pick([1,2,3]),extra:PLAYER_EXTRAS[k]?pick(PLAYER_EXTRAS[k]):'',hairdo:pick(CAST_OPTIONS.hairdo),skin:pick(playerSkins(k)),hair:pick(CAST_HAIR)};
+}
+function openPlayerPicker(){
+  let v={...(playerChoice||{kind:'raccoon'})};
+  const cycle=(f,list)=>{v[f]=list[(list.indexOf(v[f])+1)%list.length];draw();};
+  function draw(){
+    const k=v.kind,parts=[];
+    if(k==='monster'||k==='alien')parts.push(['body','Shape',CAST_OPTIONS.body],['eyes','Eyes',[1,2,3]]);
+    if(k==='human'||k==='fae')parts.push(['hairdo','Hair',CAST_OPTIONS.hairdo],['hair','Hair colour',CAST_HAIR]);
+    if(PLAYER_EXTRAS[k])parts.push(['extra',k==='fae'?'Magic':'Extra',PLAYER_EXTRAS[k]]);
+    const chip=(on,label,attr)=>'<button class="'+(on?'primary-button':'secondary-button')+'" style="flex:0 0 auto;padding:8px 12px" '+attr+'>'+esc(label)+'</button>';
+    openModal(titleHTML('Who are you tonight?','YOUR LOOK')+
+      '<div style="display:flex;justify-content:center"><canvas id="pp-view" width="320" height="260" style="width:160px;height:130px" aria-hidden="true"></canvas></div>'+
+      '<p class="scene-context" style="text-align:center">Pick anything. You can change it any time from the title screen.</p>'+
+      '<div class="action-row" style="justify-content:center">'+PLAYER_KINDS.map(([id,l])=>chip(v.kind===id,l,'data-kind="'+id+'"')).join('')+'</div>'+
+      (k==='raccoon'?'':'<div class="action-row" style="justify-content:center">'+parts.map(([f,l])=>chip(false,l+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
+      '<div class="action-row" style="justify-content:center">'+playerSkins(k).map(c=>'<button data-skin="'+c+'" aria-label="Colour" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+(v.skin===c?'#4b2f1c':'#fff')+';background:'+c+'"></button>').join('')+'</div>')+
+      '<div class="action-row" style="justify-content:center">'+chip(false,'🎲 Randomize','id="pp-random"')+'<button id="pp-done" class="primary-button" style="flex:0 0 auto">That’s me</button></div>');
+    const c=$('pp-view').getContext('2d');c.scale(2,2);
+    drawBeing(c,80,104,v.kind==='raccoon'?castLook('player',{color:currentLook().coat}):castMake({...v,color:currentLook().coat,outfit:'vest',extra2:''}),0,'down',false,2.5);
+    const body=$('pp-view').closest('dialog')||document;
+    body.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.kind;v=id==='raccoon'?{kind:id}:{...randomPlayer(id),...(v.kind===id?v:{})};draw();});
+    body.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{const f=b.dataset.cycle,p=parts.find(x=>x[0]===f);cycle(f,p[2]);});
+    body.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{v.skin=b.dataset.skin;draw();});
+    $('pp-random').onclick=()=>{v=randomPlayer();draw();};
+    $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(v.kind==='raccoon'?'A raccoon it is. Delores approves.':'Delores looks you up and down. “Welcome to the family.”');};
+  }
+  draw();
+}
 /* MUFFIN v1: Cece's cat. A cat according to her owner, and that is the end of the matter.
    Muffin keeps her own little life in the Festival Garden, whatever the player is doing. Where she is
    depends on the season, the weather and the night. Tapping her (or E nearby) plays a tiny animation:
@@ -2388,7 +2431,7 @@ const LOOKS=[
 ];
 const topTier=()=>Math.max(...BARS.map(([k])=>tierOf(growth.pts[k])));
 function currentLook(){const look=LOOKS.find(l=>l.id===growth.look);return look&&look.tier<=topTier()?look:LOOKS[0];}
-function playerLook(){return {cast:'player',color:currentLook().coat};}
+function playerLook(){const coat=currentLook().coat;return {cast:'player',color:coat,recipe:playerRecipe(coat)};}
 function drawPlayerFlair(c,p,time,calm){
   if(!currentLook().halo)return;
   const bob=calm?0:Math.sin(time/300)*2;c.save();c.globalAlpha=.9;ellipse(c,p.x,p.y-42+bob,9,9,'#ffe9a655');
@@ -2583,6 +2626,7 @@ world.options.extras=()=>[...storyExtras(),...(guestMomentAvailable()?[{id:'gues
 world.options.drawExtras=(c,time,calm)=>{storyDrawExtras(c,time,calm);drawGrowthWorld(c,time,calm);};
 /* Muffin and Cece in the Festival Garden: optional, no points (CHARACTER KIT v1). */
 const castExtras=world.options.extras;world.options.extras=()=>[...castExtras(),...muffinPoints()];
+{const b=document.createElement('button');b.id='title-who';b.className='glass-button';b.textContent='Who are you?';$('title-memories')?.after(b);b.onclick=openPlayerPicker;}
 const castInteract=interact;interact=function(id){if(festivalActive&&muffinInteract(id))return;return castInteract.apply(this,arguments);};
 $('title-quick').onclick=startQuickShift;
 addEventListener('keydown',e=>{
