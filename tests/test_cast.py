@@ -22,6 +22,7 @@ Object.defineProperty(window,'castTest',{get:()=>({
  look:(k,b)=>castLook(k,b||{}),drawPerson,muffin,spot:()=>muffinSpot(0),points:()=>world.options.extras().map(p=>p.id),
  interact:id=>interact(id),player:()=>castLook(castKey(playerLook()),playerLook()),festival:festivalActive
 })});
+window.castTestOptions=()=>CAST_OPTIONS;window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
 """
 TEST_HTML = HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
 
@@ -72,7 +73,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 24_000, 'The kit should stay around 20 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 30_000, 'The kit should stay under 30 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -85,8 +86,15 @@ class Cast(unittest.TestCase):
         self.assertEqual(self.page.evaluate(f"{t}.look('Mr. Finch')"), first, 'A named character looks the same every visit')
         kinds = self.page.evaluate(f"(()=>{{const c={{}};for(let i=0;i<400;i++){{const k={t}.look('guest#'+i).kind;c[k]=(c[k]||0)+1;}}return c;}})()")
         self.assertNotIn('raccoon', kinds, 'Only the family are raccoons')
-        for kind in ['monster', 'alien', 'human']:
-            self.assertGreater(kinds.get(kind, 0), 40, kind)
+        for kind in ['monster', 'alien', 'human', 'fae', 'construct']:
+            self.assertGreater(kinds.get(kind, 0), 20, kind)
+
+    def test_06_creator_ready_every_choice_draws(self):
+        ok = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d'),o=castTestOptions();
+          for(const kind of o.kind)for(const extra of o.extra)for(const body of o.body)for(const d of ['down','up','left','right']){
+            castTestDraw(c,{kind,extra,body,hairdo:o.hairdo[extra.length%4],outfit:o.outfit[body.length%5],eyes:1+extra.length%3},d);
+            const m=c.getTransform();if(m.a!==1||m.e!==0)return 'leak '+kind+extra;}return 'ok';})()""")
+        self.assertEqual(ok, 'ok')
 
     def test_03_every_recipe_draws_cleanly_in_every_direction(self):
         ok = self.page.evaluate("""(()=>{const t=window.castTest,c=document.createElement('canvas').getContext('2d');
