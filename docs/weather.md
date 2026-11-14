@@ -21,8 +21,3 @@ If the fun list's surprise nights are in the game, "Surprise me" follows them: s
 - `index.html`: the `WEATHER v1` script (just before the main script) and its CSS; `LOOK v2` helpers (`softShadow`, `tree`, `paintGrounds`, `windowLight`) and `ManorWorld.light()`.
 - The map calls `window.MapachezWeather.tick()` once per frame.
 - Tests: `tests/test_weather.py`.
-
-## Seasonal title paintings
-The title screen shows the owner's own painting of the manor for the current season, with matching code weather drifting over it:
-spring (March to May, petals), summer (June to August, fireflies), autumn (September and October, leaves), harvest (November, leaves) and winter (December to February, snow).
-The five paintings are 1152px WebP files embedded in the `SEASONS v1` script (about 1.1 MB in all), and only the current one is decoded. The older lobby painting is still in the page but no longer shown. Removing it would save about 0.35 MB.
