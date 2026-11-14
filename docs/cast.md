@@ -1,8 +1,27 @@
 # Character kit
 
-Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 33 KB inside, player picker included, `index.html`.
+Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 52 KB inside, player picker included, `index.html`.
 
 ![Sample cast](screenshots/cast-sheet.jpg)
+
+## Detail (v2)
+
+![Before and after](screenshots/cast-detail-closeup.jpg)
+
+Version 2 of the kit adds:
+- soft top-lit shading and highlights on bodies, heads and clothes
+- coloured eyes with sparkles, lids and lashes, plus brows and a few mouth shapes
+- layered hair with bangs, side locks and shine
+- curly hair drawn as shaded curls
+- raccoon fur with a fluffy crown, cheek fluff, pink inner ears, a nose highlight and a shaded ringed tail
+- outfits with lapels, collars, gold trim, cuffs, knit ribs, shiny buttons and shoes
+- skirts with a trimmed hem
+- fauns with hooves
+- robots with brushed metal, glowing lamp eyes and a ticking dial
+
+A standing character is painted once into a small picture in memory, one with eyes open and one blinking, and that picture is reused every frame. Thirty standing characters now take about 0.4 ms a frame, compared with about 2.7 ms for the old simple shapes. Walking characters are still drawn live.
+
+**What size allows.** On the map, characters are about 40 to 45 screen pixels tall on a laptop and about 25 to 30 on a phone. At that size you see the shading, colour and overall shape, but the finest touches like lashes, sparkles and buttons are only a pixel or two. They show fully in close views such as the "Who are you?" picker and guest portraits. If the map ever needs more detail, the next step is to draw the characters a bit larger on the map, which is a layout choice and not a file-size cost.
 
 ## Who is what
 
