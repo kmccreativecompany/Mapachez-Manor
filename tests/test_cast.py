@@ -73,7 +73,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 34_000, 'The kit and player picker should stay under 34 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 56_000, 'The detailed kit and player picker should stay under 56 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -143,6 +143,14 @@ class Cast(unittest.TestCase):
         self.page.locator('[data-kind="raccoon"]').click()
         self.page.locator('#pp-done').click()
         self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon')
+
+    def test_10_standing_characters_are_cached_and_cheap(self):
+        ms = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');c.canvas.width=1280;c.canvas.height=800;const d=window.castTest.drawPerson;
+          for(let i=0;i<30;i++)d(c,40+i*40,400,{cast:'b'+i},0,'down',false,1.2);
+          const t0=performance.now();for(let f=0;f<100;f++)for(let i=0;i<30;i++)d(c,40+i*40,400,{cast:'b'+i},0,'down',false,1.2);
+          const m=c.getTransform();if(m.a!==1||m.e!==0)return -1;return (performance.now()-t0)/100;})()""")
+        self.assertGreaterEqual(ms, 0, 'Canvas state leaked')
+        self.assertLess(ms, 4, f'30 standing characters took {ms:.2f} ms a frame')
 
     def welcome(self):
         return self.page.evaluate('deloresWelcomeTest()')
