@@ -1,6 +1,6 @@
 # Weather and evening light
 
-Calm, storybook weather over the manor map and the festival garden, plus softer light and depth on the map itself. Everything is drawn with code: no pictures, sound files, services or network calls.
+Calm, storybook weather outdoors (the grounds around the manor and the festival garden; never inside the rooms), plus softer light and depth on the map itself. Everything is drawn with code: no pictures, sound files, services or network calls.
 
 ## What players see
 - **Six weathers:** gentle rain (with ripples on the lawn and soft mist), a soft storm (heavier rain, wind swirls, a few torn leaves and an occasional gentle flash), wind in the leaves, blossom petals, quiet snow and fireflies. "Clear night" turns the effects off.
