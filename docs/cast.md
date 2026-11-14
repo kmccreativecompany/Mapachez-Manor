@@ -4,24 +4,24 @@ Every character in Mapáchez Manor is drawn with code from a short recipe. There
 
 ![Sample cast](screenshots/cast-sheet.jpg)
 
-## Detail (v2)
+## Pixel chibi look (v3)
 
-![Before and after](screenshots/cast-detail-closeup.jpg)
+![Your style guide next to the game](screenshots/cast-chibi-side-by-side.jpg)
 
-Version 2 of the kit adds:
-- soft top-lit shading and highlights on bodies, heads and clothes
-- coloured eyes with sparkles, lids and lashes, plus brows and a few mouth shapes
-- layered hair with bangs, side locks and shine
-- curly hair drawn as shaded curls
-- raccoon fur with a fluffy crown, cheek fluff, pink inner ears, a nose highlight and a shaded ringed tail
-- outfits with lapels, collars, gold trim, cuffs, knit ribs, shiny buttons and shoes
-- skirts with a trimmed hem
-- fauns with hooves
-- robots with brushed metal, glowing lamp eyes and a ticking dial
+Every character is now painted like pixel art, following the Character Style Guide picture: a big head, big glossy eyes with a white sparkle, chunky hair with shine, a soft coloured outline and light from the top left. Each one is painted on a small 32 by 44 pixel grid from its recipe, then scaled up crisply with no blur.
 
-A standing character is painted once into a small picture in memory, one with eyes open and one blinking, and that picture is reused every frame. Thirty standing characters now take about 0.4 ms a frame, compared with about 2.7 ms for the old simple shapes. Walking characters are still drawn live.
+The whole cast uses it:
+- **Raccoons** (Delores, her family and the default player): mask, pink inner ears, ringed tail, cheek fluff and whiskers.
+- **People**: short, long, bun or curly hair, skirts or trousers, glasses.
+- **Folklore beings**: pointed ears, antlers, leaf crowns with a flower, fairy wings, goat horns with hooves, or a soft glow.
+- **Monsters**: a wolf with ears, muzzle and tail; a stitched monster with a flat top and neck bolts; a horned imp with a tail; a mummy with wraps and glowing eyes. Which one a monster is comes from its recipe.
+- **Aliens**: antennae with glowing bulbs or head tentacles, with one, two or three eyes.
+- **Robots**: a screen face with lamp eyes and a little antenna.
+- **Muffin**: drawn small, given crisp edges and the same soft outline, so she matches everyone else.
 
-**What size allows.** On the map, characters are about 40 to 45 screen pixels tall on a laptop and about 25 to 30 on a phone. At that size you see the shading, colour and overall shape, but the finest touches like lashes, sparkles and buttons are only a pixel or two. They show fully in close views such as the "Who are you?" picker and guest portraits. If the map ever needs more detail, the next step is to draw the characters a bit larger on the map, which is a layout choice and not a file-size cost.
+Each grid is made once per direction, walking step and blink, kept in memory and reused, so 30 characters take about 0.2 ms a frame. The kit is about 39 KB, smaller than the v2 detail kit (about 52 KB).
+
+**How close code can get.** The shapes, proportions, outlines and eyes match the style guide well. A hand-drawn sprite sheet would still win on things like flowing hair locks, dress folds and changing facial expressions, because an artist places every pixel by eye. Getting that here would mean adding picture files, which the game avoids to stay free and light.
 
 ## Who is what
 
