@@ -27,6 +27,10 @@ The whole cast uses it:
 
 ![Raccoons before and after](screenshots/cast-raccoons.jpg)
 
+**Raccoon styles and colours.** There are four raccoon face styles: button (the default), plush, fluffy and classic. Set one with `rstyle` on a recipe, for example in `CAST_PINS`. Any raccoon can have a `fur` colour, and the classic grey is used when none is set. About one guest in ten turns out to be a raccoon, and about half of those have fun fur (lilac, pink, mint, sky, butter, cocoa, peach or periwinkle). Delores stays classic grey. Player raccoons can pick a fur colour on the "Who are you?" screen.
+
+![Raccoon styles and colours](screenshots/cast-raccoon-options.jpg)
+
 Each grid is made once per direction, walking step and blink, kept in memory and reused, so 30 characters take about 0.2 ms a frame. The kit is about 39 KB, smaller than the v2 detail kit (about 52 KB).
 
 **How close code can get.** The shapes, proportions, outlines and eyes match the style guide well. A hand-drawn sprite sheet would still win on things like flowing hair locks, dress folds and changing facial expressions, because an artist places every pixel by eye. Getting that here would mean adding picture files, which the game avoids to stay free and light.

@@ -73,7 +73,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 42_000, 'The detailed kit and player picker should stay under 56 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 46_000, 'The pixel kit and player picker should stay under 46 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -85,7 +85,14 @@ class Cast(unittest.TestCase):
         self.page.reload()
         self.assertEqual(self.page.evaluate(f"{t}.look('Mr. Finch')"), first, 'A named character looks the same every visit')
         kinds = self.page.evaluate(f"(()=>{{const c={{}};for(let i=0;i<400;i++){{const k={t}.look('guest#'+i).kind;c[k]=(c[k]||0)+1;}}return c;}})()")
-        self.assertNotIn('raccoon', kinds, 'Only the family are raccoons')
+        self.assertLess(kinds.get('raccoon', 0), 60, 'Raccoon guests are a rare treat; Delores and family always are')
+        furs = self.page.evaluate(f"(()=>{{let a=0,f=0;for(let i=0;i<400;i++){{const r={t}.look('guest#'+i);if(r.kind==='raccoon'){{a++;if(r.fur)f++;}}}}return [a,f];}})()")
+        self.assertTrue(0 < furs[1] < furs[0], 'Some raccoons, not all, have fun fur')
+        self.assertFalse(self.page.evaluate(f"{t}.look('delores').fur"), 'Delores keeps her classic grey')
+        ok = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');
+          for(const rstyle of ['button','plush','fluffy','classic'])for(const fur of [undefined,'#f5b8cf'])for(const d of ['down','up','left','right'])
+            castTestDraw(c,{kind:'raccoon',rstyle,fur,specs:rstyle==='plush'},d);return c.getTransform().a===1;})()""")
+        self.assertTrue(ok, 'Every raccoon style draws')
         for kind in ['monster', 'alien', 'human', 'fae', 'construct']:
             self.assertGreater(kinds.get(kind, 0), 20, kind)
 

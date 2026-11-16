@@ -1042,6 +1042,7 @@ const CAST_HAIR=['#4a3a5c','#6b4a32','#2f4a44','#7a4058','#3a3550','#8a6a3a','#b
 const CAST_SKIN=['#f6d7c3','#ecc09f','#d39b74','#b07a54','#87573a','#f3cdb0'];
 /* Candy colours: most beings get a fun skin and bright hair. */
 const CAST_FUNSKIN=['#bfe8d0','#cdbff2','#b9dcf5','#f7c1d6','#f6e3a1','#ffc9a8','#a9e3e0','#e2c4f0','#c4d0ff','#d6f0a8','#9fd3c0','#f2a9c4'];
+const CAST_RACFUR=['#c9b3ea','#f5b8cf','#a8e0c8','#a9cdf0','#f3dc94','#b08a6e','#f6c3a4','#b9c3f5'];
 const CAST_BRIGHT=['#ff7eb6','#f25c9a','#6fb7ff','#3f8cff','#a974ff','#c79bff','#ffd84d','#7fdc6a','#39c7a8','#ff9a4d','#f4f0ff','#5ee0e6'];
 const CAST_FAE=['#cfe6c0','#d9cdf0','#c7e3ec','#f2d3df','#bfe0d0','#e8dcb6'];
 const CAST_BODY={round:{hy:-9,fw:9,top:-20,neck:-2,aw:12},tall:{hy:-17,fw:7,top:-27,neck:-8,aw:9},blob:{hy:-5,fw:9,top:-16,neck:2,aw:13},wiggly:{hy:-16,fw:7,top:-26,neck:-5,aw:8}};
@@ -1063,6 +1064,10 @@ function castLook(key,base={}){
   /* Extra rolls at the end so every existing look keeps its kind and shape. */
   const funSkin=R(),funHair=R(),fs=pick(CAST_FUNSKIN),fh=pick(CAST_BRIGHT);
   if(kind!=='raccoon'&&kind!=='construct'){if(funSkin<.75)r.skin=fs;if(funHair<.85)r.hair=fh;}
+  /* A few guests turn out to be raccoons too, and about half of non-family raccoons have fun fur. */
+  const racRoll=R(),racFur=R(),rf=pick(CAST_RACFUR),fam=r.kind==='raccoon';
+  if(!fam&&!CAST_PINS[id]&&racRoll<.1)r.kind='raccoon';
+  if(r.kind==='raccoon'&&!fam&&racFur<.55)r.fur=rf;
   Object.assign(r,CAST_PINS[id]||CAST_PINS[id.toLowerCase()]||{});
   if(base.color)r.color=base.color;
   r.dark=castShade(r.skin,-.32);r.light=castShade(r.skin,.35);r.coatDk=castShade(r.color,-.3);
@@ -1145,27 +1150,46 @@ function pxPaint(r,dir,blink,frame){
     else mirror([[6,hy+1],[6,hy+2]],skin,skin);};
   /* Painting by kind. */
   if(k==='raccoon'){
-    /* Raccoons are the stars: round fluffy head, big round ears, soft bandit patches, huge shiny eyes,
-       white brows, a button nose, a tiny open smile, rosy cheeks and a big ringed tail. */
-    const fur='#a29eab',furDk='#615c69',mask='#34303c',crm='#fbf6ee',ink='#140f18',pinkE='#f2aec0',bean='#e98aa4';shade.add(fur);
-    const tail=()=>{const pts=[[7,34],[5,32],[4,30],[3,28],[3,26],[4,24],[5,22]];pts.forEach(([x,y],i)=>{const xx=back?32-x:x;E(xx,y,2.9,2.4,i%2?mask:fur,i%2?mask:fur);});};
+    /* Raccoons are the stars. Four face styles (button, plush, fluffy, classic) and any fur colour;
+       the classic grey keeps its hand-picked tones. */
+    const st=r.rstyle||'button',grey=!r.fur,fur=r.fur||'#a29eab',furDk=grey?'#615c69':T(fur,-.35),mask=grey?'#34303c':T(fur,-.66),
+      crm='#fbf6ee',ink='#140f18',pinkE='#f2aec0',bean='#e98aa4',mc='#5a2f38';shade.add(fur);
+    const tail=()=>{const pts=st==='fluffy'?[[7,34],[5,33],[3,31],[2,29],[2,27],[3,25],[4,23],[6,21]]:[[7,34],[5,32],[4,30],[3,28],[3,26],[4,24],[5,22]],rad=st==='fluffy'?3.3:2.9;
+      pts.forEach(([x,y],i)=>{const xx=back?32-x:x;E(xx,y,rad,2.5,i%2?mask:fur,i%2?mask:fur);});if(st==='fluffy'){const [x,y]=pts[pts.length-1];E(back?32-x:x,y-1,2.2,1.8,crm,crm);}};
     if(!back)tail();
     legs(furDk,mask);torso(fur,fur,mask);if(!back){E(16.5,28.5,4.4,4.6,crm,crm,fur);}outfit();
-    for(const ex0 of [9,24]){const t=ex0<16?-1:1;E(ex0,7.5,3.5,3.4,fur);P(ex0+t,3,fur);P(ex0+t,4,fur);P(ex0,4,fur);E(ex0,8,1.8,2.2,back?furDk:pinkE,'ear');P(ex0+t,6,back?furDk:pinkE,'ear');}
-    E(16.5,16.5,11.6,9,fur);
-    mirror([[4,19],[3,20],[4,21],[3,22],[5,23]],fur,fur);
+    /* Ears. */
+    for(const ex0 of [9,24]){const t=ex0<16?-1:1,inner=back?furDk:pinkE;
+      if(st==='classic'){for(let j=0;j<6;j++)R(ex0-3+(t<0?0:j>>1)+(t<0?j>>1:0)-(j>>1),2+j,1+j,1,fur);for(let j=0;j<5;j++)R(ex0-3+(t<0?0:j>>1)+(t<0?j>>1:0)-(j>>1)+2,4+j,Math.max(0,j-1),1,j>1?inner:fur,'ear');}
+      else{E(ex0,7.5,3.5,3.4,fur);if(st!=='plush'){P(ex0+t,3,fur);P(ex0+t,4,fur);P(ex0,4,fur);}E(ex0,8,1.8,2.2,inner,'ear');if(st!=='plush')P(ex0+t,6,inner,'ear');if(st==='fluffy'&&!back){P(ex0,9,crm,'ear');P(ex0-t,8,crm,'ear');}}}
+    E(16.5,st==='plush'?16:16.5,st==='plush'?12.2:11.6,st==='plush'?9.4:9,fur);
+    if(st==='fluffy'){for(let x=7;x<=26;x+=2)P(x,7+(x%4?0:-1),fur,fur);mirror([[4,13],[3,14],[4,16],[2,17],[3,18]],fur,fur);}
+    if(st!=='plush')mirror([[4,19],[3,20],[4,21],[3,22],[5,23]],fur,fur);
     if(back){R(16,9,1,6,furDk);for(const x of [11,22])R(x,11,1,3,furDk);tail();}
-    else{const o=fx;R(16+o,8,1,4,furDk);
+    else{const o=fx,iris=r.iris||(st==='fluffy'?'#c98a2e':st==='classic'?'#5f8f45':'#8a5a34');
+      if(st!=='plush')R(16+o,8,1,4,furDk);
       if(r.tuft)E(16.5,7.5,3.2,2,'#efeaf4');
-      for(const cx of [11,22]){E(cx+o,16.5,4.4,3.6,mask,mask);P(cx+o+(cx<16?-4:4),19,mask,mask);P(cx+o+(cx<16?-5:5),20,mask,mask);}
-      R(9+o,11,4,1,crm,crm);R(20+o,11,4,1,crm,crm);
-      for(const ex of [9,20]){if(blink){P(ex+o,17,'#d8d0e0');R(ex+1+o,16,3,1,'#d8d0e0');P(ex+4+o,17,'#d8d0e0');}
-        else S(['.KKK.','KWWKK','KWWKK','KIKLK','.III.'],ex+o,14,{K:ink,W:white,I:r.iris||'#8a5a34',L:white});}
-      E(16.5+o,21.6,4.4,2.6,crm,crm);for(const cx of [6,27])for(const [dx,dy] of [[0,0],[0,1],[1,1],[-1,2]])P(cx+(cx<16?dx:-dx)+o,21+dy,crm,crm);
-      R(15+o,19,4,1,ink);R(16+o,20,2,1,ink);P(15+o,19,'#6e6678');
-      R(16+o,21,2,1,'#5a2f38');P(15+o,22,'#5a2f38');P(18+o,22,'#5a2f38');R(16+o,22,2,1,'#ec7f96');
-      for(const bx of [8,24]){R(bx+o,21,2,1,'#f7a0b4');P(bx+o,22,'#fbc4d0');}
-      for(const wx of [5,27])P(wx+o,21,'#d6d0dc');
+      if(st==='fluffy')for(const [x,y] of [[15,6],[16,5],[17,6],[18,5],[16,7]])P(x+o,y,T(fur,.35),fur);
+      /* Mask. */
+      if(st==='button'||st==='fluffy')for(const cx of [11,22]){E(cx+o,16.5,4.4,3.6,mask,mask);P(cx+o+(cx<16?-4:4),19,mask,mask);P(cx+o+(cx<16?-5:5),20,mask,mask);}
+      if(st==='plush'){E(16.5+o,16,10.6,3.4,mask,mask);mirror([[6,18],[7,19]],mask,mask);}
+      if(st==='classic'){R(6+o,14,21,5,mask,mask);P(5+o,15,mask,mask);P(27+o,15,mask,mask);P(4+o,16,mask,mask);P(28+o,16,mask,mask);R(15+o,13,3,1,mask,mask);R(15+o,18,3,2,fur,fur);}
+      if(st!=='plush'){R(9+o,11,4,1,crm,crm);R(20+o,11,4,1,crm,crm);}
+      /* Eyes. */
+      for(const ex of st==='plush'?[10,20]:[9,20]){
+        if(blink){P(ex+o,17,'#d8d0e0');R(ex+1+o,16,st==='plush'?2:3,1,'#d8d0e0');P(ex+(st==='plush'?3:4)+o,17,'#d8d0e0');continue;}
+        if(st==='plush')S(['.KK.','KWKK','KKKK','KKWK','.KK.'],ex+o,14,{K:ink,W:white});
+        else if(st==='classic')S(['.SSS.','SWWIS','SWIDS','SIDKS','SILWS','.SSS.'],ex+o,13,{S:white,W:white,I:iris,D:T(iris,-.4),K:ink,L:T(iris,.45)});
+        else S(['.KKK.','KWWKK','KWWKK','KIKLK','.III.'],ex+o,14,{K:ink,W:white,I:iris,L:white});}
+      /* Muzzle, nose, mouth, cheeks. */
+      E(16.5+o,21.6,4.4,2.6,crm,crm);
+      if(st==='button'||st==='fluffy')for(const cx of [6,27])for(const [dx,dy] of [[0,0],[0,1],[1,1],[-1,2]])P(cx+(cx<16?dx:-dx)+o,21+dy,crm,crm);
+      if(st==='plush'){R(16+o,19,2,1,ink);P(15+o,21,mc);P(16+o,22,mc);P(17+o,21,mc);P(18+o,22,mc);P(19+o,21,mc);}
+      else{R(15+o,19,4,1,ink);R(16+o,20,2,1,ink);P(15+o,19,T(ink,.35));
+        if(st==='classic'){P(15+o,22,mc);R(16+o,23,2,1,mc);P(18+o,22,mc);}
+        else{R(16+o,21,2,1,mc);P(15+o,22,mc);P(18+o,22,mc);R(16+o,22,2,1,'#ec7f96');}}
+      const bl=st==='plush'?[[7,20,3],[23,20,3]]:[[8,21,2],[24,21,2]];for(const [bx,by,w] of bl){R(bx+o,by,w,1,'#f7a0b4');R(bx+o,by+1,w,1,'#fbc4d0');}
+      if(st!=='plush')for(const wx of [5,27])P(wx+o,21,'#d6d0dc');
       if(r.specs){for(const sx of [8,19]){R(sx+1+o,13,5,1,gold);R(sx+1+o,19,5,1,gold);R(sx+o,14,1,5,gold);R(sx+6+o,14,1,5,gold);}R(15+o,15,4,1,gold);}
       P(9,31,bean,mask);P(23,31,bean,mask);}
     if(r.outfit==='hat')hat(6);
@@ -1263,8 +1287,9 @@ const PLAYER_EXTRAS={fae:['wings','antlers','leaves','goat','glow'],monster:['ho
 let playerChoice=null;try{const v=JSON.parse(localStorage.getItem(PLAYER_KEY)||'null');if(v&&CAST_OPTIONS.kind.includes(v.kind))playerChoice=v;}catch{}
 function savePlayerChoice(v){playerChoice=v;try{localStorage.setItem(PLAYER_KEY,JSON.stringify(v));}catch{}}
 function playerSkins(kind){return kind==='human'?[...CAST_FUNSKIN.slice(0,6),...CAST_SKIN]:kind==='fae'?[...CAST_FAE,...CAST_FUNSKIN.slice(6)]:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
+function playerRaccoon(coat,fur){const b=castLook('player',{color:coat});if(!fur)return b;const k=coat+fur;if(playerRaccoon.k!==k){playerRaccoon.k=k;playerRaccoon.r={...b,fur};}return playerRaccoon.r;}
 function playerRecipe(coat){
-  const v=playerChoice;if(!v||v.kind==='raccoon')return castLook('player',{color:coat});
+  const v=playerChoice;if(!v||v.kind==='raccoon')return playerRaccoon(coat,v&&v.fur);
   const k=JSON.stringify(v)+coat;if(playerRecipe.k!==k){playerRecipe.k=k;playerRecipe.r=castMake({...v,color:coat,outfit:'vest',extra2:''});}return playerRecipe.r;
 }
 /* Pronouns are optional and stay on this device (never in score codes or team reports).
@@ -1299,7 +1324,7 @@ function openPlayerPicker(){
       '<div style="display:flex;justify-content:center"><canvas id="pp-view" width="320" height="260" style="width:160px;height:130px" aria-hidden="true"></canvas></div>'+
       '<p class="scene-context" style="text-align:center">'+esc(t('Pick anything. You can change it any time from the title screen.'))+'</p>'+
       '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+PLAYER_KINDS.map(([id,l])=>chip(v.kind===id,l,'data-kind="'+id+'"')).join('')+'</div>'+
-      (k==='raccoon'?'':'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+parts.map(([f,l])=>chip(false,t(l)+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
+      (k==='raccoon'?'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+['',...CAST_RACFUR].map(c=>'<button data-fur="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+((v.fur||'')===c?'#4b2f1c':'#fff')+';background:'+(c||'#a29eab')+'"></button>').join('')+'</div>':'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+parts.map(([f,l])=>chip(false,t(l)+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
       '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+playerSkins(k).map(c=>'<button data-skin="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+(v.skin===c?'#4b2f1c':'#fff')+';background:'+c+'"></button>').join('')+'</div>')+
       '<h3 style="text-align:center;margin:22px 0 4px;font:normal 18px Georgia,serif">'+esc(t('What should guests call you? Optional.'))+'</h3>'+
       '<p style="text-align:center;margin:0;font-size:13px;color:#5a6655">'+esc(t('Pick any, or none. Skip it and everyone says “they”.'))+'</p>'+
@@ -1307,11 +1332,12 @@ function openPlayerPicker(){
       '<input id="pp-own" maxlength="24" autocomplete="off" aria-label="'+esc(t('Your own words'))+'" placeholder="'+esc(t('Type your own, like xe/xem'))+'" value="'+esc(v.own||'')+'" style="flex:1 1 180px;max-width:240px;padding:9px 12px;border:1px solid #cbd0bb;border-radius:5px;font:inherit"></div>'+
       '<div class="action-row" style="justify-content:center">'+chip(false,'🎲 Randomize','id="pp-random"')+'<button id="pp-done" class="primary-button" style="flex:0 0 auto">'+esc(t('That’s me'))+'</button></div>');
     const c=$('pp-view').getContext('2d');c.scale(2,2);
-    drawBeing(c,80,104,v.kind==='raccoon'?castLook('player',{color:currentLook().coat}):castMake({...v,color:currentLook().coat,outfit:'vest',extra2:''}),1e-6,'down',false,2.5);
+    drawBeing(c,80,104,v.kind==='raccoon'?playerRaccoon(currentLook().coat,v.fur):castMake({...v,color:currentLook().coat,outfit:'vest',extra2:''}),1e-6,'down',false,2.5);
     const body=$('pp-view').closest('dialog')||document;
     body.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.kind;v={...(id==='raccoon'?{kind:id}:{...randomPlayer(id),...(v.kind===id?v:{})}),pronouns:v.pronouns,own:v.own};draw();});
     body.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{const f=b.dataset.cycle,p=parts.find(x=>x[0]===f);cycle(f,p[2]);});
     body.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{v.skin=b.dataset.skin;draw();});
+    body.querySelectorAll('[data-fur]').forEach(b=>b.onclick=()=>{v.fur=b.dataset.fur||undefined;draw();});
     body.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();});
     $('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24).trim();};
     $('pp-random').onclick=()=>{v={...randomPlayer(),pronouns:v.pronouns,own:v.own};draw();};
