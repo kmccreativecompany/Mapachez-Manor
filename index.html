@@ -1040,6 +1040,9 @@ const CAST_WARM=['#f2b8a0','#e9cf8a','#b9d48f','#e3a9c0','#f0c6a2','#d7a6d9','#9
 const CAST_COOL=['#9fb3e6','#a8d8cc','#c8b3e0','#a9cde0','#b7e0a8','#d0c4f2','#8fd0c4','#bfe3f0'];
 const CAST_HAIR=['#4a3a5c','#6b4a32','#2f4a44','#7a4058','#3a3550','#8a6a3a','#b4532f','#e8dcc8','#2b2522'];
 const CAST_SKIN=['#f6d7c3','#ecc09f','#d39b74','#b07a54','#87573a','#f3cdb0'];
+/* Candy colours: most beings get a fun skin and bright hair. */
+const CAST_FUNSKIN=['#bfe8d0','#cdbff2','#b9dcf5','#f7c1d6','#f6e3a1','#ffc9a8','#a9e3e0','#e2c4f0','#c4d0ff','#d6f0a8','#9fd3c0','#f2a9c4'];
+const CAST_BRIGHT=['#ff7eb6','#f25c9a','#6fb7ff','#3f8cff','#a974ff','#c79bff','#ffd84d','#7fdc6a','#39c7a8','#ff9a4d','#f4f0ff','#5ee0e6'];
 const CAST_FAE=['#cfe6c0','#d9cdf0','#c7e3ec','#f2d3df','#bfe0d0','#e8dcb6'];
 const CAST_BODY={round:{hy:-9,fw:9,top:-20,neck:-2,aw:12},tall:{hy:-17,fw:7,top:-27,neck:-8,aw:9},blob:{hy:-5,fw:9,top:-16,neck:2,aw:13},wiggly:{hy:-16,fw:7,top:-26,neck:-5,aw:8}};
 const CAST_CACHE=new Map(),CAST_TAU=Math.PI*2;
@@ -1055,8 +1058,11 @@ function castLook(key,base={}){
     body:pick(['round','tall','blob','wiggly']),eyes:alien?pick([1,2,3,3]):pick([1,2,2,2]),
     extra:alien?pick(['antennae','antennae','tentacles','glow']):kind==='fae'?pick(['antlers','leaves','goat','wings','wings','glow']):pick(['horns','horns','ears','fur','tail','spots']),
     extra2:R()<.4?(alien?pick(['spots','glow','antennae']):kind==='fae'?pick(['leaves','wings','glow']):pick(['tail','spots','fur'])):'',
-    outfit:pick(['vest','scarf','bow','cardigan','hat']),tooth:kind==='monster'&&R()<.5,specs:R()<.12,hairdo:pick(['short','long','bun','curly'])};
+    outfit:pick(['vest','scarf','bow','cardigan','hat']),tooth:kind==='monster'&&R()<.5,specs:R()<.06,hairdo:pick(['short','long','bun','curly'])};
   if(kind==='construct')r.skin=pick(['#d9d2c3','#c8d3d6','#e0c99c']);
+  /* Extra rolls at the end so every existing look keeps its kind and shape. */
+  const funSkin=R(),funHair=R(),fs=pick(CAST_FUNSKIN),fh=pick(CAST_BRIGHT);
+  if(kind!=='raccoon'&&kind!=='construct'){if(funSkin<.75)r.skin=fs;if(funHair<.85)r.hair=fh;}
   Object.assign(r,CAST_PINS[id]||CAST_PINS[id.toLowerCase()]||{});
   if(base.color)r.color=base.color;
   r.dark=castShade(r.skin,-.32);r.light=castShade(r.skin,.35);r.coatDk=castShade(r.color,-.3);
@@ -1074,7 +1080,7 @@ function castLit(c,top,bot,base,k=.24){const g=c.createLinearGradient(0,top,0,bo
 function castRound(c,x,y,r,base){const g=c.createRadialGradient(x-r*.35,y-r*.45,r*.1,x,y,r*1.05);g.addColorStop(0,castTone(base,.3));g.addColorStop(.6,base);g.addColorStop(1,castTone(base,-.2));return g;}
 /* Ready for a character creator: every choice a player could make, and a recipe built from those choices. */
 const CAST_OPTIONS={kind:['raccoon','human','fae','monster','alien','construct'],body:Object.keys(CAST_BODY),eyes:[1,2,3],hairdo:['short','long','bun','curly'],
-  extra:['','horns','ears','fur','tail','spots','antennae','tentacles','glow','antlers','leaves','goat','wings'],outfit:['vest','scarf','bow','cardigan','hat'],color:CAST_COATS,skin:[...CAST_SKIN,...CAST_FAE,...CAST_WARM,...CAST_COOL],hair:CAST_HAIR};
+  extra:['','horns','ears','fur','tail','spots','antennae','tentacles','glow','antlers','leaves','goat','wings'],outfit:['vest','scarf','bow','cardigan','hat'],color:CAST_COATS,skin:[...CAST_SKIN,...CAST_FAE,...CAST_WARM,...CAST_COOL],hair:[...CAST_BRIGHT,...CAST_HAIR]};
 function castMake(choices={}){const r={...castLook('maker'),...choices,seed:1};r.dark=castShade(r.skin,-.32);r.light=castShade(r.skin,.35);r.coatDk=castShade(r.color,-.3);return r;}
 /* PIXEL CHIBI v3: every being is painted on a small 32 x 44 pixel grid from its recipe, the way a pixel
    artist would: big head, big glossy eyes, chunky hair, coloured outlines and light from the top left.
@@ -1093,17 +1099,19 @@ function pxPaint(r,dir,blink,frame){
   const skin=r.skin,hair=r.hair,coat=r.color,coatDk=T(coat,-.3),hairDk=T(hair,-.35),hairLt=T(hair,.3),iris=castIris(r);
   shade.add(skin);shade.add(hair);shade.add(coat);cast.add(hair);
   /* Faces. */
-  const eye=(x,y,c=iris)=>{if(blink){P(x,y+2,K);P(x+1,y+3,K);P(x+2,y+3,K);P(x+3,y+2,K);return;}
-    S(['KKKK','DWKD','IKKI','ILWI','.II.'],x,y,{K,D:T(c,-.35),I:c,L:T(c,.4),W:white});};
+  const eye=(x,y,c=iris,lash=1)=>{if(blink){P(x,y+3,K);P(x+1,y+2,K);P(x+2,y+2,K);P(x+3,y+2,K);P(x+4,y+3,K);return;}
+    S(['.KKK.','KWWKK','KWKDK','KDDIK','KIILK','.ILI.'],x,y,{K,D:T(c,-.4),I:c,L:T(c,.45),W:white});if(lash){P(x-1,y+1,K);P(x+5,y+1,K);}};
   const bigEye=(x,y)=>{if(blink){R(x,y+3,6,1,K);return;}S(['.KKKK.','KSSSSK','KSWDDK','KSDKIK','KSIKIK','KSLIWK','.KKKK.'],x,y,{K,S:white,W:white,D:T(iris,-.35),I:iris,L:T(iris,.4)});};
   const tinyEye=(x,y)=>{if(blink){R(x,y+2,3,1,K);return;}S(['KKK','DWD','ILI'],x,y,{K,D:T(iris,-.35),I:iris,L:T(iris,.4),W:white});};
-  const face=(hy,eyes=2,mouth=bit(4)?1:0,blushCol='#f0a0a8')=>{const o=fx;
-    if(eyes===1)bigEye(13+o,hy-3);else if(eyes===3){tinyEye(11+o,hy);tinyEye(19+o,hy);tinyEye(15+o,hy-4);}else{eye(11+o,hy-2);eye(18+o,hy-2);}
-    const my=hy+(eyes===1?5:4);
-    if(mouth===1){R(15+o,my,3,1,'#7a3040');P(16+o,my+1,'#e07080');}else{P(15+o,my,'#6a3038');P(16+o,my+1,'#6a3038');P(17+o,my,'#6a3038');}
+  const face=(hy,eyes=2,mouth=bit(4)?1:0,blushCol='#f78aa6')=>{const o=fx;
+    if(eyes===1)bigEye(13+o,hy-3);else if(eyes===3){tinyEye(11+o,hy);tinyEye(19+o,hy);tinyEye(15+o,hy-4);}else{eye(10+o,hy-2,iris,!r.specs);eye(18+o,hy-2,iris,!r.specs);}
+    const my=hy+5,mc='#6a3038',ms=Math.floor(seed*7)%3;
+    if(ms===0){P(14+o,my,mc);P(15+o,my+1,mc);P(16+o,my,mc);P(17+o,my+1,mc);P(18+o,my,mc);}
+    else if(ms===1){R(16+o,my,2,1,mc);R(16+o,my+1,2,1,'#e8788c');}
+    else{P(15+o,my,mc);R(16+o,my+1,2,1,mc);P(18+o,my,mc);}
     if(r.tooth)P(17+o,my+1,white);
-    R(8+o,my-1,2,1,blushCol);R(23+o,my-1,2,1,blushCol);
-    if(r.specs){R(10+o,hy-3,6,1,gold);R(17+o,hy-3,6,1,gold);P(10+o,hy-2,gold);P(15+o,hy-2,gold);P(17+o,hy-2,gold);P(22+o,hy-2,gold);P(16+o,hy-2,gold);R(10+o,hy+3,6,1,gold);R(17+o,hy+3,6,1,gold);}
+    for(const bx of [7,23]){R(bx+o,my-2,3,2,blushCol);P(bx+o,my-2,'#ffd0dc');}
+    if(r.specs){for(const sx of [9,17]){R(sx+1+o,hy-3,5,1,gold);R(sx+1+o,hy+4,5,1,gold);R(sx+o,hy-2,1,6,gold);R(sx+6+o,hy-2,1,6,gold);}P(16+o,hy-1,gold);}
   };
   /* Shared chibi body: torso, arms, legs and shoes, with the outfit on top. */
   const legs=(legCol,shoe,hoof)=>{const l=frame===1?-1:0,rr=frame===3?-1:0;
@@ -1147,12 +1155,12 @@ function pxPaint(r,dir,blink,frame){
     else{const o=fx;R(16+o,8,1,4,furDk);
       if(r.tuft)E(16.5,7.5,3,1.8,'#ebe6ee');
       R(8+o,15,17,4,mask,mask);P(7+o,16,mask,mask);P(25+o,16,mask,mask);R(10+o,14,4,1,mask,mask);R(19+o,14,4,1,mask,mask);
-      eye(10+o,14,r.iris||'#9a6a3a');eye(19+o,14,r.iris||'#9a6a3a');
+      eye(9+o,14,r.iris||'#9a6a3a',0);eye(19+o,14,r.iris||'#9a6a3a',0);
       E(10.5+o,20.5,3.6,2.4,crm,crm);E(22.5+o,20.5,3.6,2.4,crm,crm);E(16.5+o,21,3.6,2.4,crm,crm);
       R(15+o,19,3,1,mask);P(16+o,20,mask);P(15+o,19,'#6a6470');
       P(15+o,22,'#6a3038');P(16+o,23,'#6a3038');P(17+o,22,'#6a3038');R(8+o,19,2,1,'#f0a0a8');R(23+o,19,2,1,'#f0a0a8');
       for(const s of [-1,1])for(const d of [5,6])P(16+o+s*d,21+(d-5),'#b9b4bf');
-      if(r.specs){R(9+o,13,6,1,gold);R(18+o,13,6,1,gold);P(9+o,14,gold);P(14+o,14,gold);P(15+o,14,gold);P(16+o,14,gold);P(17+o,14,gold);P(18+o,14,gold);P(23+o,14,gold);}}
+      if(r.specs){R(8+o,13,7,1,gold);R(18+o,13,7,1,gold);P(8+o,14,gold);P(14+o,14,gold);P(15+o,14,gold);P(16+o,14,gold);P(17+o,14,gold);P(18+o,14,gold);P(24+o,14,gold);}}
     if(r.outfit==='hat')hat(7);
   }
   else if(k==='construct'){
@@ -1165,7 +1173,7 @@ function pxPaint(r,dir,blink,frame){
     R(5,11,2,5,brass);R(26,11,2,5,brass);
     if(!back){const o=fx;R(9+o,9,15,10,'#2b2a36','scr');
       if(blink){R(11+o,13,3,1,'#ffd98a');R(19+o,13,3,1,'#ffd98a');}else{for(const x of [11,19]){R(x+o,12,3,3,'#ffd98a');P(x+o,12,white);P(x+2+o,14,'#e0a040');}}
-      P(14+o,16,'#ffd98a');R(15+o,17,3,1,'#ffd98a');P(18+o,16,'#ffd98a');R(10+o,10,3,1,'#4a4858');R(7,19,1,1,'#ff9aa8');}
+      P(14+o,16,'#ffd98a');R(15+o,17,3,1,'#ffd98a');P(18+o,16,'#ffd98a');R(10+o,16,2,1,'#ff8fb0');R(21+o,16,2,1,'#ff8fb0');R(10+o,10,3,1,'#4a4858');R(7,19,1,1,'#ff9aa8');}
     if(r.outfit==='hat')hat(5);
   }
   else{
@@ -1215,7 +1223,7 @@ function pxPaint(r,dir,blink,frame){
     else if(at(x+1,y)!==m||at(x,y+1)!==m)out[i]=T(m,-.2);
     else if(at(x,y-1)!==m||at(x-1,y)!==m)out[i]=T(m,.18);}
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x;if(col[i])continue;
-    for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=W||yy>=H)continue;const n=col[yy*W+xx];if(n){out[i]=glow?'#cfeaff':mat[yy*W+xx]==='w'?'#9cc0de':T(mat[yy*W+xx]||n,-.6);break;}}}
+    for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]]){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=W||yy>=H)continue;const n=col[yy*W+xx];if(n){out[i]=glow?'#cfeaff':mat[yy*W+xx]==='w'?'#9cc0de':T(mat[yy*W+xx]||n,-.5);break;}}}
   return dir==='left'?out.map((_,i)=>out[Math.floor(i/W)*W+(W-1-i%W)]):out;
 }
 const PX_SPRITES=new WeakMap();
@@ -1247,7 +1255,7 @@ const PLAYER_KINDS=[['raccoon','Raccoon'],['human','Person'],['fae','Fae folk'],
 const PLAYER_EXTRAS={fae:['wings','antlers','leaves','goat','glow'],monster:['horns','ears','fur','tail','spots'],alien:['antennae','tentacles','glow','spots']};
 let playerChoice=null;try{const v=JSON.parse(localStorage.getItem(PLAYER_KEY)||'null');if(v&&CAST_OPTIONS.kind.includes(v.kind))playerChoice=v;}catch{}
 function savePlayerChoice(v){playerChoice=v;try{localStorage.setItem(PLAYER_KEY,JSON.stringify(v));}catch{}}
-function playerSkins(kind){return kind==='human'?CAST_SKIN:kind==='fae'?CAST_FAE:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
+function playerSkins(kind){return kind==='human'?[...CAST_FUNSKIN.slice(0,6),...CAST_SKIN]:kind==='fae'?[...CAST_FAE,...CAST_FUNSKIN.slice(6)]:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
 function playerRecipe(coat){
   const v=playerChoice;if(!v||v.kind==='raccoon')return castLook('player',{color:coat});
   const k=JSON.stringify(v)+coat;if(playerRecipe.k!==k){playerRecipe.k=k;playerRecipe.r=castMake({...v,color:coat,outfit:'vest',extra2:''});}return playerRecipe.r;
@@ -1269,7 +1277,7 @@ function deloresWelcome(){
 }
 function randomPlayer(kind){
   const pick=a=>a[Math.floor(Math.random()*a.length)],k=kind||pick(PLAYER_KINDS)[0];
-  return {kind:k,body:pick(['round','tall','blob','wiggly']),eyes:pick([1,2,3]),extra:PLAYER_EXTRAS[k]?pick(PLAYER_EXTRAS[k]):'',hairdo:pick(CAST_OPTIONS.hairdo),skin:pick(playerSkins(k)),hair:pick(CAST_HAIR)};
+  return {kind:k,body:pick(['round','tall','blob','wiggly']),eyes:pick([1,2,3]),extra:PLAYER_EXTRAS[k]?pick(PLAYER_EXTRAS[k]):'',hairdo:pick(CAST_OPTIONS.hairdo),skin:pick(playerSkins(k)),hair:pick(CAST_OPTIONS.hair)};
 }
 function openPlayerPicker(){
   let v={...(playerChoice||{kind:'raccoon'})};
@@ -1277,7 +1285,7 @@ function openPlayerPicker(){
   function draw(){
     const k=v.kind,parts=[];
     if(k==='monster'||k==='alien')parts.push(['body','Shape',CAST_OPTIONS.body],['eyes','Eyes',[1,2,3]]);
-    if(k==='human'||k==='fae')parts.push(['hairdo','Hair',CAST_OPTIONS.hairdo],['hair','Hair colour',CAST_HAIR]);
+    if(k==='human'||k==='fae')parts.push(['hairdo','Hair',CAST_OPTIONS.hairdo],['hair','Hair colour',CAST_OPTIONS.hair]);
     if(PLAYER_EXTRAS[k])parts.push(['extra',k==='fae'?'Magic':'Extra',PLAYER_EXTRAS[k]]);
     const chip=(on,label,attr)=>'<button class="'+(on?'primary-button':'secondary-button')+'" style="flex:0 0 auto;padding:8px 12px" '+attr+(on?' aria-pressed="true"':'')+'>'+esc(t(label))+'</button>',es=profile.lang==='es',pro=v.pronouns||[];
     openModal(titleHTML(t('Who are you tonight?'),t('YOUR LOOK'))+

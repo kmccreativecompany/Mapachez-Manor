@@ -19,6 +19,10 @@ The whole cast uses it:
 - **Robots**: a screen face with lamp eyes and a little antenna.
 - **Muffin**: drawn small, given crisp edges and the same soft outline, so she matches everyone else.
 
+**Candy colours and extra cute (v3.1).** About three in four beings get a fun skin colour (mint, lavender, sky blue, pink, butter yellow, peach) and most get bright hair (pink, blue, purple, yellow, green, teal, orange). Raccoons and robots keep their own colours. Eyes are bigger with two sparkles, cheeks are rosy, mouths are small (a cat "w", a tiny smile or a little "o"), outlines are softer, a blink is a happy closed "^", and robots have pink cheeks on their screen. The new colour rolls come after all the old ones, so every named character keeps their kind and shape. The "Who are you?" picker offers the new skins and hair colours too.
+
+![Candy colours close up](screenshots/cast-candy-closeup.jpg)
+
 Each grid is made once per direction, walking step and blink, kept in memory and reused, so 30 characters take about 0.2 ms a frame. The kit is about 39 KB, smaller than the v2 detail kit (about 52 KB).
 
 **How close code can get.** The shapes, proportions, outlines and eyes match the style guide well. A hand-drawn sprite sheet would still win on things like flowing hair locks, dress folds and changing facial expressions, because an artist places every pixel by eye. Getting that here would mean adding picture files, which the game avoids to stay free and light.
