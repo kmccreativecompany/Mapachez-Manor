@@ -1152,7 +1152,7 @@ function pxPaint(r,dir,blink,frame){
   if(k==='raccoon'){
     /* Raccoons are the stars. Four face styles (button, plush, fluffy, classic) and any fur colour;
        the classic grey keeps its hand-picked tones. */
-    const st=r.rstyle||'button',grey=!r.fur,fur=r.fur||'#a29eab',furDk=grey?'#615c69':T(fur,-.35),mask=grey?'#34303c':T(fur,-.66),
+    const st=r.rstyle||'plush',grey=!r.fur,fur=r.fur||'#a29eab',furDk=grey?'#615c69':T(fur,-.35),mask=grey?'#34303c':T(fur,-.66),
       crm='#fbf6ee',ink='#140f18',pinkE='#f2aec0',bean='#e98aa4',mc='#5a2f38';shade.add(fur);
     const tail=()=>{const pts=st==='fluffy'?[[7,34],[5,33],[3,31],[2,29],[2,27],[3,25],[4,23],[6,21]]:[[7,34],[5,32],[4,30],[3,28],[3,26],[4,24],[5,22]],rad=st==='fluffy'?3.3:2.9;
       pts.forEach(([x,y],i)=>{const xx=back?32-x:x;E(xx,y,rad,2.5,i%2?mask:fur,i%2?mask:fur);});if(st==='fluffy'){const [x,y]=pts[pts.length-1];E(back?32-x:x,y-1,2.2,1.8,crm,crm);}};

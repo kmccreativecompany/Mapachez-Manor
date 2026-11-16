@@ -23,11 +23,11 @@ The whole cast uses it:
 
 ![Candy colours close up](screenshots/cast-candy-closeup.jpg)
 
-**Extra-cute raccoons.** Delores, her family and the player raccoon have their own face: a round fluffy head with cheek tufts, big round ears with pink insides, soft bandit patches, huge shiny eyes with big sparkles, little white brows, a button nose, a tiny open smile, rosy cheeks, pink paw pads and a bigger ringed tail. Blinks are happy "^" arcs.
+**Extra-cute raccoons.** Raccoons have their own faces. The "button" style has: a round fluffy head with cheek tufts, big round ears with pink insides, soft bandit patches, huge shiny eyes with big sparkles, little white brows, a button nose, a tiny open smile, rosy cheeks, pink paw pads and a bigger ringed tail. Blinks are happy "^" arcs.
 
 ![Raccoons before and after](screenshots/cast-raccoons.jpg)
 
-**Raccoon styles and colours.** There are four raccoon face styles: button (the default), plush, fluffy and classic. Set one with `rstyle` on a recipe, for example in `CAST_PINS`. Any raccoon can have a `fur` colour, and the classic grey is used when none is set. About one guest in ten turns out to be a raccoon, and about half of those have fun fur (lilac, pink, mint, sky, butter, cocoa, peach or periwinkle). Delores stays classic grey. Player raccoons can pick a fur colour on the "Who are you?" screen.
+**Raccoon styles and colours.** There are four raccoon face styles: plush (the default, chosen by the owner), button, fluffy and classic. Set one with `rstyle` on a recipe, for example in `CAST_PINS`. Any raccoon can have a `fur` colour, and the classic grey is used when none is set. About one guest in ten turns out to be a raccoon, and about half of those have fun fur (lilac, pink, mint, sky, butter, cocoa, peach or periwinkle). Delores stays classic grey. Player raccoons can pick a fur colour on the "Who are you?" screen.
 
 ![Raccoon styles and colours](screenshots/cast-raccoon-options.jpg)
 
