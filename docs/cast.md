@@ -23,6 +23,10 @@ The whole cast uses it:
 
 ![Candy colours close up](screenshots/cast-candy-closeup.jpg)
 
+**Extra-cute raccoons.** Delores, her family and the player raccoon have their own face: a round fluffy head with cheek tufts, big round ears with pink insides, soft bandit patches, huge shiny eyes with big sparkles, little white brows, a button nose, a tiny open smile, rosy cheeks, pink paw pads and a bigger ringed tail. Blinks are happy "^" arcs.
+
+![Raccoons before and after](screenshots/cast-raccoons.jpg)
+
 Each grid is made once per direction, walking step and blink, kept in memory and reused, so 30 characters take about 0.2 ms a frame. The kit is about 39 KB, smaller than the v2 detail kit (about 52 KB).
 
 **How close code can get.** The shapes, proportions, outlines and eyes match the style guide well. A hand-drawn sprite sheet would still win on things like flowing hair locks, dress folds and changing facial expressions, because an artist places every pixel by eye. Getting that here would mean adding picture files, which the game avoids to stay free and light.
