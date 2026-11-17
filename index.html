@@ -359,6 +359,14 @@ body.large-text .fun-night p,body.large-text .fun-remember,body.large-text .fun-
 .reduce-motion .heart-motes{display:none}
 @media (prefers-reduced-motion:reduce){.heart-motes{display:none}}
 @media (max-width:560px){.heart-thought{font-size:13px;margin-top:12px}}
+/* CHATS v1: guest-to-guest chats by the lobby chairs. The bubble fades, then the pair walks apart. */
+.lobby-chatter{transition:opacity .5s ease}
+.lobby-chatter.chat-fading{opacity:0}
+.reduce-motion .lobby-chatter{transition:none}
+@media (prefers-reduced-motion:reduce){.lobby-chatter{transition:none}}
+.overheard-dialogue.chat-lines li{margin-left:0;background:#fffdf4;border-radius:12px 12px 12px 3px}
+.overheard-dialogue.chat-lines li.s1{margin-left:auto;background:#e9eedc;border-radius:12px 12px 3px 12px}
+.overheard-stage.chat-end{margin-top:4px}
 </style>
   
 </head>
@@ -979,7 +987,7 @@ const MEMORY_PAGES=[
   {id:'pot',kind:'care',title:'A hand, and a little breathing room',from:'A moment with Chef Mirelle',text:'You carried the heavy stockpot and covered for a break. Looking after the team is part of looking after the manor.'},
   {id:'gallery',kind:'festival',title:'Three little windows',from:'Tide & Fern · fictional demonstration',text:'You lingered over an imagined island in three paintings. The hotel clock waited while you took a look.'},
   {id:'umbrella-story',kind:'festival',title:'Correspondence, slightly damp',from:'Little Island Press · fictional demonstration',text:'An umbrella requested a garden view and left a damp thank-you note. Reception filed what it could.'},
-  {id:'fern-seat',kind:'manor',title:'The hat comes back after dessert',from:'Overheard by the lobby chairs',text:'A very serious seating dispute ended with room for everyone. The fern kept the hat until dessert. Nobody asked what it had ordered.'}
+  {id:'fern-seat',kind:'manor',title:'Sparkling water for the fern',from:'Overheard by the lobby chairs',text:'A very serious seating dispute ended with room for everyone. The fern kept the chair, the hat, and a sparkling water. She seemed to sit up a little taller.'}
 ];
 function createMemoryBook(){return {version:1,moments:[],favorites:[]};}
 function normaliseMemoryBook(value){
@@ -4260,6 +4268,207 @@ PINS.push(
 );
 renderGrowth();checkPins();
 /* ==== end HEART v1 ==== */
+/* ==== CHATS v1: guests talking to each other by the lobby chairs ====
+   Seven little conversations between guests, one pair at a time. Tap the bubble to listen.
+   Once you have heard the whole thing, the bubble fades, the two guests walk off in different
+   directions, and a new pair settles into the chairs a little later.
+   Written with the rules of comedy: three beats, the funny word last, specific details,
+   callbacks to things guests already do, a small misdirection, short lines, and jokes that come
+   from who the guests are. Everyone is laughed with, never at. Hidden stories are hinted, never told.
+   Every word is written here ahead of time (English and Spanish), so it costs nothing to run.
+   Save key: mapachez_chats_v1 (next pair, conversations heard). */
+const CHATS_TEXT={
+en:{
+  kicker:'OVERHEARD BY RECEPTION',point:'Listen by the lobby chairs',
+  listen:'Listen in',again:'Hear it again',clock:'Listening never advances the hotel clock.',
+  ariaListen:'Listen to the conversation by the lobby chairs.',ariaAgain:'Hear the conversation again.',
+  keep:['Keep listening','See how this ends.'],leave:['Let them sort it out','They’ll still be here.'],
+  done:'Return to your evening',book:['Open Memory Book','Keep a little moment from the manor.'],
+  walked:'The chairs are free. Someone new will sit down soon.  ·  Overheard: {n} of {total}',
+  pin:['All Ears','Overhear every conversation by the lobby chairs.'],
+  list:[
+    {id:'fern',title:'A matter of seating',a:{name:'Sunny Marrow'},b:{name:'Zinnia Starling'},
+     intro:'Two guests are having a very quiet disagreement beside an armchair.',
+     lines:[[0,'You gave my chair to a fern.'],[1,'She was here first.'],[0,'She’s wearing my hat.'],
+       [1,'Someone keeps moving her. She deserves one nice night.'],[0,'Fine. She keeps the hat until dessert.'],[1,'She’s never had dessert.'],[0,'Then get her a water. Sparkling.']],
+     stage:'In the armchair sits a potted fern. The hat suits it. Annoyingly well.',
+     end:'The fern seems to sit up a little taller.'},
+    {id:'bells',title:'One note, many spoons',a:{name:'Gwendolyn Butterfield'},b:{name:'Mr. Finch',cast:'finch'},
+     intro:'A collector and a musician share the lobby sofa.',
+     lines:[[0,'Is that a triangle?'],[1,'It is the triangle.'],[0,'How many do you own?'],
+       [1,'One. I’m very committed.'],[0,'I owned four hundred spoons.'],[1,'Owned?'],[0,'This visit it’s bells. Spoons are a closed chapter.'],[1,'May I ring one?'],[0,'Just once.']],
+     end:'He rings it once. One clear note. Gwendolyn quietly starts a new notebook. On the cover: “Triangles.”'},
+    {id:'time',title:'Plenty of time',a:{name:'Ms. Chen'},b:{name:'Dr. Evangeline Merriweather'},
+     intro:'Two guests wait for tea. Only one of them is in a hurry.',
+     lines:[[0,'Any idea how long the tea takes?'],[1,'I never ask. I never rush.'],[0,'Must be nice. I have nine minutes.'],
+       [1,'I have rather more than that.'],[0,'Long holiday?'],[1,'Centuries. I mean weeks. A few weeks.'],[0,'Teach me how to relax.'],[1,'Lesson one: stop checking your watch.']],
+     end:'Ms. Chen nods slowly, thinking it over. Then she checks her watch.'},
+    {id:'muffin',title:'Two professionals',a:{name:'Cece Wrenwood',cast:'Celestine "Cece" Wrenwood'},b:{name:'Basil Thorne'},
+     intro:'Two guests and their companions share the rug by the lobby chairs.',
+     lines:[[1,'What a lovely cat.'],[0,'Thank you. This is Muffin.'],[1,'Is she… hanging by her tail?'],
+       [0,'Only when she’s relaxed.'],[1,'And when she’s nervous?'],[0,'She pretends to be asleep. Very convincingly.'],[1,'Admiral does that at bath time.']],
+     end:'Under the chair, Muffin and Admiral lie perfectly still. Two professionals.'},
+    {id:'blankets',title:'The secret to forty years',a:{name:'Mrs. Calder'},b:{name:'Mr. Calder'},
+     intro:'An anniversary couple share one armchair. It is a little squished.',
+     lines:[[0,'Forty years. What’s our secret?'],[1,'Patience. Kindness. Separate blankets.'],[0,'I do steal the blankets.'],
+       [1,'I know. That’s where the patience comes in.'],[0,'And the kindness?'],[1,'I always bring two.']],
+     end:'She rests her head on his shoulder. Later, Housekeeping is asked for a third blanket.'},
+    {id:'tuesday',title:'The scenic route',a:{name:'Mr. Alvarez'},b:{name:'M. Nine',cast:'nine'},
+     intro:'A tired traveller and a very precise guest compare journeys.',
+     lines:[[0,'My flight was six hours late.'],[1,'Mine took the scenic route.'],[0,'Through which city?'],
+       [1,'Through Tuesday. Twice.'],[0,'…Was it nice?'],[1,'Quiet. Lots of puddles.']],
+     end:'M. Nine shakes out a folded umbrella. It is dry inside, and full of tiny stars.'},
+    {id:'duchess',title:'A real duchess',a:{name:'Pippa'},b:{name:'Lavinia Bloom'},
+     intro:'A small guest has big questions for a guest with a very fancy little dog.',
+     lines:[[0,'Is Duchess a real duchess?'],[1,'She thinks so.'],[0,'Does she have a castle?'],
+       [1,'She has a cushion. She treats it like a castle.'],[0,'My cat Miso has six legs and a crown.'],[1,'…Really?'],[0,'In my drawing. In real life she’s still working on the crown.']],
+     end:'Duchess turns around three times and settles on her cushion like a queen.'}
+  ]
+},
+es:{
+  kicker:'ESCUCHADO EN RECEPCIÓN',point:'Escuchar junto a los sillones del vestíbulo',
+  listen:'Escuchar',again:'Escuchar otra vez',clock:'Escuchar nunca adelanta el reloj del hotel.',
+  ariaListen:'Escucha la conversación junto a los sillones del vestíbulo.',ariaAgain:'Escucha la conversación otra vez.',
+  keep:['Seguir escuchando','Mira cómo termina.'],leave:['Que lo resuelvan solos','Seguirán aquí.'],
+  done:'Volver a tu noche',book:['Abrir el Libro de recuerdos','Guarda un momento de la mansión.'],
+  walked:'Los sillones están libres. Pronto se sentará alguien más.  ·  Escuchadas: {n} de {total}',
+  pin:['Todo oídos','Escucha todas las conversaciones junto a los sillones del vestíbulo.'],
+  list:[
+    {id:'fern',title:'Una cuestión de asientos',a:{name:'Sunny Marrow'},b:{name:'Zinnia Starling'},
+     intro:'Dos huéspedes tienen un desacuerdo muy discreto junto a un sillón.',
+     lines:[[0,'Le diste mi silla a un helecho.'],[1,'Ella llegó primero.'],[0,'Lleva puesto mi sombrero.'],
+       [1,'Alguien no deja de moverla. Se merece una noche bonita.'],[0,'Está bien. Se queda el sombrero hasta el postre.'],[1,'Nunca ha probado el postre.'],[0,'Entonces pídele agua. Con gas.']],
+     stage:'En el sillón hay un helecho en maceta. El sombrero le queda bien. Demasiado bien.',
+     end:'El helecho parece sentarse un poquito más derecho.'},
+    {id:'bells',title:'Una nota, muchas cucharas',a:{name:'Gwendolyn Butterfield'},b:{name:'Mr. Finch',cast:'finch'},
+     intro:'Una coleccionista y un músico comparten el sofá del vestíbulo.',
+     lines:[[0,'¿Eso es un triángulo?'],[1,'Es el triángulo.'],[0,'¿Cuántos tiene?'],
+       [1,'Uno. Soy muy fiel.'],[0,'Yo tuve cuatrocientas cucharas.'],[1,'¿Tuvo?'],[0,'Esta visita son campanitas. Las cucharas son un capítulo cerrado.'],[1,'¿Puedo tocar una?'],[0,'Solo una vez.']],
+     end:'La toca una vez. Una nota clara. Gwendolyn empieza en silencio una libreta nueva. En la tapa: «Triángulos».'},
+    {id:'time',title:'Tiempo de sobra',a:{name:'Sra. Chen',cast:'Ms. Chen'},b:{name:'Dr. Evangeline Merriweather'},
+     intro:'Dos huéspedes esperan el té. Solo una de ellas tiene prisa.',
+     lines:[[0,'¿Sabe cuánto tarda el té?'],[1,'Nunca pregunto. Nunca tengo prisa.'],[0,'Qué suerte. Yo tengo nueve minutos.'],
+       [1,'Yo tengo bastante más.'],[0,'¿Vacaciones largas?'],[1,'Siglos. Digo, semanas. Unas semanas.'],[0,'Enséñeme a relajarme.'],[1,'Lección uno: deje de mirar el reloj.']],
+     end:'La Sra. Chen asiente despacio, pensándolo. Luego mira el reloj.'},
+    {id:'muffin',title:'Dos profesionales',a:{name:'Cece Wrenwood',cast:'Celestine "Cece" Wrenwood'},b:{name:'Basil Thorne'},
+     intro:'Dos huéspedes y sus compañeros comparten la alfombra junto a los sillones.',
+     lines:[[1,'Qué gata tan bonita.'],[0,'Gracias. Se llama Muffin.'],[1,'¿Está… colgada de la cola?'],
+       [0,'Solo cuando está tranquila.'],[1,'¿Y cuando está nerviosa?'],[0,'Se hace la dormida. Muy convincente.'],[1,'Admiral hace lo mismo a la hora del baño.']],
+     end:'Bajo el sillón, Muffin y Admiral se quedan perfectamente quietos. Dos profesionales.'},
+    {id:'blankets',title:'El secreto de cuarenta años',a:{name:'Sra. Calder',cast:'Mrs. Calder'},b:{name:'Sr. Calder',cast:'Mr. Calder'},
+     intro:'Una pareja de aniversario comparte un sillón. Van un poco apretados.',
+     lines:[[0,'Cuarenta años. ¿Cuál es nuestro secreto?'],[1,'Paciencia. Cariño. Mantas separadas.'],[0,'Es que yo te robo la manta.'],
+       [1,'Lo sé. Para eso es la paciencia.'],[0,'¿Y el cariño?'],[1,'Siempre traigo dos.']],
+     end:'Ella apoya la cabeza en su hombro. Más tarde, alguien pide a Limpieza una tercera manta.'},
+    {id:'tuesday',title:'La ruta panorámica',a:{name:'Sr. Alvarez',cast:'Mr. Alvarez'},b:{name:'M. Nine',cast:'nine'},
+     intro:'Dos huéspedes comparan sus viajes. Uno llegó cansado. M. Nine llegó muy puntual.',
+     lines:[[0,'Mi vuelo llegó seis horas tarde.'],[1,'El mío tomó la ruta panorámica.'],[0,'¿Por qué ciudad?'],
+       [1,'Por el martes. Dos veces.'],[0,'…¿Y estuvo bonito?'],[1,'Tranquilo. Muchos charcos.']],
+     end:'M. Nine sacude un paraguas plegado. Por dentro está seco, y lleno de estrellitas.'},
+    {id:'duchess',title:'Una duquesa de verdad',a:{name:'Pippa'},b:{name:'Lavinia Bloom'},
+     intro:'Una huésped pequeña tiene grandes preguntas para la dueña de una perrita muy elegante.',
+     lines:[[0,'¿Duchess es una duquesa de verdad?'],[1,'Ella cree que sí.'],[0,'¿Tiene castillo?'],
+       [1,'Tiene un cojín. Lo trata como un castillo.'],[0,'Mi gata Miso tiene seis patas y una corona.'],[1,'…¿De verdad?'],[0,'En mi dibujo. En la vida real todavía está trabajando en la corona.']],
+     end:'Duchess da tres vueltas y se acomoda en su cojín como una reina.'}
+  ]
+}};
+const CHAT=CHATS_TEXT[profile.lang]||CHATS_TEXT.en;
+const CHATS_KEY='mapachez_chats_v1';
+let chats={version:1,next:0,heard:[]};
+try{const v=JSON.parse(localStorage.getItem(CHATS_KEY)||'null');if(v&&v.version===1){
+  chats.next=Number.isInteger(v.next)&&v.next>=0?v.next%CHAT.list.length:0;
+  chats.heard=Array.isArray(v.heard)?[...new Set(v.heard.filter(id=>CHAT.list.some(c=>c.id===id)))]:[];}}catch{}
+function storeChats(){try{localStorage.setItem(CHATS_KEY,JSON.stringify(chats));}catch{}}
+const chatNow=()=>CHAT.list[chats.next%CHAT.list.length];
+const chatHeard=c=>chats.heard.includes(c.id);
+const chatWho=(c,i)=>i?c.b:c.a;
+/* Times in ms. fade: the bubble fades and the pair turns away. leave/arrive: the walk. gap: empty chairs. */
+const CHAT_WALK={fade:700,leave:3000,arrive:2400,gap:30000};
+/* Where each guest walks: the first one heads west along the foyer, the second one south toward the garden door. */
+const CHAT_PATH=[{dx:-150,dy:14,leave:'left',arrive:'right'},{dx:36,dy:92,leave:'down',arrive:'up'}];
+const chatMove={phase:'here',t0:0,pending:false,chat:null,full:false};
+LOBBY_SCENE.point.name=CHAT.point;
+function chatTick(now){
+  if(chatMove.pending&&!modal.open){chatMove.pending=false;chatMove.full=false;chatMove.chat=chatNow();
+    chats.next=(chats.next+1)%CHAT.list.length;storeChats();
+    chatMove.phase=settings.motion?'away':'leaving';chatMove.t0=now;
+    toast(CHAT.walked.replace('{n}',chats.heard.length).replace('{total}',CHAT.list.length));}
+  if(chatMove.phase==='leaving'&&now-chatMove.t0>=CHAT_WALK.leave){chatMove.phase='away';chatMove.t0=now;}
+  if(chatMove.phase==='away'&&now-chatMove.t0>=CHAT_WALK.gap){chatMove.phase=settings.motion?'here':'arriving';chatMove.t0=now;}
+  if(chatMove.phase==='arriving'&&now-chatMove.t0>=CHAT_WALK.arrive)chatMove.phase='here';
+}
+/* The two guests as they should be drawn right now: seated and chatting, walking off, or walking in. */
+function chatActors(now){
+  if(chatMove.phase==='away')return [];
+  const leaving=chatMove.phase==='leaving',arriving=chatMove.phase==='arriving',c=leaving?chatMove.chat:chatNow();
+  let k=0;
+  if(leaving)k=Math.max(0,Math.min(1,(now-chatMove.t0-CHAT_WALK.fade)/(CHAT_WALK.leave-CHAT_WALK.fade)));
+  if(arriving)k=1-Math.min(1,(now-chatMove.t0)/CHAT_WALK.arrive);
+  const moving=(leaving&&now-chatMove.t0>CHAT_WALK.fade)||arriving;
+  return [0,1].map(i=>{const seat=LOBBY_SCENE.actors[i],path=CHAT_PATH[i],who=chatWho(c,i);
+    return {x:seat.x+path.dx*k,y:seat.y+path.dy*k,dir:leaving?path.leave:arriving?path.arrive:(i?'left':'right'),
+      step:moving?now/95+i*1.7:0,alpha:k<.6?1:Math.max(0,1-(k-.6)/.4),person:{name:who.name,cast:who.cast||who.name}};});
+}
+drawLobbyScene=function(c){
+  if(!lobbySceneAvailable(state))return;
+  const now=performance.now();chatTick(now);
+  rect(c,351,631,29,30,'#947d62',5);rect(c,354,635,23,15,'#c6b58e',3);rect(c,354,657,4,7,'#75644c');rect(c,373,657,4,7,'#75644c');
+  plant(c,366,637,1.12);
+  ellipse(c,366,610,17,4,'#b58a53');rect(c,355,598,22,13,'#cba76b',4);rect(c,355,607,22,3,'#866479');
+  for(const p of chatActors(now)){c.save();c.globalAlpha=p.alpha;drawPerson(c,p.x,p.y,p.person,p.step,p.dir,false,1.2);c.restore();}
+};
+updateLobbyOverlay=function(time,view){
+  const box=$('lobby-chatter'),button=$('lobby-bubble');
+  if(titleVisible||festivalActive||!lobbySceneAvailable(state)||modal.open||document.hidden){box.hidden=true;lobbyView.last=null;return;}
+  const now=performance.now();chatTick(now);
+  /* While they turn to leave, the last line stays a moment, then the bubble fades away. */
+  const fading=chatMove.phase==='leaving'&&now-chatMove.t0<CHAT_WALK.fade;
+  if(chatMove.phase!=='here'&&!fading){box.hidden=true;box.classList.remove('chat-fading');lobbyView.last=null;return;}
+  const p=state.player,near=Math.hypot(p.x-LOBBY_SCENE.point.x,p.y-LOBBY_SCENE.point.y)<330;
+  const dt=lobbyView.last===null?0:Math.max(0,Math.min(250,time-lobbyView.last));lobbyView.last=time;
+  if(!near){box.hidden=true;lobbyView.last=null;return;}
+  if(!settings.motion&&!button.matches(':hover')&&document.activeElement!==button)lobbyView.elapsed+=dt;
+  const c=fading?chatMove.chat:chatNow(),heard=chatHeard(c);
+  const line=fading?c.lines[c.lines.length-1]:c.lines[settings.motion?0:Math.floor(lobbyView.elapsed/7000)%3];
+  const who=chatWho(c,line[0]),seat=LOBBY_SCENE.actors[line[0]];
+  const x=view.ox+seat.x*view.scale,y=view.oy+(seat.y-31)*view.scale;
+  if(x<8||x>view.width-8||y<0||y>view.height-15){box.hidden=true;lobbyView.last=null;return;}
+  const key=c.id+line[0]+line[1]+String(heard)+String(fading);
+  if(lobbyView.line!==key){$('lobby-speaker').textContent=who.name;$('lobby-line').textContent='“'+line[1]+'”';$('lobby-hint').textContent=fading?'':heard?CHAT.again:CHAT.listen;
+    button.setAttribute('aria-label',who.name+': '+line[1]+' '+(heard?CHAT.ariaAgain:CHAT.ariaListen));lobbyView.line=key;}
+  box.hidden=false;box.classList.toggle('chat-fading',fading&&now-chatMove.t0>160);
+  const width=box.offsetWidth,height=box.offsetHeight;
+  const left=Math.max(10,Math.min(view.width-width-10,x-36)),top=Math.max(8,Math.min(view.height-height-12,y-height-16));
+  box.style.transform='translate('+left+'px,'+top+'px)';box.style.setProperty('--tail-x',Math.max(18,Math.min(width-18,x-left))+'px');
+};
+function hearChat(c){
+  if(!chats.heard.includes(c.id)){chats.heard.push(c.id);storeChats();}
+  if(c.id==='fern')state=finishLobbyConversation(state);
+  if(!growth.story.listened){growth.story.listened=true;storeGrowth();}
+  save();checkPins();
+}
+openLobbyConversation=function(){
+  if(festivalActive||!lobbySceneAvailable(state)||chatMove.phase!=='here')return;
+  const c=chatNow(),full=chatMove.full||chatHeard(c);
+  const row=l=>'<li class="s'+l[0]+'"><b>'+esc(chatWho(c,l[0]).name)+'</b>“'+esc(l[1])+'”</li>';
+  const talk=ls=>'<ol class="overheard-dialogue chat-lines">'+ls.map(row).join('')+'</ol>';
+  const stage=(s,cls='')=>s?'<p class="overheard-stage'+cls+'">'+esc(s)+'</p>':'';
+  openModal(titleHTML(c.title,CHAT.kicker)+'<p class="modal-description">'+esc(c.intro)+'</p>'+talk(c.lines.slice(0,3))+
+    (full?stage(c.stage)+talk(c.lines.slice(3))+stage(c.end,' chat-end'):'')+'<p class="festival-note">'+esc(CHAT.clock)+'</p>');
+  if(full){
+    hearChat(c);
+    chatMove.pending=true;
+    const opts=[{text:CHAT.done,run:closeModal}];
+    if(c.id==='fern'&&lobbySceneHeard(state))opts.push({text:CHAT.book[0],detail:CHAT.book[1],run:()=>openMemoryBook('manor')});
+    choices(opts,'lobby-conversation');
+  }else choices([{text:CHAT.keep[0],detail:CHAT.keep[1],run:()=>{chatMove.full=true;openLobbyConversation();}},{text:CHAT.leave[0],detail:CHAT.leave[1],run:closeModal}],'lobby-conversation');
+  narrativeText=body.innerText;
+};
+{const chatExtras=world.options.extras;
+ world.options.extras=()=>chatExtras().filter(e=>e.id!==LOBBY_SCENE.id||chatMove.phase==='here');}
+PINS.push({id:'all-ears',icon:'🛋️',name:CHAT.pin[0],hint:CHAT.pin[1],test:()=>chats.heard.length>=CHAT.list.length});
+renderGrowth();checkPins();
+/* ==== end CHATS v1 ==== */
 
 
 })();
