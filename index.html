@@ -881,7 +881,7 @@ const FESTIVAL_EXHIBITORS=[
   {id:'moon',name:'Moss & Moon',talents:['Musician'],point:'stage',line:'Small melodies for a quiet island.',about:'An imagined independent musician sharing a short instrumental soundcheck on the demonstration stage.'},
   {id:'fern',name:'Tide & Fern Studio',talents:['Artist'],point:'gallery',line:'Windows onto somewhere peaceful.',about:'An imagined island studio exhibiting three small landscapes. Browse the pictures at your own pace.'},
   {id:'press',name:'Little Island Press',talents:['Writer'],point:'books',line:'Stories with room for a cup of tea.',about:'An imagined independent press sharing a short story opening. The bookmark is, for once, exactly where it belongs.'},
-  {id:'stargazer',name:'Corey Lightsey',talents:['Musician','Author','Mathematician'],creator:true,point:'music',about:'A drummer first, though Corey can coax a tune out of almost any instrument. He plans every set down to the last beat, keeps perfect time, and always saves a seat for whoever looks a little lost. Ask about the math of a good groove: the answer is clever, kind, and comes with a very dry joke.',links:[]}
+  {id:'stargazer',name:'Corey Lightsey',talents:['Musician','Author','Mathematician'],creator:true,point:'music',about:'A drummer first, though Corey can coax a tune out of almost any instrument. He plans every set down to the last beat, keeps perfect time, and always saves a seat for a friend.',quips:['I counted the beats in that song. There were exactly enough.','I don’t panic. I just rehearse the problem first.','Drums are just math you’re allowed to hit.','Sit down, you look lost. I made a seating chart for that.'],links:[]}
 ];
 const FESTIVAL_TALENT_OPTIONS=[
   {label:'Musician',category:'Music',display:'Music'},
@@ -2235,9 +2235,12 @@ function openFestivalDirectory(category='All'){
   }
   $('festival-preview-link').onclick=openPerformancePreview;narrativeText=body.innerText;
 }
+/* A booth with quips says a different one each visit (starting somewhere random). */
+let quipTurn=Math.random()*97|0;
+function quipHTML(e){if(!e.quips?.length)return '';const q=e.quips[quipTurn++%e.quips.length];return '<p class="scene-copy booth-quip" style="margin-top:10px;font-style:italic">“'+esc(q)+'”<small style="display:block;font-style:normal;font-size:13px;opacity:.75;margin-top:4px">— '+esc(e.name)+'</small></p>';}
 function openFestivalProfile(id){
   const exhibitor=festivalExhibitors('All',festivalBoothTalents()).find(x=>x.id===id);if(!exhibitor)return;
-  openModal(titleHTML(exhibitor.name,exhibitor.label+' · FESTIVAL EXHIBITOR')+'<span class="festival-tag">'+(exhibitor.creator?'Creator persona':'Fictional exhibitor · demonstration')+'</span><p class="scene-copy" style="margin-top:18px">'+esc(exhibitor.line)+'</p>'+(exhibitor.about?'<p class="modal-description">'+esc(exhibitor.about)+'</p>':'')+'<p class="modal-description">'+(exhibitor.creator?'Visiting Yaupon Island':'<b>Serving:</b> Yaupon Island')+'</p><div id="exhibitor-actions" class="action-row"></div>');
+  openModal(titleHTML(exhibitor.name,exhibitor.label+' · FESTIVAL EXHIBITOR')+'<span class="festival-tag">'+(exhibitor.creator?'Creator persona':'Fictional exhibitor · demonstration')+'</span><p class="scene-copy" style="margin-top:18px">'+esc(exhibitor.line)+'</p>'+quipHTML(exhibitor)+(exhibitor.about?'<p class="modal-description">'+esc(exhibitor.about)+'</p>':'')+'<p class="modal-description">'+(exhibitor.creator?'Visiting Yaupon Island':'<b>Serving:</b> Yaupon Island')+'</p><div id="exhibitor-actions" class="action-row"></div>');
   const add=(label,handler)=>{const b=document.createElement('button');b.className='secondary-button';b.textContent=label;b.onclick=handler;$('exhibitor-actions').append(b);};
   if(id==='moon'||id==='lantern')add('Listen to soundcheck',()=>{void playFestivalTrack(id==='moon'?'moon':'lantern');});
   if(id==='fern')add('View the exhibition',openFestivalGallery);
