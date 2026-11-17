@@ -864,7 +864,7 @@ function ending(s) {
 const FESTIVAL_POINTS={
   stage:{x:640,y:336,name:'Lantern stage'},
   programme:{x:640,y:432,name:'Programme board'},
-  music:{x:240,y:528,name:'Stargazer Katie · creator booth'},
+  music:{x:240,y:528,name:'Corey Lightsey · creator booth'},
   gallery:{x:1040,y:528,name:'Tide & Fern · gallery'},
   books:{x:240,y:688,name:'Little Island Press · books'},
   welcome:{x:1040,y:688,name:'Festival welcome desk'},
@@ -881,7 +881,7 @@ const FESTIVAL_EXHIBITORS=[
   {id:'moon',name:'Moss & Moon',talents:['Musician'],point:'stage',line:'Small melodies for a quiet island.',about:'An imagined independent musician sharing a short instrumental soundcheck on the demonstration stage.'},
   {id:'fern',name:'Tide & Fern Studio',talents:['Artist'],point:'gallery',line:'Windows onto somewhere peaceful.',about:'An imagined island studio exhibiting three small landscapes. Browse the pictures at your own pace.'},
   {id:'press',name:'Little Island Press',talents:['Writer'],point:'books',line:'Stories with room for a cup of tea.',about:'An imagined independent press sharing a short story opening. The bookmark is, for once, exactly where it belongs.'},
-  {id:'stargazer',name:'Stargazer Katie',talents:['Musician','Artist','Writer'],creator:true,point:'music',about:'',links:[]}
+  {id:'stargazer',name:'Corey Lightsey',talents:['Musician','Author','Mathematician'],creator:true,point:'music',about:'A drummer first, though Corey can coax a tune out of almost any instrument. He plans every set down to the last beat, keeps perfect time, and always saves a seat for whoever looks a little lost. Ask about the math of a good groove: the answer is clever, kind, and comes with a very dry joke.',links:[]}
 ];
 const FESTIVAL_TALENT_OPTIONS=[
   {label:'Musician',category:'Music',display:'Music'},
@@ -1771,7 +1771,7 @@ class ManorWorld {
       text(c,mark,x+100,y+36,25,'#f6e3ad','Georgia');
       c.save();c.shadowColor='rgba(10,30,20,.55)';c.shadowBlur=4;c.shadowOffsetY=1;text(c,label,x+100,y+92,14,'#fff6dc','Georgia, serif');c.restore();
     };
-    booth(140,418,(this.options.musicBoothName?.()||'Stargazer Katie').toUpperCase().slice(0,24),'#a596cf','✦');booth(940,418,'TIDE & FERN','#86b2d4','▧');
+    booth(140,418,(this.options.musicBoothName?.()||'Corey Lightsey').toUpperCase().slice(0,24),'#a596cf','♪');booth(940,418,'TIDE & FERN','#86b2d4','▧');
     booth(140,578,'LITTLE ISLAND PRESS','#d995a9','Aa');booth(940,578,'WELCOME & GUIDE','#dfbd62','?');
     rect(c,590,382,100,26,'#3d5a45',3);stroke(c,590,382,100,26,'#d4bb7e',2,3);text(c,'PROGRAMME',640,400,10,'#f6e8c5');
     for(const x of [523,757]){ellipse(c,x,543,45,25,'#99845c');ellipse(c,x,538,43,23,'#e0cda5');plant(c,x,532,.7);for(const dx of [-55,55]){rect(c,x+dx-11,533,22,19,'#cfbb91',5);}}
@@ -2228,7 +2228,7 @@ function leaveFestival(){
 }
 function openFestivalDirectory(category='All'){
   const categories=festivalCategories(festivalDirectoryItems());if(!categories.includes(category))category='All';
-  openModal(titleHTML('A little island of discoveries','THE FESTIVAL BOOTHS')+'<p class="modal-description">Meet Stargazer Katie alongside fictional demonstration exhibitors. Music, pictures, and pages to linger over.</p><div id="festival-tabs" class="festival-tabs" aria-label="Exhibit categories"></div><div id="festival-exhibitors" class="festival-grid"></div><button id="festival-preview-link" class="secondary-button">Preview a performance link</button>',true);
+  openModal(titleHTML('A little island of discoveries','THE FESTIVAL BOOTHS')+'<p class="modal-description">Meet Corey Lightsey alongside fictional demonstration exhibitors. Music, pictures, and pages to linger over.</p><div id="festival-tabs" class="festival-tabs" aria-label="Exhibit categories"></div><div id="festival-exhibitors" class="festival-grid"></div><button id="festival-preview-link" class="secondary-button">Preview a performance link</button>',true);
   for(const label of categories){const button=document.createElement('button');button.textContent=label;button.setAttribute('aria-pressed',String(label===category));button.onclick=()=>openFestivalDirectory(label);$('festival-tabs').append(button);}
   for(const exhibitor of festivalDirectoryItems(category)){
     const button=document.createElement('button');button.className='exhibitor-card';button.dataset.exhibitor=exhibitor.id;button.innerHTML='<span class="festival-tag">'+esc(exhibitor.label)+(exhibitor.id==='local-preview'?' · local preview':'')+'</span><b>'+esc(exhibitor.name)+'</b><small>'+esc(exhibitor.line)+'</small>';button.onclick=()=>exhibitor.id==='local-preview'?openLocalPerformanceProfile():openFestivalProfile(exhibitor.id);$('festival-exhibitors').append(button);
@@ -2310,7 +2310,7 @@ setInterval(updateFestivalProgramme,250);
 const world=new ManorWorld($('world'),{
   state:()=>festivalActive?{...state,player:festivalPosition}:state,active:()=>!!state&&!titleVisible,
   festival:()=>festivalActive,
-  musicBoothName:()=>localPerformancePreview()?.name||'Stargazer Katie',
+  musicBoothName:()=>localPerformancePreview()?.name||'Corey Lightsey',
   paused:()=>modal.open||(!festivalActive&&state?.phase==='ended'),
   focus:()=>festivalActive?null:getTasks(state||createState(1)).find(t=>t.id===focused)?.station,
   settings:()=>settings,
