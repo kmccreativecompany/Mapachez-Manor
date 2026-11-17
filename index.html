@@ -336,6 +336,29 @@ body.large-text .fun-night p,body.large-text .fun-remember,body.large-text .fun-
 @media(max-width:650px){#modal.silver-key-modal{padding:20px 14px 10px}}
 @media(max-width:800px){.title-crest.crest-art{width:66px;height:77px}}
 @media(max-width:520px){.shift-sidebar{grid-template-columns:1fr}.shift-clock{flex-wrap:wrap;row-gap:4px}.shift-clock>.overline{max-width:none;width:100%;line-height:1.4}.task-list{grid-template-columns:1fr}.evening-progress,.radio-note{grid-column:1/-1}.evening-progress>div:first-child{white-space:nowrap}}
+/* HEART v1: a gentle, dreamy voice. Soft gold motes on the title, a nightly thought, warm verdicts, little glimmers to find. */
+.heart-motes{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.heart-motes i{position:absolute;bottom:-12px;width:5px;height:5px;border-radius:50%;background:#ffe9b0;box-shadow:0 0 10px 3px rgba(255,220,140,.55);opacity:0;animation:heartMote 14s linear infinite}
+@keyframes heartMote{0%{transform:translate(0,0);opacity:0}12%{opacity:.85}50%{transform:translate(18px,-48vh)}85%{opacity:.6}100%{transform:translate(-10px,-96vh);opacity:0}}
+.heart-thought{margin:16px 0 0;max-width:430px;padding:10px 14px;border-left:2px solid rgba(215,183,120,.7);background:rgba(255,240,205,.06);border-radius:0 8px 8px 0;font:italic 14px/1.6 Georgia,serif;color:#f1e6cc}
+.heart-thought small{display:block;font:600 10px/1.4 system-ui,sans-serif;letter-spacing:.14em;color:#d7b778;font-style:normal;margin-bottom:3px}
+.heart-thought .heart-back{display:block;font-style:normal;color:#ffe3a3;margin-bottom:4px}
+.gm-result.ok .gm-verdict{color:#5b6b33}
+.gm-result.miss .gm-verdict{color:#4c4f78}
+.gm-result.best .gm-verdict{text-shadow:0 0 18px rgba(255,214,120,.55)}
+.gm-heart{margin:0;padding:12px 14px;border-radius:8px;background:linear-gradient(135deg,#f3eefb,#fbf3e2);font:italic 15px/1.55 Georgia,serif;color:#3d3a5c;text-align:center}
+.gm-heart small{display:block;font:600 10px/1.4 system-ui,sans-serif;letter-spacing:.14em;color:#8a7bb0;font-style:normal;margin-bottom:4px}
+.heart-journal{display:grid;gap:6px;max-height:min(60vh,520px);overflow:auto;padding-right:4px}
+.heart-sec{font:600 12px/1.4 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#7a6331;margin:10px 0 2px;display:flex;justify-content:space-between}
+.heart-sec small{color:#8a7bb0;letter-spacing:0}
+.heart-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.heart-list li{padding:9px 12px;border-radius:8px;font:italic 14px/1.5 Georgia,serif}
+.heart-list li.found{background:linear-gradient(135deg,#fbf3e2,#f3eefb);color:#3d3a5c}
+.heart-list li.found b{display:block;font-style:normal;color:#5a4a20;margin-bottom:2px}
+.heart-list li.blank{color:#9a958a;border:1px dashed #d8cfbb;background:transparent}
+.reduce-motion .heart-motes{display:none}
+@media (prefers-reduced-motion:reduce){.heart-motes{display:none}}
+@media (max-width:560px){.heart-thought{font-size:13px;margin-top:12px}}
 </style>
   
 </head>
@@ -4053,6 +4076,190 @@ renderGrowth();checkPins();
 /* ==== end FUN v1 ==== */
 /* VISUAL POLISH v1: the manor crest shows Delores exactly as she looks in the game (Plush raccoon face, code-drawn). */
 document.querySelectorAll('.crest-face').forEach(cv=>paintBust(cv,{cast:'delores'},30,3));
+
+/* ==== HEART v1: a gentle, dreamy, kind voice for the whole manor ====
+   The manor's personality: imaginative, quietly hopeful and kind. Mistakes are met with warmth,
+   good answers with wonder, and there are small poetic things to find while you walk.
+   Every word is written here ahead of time (English and Spanish). Nothing is generated while
+   playing, nothing is downloaded, and the glimmers are a few canvas strokes, so it costs nothing to run.
+   Writing rules: show the feeling, never name it; short lines; kind to everyone; no room numbers. */
+const HEART_TEXT={
+en:{
+  best:['Wonderful. That’s the Silver Key way.','You saw what they needed before they said it.','That was kindness, done beautifully.','Gentle, clear and exactly right.','That’s the kind of care people remember.','Somewhere a guest is smiling. You know why.'],
+  ok:['So close. Your heart was in the right place.','A good instinct. Here’s how to make it shine.','Almost there. Here’s the gentle way to finish it.','Nearly. Let’s polish it together.'],
+  miss:['Not this time, and that’s alright.','Every good host learns this one. Here’s how.','No harm done. Now you know, and knowing helps.','That’s okay. Even Delores had a first night.','A soft stumble. Here’s the path that helps them most.'],
+  later:'This guest will come back soon, and you’ll get another try.',
+  thoughtKicker:'TONIGHT’S LITTLE THOUGHT',
+  back:'Welcome back. The manor kept a lamp on for you.',
+  thoughts:['Be gentle with yourself tonight. You’re learning.','Kindness is a skill, and you get to practise it.','The best hosts notice the small things.','Every guest carries a story. Listen for it.','You don’t need to be perfect. Just present.','A warm welcome can change someone’s whole trip.','Mistakes are how good instincts are made.','Leave every room a little softer than you found it.','Quiet care is still care.','Someone tonight will remember how you made them feel.','Small, steady and kind. That’s enough.','Curiosity is where great service begins.','It’s okay to take your time.','The manor is glad you’re here.'],
+  goodbyeKicker:'BEFORE YOU GO',
+  goodbye:['Somewhere upstairs, someone is sleeping better because of you.','The lamps are dimmer now, but the manor feels warmer.','Every guest you helped tonight will carry a little of it home.','You didn’t just finish a shift. You made a few people feel seen.','The night was kinder because you were in it.','Rest well. The manor will keep your place.'],
+  glimmerName:'A little glimmer',
+  glimmerFound:'✨ “{line}”  ·  Little wonders: {n} of {total}',
+  wonders:['The lobby clock ticks a little slower when someone is reading.','Every lamp in the manor was lit by someone who hoped you would come.','A guest left a pressed flower in a library book. It is still keeping their place.','The moon checks in every night. It never asks for a late checkout.','Somewhere upstairs, a kind word is still echoing.','The piano hums one note when nobody is playing. It sounds like relief.','Tea tastes better when someone remembered how you take it.','The stairs creak in the same spot every night, like a friend saying hello.','A forgotten umbrella waits by the door, sure its person will come back.','Small kindnesses are never small to the one who receives them.','The lilies lean toward whoever waters them.','Every guest is the main character of their own story.','A hallway candle has been burning for exactly one good conversation.','Delores keeps a jar of unclaimed buttons. She calls them “maybe someday.”','The night breeze remembers every window that was opened for it.','A child once drew the manor with a smile on the roof. It is pinned behind the desk.','Patience is love that has decided to wait.','The mail slot delivered eleven thank-you notes this year. It is very proud.','Somewhere, a star is shining at exactly your speed.','A good listener can make a small room feel enormous.','The old armchair remembers everyone who ever dozed off in it.','You don’t have to be perfect to be the best part of someone’s day.','The kettle sings for whoever is up late.','Every key on the board has a little story tied to it, and a little hope.','Rain sounds kinder from inside a place that cares about you.','Muffin sat on your shoe for one whole second. That counts.','A smile at two in the morning is worth twice as much.','The manor has one secret room: wherever someone feels at home.','Some guests come for the view and stay for the welcome.','You noticed this. That is the whole trick.'],
+  noteName:'A note under a door',
+  noteFound:'✉️ “{line}”  ·  Notes found: {n} of {total}',
+  notes:['“Thank you for the extra blanket. I slept like the moon.”','“Whoever folded the towels into a swan: it made my whole week.”','“I came here sad and I am leaving a little less. Thank you.”','“The tea was perfect. So was the quiet.”','“My grandmother stayed here once. I think I understand why now.”','“I wrote a poem on your stationery. I am keeping it, sorry.”','“Please tell the night staff they are doing beautifully.”','“The lamp by the window is my favourite lamp in the world.”','“Someone remembered my name on day two. I nearly cried.”','“I left a little drawing for whoever finds this. It is a raccoon. Obviously.”','“I didn’t need anything tonight. It was nice to know I could ask.”','“Keep being gentle. It shows.”'],
+  rareKicker:'One of a kind',
+  rare:[['🪶','A feather from no bird anyone has seen','It is warm, as if it was just somewhere sunny. Delores says to keep it. She did not say why.'],['🗝️','A tiny silver key that fits nothing','Yet. Some keys wait years for their door.'],['🐚','A shell that hums','Hold it close and you can hear a beach that may not exist.'],['🌙','A crescent moon button','It fell off the night’s coat. The night has not asked for it back.'],['🎼','One page of an unfinished song','The last line is blank. It seems to be waiting for you.'],['🕯️','A candle stub that never melts','Lit once for a guest who was afraid of the dark. They are not, anymore.']],
+  journal:'Keepsakes',journalKicker:'YOUR KEEPSAKE JOURNAL',
+  journalIntro:'Little things found while walking the manor. Some are everywhere. Some only appear once.',
+  secWonders:'Small wonders',secNotes:'Notes under doors',secRare:'One of a kind',
+  unfound:'Still out there, somewhere.',rareUnfound:'Not yet found. Rare things take their time.',
+  pins:{few:['Small Wonders','Find 5 keepsakes around the manor.'],all:['A Jar Full of Wonders','Find every small wonder and every note.'],rare:['One of a Kind','Some things only appear once.']}
+},
+es:{
+  best:['Excelente. Así se hace al estilo Silver Key.','Viste lo que necesitaban antes de que lo dijeran.','Eso fue amabilidad, hecha con belleza.','Suave, claro y justo lo correcto.','Ese es el tipo de cuidado que la gente recuerda.','En algún lugar sonríe un huésped. Tú sabes por qué.'],
+  ok:['Casi. Tu corazón estaba en el lugar correcto.','Buen instinto. Así se hace brillar.','Ya casi. Así se termina con suavidad.','Muy cerca. Vamos a pulirlo juntos.'],
+  miss:['Esta vez no, y está bien.','Todo buen anfitrión aprende esta. Así se hace.','No pasó nada malo. Ahora lo sabes, y eso ayuda.','No pasa nada. Hasta Delores tuvo una primera noche.','Un pequeño tropiezo. Este es el camino que más les ayuda.'],
+  later:'Este huésped volverá pronto y tendrás otra oportunidad.',
+  thoughtKicker:'EL PEQUEÑO PENSAMIENTO DE ESTA NOCHE',
+  back:'Qué bueno verte de nuevo. La mansión te dejó una lámpara encendida.',
+  thoughts:['Sé amable contigo esta noche. Estás aprendiendo.','La amabilidad es una habilidad, y puedes practicarla.','Los mejores anfitriones notan las cosas pequeñas.','Cada huésped trae una historia. Escúchala.','No necesitas perfección. Solo estar presente.','Una bienvenida cálida puede cambiar todo un viaje.','Los errores son cómo nacen los buenos instintos.','Deja cada habitación un poco más suave de como la encontraste.','El cuidado silencioso también es cuidado.','Alguien recordará esta noche cómo le hiciste sentir.','Poco a poco, con calma y con cariño. Eso basta.','La curiosidad es donde empieza el gran servicio.','Está bien tomarse su tiempo.','La mansión se alegra de que estés aquí.'],
+  goodbyeKicker:'ANTES DE IRTE',
+  goodbye:['En algún piso de arriba, alguien duerme mejor gracias a ti.','Las lámparas brillan menos, pero la mansión se siente más cálida.','Cada huésped que ayudaste esta noche se llevará un poquito a casa.','No solo terminaste un turno. Hiciste que algunas personas se sintieran vistas.','La noche fue más amable porque estabas en ella.','Descansa. La mansión te guardará el lugar.'],
+  glimmerName:'Un pequeño destello',
+  glimmerFound:'✨ “{line}”  ·  Pequeñas maravillas: {n} de {total}',
+  wonders:['El reloj del vestíbulo avanza más despacio cuando alguien está leyendo.','Cada lámpara de la mansión la encendió alguien que esperaba que vinieras.','Un huésped dejó una flor prensada en un libro. Todavía le guarda la página.','La luna se registra cada noche. Nunca pide salir tarde.','En algún piso de arriba, una palabra amable todavía resuena.','El piano tararea una nota cuando nadie lo toca. Suena a alivio.','El té sabe mejor cuando alguien recordó cómo lo tomas.','La escalera cruje en el mismo lugar cada noche, como un amigo que saluda.','Un paraguas olvidado espera junto a la puerta, seguro de que su dueño volverá.','Las pequeñas amabilidades nunca son pequeñas para quien las recibe.','Los lirios se inclinan hacia quien los riega.','Cada huésped es el protagonista de su propia historia.','Una vela del pasillo lleva encendida exactamente una buena conversación.','Delores guarda un frasco de botones sin dueño. Los llama “quizás algún día”.','La brisa nocturna recuerda cada ventana que se abrió para ella.','Un niño dibujó la mansión con una sonrisa en el tejado. Está clavado detrás del mostrador.','La paciencia es cariño que decidió esperar.','La ranura del correo entregó once notas de agradecimiento este año. Está muy orgullosa.','En algún lugar, una estrella brilla exactamente a tu ritmo.','Quien sabe escuchar puede hacer enorme una habitación pequeña.','El sillón viejo recuerda a todos los que se quedaron dormidos en él.','No hace falta la perfección para ser lo mejor del día de alguien.','La tetera canta para quien se queda despierto.','Cada llave del tablero tiene una pequeña historia atada, y una pequeña esperanza.','La lluvia suena más amable desde un lugar que te cuida.','Muffin se sentó en tu zapato un segundo entero. Eso cuenta.','Una sonrisa a las dos de la mañana vale el doble.','La mansión tiene una habitación secreta: donde alguien se siente en casa.','Algunos huéspedes vienen por la vista y se quedan por la bienvenida.','Notaste esto. Ese es todo el truco.'],
+  noteName:'Una nota bajo una puerta',
+  noteFound:'✉️ “{line}”  ·  Notas encontradas: {n} de {total}',
+  notes:['“Gracias por la manta extra. Dormí como la luna.”','“A quien dobló las toallas en forma de cisne: me alegró toda la semana.”','“Llegué triste y me voy un poco menos. Gracias.”','“El té estuvo perfecto. El silencio también.”','“Mi abuela se hospedó aquí una vez. Creo que ahora entiendo por qué.”','“Escribí un poema en su papel de cartas. Me lo llevo, perdón.”','“Por favor díganle al personal de noche que lo hace de maravilla.”','“La lámpara junto a la ventana es mi lámpara favorita del mundo.”','“Alguien recordó mi nombre el segundo día. Casi lloro.”','“Dejé un dibujito para quien encuentre esto. Es un mapache. Obviamente.”','“No necesité nada esta noche. Fue lindo saber que podía pedirlo.”','“Sigan siendo amables. Se nota.”'],
+  rareKicker:'Único en su clase',
+  rare:[['🪶','Una pluma de un pájaro que nadie ha visto','Está tibia, como si acabara de estar en un lugar soleado. Delores dice que la guardes. No dijo por qué.'],['🗝️','Una llavecita de plata que no abre nada','Todavía. Algunas llaves esperan años a su puerta.'],['🐚','Una concha que tararea','Acércala al oído y oirás una playa que quizás no existe.'],['🌙','Un botón con forma de luna','Se le cayó al abrigo de la noche. La noche no lo ha reclamado.'],['🎼','Una página de una canción sin terminar','La última línea está en blanco. Parece que te espera.'],['🕯️','Un cabo de vela que nunca se derrite','Se encendió una vez para un huésped que temía la oscuridad. Ya no la teme.']],
+  journal:'Recuerdos',journalKicker:'TU DIARIO DE RECUERDOS',
+  journalIntro:'Cositas encontradas paseando por la mansión. Algunas están por todas partes. Otras solo aparecen una vez.',
+  secWonders:'Pequeñas maravillas',secNotes:'Notas bajo las puertas',secRare:'Únicos en su clase',
+  unfound:'Todavía anda por ahí.',rareUnfound:'Aún sin encontrar. Las cosas raras se toman su tiempo.',
+  pins:{few:['Pequeñas maravillas','Encuentra 5 recuerdos por la mansión.'],all:['Un frasco lleno de maravillas','Encuentra todas las maravillas y todas las notas.'],rare:['Único en su clase','Algunas cosas solo aparecen una vez.']}
+}};
+const HEART=HEART_TEXT[profile.lang]||HEART_TEXT.en;
+const HEART_KEY='mapachez_heart_v1';
+let heart={version:1,found:[],notes:[],rare:[],lastVisit:''};
+try{const v=JSON.parse(localStorage.getItem(HEART_KEY)||'null');if(v&&v.version===1){heart.found=Array.isArray(v.found)?[...new Set(v.found.filter(n=>Number.isInteger(n)&&n>=0&&n<HEART.wonders.length))]:[];heart.lastVisit=typeof v.lastVisit==='string'?v.lastVisit:'';const keep=(a,len)=>Array.isArray(a)?[...new Set(a.filter(n=>Number.isInteger(n)&&n>=0&&n<len))]:[];heart.notes=keep(v.notes,HEART.notes.length);heart.rare=keep(v.rare,HEART.rare.length);}}catch{}
+function storeHeart(){try{localStorage.setItem(HEART_KEY,JSON.stringify(heart));}catch{}}
+const heartPick=(list,n)=>list[((n%list.length)+list.length)%list.length];
+
+/* Title: a few drifting gold motes and one little thought for tonight (the same for everyone that day). */
+{
+  const screen=document.querySelector('.title-screen');
+  if(screen){const m=document.createElement('div');m.className='heart-motes';m.setAttribute('aria-hidden','true');
+    for(let k=0;k<9;k++){const i=document.createElement('i');i.style.left=(6+k*11+(k%3)*2)+'%';i.style.animationDelay=(-k*1.7)+'s';i.style.animationDuration=(11+(k*7)%6)+'s';i.style.transform='scale('+(.6+(k%4)*.2)+')';m.append(i);}
+    screen.prepend(m);}
+  const today=dayKey(),away=heart.lastVisit&&heart.lastVisit!==today;
+  const p=document.createElement('p');p.className='heart-thought';p.id='heart-thought';
+  p.innerHTML=(away?'<span class="heart-back">'+esc(HEART.back)+'</span>':'')+'<small>🌙 '+esc(HEART.thoughtKicker)+'</small>'+esc(heartPick(HEART.thoughts,comedyDay()));
+  (document.querySelector('.title-foot')||document.querySelector('.title-actions'))?.before(p);
+  heart.lastVisit=today;storeHeart();
+}
+
+/* Verdicts: warm words that change each time. The best answer and the standard still follow. */
+const heartShowMomentResult=showMomentResult;
+showMomentResult=function(i,k,mode,host){
+  heartShowMomentResult(i,k,mode,host);
+  const box=body.querySelector('.gm-result');if(!box)return;
+  const verdict=box.querySelector('.gm-verdict'),n=growth.answers;
+  if(verdict&&!box.querySelector('.gm-silly-note')){
+    const [icon,list]=box.classList.contains('best')?['✨',HEART.best]:box.classList.contains('ok')?['🌱',HEART.ok]:['🌙',HEART.miss];
+    /* Only swap the plain words and the plain icon, so other layers' raccoon and combo badges stay. */
+    const iconSpan=[...verdict.children].find(e=>e.tagName==='SPAN'&&!e.className);if(iconSpan)iconSpan.textContent=icon;
+    const words=[...verdict.childNodes].filter(x=>x.nodeType===3&&x.nodeValue.trim());
+    if(words.length){words[0].nodeValue=' '+heartPick(list,n)+(words.length>1?' ':'');words.slice(1).forEach(x=>x.nodeValue=' ');}
+  }
+  const later=box.querySelector('.gm-later');if(later)later.textContent=HEART.later;
+  narrativeText=body.innerText;
+};
+/* The end of a quick shift: one soft line to carry home. */
+const heartFinishShift=finishShift;
+finishShift=function(){
+  heartFinishShift();
+  const row=$('shift-actions');
+  if(row)row.insertAdjacentHTML('beforebegin','<p class="gm-heart"><small>🌙 '+esc(HEART.goodbyeKicker)+'</small>'+esc(heartPick(HEART.goodbye,growth.shifts-1))+'</p>');
+  narrativeText=body.innerText;
+};
+
+/* Little glimmers (inside the manor only): one soft find at a time, somewhere you can walk.
+   Most are small wonders (a soft light) or notes slipped under doors (a folded paper).
+   Rarely, a gold star: a one-of-a-kind keepsake that only ever appears once. Everything lands in the keepsake journal. */
+let glimmer=null,glimmerNext=performance.now()+20000;
+const heartTotal=()=>HEART.wonders.length+HEART.notes.length;
+const heartFoundCount=()=>heart.found.length+heart.notes.length+heart.rare.length;
+function glimmerSpot(){
+  const p=world.options.state()?.player;
+  for(let k=0;k<60;k++){const x=40+Math.random()*(W-80),y=60+Math.random()*(H-100);
+    if(world.walkable(x,y)&&(!p||Math.hypot(p.x-x,p.y-y)>140))return {x:Math.round(x),y:Math.round(y)};}
+  return null;
+}
+function glimmerKind(){
+  const rareLeft=heart.rare.length<HEART.rare.length,wLeft=heart.found.length<HEART.wonders.length,nLeft=heart.notes.length<HEART.notes.length;
+  if(rareLeft&&heartFoundCount()>=3&&Math.random()<.1)return 'rare';
+  if(nLeft&&(!wLeft||Math.random()<.4))return 'note';
+  if(wLeft)return 'light';
+  return rareLeft?'rare':null;
+}
+function glimmerTick(now){
+  if(glimmer||now<glimmerNext)return;
+  const kind=glimmerKind();if(!kind){glimmerNext=Infinity;return;}
+  const s=glimmerSpot();if(s)glimmer={...s,kind,born:now};else glimmerNext=now+5000;
+}
+function drawGlimmer(c,time,calm){
+  if(!state||titleVisible||festivalActive)return;
+  glimmerTick(performance.now());if(!glimmer)return;
+  const fade=Math.min(1,(performance.now()-glimmer.born)/1500),pulse=calm?.8:.62+.3*Math.sin(time/380),bob=calm?0:Math.sin(time/700)*3;
+  const rare=glimmer.kind==='rare',x=glimmer.x,y=glimmer.y-22+bob,R=rare?46:38,g=c.createRadialGradient(x,y,0,x,y,R);
+  /* Warm amber so it reads on both the pale floors and the dark corridor. */
+  g.addColorStop(0,'rgba(255,226,140,'+(.95*pulse*fade)+')');g.addColorStop(.4,'rgba(240,'+(rare?170:186)+',70,'+(.42*pulse*fade)+')');g.addColorStop(1,'rgba(240,186,70,0)');
+  c.save();c.fillStyle=g;c.beginPath();c.arc(x,y,R,0,Math.PI*2);c.fill();c.fill();c.globalAlpha=fade;
+  /* The map is shown small, so the find itself is drawn larger than life. */
+  c.translate(x,y);c.scale(1.7,1.7);c.translate(-x,-y);
+  ellipse(c,glimmer.x,glimmer.y+2,8,3,'rgba(160,110,30,.28)');
+  if(glimmer.kind==='note'){
+    /* A little folded note with a red seal, tilting softly. */
+    c.translate(x,y);c.rotate(calm?-.12:-.12+Math.sin(time/900)*.06);c.scale(1.4,1.4);
+    c.fillStyle='#fffaf0';c.strokeStyle='#8f6a2b';c.lineWidth=1;c.beginPath();c.rect(-8,-5.5,16,11);c.fill();c.stroke();
+    c.beginPath();c.moveTo(-8,-5.5);c.lineTo(0,1.5);c.lineTo(8,-5.5);c.stroke();
+    c.fillStyle='#c25b5b';c.beginPath();c.arc(0,1.5,2.2,0,Math.PI*2);c.fill();
+  }else{
+    const r=(rare?10:7)+(calm?0:Math.sin(time/240)*1.2);c.fillStyle=rare?'#ffd65e':'#fff6d8';c.strokeStyle=rare?'#a0741f':'#c9952f';c.lineWidth=1.3;c.beginPath();
+    c.moveTo(x,y-r);c.quadraticCurveTo(x,y,x+r,y);c.quadraticCurveTo(x,y,x,y+r);c.quadraticCurveTo(x,y,x-r,y);c.quadraticCurveTo(x,y,x,y-r);c.fill();c.stroke();
+    if(!calm){const n=rare?3:2;for(let k=0;k<n;k++){const a=time/600+k*(Math.PI*2/n);c.fillStyle='#e9b649';c.beginPath();c.arc(x+Math.cos(a)*(rare?17:13),y+Math.sin(a)*(rare?10:8),1.7,0,Math.PI*2);c.fill();}}
+  }
+  c.restore();
+}
+function heartTake(list,have){const left=list.map((_,n)=>n).filter(n=>!have.includes(n));if(!left.length)return -1;const pick=left[Math.random()*left.length|0];have.push(pick);return pick;}
+function collectGlimmer(){
+  if(!glimmer)return;
+  const kind=glimmer.kind;glimmer=null;glimmerNext=performance.now()+40000+Math.random()*40000;
+  if(kind==='rare'){const k=heartTake(HEART.rare,heart.rare);if(k>=0){const [icon,name,line]=HEART.rare[k];storeHeart();
+    celebrate({icon,kicker:HEART.rareKicker,label:name,confetti:true});toast(icon+' '+name+'. '+line);sound('seal');checkPins();return;}}
+  const note=kind==='note',list=note?HEART.notes:HEART.wonders,have=note?heart.notes:heart.found,k=heartTake(list,have);
+  if(k<0)return;storeHeart();
+  toast((note?HEART.noteFound:HEART.glimmerFound).replace('{line}',list[k]).replace('{n}',have.length).replace('{total}',list.length));
+  sound('triangle');checkPins();
+}
+/* The keepsake journal: everything found, with soft blanks for what is still out there. */
+function openKeepsakes(){
+  const sec=(title,list,have,fmt,blank)=>'<h3 class="heart-sec">'+esc(title)+' <small>'+have.length+' / '+list.length+'</small></h3><ul class="heart-list">'+
+    [...have.map(n=>'<li class="found">'+fmt(list[n])+'</li>'),...Array(list.length-have.length).fill('<li class="blank">'+esc(blank)+'</li>')].join('')+'</ul>';
+  openModal(titleHTML(HEART.journal,HEART.journalKicker)+'<p class="modal-description">'+esc(HEART.journalIntro)+'</p><div class="heart-journal">'+
+    sec(HEART.secRare,HEART.rare,heart.rare,([i,name,line])=>'<b>'+i+' '+esc(name)+'</b><span>'+esc(line)+'</span>',HEART.rareUnfound)+
+    sec(HEART.secNotes,HEART.notes,heart.notes,x=>'<span>✉️ '+esc(x)+'</span>',HEART.unfound)+
+    sec(HEART.secWonders,HEART.wonders,heart.found,x=>'<span>✨ '+esc(x)+'</span>',HEART.unfound)+'</div>');
+  narrativeText=body.innerText;
+}
+{const b=document.createElement('button');b.className='text-button';b.id='keepsakes-button';b.innerHTML='📖 '+esc(HEART.journal);b.onclick=openKeepsakes;
+ $('places-button')?.after(b);}
+const heartExtras=world.options.extras;
+world.options.extras=()=>[...heartExtras(),...(glimmer&&!festivalActive?[{id:'glimmer',x:glimmer.x,y:glimmer.y,name:glimmer.kind==='note'?HEART.noteName:HEART.glimmerName}]:[])];
+const heartDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{heartDrawExtras(c,time,calm);drawGlimmer(c,time,calm);};
+const heartInteract=interact;interact=function(id){if(id==='glimmer'){collectGlimmer();return;}return heartInteract.apply(this,arguments);};
+PINS.push(
+  {id:'small-wonders',icon:'✨',name:HEART.pins.few[0],hint:HEART.pins.few[1],test:()=>heartFoundCount()>=5},
+  {id:'wonder-jar',icon:'🫙',name:HEART.pins.all[0],hint:HEART.pins.all[1],test:()=>heart.found.length+heart.notes.length>=heartTotal()},
+  {id:'one-of-a-kind',icon:'🪶',name:HEART.pins.rare[0],secret:true,hint:HEART.pins.rare[1],test:()=>heart.rare.length>=1}
+);
+renderGrowth();checkPins();
+/* ==== end HEART v1 ==== */
 
 
 })();
