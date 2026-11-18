@@ -5719,6 +5719,305 @@ PINS.push(
 renderGrowth();checkPins();
 /* ==== end HMS v1 ==== */
 
+/* ==== PENNY v1: Penny Puffwing, the manor's tiny money dragon ====
+   Penny is a chubby baby dragon who keeps the manor's books. Dragons hoard gold; Penny hoards facts
+   about the hotel business (occupancy, ADR, RevPAR, costs, tips, folios) and shares one at a time.
+   - She sits on her little coin pile by the archive cabinet, wearing a green banker's visor.
+   - Tap her (or press P): a "money minute" with one bite-size fact and a gentle 3-choice coin check.
+   - Up to 3 new facts a night, so there is always something to come back for. Then quick reviews.
+   - Facts you get right go into Penny's coin book (sidebar, house ledger tab). Four pins.
+   Drawn with code, all words written here in English and Spanish, nothing downloaded, nothing costs
+   money to run. Facts are general and kept current to 2025 U.S. rules; they are not tax advice.
+   Progress lives in its own key, mapachez_penny_v1. */
+const PENNY_TEXT={
+en:{
+  name:'Penny Puffwing',mapName:'Penny Puffwing · money facts',kicker:'PENNY’S MONEY MINUTE',book:'Penny’s coin book',
+  hello:[
+    'Oh! Hello! Want to see something shiny? It’s a number. Numbers are my favourite kind of shiny.',
+    'Dragons hoard gold. I hoard facts. They take up less room, and nobody tries to sneak off with them.',
+    'I tried to breathe fire once. A tiny smoke ring came out, shaped like a percent sign. I’ve decided that’s my thing.',
+    'Every coin in my pile has a story. This one’s story is “Room 204 ordered tea.” It’s a good story.',
+    'I polish one coin a night with my tail. Tonight’s coin is extra shiny. So is tonight’s fact.',
+    'Delores says I count the spoons too often. I say a spoon that is counted is a spoon that is loved.'
+  ],
+  first:'Hello, new friend! I’m Penny. I keep the manor’s books. Every night I share one shiny money fact, so the business side of hotels feels less like a mystery and more like treasure.',
+  factOf:'FACT {n} OF {total}',check:'🪙 Coin check',
+  right:['Ooh, a ledger brain! Into the hoard it goes.','*happy wing flaps* Exactly right!','Shiny answer. I may frame it.','You’d make a wonderful dragon. Financially speaking.'],
+  miss:'Close! Numbers are sneaky little things. Here’s the shiny bit:',missAgain:'I’ll ask this one again next time. No rush at all.',
+  next:'Another fact →',review:'Quick review →',bookBtn:'🪙 Coin book',back:'Back to the manor',done:'Done',
+  rest:'That’s three new coins tonight. I like to save a few for tomorrow. It’s the dragon way.',
+  allDone:'You’ve collected every coin in my hoard! I’ll keep quizzing you, gently, so they stay shiny.',
+  reviewKick:'REVIEW · A COIN FROM YOUR BOOK',
+  gotN:'🪙 {n} / {total} facts in your coin book',leftToday:'{n} new tonight',noneToday:'new facts again tomorrow',
+  bookIntro:'Every fact you’ve answered lives here. Tap a coin to read it again.',locked:'Not found yet',
+  side:'🐉 Penny · {n}/{total}',titleNew:'Penny has a shiny money fact for you',titleAll:'Penny’s coin book',
+  note:'General facts for learning, not tax advice.',
+  pins:{first:['First Coin','Get one of Penny’s money facts right.'],purse:['Coin Purse','Collect 10 of Penny’s facts.'],hoard:['Penny’s Apprentice','Collect every fact in Penny’s hoard.'],puff:['Smoke Ring','Visit Penny seven times. She has a trick.']}
+},
+es:{
+  name:'Penny Puffwing',mapName:'Penny Puffwing · datos de dinero',kicker:'EL MINUTO DEL DINERO DE PENNY',book:'El libro de monedas de Penny',
+  hello:[
+    '¡Oh! ¡Hola! ¿Quieres ver algo brillante? Es un número. Los números son mi tipo de brillo favorito.',
+    'Los dragones guardan oro. Yo guardo datos. Ocupan menos y nadie intenta llevárselos a escondidas.',
+    'Una vez intenté echar fuego. Salió un anillito de humo con forma de signo de porcentaje. He decidido que es mi sello.',
+    'Cada moneda de mi montón tiene una historia. La de esta es “La 204 pidió té”. Es una buena historia.',
+    'Cada noche pulo una moneda con la cola. La de hoy brilla muchísimo. Igual que el dato de hoy.',
+    'Delores dice que cuento las cucharas demasiado. Yo digo que una cuchara contada es una cuchara querida.'
+  ],
+  first:'¡Hola, nueva amistad! Soy Penny. Llevo las cuentas de la mansión. Cada noche comparto un dato brillante sobre dinero, para que el lado de negocio del hotel parezca menos un misterio y más un tesoro.',
+  factOf:'DATO {n} DE {total}',check:'🪙 Prueba de moneda',
+  right:['¡Qué cabeza de contabilidad! Al tesoro va.','*aleteo feliz* ¡Exacto!','Respuesta brillante. Quizá la enmarque.','Serías un dragón maravilloso. Hablando de finanzas.'],
+  miss:'¡Casi! Los números son traviesos. Aquí está lo brillante:',missAgain:'Te lo preguntaré otra vez la próxima. Sin ninguna prisa.',
+  next:'Otro dato →',review:'Repaso rápido →',bookBtn:'🪙 Libro de monedas',back:'Volver a la mansión',done:'Listo',
+  rest:'Son tres monedas nuevas esta noche. Me gusta guardar algunas para mañana. Es lo que hacen los dragones.',
+  allDone:'¡Tienes todas las monedas de mi tesoro! Seguiré preguntándote, con cariño, para que sigan brillando.',
+  reviewKick:'REPASO · UNA MONEDA DE TU LIBRO',
+  gotN:'🪙 {n} / {total} datos en tu libro de monedas',leftToday:'{n} nuevos esta noche',noneToday:'más datos nuevos mañana',
+  bookIntro:'Aquí vive cada dato que has respondido. Toca una moneda para leerlo otra vez.',locked:'Aún sin encontrar',
+  side:'🐉 Penny · {n}/{total}',titleNew:'Penny tiene un dato brillante para ti',titleAll:'El libro de monedas de Penny',
+  note:'Datos generales para aprender, no son asesoría fiscal.',
+  pins:{first:['Primera moneda','Acierta un dato de dinero de Penny.'],purse:['Monedero','Reúne 10 datos de Penny.'],hoard:['Aprendiz de Penny','Reúne todos los datos del tesoro de Penny.'],puff:['Anillo de humo','Visita a Penny siete veces. Tiene un truco.']}
+}};
+const PT=PENNY_TEXT[profile.lang]||PENNY_TEXT.en;
+const pt=(s,vars)=>String(s).replace(/\{(\w+)\}/g,(_,k)=>vars&&vars[k]!=null?String(vars[k]):'');
+/* Each fact: a short title, the fact (with the manor's own six rooms as the example) and one coin check.
+   The first option is the right one; options are shuffled when shown. */
+const PENNY_FACTS=[
+ {id:'occupancy',en:['Occupancy','Occupancy is rooms sold ÷ rooms you have. The manor has 6 rooms. Sell 3 and we’re 50% full.','4 of our 6 rooms are sold tonight. What’s our occupancy?',['About 67%','4%','40%']],
+  es:['Ocupación','La ocupación es habitaciones vendidas ÷ habitaciones que tienes. La mansión tiene 6. Si vendemos 3, estamos al 50%.','Esta noche vendimos 4 de nuestras 6 habitaciones. ¿Qué ocupación tenemos?',['Más o menos 67%','4%','40%']]},
+ {id:'adr',en:['ADR','ADR means average daily rate: room money ÷ rooms sold. Three rooms bring in $360, so our ADR is $120.','2 rooms sold for $300 in total. What’s the ADR?',['$150','$300','$600']],
+  es:['ADR','ADR es la tarifa media diaria: dinero de habitaciones ÷ habitaciones vendidas. Tres habitaciones traen $360, así que el ADR es $120.','Vendimos 2 habitaciones por $300 en total. ¿Cuál es el ADR?',['$150','$300','$600']]},
+ {id:'revpar',en:['RevPAR','RevPAR is room money ÷ ALL your rooms, sold or not. $360 ÷ 6 rooms = $60. It shows price and fullness in one number.','Which number counts the empty rooms too?',['RevPAR','ADR','The tip jar']],
+  es:['RevPAR','RevPAR es el dinero de habitaciones ÷ TODAS las habitaciones, vendidas o no. $360 ÷ 6 = $60. Muestra precio y ocupación en un solo número.','¿Qué número cuenta también las habitaciones vacías?',['RevPAR','ADR','El bote de propinas']]},
+ {id:'perish',en:['Rooms are like fresh bread','An empty room tonight can never be sold for tonight again. Hotel rooms “spoil” like fresh bread, so hotels work hard to fill them.','Room 206 is empty tonight. Can we sell tonight’s 206 next week?',['No, that night is gone','Yes, we keep it in a drawer','Only on Tuesdays']],
+  es:['Las habitaciones son como pan fresco','Una habitación vacía esta noche ya no se puede vender para esta noche. Las habitaciones “caducan” como el pan, por eso los hoteles se esfuerzan en llenarlas.','La 206 está vacía esta noche. ¿Podemos vender la noche de hoy la semana que viene?',['No, esa noche ya pasó','Sí, la guardamos en un cajón','Solo los martes']]},
+ {id:'profit',en:['Revenue vs profit','Revenue is all the money coming in. Profit is what’s left after paying the bills. A busy hotel can still have a thin profit.','Which one is “what’s left after costs”?',['Profit','Revenue','Occupancy']],
+  es:['Ingresos y beneficio','Los ingresos son todo el dinero que entra. El beneficio es lo que queda tras pagar los gastos. Un hotel lleno puede tener poco beneficio.','¿Cuál es “lo que queda tras los gastos”?',['El beneficio','Los ingresos','La ocupación']]},
+ {id:'labor',en:['The biggest cost','People are usually a hotel’s biggest cost: housekeeping, the desk, the kitchen. That’s why smooth teamwork saves real money.','What is often a hotel’s biggest single cost?',['Paying the team','Pillow mints','Doorknobs']],
+  es:['El mayor gasto','Normalmente el mayor gasto de un hotel es el equipo: limpieza, recepción, cocina. Por eso trabajar bien en equipo ahorra dinero de verdad.','¿Cuál suele ser el mayor gasto de un hotel?',['Pagar al equipo','Los caramelos de la almohada','Los pomos']]},
+ {id:'ota',en:['Booking websites','Booking websites charge the hotel a commission, often about 15 to 25%. A booking made straight with the hotel keeps more of the money.','A $100 room is booked on a site that takes 20%. What does the hotel keep?',['$80','$100','$120']],
+  es:['Webs de reservas','Las webs de reservas cobran al hotel una comisión, a menudo del 15 al 25%. Una reserva hecha directamente con el hotel deja más dinero en casa.','Una habitación de $100 se reserva en una web que cobra el 20%. ¿Cuánto se queda el hotel?',['$80','$100','$120']]},
+ {id:'loyal',en:['Happy guests come back','It usually costs less to keep a happy guest than to find a new one. Remembering someone’s tea order is good manners and good business.','Which usually costs less?',['Welcoming back a returning guest','Finding a brand-new guest','They cost exactly the same']],
+  es:['Los huéspedes felices vuelven','Suele costar menos conservar a un huésped feliz que encontrar uno nuevo. Recordar cómo toma alguien el té es cortesía y buen negocio.','¿Qué suele costar menos?',['Recibir otra vez a un huésped que vuelve','Encontrar un huésped nuevo','Cuestan exactamente lo mismo']]},
+ {id:'cpor',en:['Cost per occupied room','CPOR means cost per occupied room: the cleaning, laundry and little soaps that each sold room needs.','Cleaning, laundry and soaps for one stay cost $30. What’s that called?',['Cost per occupied room','ADR','A tip']],
+  es:['Coste por habitación ocupada','CPOR es el coste por habitación ocupada: limpieza, lavandería y jaboncitos que necesita cada habitación vendida.','Limpieza, lavandería y jabones de una estancia cuestan $30. ¿Cómo se llama eso?',['Coste por habitación ocupada','ADR','Una propina']]},
+ {id:'fixed',en:['Fixed costs','Some costs stay the same whether the manor is full or empty, like the building and the heating. These are fixed costs, which is why every extra room sold helps so much.','Which one is a fixed cost?',['The building’s rent or mortgage','Soap for each stay','Laundry for each room']],
+  es:['Costes fijos','Algunos gastos son iguales con la mansión llena o vacía, como el edificio y la calefacción. Son costes fijos, y por eso cada habitación extra vendida ayuda tanto.','¿Cuál es un coste fijo?',['El alquiler o la hipoteca del edificio','El jabón de cada estancia','La lavandería de cada habitación']]},
+ {id:'tipreport',en:['Tips are income','Tips are income. In the U.S., an employee who gets $20 or more in tips in a month reports them to their employer.','Bea got $45 in tips this month. What should she do?',['Report them to her employer','Nothing, tips are invisible','Report only the coins']],
+  es:['Las propinas son ingresos','Las propinas son ingresos. En EE. UU., quien recibe $20 o más en propinas en un mes se las declara a su empleador.','Bea recibió $45 en propinas este mes. ¿Qué debe hacer?',['Declararlas a su empleador','Nada, las propinas son invisibles','Declarar solo las monedas']]},
+ {id:'service',en:['Tip or service charge?','A tip is chosen by the guest. A required service charge is not a tip, even if it’s called a “gratuity.” It’s usually treated like wages.','Room service adds a required 18% charge. Is that a tip?',['No, it’s a service charge','Yes, always','Only at midnight']],
+  es:['¿Propina o cargo por servicio?','La propina la decide el huésped. Un cargo por servicio obligatorio no es una propina, aunque lo llamen “gratificación”. Suele tratarse como salario.','El servicio de habitaciones añade un cargo obligatorio del 18%. ¿Es una propina?',['No, es un cargo por servicio','Sí, siempre','Solo a medianoche']]},
+ {id:'tipdeduct',en:['A tip rule for 2025 to 2028','A U.S. tax rule for 2025 to 2028: people in jobs that usually get tips can deduct up to $25,000 of reported tips from federal income tax. It’s income tax only, and tips still get reported. A tax pro can say how it fits you.','With this rule, do tips still need to be reported?',['Yes, always','No, never again','Only the big ones']],
+  es:['Una norma de propinas de 2025 a 2028','Una norma fiscal de EE. UU. para 2025 a 2028: quien trabaja en un oficio con propinas puede deducir hasta $25,000 de propinas declaradas del impuesto federal sobre la renta. Es solo el impuesto sobre la renta, y las propinas se siguen declarando. Una persona experta en impuestos te dirá cómo te afecta.','Con esta norma, ¿hay que seguir declarando las propinas?',['Sí, siempre','No, nunca más','Solo las grandes']]},
+ {id:'overtime',en:['The “half” in time-and-a-half','Also for 2025 to 2028 in the U.S.: on time-and-a-half overtime, the extra “half” can be deducted from federal income tax, up to $12,500 a year for one person.','Regular pay is $20 an hour and overtime pay is $30. Which part is the extra “half”?',['$10','$30','$20']],
+  es:['La “mitad” de la hora y media','También en EE. UU. de 2025 a 2028: en las horas extra pagadas a hora y media, la “mitad” extra se puede deducir del impuesto federal sobre la renta, hasta $12,500 al año por persona.','La hora normal se paga a $20 y la hora extra a $30. ¿Cuál es la “mitad” extra?',['$10','$30','$20']]},
+ {id:'walk',en:['Walking a guest','Some guests never show up, so many hotels sell a few more rooms than they have. If everyone comes, the hotel “walks” a guest: it finds them a room nearby and pays for it.','What does “walking” a guest mean?',['Finding and paying for a room at another hotel','Taking them for a stroll','Moving them to the lobby sofa']],
+  es:['Reubicar a un huésped','Algunos huéspedes no se presentan, así que muchos hoteles venden alguna habitación de más. Si llegan todos, el hotel reubica a un huésped: le busca una habitación cerca y la paga.','¿Qué significa reubicar a un huésped?',['Buscarle y pagarle una habitación en otro hotel','Llevarle a dar un paseo','Mandarle al sofá del vestíbulo']]},
+ {id:'dynamic',en:['Prices that move','Room prices go up and down with demand. Festival week costs more than a quiet Tuesday. That’s called dynamic pricing.','The festival is in town and every hotel is filling up. Rates usually…',['Go up','Go down','Disappear']],
+  es:['Precios que se mueven','Los precios suben y bajan según la demanda. La semana del festival cuesta más que un martes tranquilo. Se llama precio dinámico.','Llega el festival y todos los hoteles se llenan. Las tarifas suelen…',['Subir','Bajar','Desaparecer']]},
+ {id:'folio',en:['The folio','A guest’s bill is called a folio. Every charge lands there, and the night audit checks that the whole day balances before morning.','What is a folio?',['The guest’s bill','A fancy pillow','A wake-up call']],
+  es:['El folio','La cuenta de un huésped se llama folio. Ahí cae cada cargo, y la auditoría nocturna comprueba que el día cuadra antes de la mañana.','¿Qué es un folio?',['La cuenta del huésped','Una almohada elegante','Una llamada despertador']]},
+ {id:'hold',en:['A hold is not a charge','At check-in, a hotel may put a hold on a card for extras. A hold isn’t a charge. It’s released after checkout, though some banks take a few days.','A guest worries about a $50 hold. What is it?',['A temporary hold, released after checkout','A $50 fee forever','A tip for the bell team']],
+  es:['Una retención no es un cobro','Al registrarse, el hotel puede retener una cantidad en la tarjeta para extras. No es un cobro. Se libera tras la salida, aunque algunos bancos tardan unos días.','A un huésped le preocupa una retención de $50. ¿Qué es?',['Una retención temporal que se libera tras la salida','Un cobro de $50 para siempre','Una propina para botones']]},
+ {id:'upsell',en:['A kind upsell','Offering a guest a nicer room for a little more is an upsell. Done kindly, the guest is happier and the room earns more.','Which one is a kind upsell?',['“Would you like the garden view for $20 more?”','“You must upgrade.”','Saying nothing at all']],
+  es:['Una mejora amable','Ofrecer a un huésped una habitación mejor por un poco más se llama upsell. Bien hecho, el huésped está más feliz y la habitación rinde más.','¿Cuál es una mejora amable?',['“¿Le apetece la vista al jardín por $20 más?”','“Tiene que mejorar su habitación.”','No decir nada']]},
+ {id:'stay',en:['Longer stays','Longer stays usually cost less to serve per night, because a room turned over for a new guest needs a full clean.','Which takes more housekeeping time?',['Three one-night guests in a row','One guest staying three nights','They’re exactly the same']],
+  es:['Estancias largas','Las estancias largas suelen costar menos por noche, porque una habitación que cambia de huésped necesita una limpieza completa.','¿Qué lleva más tiempo de limpieza?',['Tres huéspedes de una noche seguidos','Un huésped que se queda tres noches','Es exactamente igual']]},
+ {id:'comp',en:['Comps','A comp is something given free, like a dessert after a mix-up. It’s free for the guest, but it still costs the hotel, so it gets written down.','A comped dessert costs the hotel…',['Something, so it’s tracked','Nothing at all','Double']],
+  es:['Cortesías','Una cortesía es algo gratis, como un postre tras un despiste. Es gratis para el huésped, pero al hotel le cuesta algo, así que se apunta.','Un postre de cortesía le cuesta al hotel…',['Algo, por eso se apunta','Nada de nada','El doble']]}
+];
+const PENNY_DAILY=3;
+const PENNY_KEY='mapachez_penny_v1';
+function createPenny(){return {version:1,got:[],tries:0,right:0,visits:0,day:{key:'',n:0},miss:''};}
+function normalisePenny(v){
+  const p=createPenny();if(!v||typeof v!=='object'||v.version!==1)return p;
+  const ids=new Set(PENNY_FACTS.map(f=>f.id));
+  if(Array.isArray(v.got))p.got=[...new Set(v.got.filter(id=>ids.has(id)))];
+  for(const k of ['tries','right','visits'])p[k]=Math.max(0,v[k]|0);
+  if(v.day&&typeof v.day==='object')p.day={key:typeof v.day.key==='string'?v.day.key.slice(0,10):'',n:Math.max(0,v.day.n|0)};
+  if(typeof v.miss==='string'&&ids.has(v.miss))p.miss=v.miss;
+  return p;
+}
+let penny=createPenny();
+try{penny=normalisePenny(JSON.parse(localStorage.getItem(PENNY_KEY)||'null'));}catch{}
+function storePenny(){try{localStorage.setItem(PENNY_KEY,JSON.stringify(penny));}catch{}}
+const pL=f=>f[profile.lang]||f.en;
+function pennyToday(){if(penny.day.key!==dayKey())penny.day={key:dayKey(),n:0};return penny.day;}
+const pennyLeft=()=>Math.max(0,PENNY_DAILY-pennyToday().n);
+/* The next new fact: a missed one first, then the next one not collected yet. */
+function pennyNext(){if(penny.miss&&!penny.got.includes(penny.miss))return PENNY_FACTS.find(f=>f.id===penny.miss);return PENNY_FACTS.find(f=>!penny.got.includes(f.id))||null;}
+let pennyPuffAt=-1e9;
+
+/* ---------- Penny, drawn with code: a chubby mint baby dragon on a little coin pile ---------- */
+function drawPenny(c,x,y,k=1,time=0,calm=false,{pile=true}={}){
+  c.save();c.translate(x,y);c.scale(k,k);
+  const bob=calm?0:Math.sin(time/420)*1.2,flap=calm?0:Math.sin(time/160)*.18;
+  const mint='#8fdcc0',mintD='#5fb79a',belly='#fff3cf',wing='#c9a8f0',wingD='#9d7cd0',gold='#ffd84d',goldD='#d9a520';
+  ellipse(c,0,2,20,5,'#123b3033');
+  if(pile){for(const [cx,cy,r] of [[-15,0,5.5],[-9,-2,5.5],[13,0,5.5],[17,-3,5],[-13,-5,5]]){ellipse(c,cx,cy,r,r*.55,goldD);ellipse(c,cx,cy-1,r,r*.5,gold);}
+    if(!calm){const s=(time/900)%1;c.globalAlpha=1-s;text(c,'✦',14+(s*3),-10-s*6,7,'#fff6c4');c.globalAlpha=1;}}
+  c.translate(0,bob);
+  /* tail curling round to the right, with a little heart-shaped tip */
+  c.strokeStyle=mintD;c.lineWidth=6;c.lineCap='round';c.beginPath();c.moveTo(6,-8);c.quadraticCurveTo(22,-4,20,-16);c.stroke();
+  c.strokeStyle=mint;c.lineWidth=4;c.beginPath();c.moveTo(6,-8);c.quadraticCurveTo(22,-4,20,-16);c.stroke();
+  c.fillStyle='#f59ab7';c.beginPath();c.moveTo(20,-15);c.bezierCurveTo(14,-21,18,-27,21,-22);c.bezierCurveTo(24,-27,28,-21,20,-15);c.fill();
+  /* wings, flapping softly */
+  for(const s of [-1,1]){c.save();c.translate(s*8,-22);c.rotate(s*(-.35+flap));
+    c.fillStyle=wing;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(s*14,-14,s*17,-4);c.quadraticCurveTo(s*12,-3,s*11,1);c.quadraticCurveTo(s*7,-1,s*5,4);c.closePath();c.fill();
+    c.strokeStyle=wingD;c.lineWidth=1;c.beginPath();c.moveTo(0,0);c.lineTo(s*14,-8);c.stroke();c.restore();}
+  /* round body, cream belly with stripes, chubby feet with pink beans */
+  ellipse(c,0,-11,12,11,mintD);ellipse(c,0,-12,11.5,10.5,mint);ellipse(c,0,-10,7.5,8,belly);
+  c.strokeStyle='#f0dca6';c.lineWidth=1;for(const yy of [-13,-9,-5]){c.beginPath();c.moveTo(-5.5,yy);c.lineTo(5.5,yy);c.stroke();}
+  for(const s of [-1,1]){ellipse(c,s*6,-1,5,3.2,mintD);ellipse(c,s*6,-1.6,4.6,2.8,mint);ellipse(c,s*6,-1,1.3,1,'#f7a6bd');}
+  /* little arms hugging a gold coin */
+  ellipse(c,0,-10,5,5,goldD);ellipse(c,0,-10.6,4.5,4.5,gold);text(c,'$',0,-8,6,'#a8740e','Georgia');
+  for(const s of [-1,1])ellipse(c,s*5,-11,2.6,2.2,mint);
+  /* head */
+  const hy=-32;
+  for(const s of [-1,1]){c.fillStyle=belly;c.beginPath();c.moveTo(s*5,hy-9);c.lineTo(s*8,hy-17);c.lineTo(s*10,hy-8);c.closePath();c.fill();}
+  for(const s of [-1,1]){c.fillStyle=wing;c.beginPath();c.moveTo(s*12,hy-2);c.lineTo(s*18,hy-5);c.lineTo(s*15,hy+1);c.lineTo(s*18,hy+4);c.lineTo(s*12,hy+4);c.closePath();c.fill();}
+  ellipse(c,0,hy,14,12,mintD);ellipse(c,0,hy-.6,13.4,11.4,mint);
+  ellipse(c,0,hy+5,7,4.5,'#a9e8d1');ellipse(c,-2,hy+4,.9,.7,mintD);ellipse(c,2,hy+4,.9,.7,mintD);
+  /* green banker's visor */
+  c.fillStyle='rgba(60,170,110,.85)';c.beginPath();c.ellipse(0,hy-8,12,4,0,Math.PI,0);c.fill();
+  c.fillStyle='rgba(120,220,150,.55)';c.beginPath();c.ellipse(0,hy-8,15,4.5,0,0,Math.PI);c.fill();
+  c.fillStyle='#2f7a52';c.fillRect(-12,hy-8.6,24,1.4);
+  /* big sparkly eyes, rosy cheeks, tiny smile */
+  const blink=!calm&&(time%4200)<120;
+  for(const s of [-1,1]){
+    if(blink){c.strokeStyle='#2a2238';c.lineWidth=1.4;c.beginPath();c.arc(s*5.5,hy-1,3,.2,Math.PI-.2);c.stroke();}
+    else{ellipse(c,s*5.5,hy-1,3.4,4,'#2a2238');ellipse(c,s*5.5+1,hy-2.6,1.4,1.4,'#fff');ellipse(c,s*5.5-1.1,hy+.6,.7,.7,'#fff');}
+    ellipse(c,s*9.5,hy+3,2.6,1.6,'rgba(255,140,170,.55)');}
+  c.strokeStyle='#2a2238';c.lineWidth=.9;for(const s of [-1,1]){c.beginPath();c.arc(s*1.3,hy+6.2,1.3,.3,Math.PI-.3);c.stroke();}
+  c.restore();
+}
+/* A tiny smoke ring shaped like a percent sign, puffed when you say hello. */
+function drawPennyPuff(c,x,y,time,calm){
+  const age=(performance.now()-pennyPuffAt)/1000;if(age<0||age>2.2||calm)return;
+  const a=1-age/2.2;c.save();c.globalAlpha=a;
+  for(let k=0;k<3;k++){const yy=y-44-age*30-k*9,r=3+age*3+k*2;c.strokeStyle='rgba(235,235,245,.9)';c.lineWidth=2;c.beginPath();c.arc(x+Math.sin(age*3+k)*3,yy,r,0,Math.PI*2);c.stroke();}
+  text(c,'%',x,y-58-age*34,14+age*6,'rgba(250,250,255,.95)','Georgia');c.restore();
+}
+/* By the archive cabinet, where the manor keeps its ledgers. */
+const PENNY_SPOT={x:790,y:520};
+function pennyVisible(){return !!state&&!titleVisible&&!festivalActive;}
+const pennyExtras=world.options.extras;
+world.options.extras=()=>{const list=pennyExtras();if(pennyVisible())list.push({id:'penny',...PENNY_SPOT,name:PT.mapName});return list;};
+const pennyDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{pennyDrawExtras(c,time,calm);if(!pennyVisible())return;
+  const {x,y}=PENNY_SPOT;drawPenny(c,x,y,1.05,time,calm);drawPennyPuff(c,x,y,time,calm);
+  if(pennyLeft()>0&&pennyNext()){const bob=calm?0:Math.sin(time/300)*2;ellipse(c,x+18,y-54+bob,7,7,'#ffd84d');c.strokeStyle='#fff';c.lineWidth=1.5;c.beginPath();c.arc(x+18,y-54+bob,7,0,Math.PI*2);c.stroke();text(c,'$',x+18,y-50+bob,10,'#7a5410','Georgia');}
+  if(LABELS)plaque(c,'🐉 Penny',x,y+22);};
+const pennyInteract=interact;interact=function(id){if(id==='penny'){openPenny();return;}return pennyInteract.apply(this,arguments);};
+addEventListener('keydown',e=>{
+  if(e.key.toLowerCase()!=='p'||e.ctrlKey||e.altKey||e.metaKey||modal.open||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  e.preventDefault();openPenny();
+});
+function paintPenny(cv){
+  if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),W=86,H=86;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);drawPenny(c,W/2,H-8,1.55,performance.now(),true);
+}
+
+/* ---------- The money minute ---------- */
+function pennyShuffle(a){const r=[...a];for(let k=r.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[r[k],r[j]]=[r[j],r[k]];}return r;}
+function openPenny(mode){
+  if(world)world.stop();
+  if(mode!=='again'){penny.visits++;pennyPuffAt=performance.now();storePenny();checkPins();}
+  const first=penny.tries===0&&!penny.got.length;
+  const isNew=pennyLeft()>0&&!!pennyNext();
+  const fact=isNew?pennyNext():penny.got.length?PENNY_FACTS.find(f=>f.id===penny.got[Math.random()*penny.got.length|0]):null;
+  const say=first?PT.first:!fact?PT.rest:!isNew?(pennyNext()?PT.rest:PT.allDone):PT.hello[(penny.visits+dayKey().length)%PT.hello.length];
+  let html='<div class="penny-head"><canvas id="penny-face" aria-hidden="true"></canvas><div><span class="overline">🪙 '+esc(PT.kicker)+'</span><h2 id="modal-heading">'+esc(PT.name)+'</h2><p class="penny-say">'+esc(say)+'</p></div></div>';
+  if(fact){const L=pL(fact),n=PENNY_FACTS.indexOf(fact)+1;
+    html+='<div class="penny-card"><small>'+esc(isNew?pt(PT.factOf,{n,total:PENNY_FACTS.length}):PT.reviewKick)+'</small><h3>'+esc(L[0])+'</h3><p>'+esc(L[1])+'</p>'+
+      '<div class="penny-q"><b>'+esc(PT.check)+': '+esc(L[2])+'</b><div class="penny-opts">'+pennyShuffle(L[3].map((o,i)=>[o,i===0])).map(([o,r])=>'<button class="penny-opt" data-right="'+(r?1:0)+'">'+esc(o)+'</button>').join('')+'</div><p class="penny-res" id="penny-res" hidden></p></div></div>';}
+  html+='<div class="action-row" id="penny-actions"></div><p class="joy-hint">'+esc(pt(PT.gotN,{n:penny.got.length,total:PENNY_FACTS.length}))+(pennyNext()?' · '+esc(pennyLeft()?pt(PT.leftToday,{n:pennyLeft()}):PT.noneToday):'')+'</p>';
+  openModal(html);paintPenny($('penny-face'));
+  const acts=$('penny-actions');
+  const add=(label,primary,fn)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=fn;acts.append(b);return b;};
+  const footer=()=>{acts.innerHTML='';
+    if(pennyLeft()>0&&pennyNext())add(PT.next,true,()=>openPenny('again'));
+    else if(penny.got.length)add(PT.review,false,()=>openPenny('again'));
+    add(PT.bookBtn,false,openPennyBook);add(titleVisible?PT.done:PT.back,!(pennyLeft()>0&&pennyNext()),closeModal);};
+  if(!fact){footer();narrativeText=body.innerText;return;}
+  add(titleVisible?PT.done:PT.back,false,closeModal);
+  body.querySelectorAll('.penny-opt').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1',res=$('penny-res'),L=pL(fact);
+    body.querySelectorAll('.penny-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});
+    if(!right)b.classList.add('miss');
+    penny.tries++;
+    if(isNew){pennyToday().n++;}
+    if(right){penny.right++;if(!penny.got.includes(fact.id))penny.got.push(fact.id);if(penny.miss===fact.id)penny.miss='';}
+    else if(isNew)penny.miss=fact.id;
+    storePenny();
+    res.hidden=false;res.className='penny-res '+(right?'yes':'no');
+    res.textContent=right?'✨ '+PT.right[penny.right%PT.right.length]:'🌱 '+PT.miss+' '+L[3][0]+'. '+(isNew?PT.missAgain:'');
+    if(right){if(typeof hmsTip==='function')hmsTip(isNew?2:1);const [x,y]=centerOf(b);burst(x,y,isNew?1:.6);floatText(x,y-20,'+'+(isNew?2:1)+' 🪙',{size:20});joySound('pop');setTimeout(()=>joySound('coin',3),120);}
+    if(penny.got.length===PENNY_FACTS.length&&right&&isNew)celebrate({icon:'🐉',kicker:PT.book,label:PT.pins.hoard[0],confetti:true});
+    footer();checkPins();renderGrowth();narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+function openPennyBook(){
+  if(world)world.stop();
+  const coins=PENNY_FACTS.map((f,i)=>{const L=pL(f);return penny.got.includes(f.id)?'<details class="penny-coin got"><summary><span aria-hidden="true">🪙</span> '+esc(L[0])+'</summary><p>'+esc(L[1])+'</p></details>':'<div class="penny-coin"><span aria-hidden="true">○</span> '+esc(PT.locked)+' · '+(i+1)+'</div>';}).join('');
+  openModal('<div class="penny-head"><canvas id="penny-face" aria-hidden="true"></canvas><div><span class="overline">🐉 '+esc(PT.name)+'</span><h2 id="modal-heading">'+esc(PT.book)+'</h2><p class="penny-say">'+esc(PT.bookIntro)+'</p></div></div>'+
+    '<p class="joy-hint">'+esc(pt(PT.gotN,{n:penny.got.length,total:PENNY_FACTS.length}))+'</p><div class="penny-book">'+coins+'</div><p class="penny-note">'+esc(PT.note)+'</p><div class="action-row" id="penny-actions"></div>');
+  paintPenny($('penny-face'));
+  const acts=$('penny-actions');
+  const a=document.createElement('button');a.className='primary-button';a.textContent=pennyLeft()>0&&pennyNext()?PT.next:PT.review;a.onclick=()=>openPenny('again');a.disabled=!(pennyLeft()>0&&pennyNext())&&!penny.got.length;acts.append(a);
+  const d=document.createElement('button');d.className='secondary-button';d.textContent=titleVisible?PT.done:PT.back;d.onclick=closeModal;acts.append(d);
+  narrativeText=body.innerText;
+}
+{const st=document.createElement('style');st.textContent=`
+.penny-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.penny-head canvas{flex-shrink:0;border-radius:50%;background:radial-gradient(circle at 50% 60%,#fff6d8,#e9f6ef 70%);box-shadow:inset 0 0 0 2px #e0cf9e}
+.penny-head #modal-heading{margin-bottom:6px}
+.penny-say{font:italic 15px/1.55 Georgia,serif;color:#3b3220;margin:0}
+.penny-card{padding:14px 16px;border-radius:16px;background:linear-gradient(160deg,#fffaf0,#f3fbf6);border:1px solid #e0cf9e;box-shadow:0 6px 16px #6b442814}
+.penny-card small{font:10px Arial,sans-serif;letter-spacing:.12em;color:#7a6331}
+.penny-card h3{font:normal 22px Georgia,serif;margin:4px 0 6px}
+.penny-card>p{font-size:15px;line-height:1.6;margin:0 0 10px}
+.penny-q b{display:block;font-size:14px;line-height:1.5;margin-bottom:8px}
+.penny-opts{display:grid;gap:7px}
+.penny-opt{text-align:left;font-size:14px;padding:11px 14px;border-radius:12px;border:1px solid #cdd8c4;background:#fff;color:var(--ink);cursor:pointer;min-height:44px}
+.penny-opt:hover:not(:disabled){border-color:#5fb79a;background:#eefaf4}
+.penny-opt.right{border-color:#4f9a45;background:#e3f6dc;font-weight:600}
+.penny-opt.miss{border-color:#d9b38c;background:#fbefe3}
+.penny-res{margin:10px 0 0;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.5}
+.penny-res.yes{background:#fff3c4;color:#5b4310}.penny-res.no{background:#eef7ef;color:#2f5236}
+.penny-book{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:7px;margin:10px 0}
+.penny-coin{padding:9px 12px;border-radius:12px;border:1px dashed #d9cfae;color:#8a8270;font-size:13px}
+.penny-coin.got{border:1px solid #e0c060;background:linear-gradient(160deg,#fff8dc,#fffdf5);color:var(--ink)}
+.penny-coin summary{cursor:pointer;font-weight:600}.penny-coin p{font-size:13px;line-height:1.55;margin:6px 0 0}
+.penny-note{font-size:11px;color:#6b6450;margin:6px 0 0}
+.joy-row #joy-side-penny{background:linear-gradient(180deg,#e6f8f0,#cdeee0);border-color:#8fdcc0}
+.joy-title-mg.penny{border-color:rgba(143,220,192,.6);background:rgba(70,160,130,.22);color:#e4fbf1}
+@media(max-width:520px){.penny-head canvas{width:64px!important;height:64px!important}.penny-book{grid-template-columns:1fr}}
+`;document.head.append(st);}
+
+/* ---------- Sidebar, house ledger, title and pins ---------- */
+const pennyRenderGrowth=renderGrowth;
+renderGrowth=function(){
+  pennyRenderGrowth();const row=$('growth')?.querySelector('.joy-row');if(!row)return;
+  const b=document.createElement('button');b.id='joy-side-penny';b.textContent=pt(PT.side,{n:penny.got.length,total:PENNY_FACTS.length});b.onclick=()=>openPenny();row.append(b);
+};
+const pennyOpenLedger=openLedger;
+openLedger=function(){const r=pennyOpenLedger.apply(this,arguments);const tabs=$('ledger-tabs');
+  if(tabs&&!$('ledger-penny')){const b=document.createElement('button');b.id='ledger-penny';b.textContent='🐉 '+PT.book;b.onclick=openPennyBook;tabs.append(b);}return r;};
+{const anchor=$('hms-title')||$('joy-title-gift')||$('joy-title-mg')||document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg penny';b.id='penny-title';
+  b.innerHTML='🐉 '+esc(pennyLeft()>0&&pennyNext()?PT.titleNew:PT.titleAll)+' · <b>'+penny.got.length+' / '+PENNY_FACTS.length+'</b> →';
+  b.onclick=()=>openPenny();anchor.after(b);}}
+PINS.push(
+  {id:'penny-first',icon:'🪙',name:PT.pins.first[0],hint:PT.pins.first[1],test:()=>penny.got.length>=1},
+  {id:'penny-purse',icon:'👛',name:PT.pins.purse[0],hint:PT.pins.purse[1],test:()=>penny.got.length>=10},
+  {id:'penny-hoard',icon:'🐉',name:PT.pins.hoard[0],hint:PT.pins.hoard[1],test:()=>penny.got.length>=PENNY_FACTS.length},
+  {id:'penny-puff',icon:'💨',name:PT.pins.puff[0],secret:true,hint:PT.pins.puff[1],test:()=>penny.visits>=7}
+);
+renderGrowth();checkPins();
+/* ==== end PENNY v1 ==== */
+
 
 
 })();
