@@ -73,7 +73,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 46_000, 'The pixel kit and player picker should stay under 46 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 48_500, 'The pixel kit, player picker and cute raccoon moods should stay under 48.5 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 

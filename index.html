@@ -1136,7 +1136,7 @@ function castMake(choices={}){const r={...castLook('maker'),...choices,seed:1};r
    Each grid is made once (per direction, step and blink), kept in memory and scaled up crisply. */
 const PX_W=32,PX_H=44,PX_FEET=40,PX_U=1.12,PX_RGB=new Map();
 function pxRGB(h){let v=PX_RGB.get(h);if(!v){const n=parseInt(h.slice(1,7),16);v=[n>>16,n>>8&255,n&255];PX_RGB.set(h,v);}return v;}
-function pxPaint(r,dir,blink,frame){
+function pxPaint(r,dir,blink,frame,mood=''){
   const W=PX_W,H=PX_H,col=new Array(W*H).fill(null),mat=new Array(W*H).fill(null),shade=new Set(),cast=new Set();
   const k=r.kind,back=dir==='up',fx=dir==='right'||dir==='left'?1:0,ex=[r.extra,r.extra2],seed=r.seed||0,bit=n=>Math.floor(seed*3.17+n*5.3)%3===0;
   const T=castTone,K='#2b2433',gold='#e0b85a',white='#fffaf0',cream='#f6eedb';
@@ -1198,15 +1198,23 @@ function pxPaint(r,dir,blink,frame){
        the classic grey keeps its hand-picked tones. */
     const st=r.rstyle||'plush',grey=!r.fur,fur=r.fur||'#a29eab',furDk=grey?'#615c69':T(fur,-.35),mask=grey?'#34303c':T(fur,-.66),
       crm='#fbf6ee',ink='#140f18',pinkE='#f2aec0',bean='#e98aa4',mc='#5a2f38';shade.add(fur);
+    /* EXTRA CUTE v1 moods: tail swish (L/R), one ear twitch (t) and a happy face (h). */
+    const sw=mood.includes('L')?-1:mood.includes('R')?1:0,tw=mood.includes('t'),happy=mood.includes('h')&&!blink,plush=st==='plush';
     const tail=()=>{const pts=st==='fluffy'?[[7,34],[5,33],[3,31],[2,29],[2,27],[3,25],[4,23],[6,21]]:[[7,34],[5,32],[4,30],[3,28],[3,26],[4,24],[5,22]],rad=st==='fluffy'?3.3:2.9;
-      pts.forEach(([x,y],i)=>{const xx=back?32-x:x;E(xx,y,rad,2.5,i%2?mask:fur,i%2?mask:fur);});if(st==='fluffy'){const [x,y]=pts[pts.length-1];E(back?32-x:x,y-1,2.2,1.8,crm,crm);}};
+      const sh=i=>sw*Math.round(i*2/(pts.length-1));
+      pts.forEach(([x,y],i)=>{const xx=(back?32-x:x)+sh(i);E(xx,y,rad,2.5,i%2?mask:fur,i%2?mask:fur);});if(st==='fluffy'){const [x,y]=pts[pts.length-1];E((back?32-x:x)+sh(pts.length-1),y-1,2.2,1.8,crm,crm);}};
     if(!back)tail();
-    legs(furDk,mask);torso(fur,fur,mask);if(!back){E(16.5,28.5,4.4,4.6,crm,crm,fur);}outfit();
+    /* Chubby baby legs: short round thighs and plump paw feet with pink toe beans (front only). */
+    {const lift=[frame===1?-1:0,frame===3?-1:0],leg=T(fur,-.12);shade.add(leg);
+      [12.9,20.1].forEach((cx,i)=>{const y=lift[i];E(cx,34.6+y,2.9,3,leg,leg);E(cx+(i?.4:-.4),37.6+y,3.2,1.6,mask,mask);
+        if(!back){R(Math.round(cx-1+(i?.4:-.4)),37+y,2,1,bean,mask);}});}
+    torso(fur,fur,mask);if(!back){E(16.5,28.5,4.4,4.6,crm,crm,fur);}outfit();
     /* Ears. */
     for(const ex0 of [9,23]){const t=ex0<16?-1:1,inner=back?furDk:pinkE;
       if(st==='classic'){for(let j=0;j<6;j++)R(ex0-3+(t<0?0:j>>1)+(t<0?j>>1:0)-(j>>1),2+j,1+j,1,fur);for(let j=0;j<5;j++)R(ex0-3+(t<0?0:j>>1)+(t<0?j>>1:0)-(j>>1)+2,4+j,Math.max(0,j-1),1,j>1?inner:fur,'ear');}
+      else if(tw&&ex0>16&&!back){E(ex0+1,6.5,3.5,3.4,fur);E(ex0+1,7,1.8,2.2,inner,'ear');}
       else{E(ex0,7.5,3.5,3.4,fur);if(st!=='plush'){P(ex0+t,3,fur);P(ex0+t,4,fur);P(ex0,4,fur);}E(ex0,8,1.8,2.2,inner,'ear');if(st!=='plush')P(ex0+t,6,inner,'ear');if(st==='fluffy'&&!back){P(ex0,9,crm,'ear');P(ex0-t,8,crm,'ear');}}}
-    E(16.5,st==='plush'?16:16.5,st==='plush'?12.2:11.6,st==='plush'?9.4:9,fur);
+    E(16.5,plush?16:16.5,plush?12.8:11.6,plush?9.8:9,fur);
     if(st==='fluffy'){for(let x=7;x<=26;x+=2)P(x,7+(x%4?0:-1),fur,fur);mirror([[4,13],[3,14],[4,16],[2,17],[3,18]],fur,fur);}
     if(st!=='plush')mirror([[4,19],[3,20],[4,21],[3,22],[5,23]],fur,fur);
     if(back){R(16,9,1,6,furDk);for(const x of [11,22])R(x,11,1,3,furDk);tail();}
@@ -1216,23 +1224,28 @@ function pxPaint(r,dir,blink,frame){
       if(st==='fluffy')for(const [x,y] of [[15,6],[16,5],[17,6],[18,5],[16,7]])P(x+o,y,T(fur,.35),fur);
       /* Mask. */
       if(st==='button'||st==='fluffy')for(const cx of [11,22]){E(cx+o,16.5,4.4,3.6,mask,mask);P(cx+o+(cx<16?-4:4),19,mask,mask);P(cx+o+(cx<16?-5:5),20,mask,mask);}
-      if(st==='plush'){E(16.5+o,16,10.6,3.4,mask,mask);mirror([[6,18],[7,19]],mask,mask);}
+      if(plush){const pm=grey?'#5b5466':T(fur,-.42);E(16.5+o,16.2,10.8,3.5,pm,pm);mirror([[6,18],[7,19]],pm,pm);}
       if(st==='classic'){R(6+o,14,21,5,mask,mask);P(5+o,15,mask,mask);P(27+o,15,mask,mask);P(4+o,16,mask,mask);P(28+o,16,mask,mask);R(15+o,13,3,1,mask,mask);R(15+o,18,3,2,fur,fur);}
       if(st!=='plush'){R(9+o,11,4,1,crm,crm);R(20+o,11,4,1,crm,crm);}
       /* Eyes. */
       for(const ex of st==='plush'?[10,19]:[9,20]){
-        if(blink){P(ex+o,17,'#d8d0e0');R(ex+1+o,16,st==='plush'?2:3,1,'#d8d0e0');P(ex+(st==='plush'?3:4)+o,17,'#d8d0e0');continue;}
-        if(st==='plush')S(['.KK.','KWKK','KKKK','KKWK','.KK.'],ex+o,14,{K:ink,W:white});
+        if(happy){for(const [dx,dy] of [[0,17],[1,16],[2,15],[3,15],[4,16],[5,17]])P(ex+dx-(plush?1:0)+o,dy,'#fff4fa');continue;}
+        if(blink){P(ex+o,17,'#d8d0e0');R(ex+1+o,16,plush?2:3,1,'#d8d0e0');P(ex+(plush?3:4)+o,17,'#d8d0e0');continue;}
+        /* Plush eyes: big glossy drops with a warm iris, a big top-left shine and a tiny bottom sparkle. */
+        if(plush){const ir=r.iris||'#9a6440';S(['.KKKK.','KWWKKK','KWWKKK','KKKKKK','KIILWK','.KIIK.'],ex-1+o,13,{K:ink,W:white,I:ir,L:T(ir,.35)});}
         else if(st==='classic')S(['.SSS.','SWWIS','SWIDS','SIDKS','SILWS','.SSS.'],ex+o,13,{S:white,W:white,I:iris,D:T(iris,-.4),K:ink,L:T(iris,.45)});
         else S(['.KKK.','KWWKK','KWWKK','KIKLK','.III.'],ex+o,14,{K:ink,W:white,I:iris,L:white});}
       /* Muzzle, nose, mouth, cheeks. */
       E(16.5+o,21.6,4.4,2.6,crm,crm);
       if(st==='button'||st==='fluffy')for(const cx of [6,27])for(const [dx,dy] of [[0,0],[0,1],[1,1],[-1,2]])P(cx+(cx<16?dx:-dx)+o,21+dy,crm,crm);
-      if(st==='plush'){const sm='#b0647a',sl='#d898a8';R(15+o,19,3,1,ink);P(16+o,20,ink);P(15+o,19,'#4a4252');P(14+o,21,sl);P(15+o,22,sm);P(16+o,21,sm);P(17+o,22,sm);P(18+o,21,sl);}
+      if(plush){const sm='#b0647a',sl='#d898a8';R(15+o,19,3,1,ink);P(16+o,20,ink);P(15+o,19,'#4a4252');
+        if(happy){R(14+o,21,5,1,mc);P(15+o,22,mc);P(16+o,22,'#ec7f96');P(17+o,22,mc);}
+        else{P(14+o,21,sl);P(15+o,22,sm);P(16+o,21,sm);P(17+o,22,sm);P(18+o,21,sl);}}
       else{R(15+o,19,4,1,ink);R(16+o,20,2,1,ink);P(15+o,19,T(ink,.35));
         if(st==='classic'){P(15+o,22,mc);R(16+o,23,2,1,mc);P(18+o,22,mc);}
+        else if(happy){R(15+o,21,4,1,mc);R(16+o,22,2,1,'#ec7f96');}
         else{R(16+o,21,2,1,mc);P(15+o,22,mc);P(18+o,22,mc);R(16+o,22,2,1,'#ec7f96');}}
-      const bl=st==='plush'?[[7,20,3],[23,20,3]]:[[8,21,2],[24,21,2]];for(const [bx,by,w] of bl){R(bx+o,by,w,1,'#f7a0b4');R(bx+o,by+1,w,1,'#fbc4d0');}
+      const bl=plush?[[6,20,4],[23,20,4]]:[[8,21,2],[24,21,2]];for(const [bx,by,w] of bl){R(bx+o,by,w,1,happy?'#f48aa4':'#f7a0b4');R(bx+o,by+1,w,1,'#fbc4d0');if(plush)P(bx+1+o,by,'#ffe1ea');}
       if(st!=='plush')for(const wx of [5,27])P(wx+o,21,'#d6d0dc');
       if(r.specs){for(const sx of st==='plush'?[8,18]:[8,19]){R(sx+1+o,13,5,1,gold);R(sx+1+o,19,5,1,gold);R(sx+o,14,1,5,gold);R(sx+6+o,14,1,5,gold);}R(15+o,15,st==='plush'?3:4,1,gold);}
       P(9,31,bean,mask);P(23,31,bean,mask);}
@@ -1302,14 +1315,36 @@ function pxPaint(r,dir,blink,frame){
   return dir==='left'?out.map((_,i)=>out[Math.floor(i/W)*W+(W-1-i%W)]):out;
 }
 const PX_SPRITES=new WeakMap();
-function pxSprite(r,dir,blink,frame){
+function pxSprite(r,dir,blink,frame,mood=''){
   let m=PX_SPRITES.get(r);if(!m){m=new Map();PX_SPRITES.set(r,m);}
-  const key=dir+frame+(blink?'*':'');let o=m.get(key);
-  if(!o){const px=pxPaint(r,dir,blink,frame);o=document.createElement('canvas');o.width=PX_W;o.height=PX_H;const g=o.getContext('2d'),img=g.createImageData(PX_W,PX_H);
+  const key=dir+frame+(blink?'*':'')+mood;let o=m.get(key);
+  if(!o){const px=pxPaint(r,dir,blink,frame,mood);o=document.createElement('canvas');o.width=PX_W;o.height=PX_H;const g=o.getContext('2d'),img=g.createImageData(PX_W,PX_H);
     px.forEach((h,i)=>{if(!h)return;const [a,b,c]=pxRGB(h);img.data[i*4]=a;img.data[i*4+1]=b;img.data[i*4+2]=c;img.data[i*4+3]=255;});g.putImageData(img,0,0);m.set(key,o);}
   return o;
 }
 let CAST_BLINK=false;
+/* EXTRA CUTE v1: raccoons are never quite still. Idle: a slow tail swish, a soft breathing bob and the odd
+   ear twitch. Walking: a tiny hop on every step. Happy (near a friend): ^ ^ eyes, an open smile, a little
+   bounce and pixel hearts. All of it is a choice between cached sprites, so it costs next to nothing. */
+const CAST_HAPPY=new Map(),RAC_STEP=new WeakMap();
+function racCheer(r){if(r&&r.kind==='raccoon')CAST_HAPPY.set(r,performance.now());}
+function racMood(r,t,step){
+  const seed=r.seed||0,now=t||performance.now(),happy=now-(CAST_HAPPY.get(r)||-1e9)<260;let mood=happy?'h':'',bob=0;
+  if(!t)return {mood,bob,happy};
+  let m=RAC_STEP.get(r);if(!m){m={step,at:-1e9};RAC_STEP.set(r,m);}if(m.step!==step){m.step=step;m.at=t;}
+  if(t-m.at<160)bob=Math.round(Math.abs(Math.sin(step*Math.PI/2))*2);
+  else{const sw=Math.sin(t/650+seed*7);mood+=sw>.45?'R':sw<-.45?'L':'';if((t+seed*977)%5200<170)mood+='t';
+    bob=happy?Math.max(0,Math.round(Math.sin(t/150)*2)):Math.sin(t/900+seed)>.55?1:0;}
+  return {mood,bob,happy};
+}
+function racHearts(c,x,top,U,t,seed){
+  const cols=['#f37a9a','#ff9fbd'];
+  for(let i=0;i<2;i++){const ph=t?((t/1300+i/2+seed)%1):.5,hx=x+(i?7:-8)*U+(t?Math.sin(t/260+i*2)*U:0),hy=top+(4-ph*14)*U;
+    c.globalAlpha=t?Math.min(1,(1-ph)*1.8):1;c.fillStyle=cols[i];const u=Math.max(1,Math.round(U));
+    for(const [dx,dy] of [[0,0],[1,0],[3,0],[4,0],[0,1],[1,1],[2,1],[3,1],[4,1],[1,2],[2,2],[3,2],[2,3]])c.fillRect(Math.round(hx+(dx-2)*u),Math.round(hy+dy*u),u,u);
+    c.fillStyle='#fff';c.fillRect(Math.round(hx-2*u+u*.0),Math.round(hy),u,u);c.fillStyle=cols[i];}
+  c.globalAlpha=1;
+}
 function castBlink(r,t){return CAST_BLINK||!!t&&((t+(r.seed||0)*9)%4400)<140;}
 /* Draws one being with its feet at (x, y+12), the same footprint as the original person sprite. */
 function drawBeing(c,x,y,r,step=0,dir='down',carrying=false,scale=1){
@@ -1317,9 +1352,11 @@ function drawBeing(c,x,y,r,step=0,dir='down',carrying=false,scale=1){
   const frame=step?((Math.round(step*2/Math.PI)%4)+4)%4:0;
   ellipse(c,px,py+10*scale,12*scale,3.6*scale,'#123b303b');
   if(r.extra==='glow'||r.extra2==='glow'){const g=c.createRadialGradient(px,py-10*scale,2,px,py-10*scale,24*scale);g.addColorStop(0,'rgba(200,232,255,.35)');g.addColorStop(1,'rgba(200,232,255,0)');c.fillStyle=g;c.beginPath();c.arc(px,py-10*scale,24*scale,0,CAST_TAU);c.fill();}
-  const bob=t&&r.kind!=='human'&&r.kind!=='raccoon'&&Math.sin(t/420+(r.seed||0))>.6?U:0;
-  const o=pxSprite(r,dir,castBlink(r,t),frame),s=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
+  const rac=r.kind==='raccoon',cute=rac?racMood(r,t,step):null;
+  const bob=rac?cute.bob*U:t&&r.kind!=='human'&&Math.sin(t/420+(r.seed||0))>.6?U:0;
+  const o=pxSprite(r,dir,castBlink(r,t)&&!(cute&&cute.happy),frame,rac?cute.mood:''),s=c.imageSmoothingEnabled;c.imageSmoothingEnabled=false;
   c.drawImage(o,px-16*U,py+12*scale-PX_FEET*U-bob,PX_W*U,PX_H*U);c.imageSmoothingEnabled=s;
+  if(cute&&cute.happy)racHearts(c,px,py+12*scale-PX_FEET*U-bob,U,t,r.seed||0);
   if(carrying){ellipse(c,px+8*scale,py-4*scale,15*scale,4*scale,'#ac8b44');rect(c,px,py-10*scale,17*scale,6*scale,'#f5e8c0');ellipse(c,px+8*scale,py-10*scale,9*scale,3*scale,'#d6bf7f');}
 }
 
@@ -1840,7 +1877,6 @@ class ManorWorld {
       roomFloor(g,{x:60,y:479,w:369,h:268},'#e8d8b6','THE GRAND FOYER');
       roomFloor(g,{x:478,y:479,w:334,h:268},'#d5dbc2','SERVICE KITCHEN');
       rect(g,398,439,100,98,'#e4d5b5');rect(g,802,440,74,99,'#d7d9bd');
-      drawPerson(g,300,512,{cast:'delores'},0,'down',false,1.05);
       rect(g,171,507,148,34,AN.walnut,14);rect(g,176,507,138,25,'#f3e9cf',11);stroke(g,174,512,142,28,AN.gold,2,11);
       rect(g,221,514,31,18,'#375e50',2);rect(g,225,517,23,11,'#b9cbbb');rect(g,232,532,11,4,'#8c734b');lamp(g,193,513,true);rect(g,280,516,17,12,'#c9b17d');ellipse(g,289,515,8,3,'#f3e5b6');
       plaque(g,'Front desk',244,580);
@@ -1858,6 +1894,9 @@ class ManorWorld {
       plaque(g,'Kitchen',626,657);plaque(g,'Archive',699,517);
       this.layer=o;this.layerK=k+'/'+LABELS;}
     c.drawImage(this.layer,0,0,W,H);
+    /* Delores lives behind the front desk: drawn every frame (so she blinks, swishes and smiles), with the desk cut out so it stays in front of her. */
+    {const del=castLook('delores'),p=s.player;if(Math.hypot(p.x-300,p.y-512)<110){racCheer(del);racCheer(playerLook().recipe);}
+      c.save();c.beginPath();c.rect(0,0,W,H);c.roundRect(171,507,148,34,14);c.clip('evenodd');drawPerson(c,300,512,{cast:'delores'},0,'down',false,1.05);c.restore();}
     if(!calm){c.strokeStyle='#e7ecc877';c.lineWidth=1;c.beginPath();c.ellipse(173,673,25+Math.sin(time/700)*3,18,0,0,Math.PI*2);c.stroke();}
     garden(c,s,time,calm);plaque(c,'Conservatory',1042,651);
     this.options.drawExtras?.(c,time,calm); /* KMC-ADD clues v1 */
