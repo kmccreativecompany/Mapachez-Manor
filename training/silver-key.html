@@ -1321,6 +1321,19 @@
       line-height: 1.35;
     }
 
+    /* Visual polish: cards line up at the top, and glossary words stay inside their sentence */
+    .play-mode-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+    }
+
+    .play-mode-card .glossary-hotterm {
+      display: inline;
+      margin: 0;
+    }
+
     .play-mode-card.active {
       border-color: rgba(122, 88, 45, .5);
       background: linear-gradient(135deg, #f4d382, #d3a94e);
