@@ -1,0 +1,76 @@
+# HMS v1: learning the desk computer
+
+HMS means **hotel management system**: the desk computer where every booking, room, guest note
+and bill lives. HMS v1 makes learning it part of play, and turns the desk jobs that feel dull in
+real life into quick, sparkly games. It lives at the end of `index.html` (`HMS v1` block).
+
+Everything is drawn with code, every word is written ahead of time in English and Spanish,
+nothing is downloaded and nothing costs money to run. Progress is saved on the device under
+`mapachez_hms_v1`.
+
+## Where players meet the HMS
+
+| Where | What happens |
+| --- | --- |
+| Title screen | "🖥️ Learn the HMS, the desk computer · 0 / 5 →" |
+| Front desk in the manor | The monitor on the desk glows, with a green "!" until all lessons are done. Walk up and press E, tap it, or press **H** anywhere. |
+| Sidebar | "🖥️ HMS · *level*" button under the tip jar. |
+| House ledger (L) | A "🖥️ Desk computer" tab. |
+| Guest moments that depend on a record | "💡 This guest has a record in the HMS. 🖥️ Peek first". Peeking shows the guest's notes; answering after a peek earns +1 tip. Without a peek, a soft "Next time, peek in the HMS" line. |
+| Every third guest in the manor | A guest asks something only the HMS knows ("Is my room ready yet?"). The hint names the tab, and the tab glows once the HMS opens. |
+| Quick shifts | After the first lesson, guest 2 of every quick shift is an HMS question (skipped when rush hour starts that early). |
+
+## The HMS screen
+
+Four big tabs: 📅 Bookings, 🛏️ Rooms, 🙂 Guests, 🧾 Bills. The data is the manor's own six
+rooms (201 to 206) and the story's guests (Mr. Finch, Lady Vesper, Ms. Vale, M. Nine) plus two
+arrivals (Juniper Glow in 201, Captain Barnaby Fuzz in 205). Room status uses four pictures:
+✨ Clean & ready, 🛌 Guest inside, 🧹 Needs a tidy, 🔧 Needs fixing. Important notes carry ⚠️.
+Arriving guests have a ✅ Check in button that only accepts a ✨ room.
+
+## Lessons (about a minute each)
+
+1. Find a booking. 2. Check a room. 3. Read guest notes. 4. Read a bill. 5. Check a guest in.
+
+Delores says what to tap and the next tap glows with a little pointing paw. Wrong taps do
+nothing. Lessons 1 to 4 end with one gentle question ("Look again" on a miss, never a penalty).
+Each new lesson: +3 tips, +10 HMS points, sparkles. All five: a gift box (`hms` reason).
+
+## Look-it-up questions
+
+12 questions in `HMS_QS`, each with the tab to look in and the HMS line that answers it.
+Right after looking: +4 tips, +5 HMS points, counts as a best answer in a quick shift.
+Right without looking: +2 tips and "Next time, peek in the HMS first."
+Missed: the right answer and the HMS line are shown, and the question comes back later.
+One question teaches privacy: a friend asks for Mr. Finch's room number, and the record says
+not to share it.
+
+## Desk games
+
+- **🧹 Room Rush** (room status): six radio calls ("Room 205 is sparkling clean!"). Tap the room,
+  then its new status. Tiles flip, coins pop, combos build. A count-up clock shows your time and
+  best time; there is no time limit.
+- **📝 Booking Builder** (data entry): a guest says their name, nights and a wish. Tap the right
+  card for each field (the traps are typos like "Bramble Thistlewink"), then pick a ✨ room.
+- **🔍 Bill Detective** (billing): one charge on each of five bills is wrong (a sesame bagel for a
+  guest with a sesame allergy, a double charge, three nights for a one-night stay). Tap it, it
+  gets stamped FIXED and the total counts down.
+
+Each round: tips for every clean answer (+2 for a perfect round), +4 HMS points, confetti on a
+perfect round. Slips are counted kindly and never take anything away.
+
+## HMS skill and pins
+
+Levels by HMS points: New at the desk (0), Finds things fast (12), Desk helper (35), HMS whiz (70),
+Desk wizard (120). Ten pins join the Memory Book: First Login, First Lesson, HMS Graduate,
+Peek First, Look It Up (5 looked-up answers), Room Board Hero, Neat Bookings, Bill Detective
+(10 mistakes caught), Desk Wizard, and the secret Quick Paws (Room Rush under 40 seconds).
+
+## The bigger lab
+
+The full Silver Key practice HMS still lives at the training desk (T → HMS practice). The desk
+computer's home links to it as "Big practice lab →" for later.
+
+## Tests
+
+`tests/test_hms.py` (run with `CHROMIUM_PATH=/opt/pw-browsers/chromium python tests/test_hms.py`).

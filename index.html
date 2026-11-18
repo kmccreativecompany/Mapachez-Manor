@@ -2612,7 +2612,7 @@ function openLedger(tab='guests',guestId='vesper'){
 }
 function renderRoomPlan(host){
   host.innerHTML='<p class="modal-description">A small view of the east wing. Match features before promising a room. A matching feature is separate from availability and inspected status.</p><div class="filter-box"><label><input type="checkbox" id="accessible-filter"> Accessible required</label><label><input type="checkbox" id="quiet-filter"> Quiet</label><select id="room-logic" aria-label="Combine optional room features"><option value="or">OR</option><option value="and">AND</option></select><label><input type="checkbox" id="garden-filter"> Garden view</label></div><div id="room-results"></div><p class="filter-note">“Accessible required” always applies. Quiet and garden view use the selected AND / OR rule. Completed past stays are review-only.</p>';
-  const rooms=[{room:'201',features:['Quiet','Garden view'],status:'Vacant · inspected'},...GUESTS.map(g=>({room:g.room,features:g.features,status:g.name,guest:g})),{room:'205',features:['Accessible','Garden view'],status:'Vacant · inspected'}].sort((a,b)=>a.room.localeCompare(b.room));
+  const rooms=[{room:'201',features:['Quiet','Garden view'],status:'Vacant · inspected'},...GUESTS.map(g=>({room:g.room,features:g.features,status:g.name,guest:g})),{room:'205',features:['Accessible','Garden view'],status:'Vacant · tidying for a late arrival'}].sort((a,b)=>a.room.localeCompare(b.room));
   function update(){
     const a=$('accessible-filter').checked,q=$('quiet-filter').checked,g=$('garden-filter').checked,logic=$('room-logic').value;
     const selected=rooms.filter(r=>{
@@ -4311,7 +4311,7 @@ const JOY_TEXT={
 en:{
   tips:'Tips',tipsGain:'+{n} tips',jar:'Tip jar',jarFull:'Tip jar full!',jarGift:'A gift box is waiting',
   combo:['','','Nice!','Sparkle streak!','On a roll!','Dazzling!','Unstoppable!','Legendary!'],
-  giftKicker:'A GIFT FOR YOU',giftWhy:{shift:'For a good shift',perfect:'For a perfect shift',jar:'From a full tip jar',mystery:'For good instincts'},
+  giftKicker:'A GIFT FOR YOU',giftWhy:{shift:'For a good shift',perfect:'For a perfect shift',jar:'From a full tip jar',mystery:'For good instincts',hms:'For learning the HMS'},
   giftTag:'With thanks, for your {skill}.',giftTagPlain:'With thanks, for looking after our guests.',
   tapHint:['Tap the box!','Again!','One more!'],glowHint:{1:'Ooh, it’s glowing a little…',2:'It’s glowing gold!'},
   rar:['Lovely','Rare','Super rare'],newItem:'NEW',
@@ -4334,7 +4334,7 @@ en:{
 es:{
   tips:'Propinas',tipsGain:'+{n} propinas',jar:'Bote de propinas',jarFull:'¡Bote de propinas lleno!',jarGift:'Te espera una caja de regalo',
   combo:['','','¡Bien!','¡Racha brillante!','¡Imparable!','¡Deslumbrante!','¡Increíble!','¡Legendario!'],
-  giftKicker:'UN REGALO PARA TI',giftWhy:{shift:'Por un buen turno',perfect:'Por un turno perfecto',jar:'De un bote de propinas lleno',mystery:'Por tu buen instinto'},
+  giftKicker:'UN REGALO PARA TI',giftWhy:{shift:'Por un buen turno',perfect:'Por un turno perfecto',jar:'De un bote de propinas lleno',mystery:'Por tu buen instinto',hms:'Por aprender el HMS'},
   giftTag:'Con cariño, por tu {skill}.',giftTagPlain:'Con cariño, por cuidar a los huéspedes.',
   tapHint:['¡Toca la caja!','¡Otra vez!','¡Una más!'],glowHint:{1:'Oh, brilla un poquito…',2:'¡Brilla en dorado!'},
   rar:['Bonito','Raro','Súper raro'],newItem:'NUEVO',
@@ -4381,7 +4381,7 @@ const GIFTS=[
   {id:'teacup',type:'keep',rar:1,icon:'☕',en:['A teacup that stays warm','Nobody knows how. Delores says not to ask the teacup.'],es:['Una taza que siempre está tibia','Nadie sabe cómo. Delores dice que no le preguntes a la taza.']},
   {id:'musicbox',type:'keep',rar:2,icon:'🎶',en:['The manor music box','Tap play to hear the manor’s lullaby.'],es:['La caja de música de la mansión','Toca para oír la canción de cuna de la mansión.']}
 ];
-const GIFT_ODDS={shift:[.68,.26,.06],jar:[.68,.26,.06],perfect:[.45,.38,.17],mystery:[.3,.5,.2]};
+const GIFT_ODDS={shift:[.68,.26,.06],jar:[.68,.26,.06],perfect:[.45,.38,.17],mystery:[.3,.5,.2],hms:[.45,.38,.17]};
 
 /* ---------- Mystery guests: one checks in each day; their secret unfolds over a few shifts ---------- */
 const MG_PARTS=4;
@@ -4952,6 +4952,773 @@ PINS.push(
 );
 renderGrowth();checkPins();
 /* ==== end JOY v1 ==== */
+
+/* ==== HMS v1: learn the desk computer, and make the "boring" desk jobs feel like play ====
+   HMS means hotel management system: the desk computer where every booking, room and bill lives.
+   - A cute desk computer sits on the front desk. Tap it (or press H) to open the manor's HMS.
+   - Five one-minute lessons, with Delores pointing at each tap: bookings, rooms, guest notes, bills, check-in.
+   - Guests with questions only the HMS can answer ("Is my room ready?"), in the manor and in quick shifts.
+   - Gentle "peek in the HMS first" hints on guest moments that depend on a guest's record.
+   - Three quick mini-games for the jobs that are dull in real life: Room Rush (room status),
+     Booking Builder (data entry) and Bill Detective (billing).
+   - HMS skill levels, ten HMS pins, tips and a gift box for finishing every lesson.
+   Everything is drawn with code, all words are written here in English and Spanish, nothing is
+   downloaded and nothing costs money to run. Progress lives in its own key, mapachez_hms_v1. */
+const HMS_TEXT={
+en:{
+  name:'Desk computer',kicker:'HMS · HOTEL MANAGEMENT SYSTEM',title:'The desk computer',
+  intro:'HMS means hotel management system. Every booking, room, guest note and bill lives here. Look it up, then help.',
+  firstHi:'Delores: “This is the HMS. Short for hotel management system. Bookings, rooms, guests and bills all live in here. We’ll learn it one tap at a time. It doesn’t bite. The printer does, a little.”',
+  hi:'Delores: “Back at the keys? Lovely. What shall we look up?”',
+  screenName:'Manor HMS',
+  tabs:{bookings:['📅','Bookings'],rooms:['🛏️','Rooms'],guests:['🙂','Guests'],bills:['🧾','Bills']},
+  back:'← Back',room:'Room',arrives:'Arrives',leaves:'Leaves',nights:'Nights',checkout:'Checkout',bookNote:'Booking note',
+  nightsN:n=>n===1?'1 night':n+' nights',inHouse:'In house',arriving:'Arriving tonight',checkedIn:'Checked in ✓',
+  profile:'🙂 Profile',bill:'🧾 Bill',checkIn:'✅ Check in',notes:'Notes',features:'Room',total:'Total',paid:'Paid',
+  status:{ready:['✨','Clean & ready'],guest:['🛌','Guest inside'],tidy:['🧹','Needs a tidy'],fix:['🔧','Needs fixing']},
+  roomTip:{ready:'Ready for a guest.',guest:'Someone is staying here.',tidy:'Housekeeping is on the way. Not ready yet.',fix:'Engineering is fixing something. Not ready yet.'},
+  pickRoom:'Pick a room for {name}. Look for ✨.',pickTidy:'Room {r} still needs a tidy. Pick one with ✨.',pickGuest:'Someone is already staying in {r} 🙂',pickFix:'Room {r} needs fixing first.',
+  checkedInMsg:'{name} is checked in to Room {r} ✨',
+  lessonsH:'Lessons · about a minute each',gamesH:'Desk games',lesson:'Lesson {n}',lessonOf:'HMS LESSON {n} OF {total}',done:'Done ✓',start:'Start',play:'Play',
+  explore:'🔎 Explore on my own',bigLab:'Big practice lab →',bigLabHint:'For later: the full practice HMS at the training desk.',
+  levelLine:'HMS skill',xp:'{n} HMS points',toNext:'{n} to {level}',maxed:'Top level!',
+  levels:['New at the desk','Finds things fast','Desk helper','HMS whiz','Desk wizard'],
+  lessonDone:'Lesson done!',nextLesson:'Next lesson →',backHome:'Back to the desk computer',graduate:'🎓 You learned the whole HMS!',graduateGift:'Delores left you a gift box for it.',
+  tryAgain:'🌱 Look again. {hint}',
+  lessons:[
+    {t:'Find a booking',d:'Who is staying, and for how long.',steps:[
+      {say:'Tap 📅 Bookings. That’s everyone staying with us tonight.',want:'tab:bookings'},
+      {say:'Lady Vesper is asking about her stay. Tap her name.',want:'booking:vesper'},
+      {say:'Everything about her stay is right here.',quiz:{q:'How many nights is Lady Vesper staying?',opts:[['2 nights',1],['1 night',0],['3 nights',0]],hint:'Find the line that says Nights.'}}]},
+    {t:'Check a room',d:'Is it ready? The little picture tells you.',steps:[
+      {say:'Tap 🛏️ Rooms. Each square is a room, and the picture shows how it is.',want:'tab:rooms'},
+      {say:'Captain Fuzz arrives soon, in Room 205. Tap 205.',want:'room:205'},
+      {say:'✨ means ready. 🧹 means housekeeping isn’t done yet.',quiz:{q:'Can Captain Fuzz go up to 205 right now?',opts:[['Not yet. It needs a tidy first.',1],['Yes, hand over the key!',0],['No, that room is gone.',0]],hint:'What does the 🧹 mean?'}}]},
+    {t:'Read guest notes',d:'Allergies and wishes, so nobody has to repeat them.',steps:[
+      {say:'Tap 🙂 Guests. That’s where the notes live.',want:'tab:guests'},
+      {say:'The kitchen is making Lady Vesper’s supper. Tap her name.',want:'guest:vesper'},
+      {say:'Notes with ⚠️ are the important ones.',quiz:{q:'What must the kitchen know about Lady Vesper?',opts:[['She’s allergic to sesame',1],['She loves garlic',0],['Nothing at all',0]],hint:'Look for the ⚠️.'}}]},
+    {t:'Read a bill',d:'Every charge has a name. No guessing.',steps:[
+      {say:'Tap 🧾 Bills.',want:'tab:bills'},
+      {say:'Ms. Vale has a question about her bill. Tap her name.',want:'bill:vale'},
+      {say:'Each line is one charge.',quiz:{q:'Ms. Vale asks, “What’s this $12?” What is it?',opts:[['Garden tea for two',1],['A parking fee',0],['A mistake, probably',0]],hint:'Find the line that says $12.'}}]},
+    {t:'Check a guest in',d:'The big one. You’ve got this.',steps:[
+      {say:'Juniper Glow just walked in! Tap 📅 Bookings.',want:'tab:bookings'},
+      {say:'Tap Juniper Glow. See “Arriving tonight”?',want:'booking:juniper'},
+      {say:'Tap ✅ Check in.',want:'checkin:juniper'},
+      {say:'Now pick a room with ✨. Those are clean and ready.',want:'pick:201'}]}
+  ],
+  coachEnd:'You did it! That’s exactly how it’s done at the desk.',
+  /* Look-it-up questions */
+  qKicker:'A GUEST HAS A QUESTION',qShift:'QUICK SHIFT · GUEST {n} OF {total} · HMS',
+  qHint:'💡 The answer is in the HMS. Look in {tab}.',lookIt:'🖥️ Look it up',looking:'🖥️ HMS open',
+  qAsk:'What do you say?',
+  qRight:'✨ You looked it up. That’s the Silver Key way.',qLucky:'👍 Right! Next time, peek in the HMS first. Then it’s never a guess.',qMiss:'🌱 Not quite. The HMS had the answer:',
+  qComeBack:'This guest will ask again soon, so you can try again.',
+  peekHint:'💡 This guest has a record in the HMS.',peekBtn:'🖥️ Peek first',peekTitle:'HMS · GUEST RECORD',peekLearn:'New to the HMS? Learn it in a minute →',
+  peekBonus:'🖥️ +1 tip for checking the HMS first',peekNext:'💡 Next time, peek in the HMS before you answer.',
+  /* Mini-games */
+  games:{rush:['🧹','Room Rush','Housekeeping radios in. Keep the room board right.'],build:['📝','Booking Builder','Listen to the guest and fill in the booking. Watch for typos!'],bill:['🔍','Bill Detective','One charge on each bill is wrong. Find it!']},
+  best:'Best: {v}',bestTime:'Best: {v}s',noBest:'New!',
+  rushTapRoom:'Tap the room.',rushPick:'Room {r} is now…',rushWrongRoom:'That’s Room {r}. Listen again 📻',rushWrongStatus:'Hmm, not that one. Listen again 📻',
+  calls:{ready:'📻 Housekeeping: “Room {r} is sparkling clean!”',tidy:'📻 Front desk: “The guest in {r} just checked out.”',guest:'📻 Bell team: “We just walked a guest up to {r}.”',fix:'📻 Engineering: “The tap in {r} is dripping. We’re on it.”',fixed:'📻 Engineering: “All fixed in {r}! It just needs a tidy now.”'},
+  call:'CALL {n} OF {total}',time:'⏱️ {s}s',
+  buildFields:{name:'Name',nights:'Nights',note:'Note',room:'Room'},buildPick:'Tap the right {f}.',buildRoom:'Pick a ✨ room.',buildWrong:'Hmm, listen again 👂',buildSaved:'Booking saved! ✨',guestOf:'GUEST {n} OF {total}',
+  billFind:'Tap the charge that’s wrong.',billOk:'That one looks right 🙂',billFixed:'FIXED',billCase:'BILL {n} OF {total}',
+  gameDone:'Round done!',slips:'Slips: {n}',perfect:'Perfect! No slips ✨',playAgain:'Play again',
+  pins:{login:['First Login','Open the desk computer.'],lesson:['First Lesson','Finish an HMS lesson.'],grad:['HMS Graduate','Finish all five HMS lessons.'],lookup:['Look It Up','Help 5 guests by checking the HMS first.'],peek:['Peek First','Check a guest’s record before you answer.'],rush:['Room Board Hero','Finish Room Rush with no slips.'],build:['Neat Bookings','Finish Booking Builder with no slips.'],detect:['Bill Detective','Catch 10 billing mistakes.'],wizard:['Desk Wizard','Reach the top HMS level.'],speedy:['Quick Paws','Finish Room Rush in under 40 seconds.']}
+},
+es:{
+  name:'Ordenador de recepción',kicker:'HMS · SISTEMA DE GESTIÓN HOTELERA',title:'El ordenador de recepción',
+  intro:'HMS es el sistema de gestión hotelera. Aquí viven todas las reservas, habitaciones, notas y cuentas. Primero consulta, luego ayuda.',
+  firstHi:'Delores: “Este es el HMS, el sistema de gestión hotelera. Reservas, habitaciones, huéspedes y cuentas: todo vive aquí. Lo aprenderemos toque a toque. No muerde. La impresora sí, un poquito.”',
+  hi:'Delores: “¿Otra vez al teclado? Qué bien. ¿Qué buscamos?”',
+  screenName:'HMS de la mansión',
+  tabs:{bookings:['📅','Reservas'],rooms:['🛏️','Habitaciones'],guests:['🙂','Huéspedes'],bills:['🧾','Cuentas']},
+  back:'← Volver',room:'Habitación',arrives:'Llega',leaves:'Sale',nights:'Noches',checkout:'Salida',bookNote:'Nota de reserva',
+  nightsN:n=>n===1?'1 noche':n+' noches',inHouse:'Alojado',arriving:'Llega esta noche',checkedIn:'Registrado ✓',
+  profile:'🙂 Ficha',bill:'🧾 Cuenta',checkIn:'✅ Registrar entrada',notes:'Notas',features:'Habitación',total:'Total',paid:'Pagado',
+  status:{ready:['✨','Limpia y lista'],guest:['🛌','Huésped dentro'],tidy:['🧹','Falta ordenar'],fix:['🔧','Hay que arreglarla']},
+  roomTip:{ready:'Lista para un huésped.',guest:'Alguien se aloja aquí.',tidy:'Limpieza va de camino. Aún no está lista.',fix:'Mantenimiento está arreglando algo. Aún no está lista.'},
+  pickRoom:'Elige una habitación para {name}. Busca ✨.',pickTidy:'La {r} aún falta ordenarla. Elige una con ✨.',pickGuest:'Alguien ya se aloja en la {r} 🙂',pickFix:'Primero hay que arreglar la {r}.',
+  checkedInMsg:'{name} ya está en la habitación {r} ✨',
+  lessonsH:'Lecciones · un minuto cada una',gamesH:'Juegos de recepción',lesson:'Lección {n}',lessonOf:'LECCIÓN HMS {n} DE {total}',done:'Hecha ✓',start:'Empezar',play:'Jugar',
+  explore:'🔎 Explorar por mi cuenta',bigLab:'Laboratorio grande →',bigLabHint:'Para más adelante: el HMS completo de práctica en el escritorio de formación.',
+  levelLine:'Habilidad HMS',xp:'{n} puntos HMS',toNext:'{n} para {level}',maxed:'¡Nivel máximo!',
+  levels:['Primer día en el mostrador','Encuentra todo rápido','Ayudante de recepción','Estrella del HMS','Magia del mostrador'],
+  lessonDone:'¡Lección hecha!',nextLesson:'Siguiente lección →',backHome:'Volver al ordenador',graduate:'🎓 ¡Aprendiste todo el HMS!',graduateGift:'Delores te dejó una caja de regalo.',
+  tryAgain:'🌱 Mira otra vez. {hint}',
+  lessons:[
+    {t:'Encontrar una reserva',d:'Quién se aloja y por cuánto tiempo.',steps:[
+      {say:'Toca 📅 Reservas. Ahí está todo el que se aloja esta noche.',want:'tab:bookings'},
+      {say:'Lady Vesper pregunta por su estancia. Toca su nombre.',want:'booking:vesper'},
+      {say:'Todo sobre su estancia está aquí.',quiz:{q:'¿Cuántas noches se queda Lady Vesper?',opts:[['2 noches',1],['1 noche',0],['3 noches',0]],hint:'Busca la línea que dice Noches.'}}]},
+    {t:'Revisar una habitación',d:'¿Está lista? El dibujito te lo dice.',steps:[
+      {say:'Toca 🛏️ Habitaciones. Cada cuadro es una habitación, y el dibujo dice cómo está.',want:'tab:rooms'},
+      {say:'El capitán Fuzz llega pronto, a la 205. Toca la 205.',want:'room:205'},
+      {say:'✨ es lista. 🧹 es que limpieza aún no terminó.',quiz:{q:'¿Puede el capitán Fuzz subir a la 205 ahora?',opts:[['Aún no. Falta ordenarla.',1],['¡Sí, dale la llave!',0],['No, esa habitación ya no existe.',0]],hint:'¿Qué significa 🧹?'}}]},
+    {t:'Leer las notas',d:'Alergias y deseos, para que nadie tenga que repetirlos.',steps:[
+      {say:'Toca 🙂 Huéspedes. Ahí viven las notas.',want:'tab:guests'},
+      {say:'La cocina prepara la cena de Lady Vesper. Toca su nombre.',want:'guest:vesper'},
+      {say:'Las notas con ⚠️ son las importantes.',quiz:{q:'¿Qué debe saber la cocina sobre Lady Vesper?',opts:[['Es alérgica al sésamo',1],['Le encanta el ajo',0],['Nada',0]],hint:'Busca el ⚠️.'}}]},
+    {t:'Leer una cuenta',d:'Cada cargo tiene nombre. Sin adivinar.',steps:[
+      {say:'Toca 🧾 Cuentas.',want:'tab:bills'},
+      {say:'La señora Vale pregunta por su cuenta. Toca su nombre.',want:'bill:vale'},
+      {say:'Cada línea es un cargo.',quiz:{q:'La señora Vale pregunta: “¿Qué son estos $12?”. ¿Qué es?',opts:[['Té del jardín para dos',1],['El aparcamiento',0],['Seguramente un error',0]],hint:'Busca la línea de $12.'}}]},
+    {t:'Registrar una entrada',d:'La grande. Tú puedes.',steps:[
+      {say:'¡Acaba de llegar Juniper Glow! Toca 📅 Reservas.',want:'tab:bookings'},
+      {say:'Toca Juniper Glow. ¿Ves “Llega esta noche”?',want:'booking:juniper'},
+      {say:'Toca ✅ Registrar entrada.',want:'checkin:juniper'},
+      {say:'Ahora elige una habitación con ✨. Están limpias y listas.',want:'pick:201'}]}
+  ],
+  coachEnd:'¡Lo lograste! Así se hace en recepción.',
+  qKicker:'UN HUÉSPED TIENE UNA PREGUNTA',qShift:'TURNO RÁPIDO · HUÉSPED {n} DE {total} · HMS',
+  qHint:'💡 La respuesta está en el HMS. Mira en {tab}.',lookIt:'🖥️ Consultar',looking:'🖥️ HMS abierto',
+  qAsk:'¿Qué dices?',
+  qRight:'✨ Lo consultaste. Así se hace en Silver Key.',qLucky:'👍 ¡Bien! La próxima vez, mira primero el HMS. Así nunca es adivinar.',qMiss:'🌱 Casi. El HMS tenía la respuesta:',
+  qComeBack:'Este huésped volverá a preguntar pronto, para que lo intentes otra vez.',
+  peekHint:'💡 Este huésped tiene ficha en el HMS.',peekBtn:'🖥️ Mirar primero',peekTitle:'HMS · FICHA DEL HUÉSPED',peekLearn:'¿Primera vez con el HMS? Apréndelo en un minuto →',
+  peekBonus:'🖥️ +1 propina por mirar primero el HMS',peekNext:'💡 La próxima vez, mira el HMS antes de responder.',
+  games:{rush:['🧹','Carrera de habitaciones','Limpieza llama por radio. Mantén el tablero al día.'],build:['📝','Crea la reserva','Escucha al huésped y completa la reserva. ¡Ojo con las erratas!'],bill:['🔍','Detective de cuentas','Un cargo de cada cuenta está mal. ¡Encuéntralo!']},
+  best:'Mejor: {v}',bestTime:'Mejor: {v}s',noBest:'¡Nuevo!',
+  rushTapRoom:'Toca la habitación.',rushPick:'La {r} ahora está…',rushWrongRoom:'Esa es la {r}. Escucha otra vez 📻',rushWrongStatus:'Mmm, esa no. Escucha otra vez 📻',
+  calls:{ready:'📻 Limpieza: “¡La {r} está reluciente!”',tidy:'📻 Recepción: “El huésped de la {r} acaba de salir.”',guest:'📻 Botones: “Acabamos de subir a un huésped a la {r}.”',fix:'📻 Mantenimiento: “El grifo de la {r} gotea. Vamos para allá.”',fixed:'📻 Mantenimiento: “¡Arreglado en la {r}! Ahora solo falta ordenarla.”'},
+  call:'LLAMADA {n} DE {total}',time:'⏱️ {s}s',
+  buildFields:{name:'Nombre',nights:'Noches',note:'Nota',room:'Habitación'},buildPick:'Toca: {f}.',buildRoom:'Elige una habitación ✨.',buildWrong:'Mmm, escucha otra vez 👂',buildSaved:'¡Reserva guardada! ✨',guestOf:'HUÉSPED {n} DE {total}',
+  billFind:'Toca el cargo que está mal.',billOk:'Ese parece correcto 🙂',billFixed:'CORREGIDO',billCase:'CUENTA {n} DE {total}',
+  gameDone:'¡Ronda terminada!',slips:'Despistes: {n}',perfect:'¡Perfecto! Sin despistes ✨',playAgain:'Jugar otra vez',
+  pins:{login:['Primer inicio','Abre el ordenador de recepción.'],lesson:['Primera lección','Termina una lección del HMS.'],grad:['Graduación del HMS','Termina las cinco lecciones del HMS.'],lookup:['Consúltalo','Ayuda a 5 huéspedes mirando primero el HMS.'],peek:['Mirar primero','Mira la ficha de un huésped antes de responder.'],rush:['Tablero perfecto','Termina la carrera de habitaciones sin despistes.'],build:['Reservas impecables','Termina Crea la reserva sin despistes.'],detect:['Detective de cuentas','Encuentra 10 errores en cuentas.'],wizard:['Magia del mostrador','Llega al nivel más alto del HMS.'],speedy:['Patitas rápidas','Termina la carrera de habitaciones en menos de 40 segundos.']}
+}};
+const HT=HMS_TEXT[profile.lang]||HMS_TEXT.en;
+const hL=o=>o[profile.lang]||o.en;
+const ht=(s,vars)=>vars?String(s).replace(/\{(\w+)\}/g,(_,k)=>vars[k]!=null?String(vars[k]):''):s;
+const hmsShuffle=a=>{const r=[...a];for(let k=r.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[r[k],r[j]]=[r[j],r[k]];}return r;};
+
+/* ---------- The manor's records: the same guests and rooms as the story (201 to 206) ---------- */
+const HMS_GUESTS=[
+  {id:'juniper',room:'201',look:{cast:'Juniper Glow'},nights:3,status:'arriving',
+   en:{name:'Juniper Glow',arrive:'Tonight',leave:'In 3 days',checkout:'11 AM',book:'Window seat, please.',notes:[['Always a little cold: extra blankets',0],['Loves the window seat',0]],features:['Quiet','Garden view'],bill:[['Room, night 1',120],['Deposit paid',-50]]},
+   es:{name:'Juniper Glow',arrive:'Esta noche',leave:'En 3 días',checkout:'11 AM',book:'Asiento junto a la ventana, por favor.',notes:[['Siempre tiene frío: mantas extra',0],['Le encanta el asiento de la ventana',0]],features:['Tranquila','Vista al jardín'],bill:[['Habitación, noche 1',120],['Depósito pagado',-50]]}},
+  {id:'finch',room:'202',look:'finch',nights:1,status:'in',
+   en:{name:'Mr. Finch',arrive:'Yesterday',leave:'Tomorrow',checkout:'1 PM (late checkout approved)',book:'Late checkout until 1 PM: approved.',notes:[['Please don’t say his room number out loud',1],['Ask before arranging an audience',0]],features:['Quiet','Garden view'],bill:[['Room, 1 night',120],['Late checkout (a gift)',0]]},
+   es:{name:'El señor Finch',arrive:'Ayer',leave:'Mañana',checkout:'1 PM (salida tardía aprobada)',book:'Salida tardía hasta la 1 PM: aprobada.',notes:[['No digas en voz alta su número de habitación',1],['Pregunta antes de reunir público',0]],features:['Tranquila','Vista al jardín'],bill:[['Habitación, 1 noche',120],['Salida tardía (regalo)',0]]}},
+  {id:'vesper',room:'203',look:'vesper',nights:2,status:'in',
+   en:{name:'Lady Vesper',arrive:'Tonight',leave:'In 2 days',checkout:'11 AM',book:'Supper in the room tonight.',notes:[['Sesame allergy',1],['Blackout curtains',0],['Ask where she’d like her tray',0]],features:['Quiet','Blackout curtains'],bill:[['Room, 2 nights',240],['Pumpkin soup supper',18]]},
+   es:{name:'Lady Vesper',arrive:'Esta noche',leave:'En 2 días',checkout:'11 AM',book:'Cena en la habitación esta noche.',notes:[['Alergia al sésamo',1],['Cortinas opacas',0],['Pregunta dónde quiere la bandeja',0]],features:['Tranquila','Cortinas opacas'],bill:[['Habitación, 2 noches',240],['Cena: sopa de calabaza',18]]}},
+  {id:'vale',room:'204',look:'vale',nights:3,status:'in',
+   en:{name:'Ms. Vale',arrive:'Yesterday',leave:'In 2 days',checkout:'11 AM',book:'Returning guest. Welcome her back by name.',notes:[['Accessible room needed',1],['Returning guest: welcome back by name',0]],features:['Accessible','Garden view'],bill:[['Room, 3 nights',360],['Garden tea for two',12]]},
+   es:{name:'La señora Vale',arrive:'Ayer',leave:'En 2 días',checkout:'11 AM',book:'Huésped que vuelve. Salúdala por su nombre.',notes:[['Necesita habitación accesible',1],['Vuelve: salúdala por su nombre',0]],features:['Accesible','Vista al jardín'],bill:[['Habitación, 3 noches',360],['Té del jardín para dos',12]]}},
+  {id:'fuzz',room:'205',look:{cast:'Captain Barnaby Fuzz'},nights:1,status:'arriving',
+   en:{name:'Captain Barnaby Fuzz',arrive:'Tonight, late',leave:'Tomorrow',checkout:'11 AM',book:'Very tall. Extra-long bed requested.',notes:[['Extra-long bed',0],['Arriving late, after midnight',0]],features:['Accessible','Garden view'],bill:[['Room, 1 night',120],['Deposit paid',-50]]},
+   es:{name:'El capitán Barnaby Fuzz',arrive:'Esta noche, tarde',leave:'Mañana',checkout:'11 AM',book:'Muy alto. Pidió cama extralarga.',notes:[['Cama extralarga',0],['Llega tarde, después de medianoche',0]],features:['Accesible','Vista al jardín'],bill:[['Habitación, 1 noche',120],['Depósito pagado',-50]]}},
+  {id:'nine',room:'206',look:'nine',nights:1,status:'in',
+   en:{name:'M. Nine',arrive:'Tonight',leave:'Tomorrow',checkout:'11 AM',book:'Wake-up call at 6:30 AM.',notes:[['Wake-up call at 6:30 AM',1],['Likes exact times',0]],features:['Accessible','Quiet'],bill:[['Room, 1 night',120],['Midnight cocoa',6]]},
+   es:{name:'M. Nine',arrive:'Esta noche',leave:'Mañana',checkout:'11 AM',book:'Llamada despertador a las 6:30 AM.',notes:[['Despertador a las 6:30 AM',1],['Le gustan las horas exactas',0]],features:['Accesible','Tranquila'],bill:[['Habitación, 1 noche',120],['Chocolate de medianoche',6]]}}
+];
+const HMS_ROOMS={'201':'ready','202':'guest','203':'guest','204':'guest','205':'tidy','206':'guest'};
+const hmsGuest=id=>HMS_GUESTS.find(g=>g.id===id);
+const hmsPerson=g=>typeof g.look==='string'?GUESTS.find(x=>x.id===g.look)||{cast:g.look}:g.look;
+const money=n=>(n<0?'−$':'$')+Math.abs(n);
+const billTotal=lines=>lines.reduce((a,l)=>a+l[1],0);
+
+/* ---------- Save ---------- */
+const HMS_KEY='mapachez_hms_v1';
+const HMS_LEVELS=[0,12,35,70,120];
+function createHms(){return {version:1,xp:0,opened:0,lessons:[],looked:0,right:0,peeks:0,since:0,q:{},caught:0,best:{rush:0,build:0,bill:0},time:0,fast:0,perfect:{rush:0,build:0,bill:0},plays:0};}
+function normaliseHms(v){
+  const h=createHms();if(!v||typeof v!=='object'||v.version!==1)return h;
+  for(const k of ['xp','opened','looked','right','peeks','since','caught','time','plays','fast'])h[k]=Math.max(0,v[k]|0);
+  if(Array.isArray(v.lessons))h.lessons=[...new Set(v.lessons.filter(n=>n>=1&&n<=5))];
+  if(v.q&&typeof v.q==='object')for(const [k,r] of Object.entries(v.q))if(r&&typeof r==='object')h.q[k]={n:r.n|0,miss:!!r.miss,at:r.at|0};
+  for(const g of ['rush','build','bill']){h.best[g]=Math.max(0,v.best?.[g]|0);h.perfect[g]=Math.max(0,v.perfect?.[g]|0);}
+  return h;
+}
+let hms=createHms();
+try{hms=normaliseHms(JSON.parse(localStorage.getItem(HMS_KEY)||'null'));}catch{}
+function storeHms(){try{localStorage.setItem(HMS_KEY,JSON.stringify(hms));}catch{}}
+const hmsLevel=(xp=hms.xp)=>{let l=0;HMS_LEVELS.forEach((v,k)=>{if(xp>=v)l=k;});return l;};
+function hmsGain(xp){
+  const before=hmsLevel();hms.xp+=xp;storeHms();const after=hmsLevel();
+  if(after>before)celebrate({icon:'🖥️',kicker:HT.levelLine+' · '+t('new level'),label:HT.levels[after],confetti:true});
+}
+/* Tips go into the same tip jar as every other good answer. */
+function hmsTip(n){
+  if(n<=0)return;joy.tips+=n;joy.jar+=n;
+  if(joy.jar>=JOY_JAR){joy.jar-=JOY_JAR;joy.jars++;joy.gifts.push('jar');celebrate({icon:'🎁',kicker:JT.jarFull,label:JT.jarGift,confetti:true});}
+  storeJoy();
+}
+function hmsReward(el,tips,xp,{big=false,word=''}={}){
+  hmsTip(tips);if(xp)hmsGain(xp);
+  if(el&&el.isConnected){const [x,y]=centerOf(el);burst(x,y,big?1.4:.7,{hearts:big,rainbow:big});if(tips)floatText(x,y-20,'+'+tips+' 🪙',{size:big?24:18});if(word)floatText(x,y-56,word,{col:'#fff3c4',size:22});}
+  joySound(big?'open':'pop',big?1:0);if(tips)setTimeout(()=>joySound('coin',2),120);
+  checkPins();renderGrowth();
+}
+
+/* ---------- The screen: one small, friendly HMS used everywhere ---------- */
+function hmsFace(cv,g){if(cv)paintBust(cv,hmsPerson(g),24,2);}
+function hmsPill(kind){return '<span class="hms-pill '+kind+'">'+esc(kind==='arriving'?HT.arriving:kind==='checked'?HT.checkedIn:HT.inHouse)+'</span>';}
+function hmsStatus(s){const [i,l]=HT.status[s];return '<span class="hms-st '+s+'"><span aria-hidden="true">'+i+'</span> '+esc(l)+'</span>';}
+/* opt: {tab, sel, onAct(act), glow:'tab:rooms', rooms, lock} */
+function hmsScreen(host,opt={}){
+  const S={tab:opt.tab||'bookings',sel:opt.sel||'',rooms:{...(opt.rooms||HMS_ROOMS)},checked:{},picking:'',room:opt.room||'',msg:'',glow:opt.glow||''};
+  host.innerHTML='';const pc=document.createElement('div');pc.className='hms-pc';host.append(pc);
+  const act=(a,run)=>{run?.();render();opt.onAct?.(a,S);};
+  function rowsFor(kind){
+    return '<div class="hms-list">'+HMS_GUESTS.map(g=>{const L=hL(g),pill=S.checked[g.id]?'checked':g.status;
+      return '<button class="hms-row" data-act="'+kind+':'+g.id+'"><canvas class="hms-face" data-face="'+g.id+'" aria-hidden="true"></canvas><span class="hms-row-main"><b>'+esc(L.name)+'</b><small>'+esc(HT.room)+' '+g.room+(kind==='bill'?' · '+esc(HT.total)+' '+money(billTotal(L.bill)):' · '+esc(HT.nightsN(g.nights)))+'</small></span>'+(kind==='booking'?hmsPill(pill):'')+'</button>';}).join('')+'</div>';
+  }
+  function body(){
+    const g=S.sel&&hmsGuest(S.sel),L=g&&hL(g);
+    if(S.tab==='rooms'){
+      const r=S.room,st=r&&S.rooms[r],who=r&&HMS_GUESTS.find(x=>x.room===r);
+      return '<div class="hms-rooms">'+Object.keys(S.rooms).map(n=>'<button class="hms-room '+S.rooms[n]+(n===r?' on':'')+'" data-act="room:'+n+'"><b>'+n+'</b><span class="hms-room-ic" aria-hidden="true">'+HT.status[S.rooms[n]][0]+'</span><small>'+esc(HT.status[S.rooms[n]][1])+'</small></button>').join('')+'</div>'+
+        (r?'<div class="hms-card hms-room-note"><b>'+esc(HT.room)+' '+r+'</b> '+hmsStatus(st)+'<p>'+esc(HT.roomTip[st])+(who&&st!=='guest'?' · '+esc(hL(who).name)+' ('+esc(hL(who).arrive.toLowerCase())+')':who&&st==='guest'?' · '+esc(hL(who).name):'')+'</p></div>':
+        '<p class="hms-legend">'+Object.keys(HT.status).map(hmsStatus).join(' ')+'</p>');
+    }
+    if(!g)return rowsFor(S.tab==='bookings'?'booking':S.tab==='guests'?'guest':'bill');
+    const head='<button class="hms-back" data-act="back">'+esc(HT.back)+'</button><div class="hms-who"><canvas class="hms-face big" data-face="'+g.id+'" aria-hidden="true"></canvas><div><b>'+esc(L.name)+'</b><small>'+esc(HT.room)+' '+g.room+'</small></div></div>';
+    if(S.tab==='bookings'){
+      if(S.picking===g.id)return head+'<p class="hms-say">'+esc(ht(HT.pickRoom,{name:L.name}))+'</p><div class="hms-rooms">'+Object.keys(S.rooms).map(n=>'<button class="hms-room '+S.rooms[n]+'" data-act="pick:'+n+'"><b>'+n+'</b><span class="hms-room-ic" aria-hidden="true">'+HT.status[S.rooms[n]][0]+'</span><small>'+esc(HT.status[S.rooms[n]][1])+'</small></button>').join('')+'</div>'+(S.msg?'<p class="hms-msg">'+esc(S.msg)+'</p>':'');
+      const rows=[[HT.room,g.room],[HT.nights,HT.nightsN(g.nights)],[HT.arrives,L.arrive],[HT.leaves,L.leave],[HT.checkout,L.checkout],[HT.bookNote,L.book]];
+      return head+'<div class="hms-card"><dl class="hms-dl">'+rows.map(([a,b])=>'<dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd>').join('')+'</dl>'+hmsPill(S.checked[g.id]?'checked':g.status)+'</div>'+
+        '<div class="hms-actions"><button data-act="guest:'+g.id+'">'+esc(HT.profile)+'</button><button data-act="bill:'+g.id+'">'+esc(HT.bill)+'</button>'+(g.status==='arriving'&&!S.checked[g.id]?'<button class="go" data-act="checkin:'+g.id+'">'+esc(HT.checkIn)+'</button>':'')+'</div>'+(S.msg?'<p class="hms-msg ok">'+esc(S.msg)+'</p>':'');
+    }
+    if(S.tab==='guests')return head+'<div class="hms-card"><span class="hms-label">'+esc(HT.notes)+'</span><ul class="hms-notes">'+L.notes.map(([n,w])=>'<li class="'+(w?'warn':'')+'">'+(w?'⚠️ ':'• ')+esc(n)+'</li>').join('')+'</ul><span class="hms-label">'+esc(HT.features)+'</span><div>'+L.features.map(f=>'<span class="feature-chip">'+esc(f)+'</span>').join('')+'</div></div>';
+    return head+'<div class="hms-card"><table class="hms-bill">'+L.bill.map(([a,n])=>'<tr><td>'+esc(a)+'</td><td>'+money(n)+'</td></tr>').join('')+'<tr class="sum"><td>'+esc(HT.total)+'</td><td>'+money(billTotal(L.bill))+'</td></tr></table></div>';
+  }
+  function render(){
+    pc.innerHTML='<div class="hms-screen"><div class="hms-bar"><span class="hms-led" aria-hidden="true"></span><b>'+esc(HT.screenName)+'</b><span>'+(state?esc(clock(state)):'11:40 PM')+'</span></div>'+
+      '<div class="hms-tabs" role="tablist">'+Object.entries(HT.tabs).map(([id,[i,l]])=>'<button role="tab" aria-selected="'+(S.tab===id)+'" class="'+(S.tab===id?'on':'')+'" data-act="tab:'+id+'"><span aria-hidden="true">'+i+'</span><small>'+esc(l)+'</small></button>').join('')+'</div>'+
+      '<div class="hms-body">'+body()+'</div></div><div class="hms-stand" aria-hidden="true"></div>';
+    pc.querySelectorAll('canvas[data-face]').forEach(cv=>hmsFace(cv,hmsGuest(cv.dataset.face)));
+    if(S.glow)pc.querySelector('[data-act="'+S.glow+'"]')?.classList.add('hms-glow');
+    pc.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>click(b.dataset.act,b));
+  }
+  function click(a,el){
+    const [kind,arg]=a.split(':');if(S.glow===a)S.glow='';
+    if(kind==='tab')return act(a,()=>{S.tab=arg;S.sel='';S.room='';S.picking='';S.msg='';});
+    if(kind==='back')return act(a,()=>{S.sel='';S.picking='';S.msg='';});
+    if(kind==='booking')return act(a,()=>{S.tab='bookings';S.sel=arg;S.msg='';});
+    if(kind==='guest')return act(a,()=>{S.tab='guests';S.sel=arg;});
+    if(kind==='bill')return act(a,()=>{S.tab='bills';S.sel=arg;});
+    if(kind==='room')return act(a,()=>{S.room=arg;});
+    if(kind==='checkin')return act(a,()=>{S.picking=arg;S.msg='';});
+    if(kind==='pick'){
+      const st=S.rooms[arg],g=hmsGuest(S.picking);
+      if(st!=='ready'){S.msg=ht(st==='tidy'?HT.pickTidy:st==='fix'?HT.pickFix:HT.pickGuest,{r:arg});render();pc.querySelector('[data-act="pick:'+arg+'"]')?.classList.add('hms-no');joySound('boop');return;}
+      return act(a,()=>{S.checked[g.id]=arg;S.rooms[arg]='guest';S.picking='';S.msg=ht(HT.checkedInMsg,{name:hL(g).name,r:arg});const [x,y]=centerOf(el);burst(x,y,1,{hearts:true});joySound('hop');});
+    }
+  }
+  S.set=(o)=>{Object.assign(S,o);render();};
+  render();return S;
+}
+
+/* ---------- Home: lessons, desk games and your HMS skill ---------- */
+function hmsSkillHTML(){
+  const l=hmsLevel(),lo=HMS_LEVELS[l],hi=HMS_LEVELS[l+1],pct=hi?Math.round((hms.xp-lo)/(hi-lo)*100):100;
+  return '<div class="hms-skill"><span class="hms-skill-ic" aria-hidden="true">🖥️</span><div><small>'+esc(HT.levelLine)+'</small><b>'+esc(HT.levels[l])+'</b><span class="bar" role="meter" aria-label="'+esc(HT.levelLine)+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><i style="width:'+pct+'%"></i></span><small>'+esc(ht(HT.xp,{n:hms.xp}))+' · '+esc(hi?ht(HT.toNext,{n:hi-hms.xp,level:HT.levels[l+1]}):HT.maxed)+'</small></div></div>';
+}
+function openHms(){
+  if(world)world.stop();
+  const first=!hms.opened;hms.opened++;storeHms();
+  const next=[1,2,3,4,5].find(n=>!hms.lessons.includes(n));
+  openModal(titleHTML(HT.title,HT.kicker)+
+    '<div class="hms-coach"><canvas id="hms-delores" aria-hidden="true"></canvas><p>'+esc(first?HT.firstHi:HT.hi)+'</p></div>'+
+    '<p class="modal-description">'+esc(HT.intro)+'</p>'+hmsSkillHTML()+
+    '<h3 class="pins-heading">'+esc(HT.lessonsH)+'</h3><div class="hms-cards" id="hms-lessons"></div>'+
+    '<h3 class="pins-heading">'+esc(HT.gamesH)+'</h3><div class="hms-cards" id="hms-games"></div>'+
+    '<div class="action-row" id="hms-home-actions"></div><p class="joy-hint">'+esc(HT.bigLabHint)+'</p>',true);
+  paintBust($('hms-delores'),{cast:'delores'},26,2);
+  HT.lessons.forEach((L,k)=>{const n=k+1,got=hms.lessons.includes(n),b=document.createElement('button');b.className='hms-lesson'+(got?' got':'')+(n===next?' next':'');b.dataset.lesson=n;
+    b.innerHTML='<span class="hms-num">'+(got?'✓':n)+'</span><span><b>'+esc(L.t)+'</b><small>'+esc(L.d)+'</small></span><span class="hms-go">'+esc(got?HT.done:HT.start)+'</span>';b.onclick=()=>startLesson(n);$('hms-lessons').append(b);});
+  for(const id of ['rush','build','bill']){const [i,name,d]=HT.games[id],b=document.createElement('button');b.className='hms-lesson game';b.dataset.game=id;
+    const best=id==='rush'?(hms.time?ht(HT.bestTime,{v:hms.time}):HT.noBest):(hms.best[id]?ht(HT.best,{v:hms.best[id]+' ⭐'}):HT.noBest);
+    b.innerHTML='<span class="hms-num" aria-hidden="true">'+i+'</span><span><b>'+esc(name)+'</b><small>'+esc(d)+'</small></span><span class="hms-go">'+esc(best)+'</span>';b.onclick=()=>HMS_GAMES[id]();$('hms-games').append(b);}
+  const row=$('hms-home-actions');
+  const add=(label,cls,run)=>{const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=run;row.append(b);return b;};
+  add(HT.explore,'secondary-button',exploreHms);
+  add(HT.bigLab,'secondary-button',()=>{closeModal();openSilverKeyTraining('lab');});
+  add(titleVisible?t('Done'):t('Back to the manor'),'primary-button',closeModal);
+  if(first)celebrate({icon:'🖥️',kicker:HT.name,label:HT.pins.login[0]});
+  checkPins();renderGrowth();narrativeText=body.innerText;
+  requestAnimationFrame(()=>body.querySelector('.hms-lesson.next')?.focus());
+}
+function exploreHms(){
+  openModal(titleHTML(HT.title,HT.kicker)+'<div id="hms-host"></div><div class="action-row" id="hms-x-actions"></div>',true);
+  hmsScreen($('hms-host'),{tab:'bookings'});
+  const b=document.createElement('button');b.className='primary-button';b.textContent=HT.backHome;b.onclick=openHms;$('hms-x-actions').append(b);
+  narrativeText=body.innerText;
+}
+
+/* ---------- Lessons: Delores points, you tap, sparkles happen ---------- */
+function startLesson(n){
+  const L=HT.lessons[n-1];let step=0,scr=null;
+  openModal('<span class="overline">'+esc(ht(HT.lessonOf,{n,total:5}))+'</span><h2 id="modal-heading">'+esc(L.t)+'</h2><div class="gm-dots" aria-hidden="true" id="hms-steps"></div>'+
+    '<div class="hms-coach live" aria-live="polite"><canvas id="hms-delores" aria-hidden="true"></canvas><p id="hms-say"></p></div><div id="hms-host"></div><div id="hms-quiz"></div><div class="action-row" id="hms-l-actions"></div>',true);
+  paintBust($('hms-delores'),{cast:'delores'},26,2);
+  function show(){
+    const s=L.steps[step];$('hms-say').textContent=s.say;
+    $('hms-steps').innerHTML=L.steps.map((_,k)=>'<i class="'+(k<step?'done':k===step?'now':'')+'"></i>').join('');
+    scr.set({glow:s.want||''});
+    const qz=$('hms-quiz');qz.innerHTML='';
+    if(s.quiz){qz.innerHTML='<p class="gm-ask">'+esc(s.quiz.q)+'</p><div class="choices"></div><p class="hms-msg" hidden></p>';
+      const host=qz.querySelector('.choices');
+      hmsShuffle(s.quiz.opts).forEach(([text,ok],k)=>{const b=document.createElement('button');b.className='choice';b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>';
+        b.onclick=()=>{if(ok){b.classList.add('hms-yes');finish(b);}else{const m=qz.querySelector('.hms-msg');m.hidden=false;m.textContent=ht(HT.tryAgain,{hint:s.quiz.hint});b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');}};host.append(b);});
+      requestAnimationFrame(()=>{try{qz.scrollIntoView({block:'nearest',behavior:joyCalm()?'auto':'smooth'});}catch{}});}
+    narrativeText=body.innerText;
+  }
+  scr=hmsScreen($('hms-host'),{tab:'bookings',onAct:(a)=>{
+    const s=L.steps[step];if(!s||s.quiz)return;
+    if(a===s.want){joySound('pop');
+      const target=$('hms-host').querySelector('.hms-body');const [x,y]=centerOf(target);burst(x,y-40,.4);
+      step++;if(step>=L.steps.length)return finish($('hms-host'));show();}
+  }});
+  show();
+  function finish(el){
+    const fresh=!hms.lessons.includes(n);
+    $('hms-say').textContent=HT.coachEnd;$('hms-steps').innerHTML=L.steps.map(()=>'<i class="done"></i>').join('');scr.set({glow:''});
+    body.querySelectorAll('#hms-quiz .choice').forEach(b=>b.disabled=true);
+    if(fresh){hms.lessons.push(n);storeHms();}
+    const grad=fresh&&hms.lessons.length===5;if(grad){joy.gifts.push('hms');storeJoy();}
+    const row=$('hms-l-actions');
+    row.insertAdjacentHTML('beforebegin','<div class="joy-panel hms-done"><small>🎓 '+esc(HT.lessonDone)+'</small><p><b>'+esc(L.t)+'</b> ✓</p>'+(grad?'<p>'+esc(HT.graduate)+'</p><p><span class="joy-mini-gift" aria-hidden="true">🎁</span>'+esc(HT.graduateGift)+'</p><button class="primary-button joy-open-gift">'+esc(JT.openGift)+'</button>':'')+'</div>');
+    body.querySelectorAll('.joy-open-gift').forEach(b=>b.onclick=openGift);
+    const nx=[1,2,3,4,5].find(k=>!hms.lessons.includes(k)&&k>n)||[1,2,3,4,5].find(k=>!hms.lessons.includes(k));
+    const add=(label,primary,run)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=run;row.append(b);return b;};
+    add(HT.backHome,!nx,openHms);if(nx)add(HT.nextLesson,true,()=>startLesson(nx)).focus();
+    hmsReward(el,fresh?3:1,fresh?10:2,{big:true,word:HT.lessonDone});
+    if(grad)celebrate({icon:'🎓',kicker:HT.name,label:HT.pins.grad[0],confetti:true});
+    narrativeText=body.innerText;
+  }
+}
+
+/* ---------- Guests with questions only the HMS can answer ---------- */
+const HMS_QS=[
+  {id:'checkout',g:'nine',tab:'bookings',en:['What time do I check out tomorrow?',[['11 AM tomorrow. I can call you at 10:30 as a reminder, if you like.',1],['Whenever you wake up!',0],['Hmm, noon? Probably noon.',0]],'Checkout for M. Nine is 11 AM.'],es:['¿A qué hora dejo la habitación mañana?',[['Mañana a las 11 AM. Si quiere, le aviso a las 10:30.',1],['¡Cuando se despierte!',0],['Mmm, ¿a mediodía? Seguramente.',0]],'La salida de M. Nine es a las 11 AM.']},
+  {id:'ready',g:'fuzz',tab:'rooms',en:['Is my room ready yet?',[['Room 205 is being tidied right now. May I bring you a cup of tea while you wait?',1],['Yes! Here’s your key.',0],['We don’t seem to have a room for you.',0]],'Room 205 shows 🧹 Needs a tidy.'],es:['¿Ya está lista mi habitación?',[['La 205 se está ordenando ahora mismo. ¿Le traigo un té mientras espera?',1],['¡Sí! Aquí tiene la llave.',0],['Parece que no tenemos habitación para usted.',0]],'La 205 muestra 🧹 Falta ordenar.']},
+  {id:'allergy',g:'vesper',tab:'guests',en:['Does the kitchen know about my allergy?',[['Yes. Your sesame allergy is on your record, and I’ll remind the kitchen myself.',1],['What allergy?',0],['It should be fine. Most soups don’t have peanuts.',0]],'Lady Vesper’s record says ⚠️ Sesame allergy.'],es:['¿Sabe la cocina lo de mi alergia?',[['Sí. Su alergia al sésamo está en su ficha, y se lo recuerdo personalmente a la cocina.',1],['¿Qué alergia?',0],['Seguro que no pasa nada. Casi ninguna sopa lleva cacahuete.',0]],'La ficha de Lady Vesper dice ⚠️ Alergia al sésamo.']},
+  {id:'charge',g:'vale',tab:'bills',en:['What’s this $12 on my bill?',[['That’s the garden tea for two from this afternoon.',1],['Oh, it’s just a fee.',0],['No idea, but I’ll take it off.',0]],'Ms. Vale’s bill: Garden tea for two, $12.'],es:['¿Qué son estos $12 de mi cuenta?',[['Es el té del jardín para dos de esta tarde.',1],['Ah, es una tarifa.',0],['Ni idea, pero se lo quito.',0]],'Cuenta de la señora Vale: té del jardín para dos, $12.']},
+  {id:'blankets',g:'juniper',tab:'guests',en:['Did you get my note about extra blankets?',[['We did. It’s on your record, and two extra blankets are on their way up.',1],['We don’t really keep notes.',0],['There might be some in a closet somewhere.',0]],'Juniper’s record: Always a little cold, extra blankets.'],es:['¿Recibieron mi nota sobre las mantas extra?',[['Sí. Está en su ficha, y le subimos dos mantas extra.',1],['La verdad, no guardamos notas.',0],['Quizá haya alguna en algún armario.',0]],'Ficha de Juniper: siempre tiene frío, mantas extra.']},
+  {id:'late',g:'finch',tab:'bookings',en:['Did my late checkout get approved?',[['It did. You’re welcome to stay until 1 PM tomorrow.',1],['Sorry, checkout is always 11.',0],['Ask again in the morning?',0]],'Mr. Finch’s booking note: Late checkout until 1 PM, approved.'],es:['¿Me aprobaron la salida tardía?',[['Sí. Puede quedarse hasta la 1 PM de mañana.',1],['Lo siento, la salida siempre es a las 11.',0],['¿Vuelve a preguntar por la mañana?',0]],'Nota de la reserva del señor Finch: salida tardía hasta la 1 PM, aprobada.']},
+  {id:'nights',g:'vesper',tab:'bookings',en:['How many nights am I staying, again?',[['Two nights. You leave the day after tomorrow.',1],['Just tonight, I think.',0],['As long as you like!',0]],'Lady Vesper’s booking: 2 nights.'],es:['¿Cuántas noches me quedo, perdone?',[['Dos noches. Se marcha pasado mañana.',1],['Solo esta noche, creo.',0],['¡Las que quiera!',0]],'Reserva de Lady Vesper: 2 noches.']},
+  {id:'deposit',g:'fuzz',tab:'bills',en:['Did my deposit go through?',[['Yes, your $50 deposit is paid. It’s right here on your bill.',1],['I can’t see bills, sorry.',0],['Better pay it again, just in case.',0]],'Captain Fuzz’s bill: Deposit paid, −$50.'],es:['¿Se cobró mi depósito?',[['Sí, su depósito de $50 está pagado. Aquí está en su cuenta.',1],['No puedo ver las cuentas, lo siento.',0],['Mejor páguelo otra vez, por si acaso.',0]],'Cuenta del capitán Fuzz: depósito pagado, −$50.']},
+  {id:'access',g:'vale',tab:'guests',en:['Is my room the accessible one?',[['Yes. Room 204 is accessible, and it’s noted on your record.',1],['All our rooms are the same.',0],['You’d have to ask housekeeping.',0]],'Ms. Vale’s record: ⚠️ Accessible room needed. Room: Accessible.'],es:['¿Mi habitación es la accesible?',[['Sí. La 204 es accesible, y está anotado en su ficha.',1],['Todas las habitaciones son iguales.',0],['Eso tendría que preguntarlo a limpieza.',0]],'Ficha de la señora Vale: ⚠️ necesita habitación accesible.']},
+  {id:'wake',g:'nine',tab:'guests',en:['Is my 6:30 wake-up call booked?',[['It is. 6:30 AM exactly, right on your record.',1],['Wake-up calls are only for weddings.',0],['Set your own alarm, just in case?',0]],'M. Nine’s record: ⚠️ Wake-up call at 6:30 AM.'],es:['¿Está programado mi despertador de las 6:30?',[['Sí. A las 6:30 AM exactas, está en su ficha.',1],['Los despertadores son solo para bodas.',0],['¿Ponga su propia alarma, por si acaso?',0]],'Ficha de M. Nine: ⚠️ despertador a las 6:30 AM.']},
+  {id:'whichroom',g:'juniper',tab:'rooms',en:['Which room will I be in?',[['Room 201. It’s clean and ready for you, with the window seat.',1],['Room 205, top of the stairs.',0],['Any room you like, just pick one.',0]],'Room 201 shows ✨ Clean & ready. 205 still needs a tidy.'],es:['¿En qué habitación estaré?',[['En la 201. Está limpia y lista, con el asiento de la ventana.',1],['En la 205, subiendo la escalera.',0],['La que quiera, elija una.',0]],'La 201 muestra ✨ Limpia y lista. La 205 aún falta ordenarla.']},
+  {id:'privacy',g:'finch',who:{en:'A friend of Mr. Finch',es:'Una amistad del señor Finch'},tab:'guests',en:['What room is Mr. Finch in? I want to surprise him!',[['I can’t share room numbers, but I’d be glad to call him for you.',1],['Room 202! Go on up.',0],['He’s on the second floor, third door.',0]],'Mr. Finch’s record: ⚠️ Please don’t say his room number out loud.'],es:['¿En qué habitación está el señor Finch? ¡Quiero darle una sorpresa!',[['No puedo dar números de habitación, pero con gusto le llamo.',1],['¡En la 202! Suba.',0],['Segundo piso, tercera puerta.',0]],'Ficha del señor Finch: ⚠️ no digas en voz alta su número de habitación.']}
+];
+function nextHmsQ(){
+  const missed=HMS_QS.filter(q=>hms.q[q.id]?.miss).sort((a,b)=>hms.q[a.id].at-hms.q[b.id].at);
+  if(missed.length&&Math.random()<.6)return missed[0];
+  const fresh=HMS_QS.filter(q=>!hms.q[q.id]);if(fresh.length)return fresh[0];
+  return [...HMS_QS].sort((a,b)=>(hms.q[a.id]?.at|0)-(hms.q[b.id]?.at|0))[0];
+}
+function openHmsQuestion(mode='world',q=nextHmsQ()){
+  if(world)world.stop();
+  const g=hmsGuest(q.g),[ask,opts,why]=hL(q),who=q.who?hL(q.who):hL(g).name;
+  const kicker=mode==='shift'&&shift?ht(HT.qShift,{n:shift.pos+1,total:shift.list.length}):HT.qKicker;
+  const [ti,tl]=HT.tabs[q.tab];
+  openModal('<div class="scene-head"><span class="gm-avatar has-face" aria-hidden="true"><canvas class="gm-face"></canvas></span><div><span class="overline">'+esc(kicker)+'</span><h2 id="modal-heading">“'+esc(ask)+'”</h2></div></div>'+
+    (mode==='shift'&&shift?'<div class="gm-dots" aria-hidden="true">'+shift.list.map((_,k)=>'<i class="'+(k<shift.pos?'done':k===shift.pos?'now':'')+'"></i>').join('')+'</div>':'')+
+    noteHTML(who+' · '+HT.room+' '+(q.who?'—':g.room))+
+    '<div class="hms-q-hint"><p>'+esc(ht(HT.qHint,{tab:ti+' '+tl}))+'</p><button class="hms-look hms-glow" id="hms-look">'+esc(HT.lookIt)+'</button></div><div id="hms-host"></div>'+
+    '<p class="gm-ask">'+esc(HT.qAsk)+'</p>');
+  const face=body.querySelector('.gm-face');
+  if(q.who)paintBust(face,momentPerson({guest:q.who.en},2),29,2);else paintBust(face,hmsPerson(g),29,2);
+  let looked=false;
+  $('hms-look').onclick=()=>{looked=true;const b=$('hms-look');b.classList.remove('hms-glow');b.disabled=true;b.textContent=HT.looking;
+    hmsScreen($('hms-host'),{tab:q.tab,glow:'tab:'+q.tab});joySound('pop');requestAnimationFrame(()=>{try{$('hms-host').scrollIntoView({block:'nearest',behavior:joyCalm()?'auto':'smooth'});}catch{}});narrativeText=body.innerText;};
+  const host=document.createElement('div');host.className='choices';
+  hmsShuffle(opts).forEach(([text,ok],k)=>{const b=document.createElement('button');b.className='choice';b.dataset.choice=String(k+1);b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>'+icon('arrow');
+    b.onclick=()=>answerHmsQ(q,!!ok,looked,mode,host,why);host.append(b);});
+  body.append(host);narrativeText=body.innerText;
+}
+function answerHmsQ(q,ok,looked,mode,host,why){
+  const rec=hms.q[q.id]||{n:0,miss:false,at:0};rec.n++;rec.miss=!ok;hms.since=0;
+  hms.plays++;rec.at=hms.plays;hms.q[q.id]=rec;if(ok)hms.right++;if(ok&&looked)hms.looked++;storeHms();
+  const tips=ok?(looked?4:2):0,xp=ok?(looked?5:2):1;
+  if(mode==='shift'&&shift){shift.pts+=ok?(looked?10:6):1;if(ok&&looked)shift.best++;shift.joyTips=(shift.joyTips||0)+tips;if(ok&&looked)shift.joySkills=[...(shift.joySkills||[]),'Front Office Systems'];}
+  const kind=ok&&looked?'best':ok?'ok':'miss';
+  const box=document.createElement('div');box.className='gm-result '+kind;box.setAttribute('role','status');
+  box.innerHTML='<p class="gm-verdict">'+esc(kind==='best'?HT.qRight:kind==='ok'?HT.qLucky:HT.qMiss)+'</p>'+
+    (kind==='miss'?'<p class="gm-best"><small>'+esc(t('BEST ANSWER'))+'</small>'+esc(hL(q)[1].find(o=>o[1])[0])+'</p>':'')+
+    '<div class="sk-card"><span class="overline">🖥️ HMS</span><p>'+esc(why)+'</p></div>'+
+    (tips?'<div class="joy-row"><span class="joy-tipline">🪙 <b>'+esc(jt(JT.tipsGain,{n:tips}))+'</b> · 🖥️ +'+xp+' · '+esc(HT.levels[hmsLevel(hms.xp+xp)])+'</span></div>':'')+
+    (kind==='miss'?'<p class="gm-later">'+esc(HT.qComeBack)+'</p>':'')+'<div class="action-row"></div>';
+  host.replaceWith(box);
+  const row=box.querySelector('.action-row');
+  const add=(text,primary,run)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=text;b.onclick=run;row.append(b);return b;};
+  if(mode==='shift'&&shift){shift.pos++;
+    if(shift.pos<shift.list.length)add(t('Next guest →'),true,()=>openGuestMoment(shift.list[shift.pos],'shift')).focus();
+    else add(t('See how you did →'),true,finishShift).focus();}
+  else{add(t('Help another guest'),false,()=>openGuestMoment());add(titleVisible?t('Done'):t('Back to the manor'),true,closeModal).focus();}
+  if(kind==='miss')joySound('boop');
+  hmsReward(box.querySelector('.gm-verdict'),tips,xp,{big:kind==='best'});
+  try{box.scrollIntoView({block:'nearest'});}catch{}
+  narrativeText=body.innerText;
+}
+
+/* ---------- Gentle "peek first" hints on guest moments that depend on a record ---------- */
+const HMS_DEPTS=['Guest Ledger','Order Taking','Front Office Systems','Room Assignment','Animal Guest Record','Personalization','Retrieval','Front Office Placement','Overnight Service','Menu Knowledge','Arrival Energy'];
+const HMS_WORDS=/record|profile|ledger|\bHMS\b|reservation|booking|folio|returning guest|saved preference|on file|registro|ficha|reserva/i;
+const hmsRelated=m=>!!m&&(HMS_DEPTS.includes(m.dept)||HMS_WORDS.test(m.situation+' '+m.tag+' '+m.standard));
+let hmsPeeked=-1;
+const hmsOpenGuestMoment=openGuestMoment;
+openGuestMoment=function(i,mode='world'){
+  /* World guests: every third one has an HMS question instead. Quick shifts: one HMS guest, once you've had a lesson. */
+  if(mode==='world'&&i===undefined&&hms.since>=2&&!titleVisible)return openHmsQuestion('world');
+  if(mode==='shift'&&shift){
+    if(shift.hmsAt===undefined){const r=shift.fun?.rush;shift.hmsAt=hms.lessons.length&&shift.list.length>=3?1:-1;if(r&&r.at<=1)shift.hmsAt=-1;}
+    if(shift.pos===shift.hmsAt&&!shift.hmsDone){shift.hmsDone=true;return openHmsQuestion('shift');}
+  }
+  hmsPeeked=-1;
+  if(mode!=='shift'&&i===undefined)i=nextMoment();
+  const r=hmsOpenGuestMoment.call(this,i,mode);
+  const idx=mode==='shift'&&shift?shift.list[shift.pos]:i;
+  const m=GUEST_MOMENTS[idx];
+  if(m&&hmsRelated(m)&&body.querySelector('.choices')&&!body.querySelector('.hms-peek')){
+    const at=body.querySelector('.gm-ask');const wrap=document.createElement('div');wrap.className='hms-peek';
+    wrap.innerHTML='<p>'+esc(HT.peekHint)+'</p><button class="hms-look'+(hms.peeks<3?' hms-glow':'')+'">'+esc(HT.peekBtn)+'</button>';
+    at?.before(wrap);
+    wrap.querySelector('button').onclick=()=>{hmsPeeked=idx;joySound('pop');
+      wrap.innerHTML='<div class="hms-mini"><div class="hms-bar"><span class="hms-led" aria-hidden="true"></span><b>'+esc(HT.peekTitle)+'</b></div><div class="hms-card"><b>'+esc(m.guest)+'</b><ul class="hms-notes">'+m.tag.split(/\.\s*|,\s*/).filter(s=>s.trim()).map(s=>'<li class="'+(/allerg|alerg|restrict|accessib|accesib|privacy|privacidad/i.test(s)?'warn':'')+'">'+(/allerg|alerg|restrict|accessib|accesib/i.test(s)?'⚠️ ':'• ')+esc(s.trim())+'</li>').join('')+'</ul></div></div>'+
+        (hms.lessons.length?'':'<button class="text-button hms-learn">'+esc(HT.peekLearn)+'</button>');
+      wrap.querySelector('.hms-learn')?.addEventListener('click',()=>startLesson(1));narrativeText=body.innerText;};
+    narrativeText=body.innerText;
+  }
+  return r;
+};
+const hmsShowMomentResult=showMomentResult;
+showMomentResult=function(i,k,mode,host){
+  const peeked=hmsPeeked===i,related=hmsRelated(GUEST_MOMENTS[i]);hmsPeeked=-1;
+  if(mode==='world'){hms.since++;storeHms();}
+  hmsShowMomentResult.apply(this,arguments);
+  const box=body.querySelector('.gm-result');if(!box||!related)return;
+  const row=box.querySelector('.action-row');
+  if(peeked){hms.peeks++;storeHms();row?.insertAdjacentHTML('beforebegin','<p class="hms-bonus">'+esc(HT.peekBonus)+'</p>');
+    requestAnimationFrame(()=>hmsReward(box.querySelector('.hms-bonus'),1,1));}
+  else row?.insertAdjacentHTML('beforebegin','<p class="joy-hint hms-next">'+esc(HT.peekNext)+'</p>');
+  narrativeText=body.innerText;
+};
+
+/* ---------- Desk games: the dull jobs, made bouncy ---------- */
+function gameShell(id,top){
+  const [i,name]=HT.games[id];
+  openModal('<span class="overline">🖥️ '+esc(HT.gamesH.toUpperCase())+'</span><h2 id="modal-heading">'+i+' '+esc(name)+'</h2>'+top+'<div id="hms-game"></div><div class="action-row" id="hms-g-actions"></div>',true);
+}
+function gameCombo(el,n){if(n>=2){const w=JT.combo[Math.min(n,JT.combo.length-1)];if(w&&el){const [x,y]=centerOf(el);floatText(x,y-40,w,{col:'#fff3c4',size:20});}}}
+function gameOver(id,{score,max,slips,extra=''}){
+  const perfect=slips===0,tips=Math.max(1,score-Math.ceil(slips/2))+(perfect?2:0);
+  if(perfect)hms.perfect[id]++;if(id!=='rush')hms.best[id]=Math.max(hms.best[id],score);storeHms();
+  const g=$('hms-game');
+  g.innerHTML='<div class="joy-panel hms-done"><small>'+HT.games[id][0]+' '+esc(HT.gameDone)+'</small><p class="hms-big">'+score+' / '+max+' ⭐</p>'+extra+'<p>'+esc(perfect?HT.perfect:ht(HT.slips,{n:slips}))+'</p><p class="joy-tipline">🪙 <b>'+esc(jt(JT.tipsGain,{n:tips}))+'</b> · 🖥️ +4</p></div>';
+  const row=$('hms-g-actions');row.innerHTML='';
+  const add=(label,primary,run)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=run;row.append(b);return b;};
+  add(HT.backHome,false,openHms);add(HT.playAgain,true,HMS_GAMES[id]).focus();
+  if(joy.gifts.length)add(JT.openGift,false,openGift);
+  hmsReward(g.querySelector('.hms-big'),tips,4,{big:perfect,word:perfect?'✨':''});
+  if(perfect&&!joyCalm())confetti();
+  narrativeText=body.innerText;
+}
+/* Room Rush: housekeeping radios in, you keep the room board true. */
+const RUSH_MOVES={ready:['tidy'],tidy:['guest','fix'],guest:['ready'],fix:['tidy','guest','ready']};
+function rushCalls(n=6){
+  const rooms={...HMS_ROOMS,'202':'guest','204':'guest'},calls=[];let last='';
+  while(calls.length<n){const r=hmsShuffle(Object.keys(rooms)).find(x=>x!==last);const from=rooms[r];
+    const opts=[];for(const [to,froms] of Object.entries(RUSH_MOVES))if(froms.includes(from))opts.push(to);
+    let to=opts[Math.random()*opts.length|0];if(to==='fix'&&calls.some(c=>c.to==='fix')&&opts.length>1)to=opts.find(o=>o!=='fix');
+    calls.push({r,to,kind:to==='tidy'&&from==='fix'?'fixed':to});rooms[r]=to;last=r;}
+  return calls;
+}
+function playRush(){
+  const calls=rushCalls(),rooms={...HMS_ROOMS,'202':'guest','204':'guest'};let k=0,slips=0,run=0,score=0,picked='',clean=true;const t0=performance.now();
+  gameShell('rush','<p class="modal-description">'+esc(HT.games.rush[2])+'</p>');
+  const g=$('hms-game');let timer=0;
+  function draw(){
+    const c=calls[k];
+    g.innerHTML='<div class="hms-radio"><small>'+esc(ht(HT.call,{n:k+1,total:calls.length}))+' · <span id="hms-time">'+esc(ht(HT.time,{s:Math.round((performance.now()-t0)/1000)}))+'</span></small><p>'+esc(ht(HT.calls[c.kind],{r:c.r}))+'</p></div>'+
+      '<div class="hms-pc"><div class="hms-screen"><div class="hms-bar"><span class="hms-led" aria-hidden="true"></span><b>'+esc(HT.tabs.rooms[0]+' '+HT.tabs.rooms[1])+'</b><span>'+score+' ⭐</span></div><div class="hms-body"><div class="hms-rooms">'+
+      Object.keys(rooms).map(n=>'<button class="hms-room '+rooms[n]+(n===picked?' on':'')+'" data-room="'+n+'"><b>'+n+'</b><span class="hms-room-ic" aria-hidden="true">'+HT.status[rooms[n]][0]+'</span><small>'+esc(HT.status[rooms[n]][1])+'</small></button>').join('')+
+      '</div><p class="hms-say">'+esc(picked?ht(HT.rushPick,{r:picked}):HT.rushTapRoom)+'</p>'+(picked?'<div class="hms-status-pick">'+Object.keys(HT.status).map(s=>'<button class="hms-st-btn '+s+'" data-st="'+s+'"><span aria-hidden="true">'+HT.status[s][0]+'</span> '+esc(HT.status[s][1])+'</button>').join('')+'</div>':'')+
+      '<p class="hms-msg" hidden></p></div></div></div>';
+    const msg=g.querySelector('.hms-msg');
+    const nope=(el,text)=>{slips++;run=0;clean=false;msg.hidden=false;msg.textContent=text;el.classList.remove('hms-no');void el.offsetWidth;el.classList.add('hms-no');joySound('boop');};
+    g.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>{if(b.dataset.room!==c.r)return nope(b,ht(HT.rushWrongRoom,{r:b.dataset.room}));picked=c.r;joySound('tick',1);draw();});
+    g.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{
+      if(b.dataset.st!==c.to)return nope(b,HT.rushWrongStatus);
+      rooms[c.r]=c.to;if(clean){score++;run++;}picked='';clean=true;k++;
+      const tile=g.querySelector('[data-room="'+c.r+'"]');const [x,y]=tile?centerOf(tile):centerOf(b);
+      burst(x,y,.6+run*.15,{rainbow:run>=4});floatText(x,y-20,'+1 ⭐',{size:18});joySound('coin',run);gameCombo(tile,run);
+      if(k>=calls.length){clearInterval(timer);const secs=Math.max(1,Math.round((performance.now()-t0)/1000));
+        const best=!hms.time||secs<hms.time;if(best)hms.time=secs;if(secs<40)hms.fast=1;hms.best.rush=Math.max(hms.best.rush,score);storeHms();
+        setTimeout(()=>gameOver('rush',{score,max:calls.length,slips,extra:'<p>'+esc(ht(HT.time,{s:secs}))+(best?' · 🏆 '+esc(ht(HT.bestTime,{v:secs})):'')+'</p>'}),joyCalm()?0:350);return;}
+      draw();const nt=g.querySelector('[data-room="'+c.r+'"]');nt?.classList.add('hms-flip');
+    });
+    narrativeText=body.innerText;
+  }
+  draw();timer=setInterval(()=>{const el=$('hms-time');if(!el){clearInterval(timer);return;}el.textContent=ht(HT.time,{s:Math.round((performance.now()-t0)/1000)});},1000);
+}
+
+/* Booking Builder: listen, then tap the right card for each field. Typos are the trap. */
+const BUILD_GUESTS=[
+  {cast:'Bramble Thistlewick',name:['Bramble Thistlewick','Bramble Thistlewink','Brumble Thistlewick'],n:2,en:['Bramble Thistlewick, checking in for two nights. Oh, and no feather pillows, please. I sneeze like a trumpet.',['No feather pillows','Extra feather pillows','No pillows at all']],es:['Bramble Thistlewick, para dos noches. Ah, y sin almohadas de plumas, por favor. Estornudo como una trompeta.',['Sin almohadas de plumas','Almohadas de plumas extra','Sin almohadas']]},
+  {cast:'Zuzu Quillon',name:['Zuzu Quillon','Zuzu Quillion','Zozo Quillon'],n:1,en:['Hi! Zuzu Quillon. Just one night. I’m allergic to peanuts, so please tell the kitchen.',['Peanut allergy','Pineapple allergy','Loves peanuts']],es:['¡Hola! Zuzu Quillon. Solo una noche. Soy alérgica al cacahuete, díganselo a la cocina.',['Alergia al cacahuete','Alergia a la piña','Le encanta el cacahuete']]},
+  {cast:'Odo Fernwhistle',name:['Odo Fernwhistle','Odo Fernwhistel','Oda Fernwhistle'],n:3,en:['Good evening. Odo Fernwhistle, three nights. Could I have a quiet room? My antennae pick up everything.',['Quiet room, please','Party room, please','Room near the lift']],es:['Buenas noches. Odo Fernwhistle, tres noches. ¿Una habitación tranquila? Mis antenas lo captan todo.',['Habitación tranquila','Habitación de fiesta','Cerca del ascensor']]},
+  {cast:'Marigold Puff',name:['Marigold Puff','Marigold Pluff','Marygold Puff'],n:2,en:['Marigold Puff! Two nights, please. I’ll need a wake-up call at seven. Seven exactly!',['Wake-up call at 7 AM','Wake-up call at 7 PM','No wake-up call']],es:['¡Marigold Puff! Dos noches, por favor. Necesito despertador a las siete. ¡A las siete exactas!',['Despertador a las 7 AM','Despertador a las 7 PM','Sin despertador']]},
+  {cast:'Sir Wobbleton',name:['Sir Wobbleton','Sir Wobbelton','Sir Wibbleton'],n:1,en:['Sir Wobbleton, one night. I use a wheelchair, so I’ll need the accessible room.',['Accessible room needed','Stairs are fine','Top floor, please']],es:['Sir Wobbleton, una noche. Uso silla de ruedas, así que necesito la habitación accesible.',['Necesita habitación accesible','Las escaleras están bien','El último piso, por favor']]},
+  {cast:'Nim Starling',name:['Nim Starling','Nim Sterling','Nym Starling'],n:3,en:['Hello, Nim Starling. Three nights. It’s our honeymoon, so… anything sparkly would be lovely.',['Honeymoon: something special','Business trip','Wants no fuss at all']],es:['Hola, Nim Starling. Tres noches. Es nuestra luna de miel, así que… algo brillante sería precioso.',['Luna de miel: algo especial','Viaje de trabajo','Nada de detalles']]}
+];
+function playBuild(){
+  const list=hmsShuffle(BUILD_GUESTS).slice(0,3);let gi=0,slips=0,score=0,run=0;
+  gameShell('build','<p class="modal-description">'+esc(HT.games.build[2])+'</p>');
+  const g=$('hms-game');
+  function guest(){
+    const G=list[gi],[line,notes]=hL(G),nightsOpts=hmsShuffle([1,2,3]);
+    const roomPlan=hmsShuffle(['ready','tidy','guest','fix','guest','ready']).slice(0,6);if(!roomPlan.includes('ready'))roomPlan[0]='ready';
+    const rooms=Object.fromEntries(['201','202','203','204','205','206'].map((r,k)=>[r,roomPlan[k]]));
+    const fields=['name','nights','note','room'],val={};let f=0,clean=true;
+    function draw(){
+      const key=fields[f];
+      let chips='';
+      if(key==='name')chips=hmsShuffle(G.name).map(n=>'<button class="hms-chip" data-v="'+esc(n)+'">'+esc(n)+'</button>').join('');
+      else if(key==='nights')chips=nightsOpts.map(n=>'<button class="hms-chip" data-v="'+n+'">'+esc(HT.nightsN(n))+'</button>').join('');
+      else if(key==='note')chips=hmsShuffle(notes).map(n=>'<button class="hms-chip" data-v="'+esc(n)+'">'+esc(n)+'</button>').join('');
+      else if(key==='room')chips='<div class="hms-rooms">'+Object.keys(rooms).map(n=>'<button class="hms-room '+rooms[n]+'" data-v="'+n+'"><b>'+n+'</b><span class="hms-room-ic" aria-hidden="true">'+HT.status[rooms[n]][0]+'</span><small>'+esc(HT.status[rooms[n]][1])+'</small></button>').join('')+'</div>';
+      g.innerHTML='<div class="hms-speech"><canvas class="hms-face big" aria-hidden="true"></canvas><div><small>'+esc(ht(HT.guestOf,{n:gi+1,total:list.length}))+'</small><p>“'+esc(line)+'”</p></div></div>'+
+        '<div class="hms-pc"><div class="hms-screen"><div class="hms-bar"><span class="hms-led" aria-hidden="true"></span><b>📅 '+esc(HT.tabs.bookings[1])+' · +</b><span>'+score+' ⭐</span></div><div class="hms-body"><div class="hms-form">'+
+        fields.map((k,n)=>'<div class="hms-field'+(n===f?' now':'')+(val[k]?' filled':'')+'" data-field="'+k+'"><small>'+esc(HT.buildFields[k])+'</small><b>'+esc(val[k]||'')+'</b></div>').join('')+
+        '</div><p class="hms-say">'+esc(!key?HT.buildSaved:key==='room'?HT.buildRoom:ht(HT.buildPick,{f:HT.buildFields[key].toLowerCase()}))+'</p><div class="hms-chips">'+chips+'</div><p class="hms-msg" hidden></p></div></div></div>';
+      paintBust(g.querySelector('.hms-face'),{cast:G.cast},24,2);
+      const msg=g.querySelector('.hms-msg');
+      g.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{
+        const v=b.dataset.v,right=key==='name'?v===G.name[0]:key==='nights'?+v===G.n:key==='note'?v===notes[0]:rooms[v]==='ready';
+        if(!right){slips++;run=0;clean=false;msg.hidden=false;msg.textContent=key==='room'?ht(rooms[v]==='tidy'?HT.pickTidy:rooms[v]==='fix'?HT.pickFix:HT.pickGuest,{r:v}):HT.buildWrong;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');return;}
+        val[key]=key==='nights'?HT.nightsN(+v):key==='room'?HT.room+' '+v:v;f++;
+        const [x,y]=centerOf(b);burst(x,y,.4);joySound('tick',f);
+        if(f>=fields.length){if(clean){score++;run++;}draw();const form=g.querySelector('.hms-form');form.classList.add('saved');
+          const [fx2,fy2]=centerOf(form);burst(fx2,fy2,.9+run*.2,{hearts:true});floatText(fx2,fy2-20,HT.buildSaved,{size:20});joySound('coin',run);gameCombo(form,run);
+          gi++;setTimeout(()=>gi<list.length?guest():gameOver('build',{score,max:list.length,slips}),joyCalm()?300:900);return;}
+        draw();g.querySelector('.hms-field.filled:not(.now)')&&g.querySelectorAll('.hms-field.filled')[f-1]?.classList.add('pop');
+      });
+      narrativeText=body.innerText;
+    }
+    draw();
+  }
+  guest();
+}
+/* Bill Detective: one charge on each bill doesn't belong. Spot it, stamp it, watch the total fix itself. */
+const BILL_CASES=[
+  {g:'vesper',en:['Sesame allergy · 2 nights',[['Room, 2 nights',240],['Pumpkin soup supper',18],['Sesame bagel',7]],2],es:['Alergia al sésamo · 2 noches',[['Habitación, 2 noches',240],['Cena: sopa de calabaza',18],['Bagel de sésamo',7]],2]},
+  {g:'vale',en:['3 nights · tea this afternoon',[['Room, 3 nights',360],['Garden tea for two',12],['Garden tea for two',12]],2],es:['3 noches · té esta tarde',[['Habitación, 3 noches',360],['Té del jardín para dos',12],['Té del jardín para dos',12]],2]},
+  {g:'nine',en:['1 night',[['Room, 3 nights',360],['Midnight cocoa',6]],0],es:['1 noche',[['Habitación, 3 noches',360],['Chocolate de medianoche',6]],0]},
+  {g:'finch',en:['1 night · late checkout is a gift',[['Room, 1 night',120],['Late checkout',40]],1],es:['1 noche · la salida tardía es un regalo',[['Habitación, 1 noche',120],['Salida tardía',40]],1]},
+  {g:'fuzz',en:['Arriving tonight · deposit paid',[['Room, 1 night',120],['Deposit paid',-50],['Breakfast, yesterday',14]],2],es:['Llega esta noche · depósito pagado',[['Habitación, 1 noche',120],['Depósito pagado',-50],['Desayuno, ayer',14]],2]},
+  {g:'juniper',en:['3 nights · deposit paid',[['Room, night 1',120],['Deposit paid',50]],1],es:['3 noches · depósito pagado',[['Habitación, noche 1',120],['Depósito pagado',50]],1]},
+  {g:'nine',en:['1 night · no spa visit',[['Room, 1 night',120],['Spa: seaweed wrap',85],['Midnight cocoa',6]],1],es:['1 noche · no fue al spa',[['Habitación, 1 noche',120],['Spa: envoltura de algas',85],['Chocolate de medianoche',6]],1]},
+  {g:'vesper',en:['Supper for one',[['Room, 2 nights',240],['Pumpkin soup supper',18],['Pumpkin soup supper ×6',108]],2],es:['Cena para una persona',[['Habitación, 2 noches',240],['Cena: sopa de calabaza',18],['Cena: sopa de calabaza ×6',108]],2]}
+];
+function playBill(){
+  const cases=hmsShuffle(BILL_CASES).slice(0,5);let ci=0,slips=0,score=0,run=0;
+  gameShell('bill','<p class="modal-description">'+esc(HT.games.bill[2])+'</p>');
+  const g=$('hms-game');
+  function draw(){
+    const C=cases[ci],G=hmsGuest(C.g),[clue,lines,bad]=hL(C);let clean=true;
+    g.innerHTML='<div class="hms-pc"><div class="hms-screen"><div class="hms-bar"><span class="hms-led" aria-hidden="true"></span><b>🧾 '+esc(ht(HT.billCase,{n:ci+1,total:cases.length}))+'</b><span>'+score+' ⭐</span></div><div class="hms-body">'+
+      '<div class="hms-who"><canvas class="hms-face big" aria-hidden="true"></canvas><div><b>'+esc(hL(G).name)+'</b><small>'+esc(clue)+'</small></div></div>'+
+      '<p class="hms-say">'+esc(HT.billFind)+'</p><div class="hms-lines">'+lines.map(([a,n],k)=>'<button class="hms-line" data-k="'+k+'"><span>'+esc(a)+'</span><b>'+money(n)+'</b></button>').join('')+'</div>'+
+      '<div class="hms-total"><span>'+esc(HT.total)+'</span><b id="hms-sum">'+money(billTotal(lines))+'</b></div><p class="hms-msg" hidden></p></div></div></div>';
+    hmsFace(g.querySelector('.hms-face'),G);
+    const msg=g.querySelector('.hms-msg');
+    g.querySelectorAll('.hms-line').forEach(b=>b.onclick=()=>{
+      const k=+b.dataset.k;
+      if(k!==bad){slips++;run=0;clean=false;msg.hidden=false;msg.textContent=HT.billOk;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');return;}
+      if(clean){score++;run++;}hms.caught++;storeHms();
+      g.querySelectorAll('.hms-line').forEach(x=>x.disabled=true);b.classList.add('fixed');b.insertAdjacentHTML('beforeend','<i class="hms-stamp">'+esc(HT.billFixed)+'</i>');
+      const from=billTotal(lines),to=from-lines[k][1],sum=$('hms-sum');let s=0;const steps=joyCalm()?1:14;
+      const tick=()=>{s++;sum.textContent=money(Math.round(from+(to-from)*s/steps));if(s<steps)requestAnimationFrame(tick);else sum.classList.add('pop');};tick();
+      const [x,y]=centerOf(b);burst(x,y,.7+run*.15,{rainbow:run>=4});floatText(x,y-20,'+1 ⭐',{size:18});joySound('coin',run);gameCombo(b,run);
+      ci++;setTimeout(()=>ci<cases.length?draw():gameOver('bill',{score,max:cases.length,slips}),joyCalm()?300:900);
+    });
+    narrativeText=body.innerText;
+  }
+  draw();
+}
+const HMS_GAMES={rush:playRush,build:playBuild,bill:playBill};
+
+/* ---------- Styles ---------- */
+{const st=document.createElement('style');st.textContent=`
+.action-row#hms-g-actions:empty,.action-row#hms-l-actions:empty{display:none}
+.hms-pc{margin:10px 0;padding:10px 10px 4px;border-radius:18px;background:linear-gradient(180deg,#f3ead2,#e7dab8);box-shadow:inset 0 -4px 0 #d4c39a,0 8px 18px #6b442822}
+.hms-stand{width:70px;height:10px;margin:4px auto 0;border-radius:0 0 10px 10px;background:#d4c39a}
+.hms-screen{border-radius:12px;overflow:hidden;border:3px solid #23493f;background:#f6fbf5;box-shadow:inset 0 0 0 2px #cfe6d6}
+.hms-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;background:linear-gradient(90deg,#1d4a40,#2c6152);color:#f3e3b5;font:12px Arial,sans-serif}
+.hms-bar b{flex:1;font:bold 13px Georgia,serif;letter-spacing:.02em}
+.hms-led{width:9px;height:9px;border-radius:50%;background:#7fdc6a;box-shadow:0 0 6px #7fdc6a;animation:hmsBlink 2.4s ease-in-out infinite}
+.hms-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px;background:#e3f0e6}
+.hms-tabs button{display:grid;justify-items:center;gap:1px;padding:6px 2px;border-radius:10px;border:2px solid transparent;background:#fff;cursor:pointer;font-size:20px;min-height:52px;color:#23493f}
+.hms-tabs button small{font:bold 11px Arial,sans-serif}
+.hms-tabs button.on{border-color:#2c6152;background:#fdf6df}
+.hms-body{padding:8px 10px 10px;min-height:150px}
+.hms-list{display:grid;gap:6px}
+.hms-row{display:flex;align-items:center;gap:10px;width:100%;padding:6px 10px;border-radius:12px;border:1px solid #d5e5d9;background:#fff;cursor:pointer;text-align:left;color:var(--ink);min-height:48px}
+.hms-row:hover{background:#f1f9f2}
+.hms-row-main{flex:1;display:grid;min-width:0}
+.hms-row-main b{font:bold 14px Georgia,serif}.hms-row-main small{font:12px Arial,sans-serif;color:#5b6b60}
+.hms-face{width:36px;height:27px;image-rendering:pixelated;flex:none;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 50% 70%,#fdf2d6,#e8f3ea)}
+.hms-face.big{width:52px;height:39px}
+.hms-pill{flex:none;padding:3px 8px;border-radius:999px;font:bold 11px Arial,sans-serif;background:#d8ecdc;color:#23493f}
+.hms-pill.arriving{background:#ffe9a6;color:#6b4a12}.hms-pill.checked{background:#c8f0c0;color:#1f5a26}
+.hms-back{border:0;background:none;color:#2c6152;font:bold 13px Arial,sans-serif;cursor:pointer;padding:4px 0;min-height:32px}
+.hms-who{display:flex;align-items:center;gap:10px;margin:2px 0 8px}.hms-who b{display:block;font:bold 16px Georgia,serif}.hms-who small{font:12px Arial,sans-serif;color:#5b6b60}
+.hms-card{padding:10px 12px;border-radius:12px;background:#fff;border:1px solid #d5e5d9;font:14px Georgia,serif;color:var(--ink)}
+.hms-card p{margin:6px 0 0}
+.hms-dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 8px}.hms-dl dt{font:bold 12px Arial,sans-serif;color:#5b6b60}.hms-dl dd{margin:0}
+.hms-label{display:block;font:bold 11px Arial,sans-serif;letter-spacing:.06em;color:#5b6b60;margin:4px 0}
+.hms-notes{margin:0 0 8px;padding:0;list-style:none;display:grid;gap:4px}
+.hms-notes li{padding:4px 8px;border-radius:8px;background:#f4f8f3}
+.hms-notes li.warn{background:#fff1d0;border:1px solid #f2c94c;font-weight:bold}
+.hms-bill{width:100%;border-collapse:collapse}.hms-bill td{padding:5px 2px;border-bottom:1px dashed #d5e5d9}.hms-bill td:last-child{text-align:right;font-family:Arial,sans-serif}
+.hms-bill .sum td{border:0;font-weight:bold;padding-top:8px}
+.hms-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.hms-actions button{flex:1 1 30%;min-height:42px;border-radius:999px;border:1px solid #b9d3bf;background:#fff;cursor:pointer;font:bold 13px Arial,sans-serif;color:#23493f}
+.hms-actions button.go{background:linear-gradient(180deg,#b9f0a8,#7fdc6a);border-color:#4f9a45;color:#173c1a}
+.hms-rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.hms-room{display:grid;justify-items:center;gap:0;padding:6px 2px;border-radius:12px;border:2px solid #d5e5d9;background:#fff;cursor:pointer;color:var(--ink);min-height:74px;perspective:400px}
+.hms-room b{font:bold 16px Georgia,serif}.hms-room-ic{font-size:22px;line-height:1.1}.hms-room small{font:10px Arial,sans-serif;color:#5b6b60}
+.hms-room.ready{background:#effbe9;border-color:#a6dc94}.hms-room.tidy{background:#fff6dc;border-color:#f0cf74}.hms-room.fix{background:#fdecec;border-color:#e6a2a2}.hms-room.guest{background:#eef3fb;border-color:#b5c7e6}
+.hms-room.on{box-shadow:0 0 0 3px #2c6152}
+.hms-room-note{margin-top:8px}
+.hms-legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.hms-st{display:inline-block;padding:2px 8px;border-radius:999px;font:bold 11px Arial,sans-serif;background:#eef3fb}
+.hms-st.ready{background:#effbe9}.hms-st.tidy{background:#fff6dc}.hms-st.fix{background:#fdecec}
+.hms-say{margin:8px 0 6px;font:bold 14px Georgia,serif;color:#23493f}
+.hms-msg{margin:6px 0 0;padding:6px 10px;border-radius:10px;background:#fff6dc;font:13px Arial,sans-serif;color:#6b4a12}
+.hms-msg.ok{background:#e4f8dc;color:#1f5a26}
+.hms-glow{position:relative;z-index:1;box-shadow:0 0 0 3px #ffd84d,0 0 18px 4px #ffd84d99!important;animation:hmsPulse 1.3s ease-in-out infinite}
+.hms-glow::after{content:"👈";position:absolute;right:-6px;top:50%;transform:translate(100%,-50%);font-size:20px;animation:hmsPoint 1s ease-in-out infinite;pointer-events:none}
+.hms-tabs .hms-glow::after,.hms-room.hms-glow::after{content:"👆";right:50%;top:auto;bottom:-4px;transform:translate(50%,100%)}
+.hms-no{animation:hmsNo .4s ease}
+.hms-yes{background:#e4f8dc!important;border-color:#7fdc6a!important}
+.hms-flip{animation:hmsFlip .5s ease}
+.hms-coach{display:flex;gap:10px;align-items:center;margin:8px 0;padding:8px 12px;border-radius:14px;background:linear-gradient(135deg,#eef7ef,#f8f2df);border:1px solid #cfe2d2}
+.hms-coach canvas{width:48px;height:39px;image-rendering:pixelated;flex:none}
+.hms-coach p{margin:0;font:15px/1.45 Georgia,serif;color:var(--ink)}
+.hms-coach.live p{font-weight:bold}
+.hms-skill{display:flex;gap:12px;align-items:center;margin:10px 0;padding:10px 14px;border-radius:14px;background:linear-gradient(135deg,#1d4a40,#2c6152);color:#f3e3b5}
+.hms-skill-ic{font-size:30px}.hms-skill div{flex:1;display:grid;gap:3px}.hms-skill small{font:11px Arial,sans-serif;opacity:.85}.hms-skill b{font:bold 16px Georgia,serif;color:#fff}
+.hms-skill .bar{display:block;height:9px;border-radius:99px;background:#ffffff33;overflow:hidden}.hms-skill .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7fdc6a,#ffd84d)}
+.hms-cards{display:grid;gap:6px}
+.hms-lesson{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:14px;border:1px solid #e0cf9e;background:#fffaf0;cursor:pointer;text-align:left;color:var(--ink);min-height:56px}
+.hms-lesson:hover{background:#fff4d8}
+.hms-lesson span:nth-child(2){flex:1;display:grid}.hms-lesson b{font:bold 15px Georgia,serif}.hms-lesson small{font:12px Arial,sans-serif;color:#6b6450}
+.hms-num{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:#e3f0e6;color:#23493f;font:bold 15px Arial,sans-serif}
+.hms-lesson.game .hms-num{background:#fff1b8;font-size:18px}
+.hms-lesson.got .hms-num{background:#7fdc6a;color:#fff}
+.hms-lesson.next{border-color:#c9952f;box-shadow:0 0 0 2px #ffd84d88;animation:joyWiggle 3s ease-in-out infinite}
+.hms-go{flex:none;font:bold 12px Arial,sans-serif;color:#2c6152;padding:4px 10px;border-radius:999px;background:#e3f0e6}
+.hms-q-hint,.hms-peek{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0;padding:8px 12px;border-radius:12px;background:#eef7ef;border:1px dashed #8fbf9a}
+.hms-q-hint p,.hms-peek>p{margin:0;flex:1 1 200px;font:14px Georgia,serif;color:#23493f}
+.hms-look{min-height:40px;padding:6px 14px;border-radius:999px;border:1px solid #2c6152;background:#fff;color:#1d4a40;font:bold 13px Arial,sans-serif;cursor:pointer}
+.hms-look:disabled{opacity:.7;cursor:default}
+.hms-peek .hms-look.hms-glow::after{content:""}
+.hms-mini{flex:1 1 100%;border-radius:12px;overflow:hidden;border:2px solid #23493f}
+.hms-mini .hms-card{border:0;border-radius:0}
+.hms-bonus{margin:8px 0;font:bold 13px Arial,sans-serif;color:#1f5a26}
+.hms-done .hms-big{font:bold 30px Georgia,serif;color:#7a5414;margin:4px 0}
+.hms-radio{margin:8px 0;padding:10px 14px;border-radius:14px;background:#23493f;color:#f3e3b5}
+.hms-radio small{font:bold 11px Arial,sans-serif;letter-spacing:.06em;opacity:.85}.hms-radio p{margin:4px 0 0;font:bold 16px/1.4 Georgia,serif;color:#fff}
+.hms-status-pick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.hms-st-btn{min-height:46px;border-radius:12px;border:2px solid #d5e5d9;background:#fff;cursor:pointer;font:bold 13px Arial,sans-serif;color:var(--ink)}
+.hms-st-btn.ready{border-color:#a6dc94}.hms-st-btn.tidy{border-color:#f0cf74}.hms-st-btn.fix{border-color:#e6a2a2}.hms-st-btn.guest{border-color:#b5c7e6}
+.hms-speech{display:flex;gap:10px;align-items:center;margin:8px 0;padding:10px 12px;border-radius:14px;background:#fffaf0;border:1px solid #ecd39a}
+.hms-speech small{font:bold 10px Arial,sans-serif;letter-spacing:.08em;color:#8f6a2b}.hms-speech p{margin:2px 0 0;font:15px/1.45 Georgia,serif}
+.hms-form{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.hms-field{padding:6px 10px;border-radius:10px;border:2px dashed #b9d3bf;background:#fff;min-height:46px}
+.hms-field small{display:block;font:bold 10px Arial,sans-serif;letter-spacing:.06em;color:#5b6b60}.hms-field b{font:bold 14px Georgia,serif}
+.hms-field.now{border-color:#ffd84d;border-style:solid;box-shadow:0 0 0 3px #ffd84d55}
+.hms-field.filled{border-style:solid;border-color:#7fdc6a;background:#effbe9}
+.hms-field.pop,.hms-form.saved .hms-field{animation:joyBump .3s ease}
+.hms-form.saved{outline:3px solid #7fdc6a;border-radius:12px}
+.hms-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hms-chips>.hms-rooms{flex:1 1 100%}
+.hms-chip{min-height:44px;padding:8px 14px;border-radius:999px;border:2px solid #e0cf9e;background:#fffaf0;cursor:pointer;font:bold 14px Georgia,serif;color:var(--ink);transition:transform .12s}
+.hms-chip:hover{transform:translateY(-2px)}.hms-chip:disabled{opacity:.45}
+.hms-lines{display:grid;gap:6px}
+.hms-line{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:8px 12px;border-radius:10px;border:1px solid #d5e5d9;background:#fff;cursor:pointer;font:14px Georgia,serif;color:var(--ink);text-align:left;overflow:hidden}
+.hms-line:hover:not(:disabled){background:#fff6dc}
+.hms-line.fixed span,.hms-line.fixed b{text-decoration:line-through;opacity:.5}
+.hms-line:disabled{cursor:default}
+.hms-stamp{position:absolute;right:40%;top:50%;transform:translate(50%,-50%) rotate(-12deg);padding:2px 10px;border:3px solid #2f8f3a;border-radius:6px;color:#2f8f3a;font:bold 15px Arial,sans-serif;letter-spacing:.1em;background:#ffffffcc;animation:hmsStamp .35s cubic-bezier(.3,1.7,.5,1)}
+.hms-total{display:flex;justify-content:space-between;margin-top:8px;padding:8px 12px;border-top:2px solid #23493f;font:bold 15px Georgia,serif}
+.hms-total b.pop{animation:joyBump .3s ease;color:#1f5a26}
+.joy-row #joy-side-hms{background:linear-gradient(180deg,#e3f0e6,#cfe6d6);border-color:#8fbf9a}
+.joy-title-mg.hms{border-color:rgba(127,220,106,.55);background:rgba(60,140,90,.22);color:#e4f8dc}
+@keyframes hmsBlink{50%{opacity:.4}}
+@keyframes hmsPulse{50%{box-shadow:0 0 0 4px #ffd84d,0 0 28px 8px #ffd84dbb}}
+@keyframes hmsPoint{50%{transform:translate(calc(100% + 6px),-50%)}}
+@keyframes hmsNo{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@keyframes hmsFlip{0%{transform:rotateY(0)}50%{transform:rotateY(90deg) scale(1.08)}100%{transform:rotateY(0)}}
+@keyframes hmsStamp{0%{transform:translate(50%,-50%) rotate(-12deg) scale(2.4);opacity:0}100%{transform:translate(50%,-50%) rotate(-12deg) scale(1);opacity:1}}
+body.reduce-motion .hms-glow,body.reduce-motion .hms-glow::after,body.reduce-motion .hms-led,body.reduce-motion .hms-no,body.reduce-motion .hms-flip,body.reduce-motion .hms-stamp,body.reduce-motion .hms-lesson.next{animation:none}
+@media(max-width:520px){.hms-body{padding:6px}.hms-tabs button{font-size:18px;min-height:48px}.hms-room{min-height:66px}.hms-form{grid-template-columns:1fr}.hms-glow::after{display:none}}
+`;document.head.append(st);}
+
+/* ---------- The desk computer in the manor: on the front desk, with a soft glow ---------- */
+const HMS_SPOT={x:196,y:566};
+function drawDeskComputer(c,time,calm){
+  if(festivalActive||!state)return;
+  /* Lights up the monitor that already sits on the front desk. */
+  const x=234,y=524,glow=calm?.55:.45+.25*Math.sin(time/450);
+  ellipse(c,x,y,26,15,'rgba(127,220,106,'+(glow*.4)+')');
+  c.fillStyle='#23493f';c.beginPath();c.roundRect(x-15,y-10,30,19,3);c.fill();
+  c.fillStyle='rgba(170,235,190,'+(.75+glow*.25)+')';c.fillRect(x-12,y-7,24,13);
+  c.fillStyle='#23493f';c.fillRect(x-9,y-4,9,1.6);c.fillRect(x-9,y-1,15,1.6);c.fillRect(x-9,y+2,6,1.6);
+  c.fillStyle='#f37a9a';c.fillRect(x+6,y+1,3,3);
+  if(hms.lessons.length<5){const bob=calm?0:Math.sin(time/300)*2;ellipse(c,x+22,y-6+bob,7,7,'#7fdc6a');c.strokeStyle='#fff';c.lineWidth=1.5;c.beginPath();c.arc(x+22,y-6+bob,7,0,Math.PI*2);c.stroke();text(c,"!",x+22,y-2+bob,10,'#173c1a','Georgia');}
+  if(!calm)for(let k=0;k<2;k++){const a=time/700+k*Math.PI;ellipse(c,x+Math.cos(a)*20,y+Math.sin(a)*8,1.4,1.4,'#e6ffe0');}
+  if(LABELS)plaque(c,'🖥️ HMS',x,y-22);
+}
+const hmsExtras=world.options.extras;
+world.options.extras=()=>{const list=hmsExtras();if(state&&!festivalActive&&!titleVisible)list.push({id:'hms',...HMS_SPOT,name:HT.name});return list;};
+const hmsDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{hmsDrawExtras(c,time,calm);drawDeskComputer(c,time,calm);};
+const hmsInteract=interact;interact=function(id){if(id==='hms'){openHms();return;}return hmsInteract.apply(this,arguments);};
+addEventListener('keydown',e=>{
+  if(e.key.toLowerCase()!=='h'||e.ctrlKey||e.altKey||e.metaKey||modal.open||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  e.preventDefault();openHms();
+});
+/* The house ledger points to the desk computer too. */
+const hmsOpenLedger=openLedger;
+openLedger=function(){const r=hmsOpenLedger.apply(this,arguments);const tabs=$('ledger-tabs');
+  if(tabs&&!$('ledger-hms')){const b=document.createElement('button');b.id='ledger-hms';b.textContent='🖥️ '+HT.name;b.onclick=openHms;tabs.append(b);}return r;};
+
+/* ---------- Sidebar, title and pins ---------- */
+const hmsRenderGrowth=renderGrowth;
+renderGrowth=function(){
+  hmsRenderGrowth();const row=$('growth')?.querySelector('.joy-row');if(!row)return;
+  const b=document.createElement('button');b.id='joy-side-hms';b.textContent='🖥️ HMS · '+HT.levels[hmsLevel()];b.onclick=openHms;row.append(b);
+};
+{const anchor=$('joy-title-gift')||$('joy-title-mg')||$('heart-thought')||document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg hms';b.id='hms-title';
+  const left=5-hms.lessons.length;b.innerHTML='🖥️ '+(left?esc(profile.lang==='es'?'Aprende el HMS, el ordenador de recepción':'Learn the HMS, the desk computer')+' · <b>'+(5-left)+' / 5</b> →':esc(HT.levels[hmsLevel()])+' · '+esc(HT.gamesH)+' →');
+  b.onclick=openHms;anchor.after(b);}}
+const HP=HT.pins;
+PINS.push(
+  {id:'hms-login',icon:'🖥️',name:HP.login[0],hint:HP.login[1],test:()=>hms.opened>=1},
+  {id:'hms-lesson',icon:'📅',name:HP.lesson[0],hint:HP.lesson[1],test:()=>hms.lessons.length>=1},
+  {id:'hms-graduate',icon:'🎓',name:HP.grad[0],hint:HP.grad[1],test:()=>hms.lessons.length>=5},
+  {id:'hms-peek',icon:'👀',name:HP.peek[0],hint:HP.peek[1],test:()=>hms.peeks>=1},
+  {id:'hms-lookup',icon:'🔎',name:HP.lookup[0],hint:HP.lookup[1],test:()=>hms.looked>=5},
+  {id:'hms-rush',icon:'🧹',name:HP.rush[0],hint:HP.rush[1],test:()=>hms.perfect.rush>=1},
+  {id:'hms-build',icon:'📝',name:HP.build[0],hint:HP.build[1],test:()=>hms.perfect.build>=1},
+  {id:'hms-detective',icon:'🔍',name:HP.detect[0],hint:HP.detect[1],test:()=>hms.caught>=10},
+  {id:'hms-wizard',icon:'💻',name:HP.wizard[0],hint:HP.wizard[1],test:()=>hmsLevel()>=HMS_LEVELS.length-1},
+  {id:'hms-speedy',icon:'⚡',name:HP.speedy[0],secret:true,hint:HP.speedy[1],test:()=>hms.fast>=1}
+);
+renderGrowth();checkPins();
+/* ==== end HMS v1 ==== */
+
 
 
 })();
