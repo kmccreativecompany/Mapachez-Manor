@@ -1,8 +1,39 @@
 # Character kit
 
-Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 33 KB inside, player picker included, `index.html`.
+Every character in Mapáchez Manor is drawn with code from a short recipe. There are no pictures, so the whole kit is about 52 KB inside, player picker included, `index.html`.
 
 ![Sample cast](screenshots/cast-sheet.jpg)
+
+## Pixel chibi look (v3)
+
+![Your style guide next to the game](screenshots/cast-chibi-side-by-side.jpg)
+
+Every character is now painted like pixel art, following the Character Style Guide picture: a big head, big glossy eyes with a white sparkle, chunky hair with shine, a soft coloured outline and light from the top left. Each one is painted on a small 32 by 44 pixel grid from its recipe, then scaled up crisply with no blur.
+
+The whole cast uses it:
+- **Raccoons** (Delores, her family and the default player): mask, pink inner ears, ringed tail, cheek fluff and whiskers.
+- **People**: short, long, bun or curly hair, skirts or trousers, glasses.
+- **Folklore beings**: pointed ears, antlers, leaf crowns with a flower, fairy wings, goat horns with hooves, or a soft glow.
+- **Monsters**: a wolf with ears, muzzle and tail; a stitched monster with a flat top and neck bolts; a horned imp with a tail; a mummy with wraps and glowing eyes. Which one a monster is comes from its recipe.
+- **Aliens**: antennae with glowing bulbs or head tentacles, with one, two or three eyes.
+- **Robots**: a screen face with lamp eyes and a little antenna.
+- **Muffin**: drawn small, given crisp edges and the same soft outline, so she matches everyone else.
+
+**Candy colours and extra cute (v3.1).** About three in four beings get a fun skin colour (mint, lavender, sky blue, pink, butter yellow, peach) and most get bright hair (pink, blue, purple, yellow, green, teal, orange). Raccoons and robots keep their own colours. Eyes are bigger with two sparkles, cheeks are rosy, mouths are small (a cat "w", a tiny smile or a little "o"), outlines are softer, a blink is a happy closed "^", and robots have pink cheeks on their screen. The new colour rolls come after all the old ones, so every named character keeps their kind and shape. The "Who are you?" picker offers the new skins and hair colours too.
+
+![Candy colours close up](screenshots/cast-candy-closeup.jpg)
+
+**Extra-cute raccoons.** Raccoons have their own faces. The "button" style has: a round fluffy head with cheek tufts, big round ears with pink insides, soft bandit patches, huge shiny eyes with big sparkles, little white brows, a button nose, a tiny open smile, rosy cheeks, pink paw pads and a bigger ringed tail. Blinks are happy "^" arcs.
+
+![Raccoons before and after](screenshots/cast-raccoons.jpg)
+
+**Raccoon styles and colours.** There are four raccoon face styles: plush (the default, chosen by the owner), button, fluffy and classic. Set one with `rstyle` on a recipe, for example in `CAST_PINS`. Any raccoon can have a `fur` colour, and the classic grey is used when none is set. About one guest in ten turns out to be a raccoon, and about half of those have fun fur (lilac, pink, mint, sky, butter, cocoa, peach or periwinkle). Delores stays classic grey. Player raccoons can pick a fur colour on the "Who are you?" screen.
+
+![Raccoon styles and colours](screenshots/cast-raccoon-options.jpg)
+
+Each grid is made once per direction, walking step and blink, kept in memory and reused, so 30 characters take about 0.2 ms a frame. The kit is about 39 KB, smaller than the v2 detail kit (about 52 KB).
+
+**How close code can get.** The shapes, proportions, outlines and eyes match the style guide well. A hand-drawn sprite sheet would still win on things like flowing hair locks, dress folds and changing facial expressions, because an artist places every pixel by eye. Getting that here would mean adding picture files, which the game avoids to stay free and light.
 
 ## Who is what
 
