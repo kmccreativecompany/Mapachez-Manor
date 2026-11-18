@@ -1,6 +1,8 @@
 # PENNY v1: Penny Puffwing, the manor's money dragon
 
-Penny is a chubby mint baby dragon in a green banker's visor who keeps the manor's books.
+Penny is a kawaii baby dragon who keeps the manor's books: a big round head, huge sparkly eyes,
+rosy blush, tiny fluttering wings, a heart-tipped tail, pink toe beans and a little green banker's visor.
+She does a happy hop every couple of seconds, with little hearts when she lands.
 Dragons hoard gold; Penny hoards facts about the hotel business, and shares them one at a time.
 She lives at the end of `index.html` (`PENNY v1` block), is drawn with code only, and saves to
 `mapachez_penny_v1` on the device. Nothing is downloaded and nothing costs money to run.
@@ -37,6 +39,9 @@ card holds, a kind upsell, longer stays, and comps.
 Facts are written plainly and neutrally (no political framing) and the coin book says "General
 facts for learning, not tax advice." When rules change, edit the fact text in `PENNY_FACTS`; the
 first option in each list is the right one (they are shuffled on screen).
+
+The bill's political nickname never appears anywhere in the game, in English or Spanish (a test checks).
+Penny talks about rules by year ("a U.S. tax rule for 2025 to 2028"), never by bill name.
 
 ## Pins
 

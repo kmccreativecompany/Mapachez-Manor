@@ -123,6 +123,10 @@ class Penny(base.Growth):
         for word in ('Trump', 'Biden', 'Republican', 'Democrat', 'Beautiful Bill', 'Congress'):
             self.assertNotIn(word.lower(), blob.lower(), word)
 
+    def test_07b_the_bill_nickname_never_appears_anywhere_in_the_game(self):
+        for pattern in (r'(?i)beautiful\s+bill', r'(?i)big\s+beautiful', r'(?i)one\s+big\s+b', r'\bBBB\b', r'(?i)\bH\.\s?R\.\s?1\b', r'(?i)gran(de)?\s+y\s+hermos'):
+            self.assertIsNone(re.search(pattern, base.HTML), pattern)
+
     def test_08_secret_smoke_ring_pin_after_seven_visits(self):
         for _ in range(7):
             self.page.evaluate('pennyTest.open()')
