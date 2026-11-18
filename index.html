@@ -6237,6 +6237,268 @@ PINS.push(
 renderGrowth();checkPins();
 /* ==== end PENNY v1 ==== */
 
+/* ==== TALKING TREES v1: three little trees with faces in the Festival Garden ====
+   Old Oakley (an oak with mossy eyebrows) shares guest-care tips, Willa (a dreamy willow by the
+   fountain) whispers hints about guests' stories and where keepsakes hide, and Little Pip (a sapling)
+   cheers you on. Walk close and a tree says something; tap it (or E) to hear the next thing.
+   They blink, sway and watch you walk past, dress for the season and react to the weather.
+   Outdoors only, because they live in the garden. Every word is written here ahead of time
+   (English and Spanish) and every tree is a handful of canvas shapes, so it costs nothing to run.
+   Writing rules (docs/heart.md): gentle, kind, a little mysterious, never gloomy; no room numbers. */
+const TREE_TEXT={
+en:{
+  heard:'Tree talk heard: {n} of {total}',
+  names:{oak:'Old Oakley',willow:'Willa the willow',pip:'Little Pip'},
+  tag:'a talking tree',
+  hello:{oak:'Hmm? Oh, hello.',willow:'Psst… over here.',pip:'Hi hi hi!'},
+  lines:{
+    oak:['Hmm. Use a guest’s name, gently. It’s the shortest way to say “I see you.”',
+      'When someone is upset, slow down and speak softly. Most people slow down with you.',
+      'Repeat the request back. “Two towels and chamomile tea?” They feel heard, and nothing gets lost.',
+      'Try never to say “no” on its own. Bring “here’s what I can do” along with it.',
+      'Safety first, always. A wet floor sign is a small act of love.',
+      'Write it down. Memory is lovely, but notebooks don’t forget.',
+      'Keep room numbers quiet in the lobby. Privacy is a kind of kindness.',
+      'If you don’t know, say “Let me find out.” Then truly find out. Roots grow that way too.',
+      'Come back and check. Guests remember the one who returned to ask, “Is everything alright now?”',
+      'Help first, explain later. A worried guest needs a hand more than a reason.'],
+    willow:['Psst. Little lights wander the manor halls. Walk slowly, and one may find you.',
+      'Grateful guests slip notes under doors. Keep wandering, and you’ll find a few.',
+      'Some keepsakes appear only once, ever. Patience is a kind of looking.',
+      'Every guest carries a story they haven’t told yet. Help them a few times, and they might.',
+      'Someone keeps moving the lilies at night. I won’t say who. Your notebook learns a little more each evening.',
+      'Cece’s cat finds a new favourite spot every season. I won’t say where. I’m very discreet.',
+      'Regulars remember kindness. Each visit, they trust you with a little more.',
+      'The moon told me a secret about the manor. I promised to keep it. I’m keeping it beautifully.',
+      'The Memory Book keeps a page for every guest you help. Some pages are still waiting for you.',
+      'Not every mystery needs solving tonight. Some are just lovely to wonder about.'],
+    pip:['Hi! You’re doing better than you think. I’ve been watching. I don’t have much else to do.',
+      'I grew a whole new leaf this week! Small progress is still progress.',
+      'Even big trees were seeds once. Oakley says he was a very small acorn with very big plans.',
+      'Made a mistake? That’s okay. I bend in the wind all the time, and I’m still here.',
+      'Take one slow breath. Trees do it all day. Well, sort of. It’s complicated.',
+      'Guests can hear a smile on the phone. I can’t use phones. But I believe it.',
+      'You don’t have to be perfect. Just kind, and a tiny bit better tomorrow.',
+      'When I feel wobbly, I imagine my roots going all the way down. Try it. Feet on the floor.',
+      'Guests forget the words, but they remember how you made them feel. Willa told me. She knows everything.',
+      'Good night, good shift, good you. That’s it. That’s the whole saying.']
+  },
+  weather:{
+    rain:['Rain is just the sky doing room service.','Offer an umbrella before a guest asks. It feels like magic to them.'],
+    storm:['Storms always pass. Stay calm, and stay close to your guests until this one does.'],
+    snow:['Snow is the quietest guest of all. Still, offer it a warm towel.'],
+    fireflies:['The fireflies are checking in. They never need a key.'],
+    petals:['I’m tidying my petals for the guests. Very slowly. With style.'],
+    leaves:['Autumn is when I wear my best colours. Everyone deserves a season like that.']
+  },
+  pins:{friend:['Tree Friend','Hear something from all three talking trees in the Festival Garden.'],all:['Tree Whisperer','Hear everything the garden trees have to say.']}
+},
+es:{
+  heard:'Charlas de árbol escuchadas: {n} de {total}',
+  names:{oak:'El viejo Oakley',willow:'Willa, el sauce',pip:'Pequeño Pip'},
+  tag:'un árbol que habla',
+  hello:{oak:'¿Mm? Ah, hola.',willow:'Psst… por aquí.',pip:'¡Hola, hola, hola!'},
+  lines:{
+    oak:['Mm. Usa el nombre del huésped, con suavidad. Es la forma más corta de decir “te veo”.',
+      'Cuando alguien está molesto, ve más despacio y habla bajito. Casi todos bajan el ritmo contigo.',
+      'Repite la petición. “¿Dos toallas y té de manzanilla?” Se sienten escuchados y nada se pierde.',
+      'Intenta no decir “no” a secas. Acompáñalo con un “esto es lo que puedo hacer”.',
+      'Primero la seguridad, siempre. Un letrero de piso mojado es un pequeño acto de amor.',
+      'Anótalo. La memoria es preciosa, pero las libretas no olvidan.',
+      'No digas los números de habitación en voz alta en el vestíbulo. La privacidad también es amabilidad.',
+      'Si no sabes algo, di “Déjame averiguarlo”. Y averígualo de verdad. Las raíces crecen así también.',
+      'Vuelve a preguntar. Los huéspedes recuerdan a quien regresó a decir: “¿Ya está todo bien?”',
+      'Primero ayuda, luego explica. Un huésped preocupado necesita una mano más que una razón.'],
+    willow:['Psst. Por los pasillos de la mansión vagan lucecitas. Camina despacio y alguna te encontrará.',
+      'Los huéspedes agradecidos dejan notas bajo las puertas. Sigue paseando y encontrarás algunas.',
+      'Algunos recuerdos aparecen una sola vez, nunca más. La paciencia es una forma de buscar.',
+      'Cada huésped trae una historia que aún no ha contado. Ayúdale unas cuantas veces y quizá te la cuente.',
+      'Alguien mueve los lirios por la noche. No diré quién. Tu libreta sabe un poquito más cada noche.',
+      'El gato de Cece elige un rincón favorito nuevo cada estación. No diré cuál. Soy muy discreta.',
+      'Los clientes habituales recuerdan la amabilidad. En cada visita te confían un poquito más.',
+      'La luna me contó un secreto de la mansión. Prometí guardarlo. Lo estoy guardando de maravilla.',
+      'El Libro de recuerdos guarda una página para cada huésped que ayudas. Algunas todavía te esperan.',
+      'No todo misterio necesita resolverse esta noche. Algunos son bonitos solo para imaginarlos.'],
+    pip:['¡Hola! Lo estás haciendo mejor de lo que crees. Te he estado mirando. No tengo mucho más que hacer.',
+      '¡Esta semana me salió una hoja nueva entera! Un pequeño avance sigue siendo un avance.',
+      'Hasta los árboles grandes fueron semillas. Oakley dice que era una bellota muy pequeña con planes muy grandes.',
+      '¿Te equivocaste? No pasa nada. Yo me doblo con el viento todo el tiempo y aquí sigo.',
+      'Respira despacio una vez. Los árboles lo hacemos todo el día. Bueno, más o menos. Es complicado.',
+      'Por teléfono se oye una sonrisa. Yo no puedo usar teléfonos. Pero lo creo.',
+      'No necesitas perfección. Solo amabilidad, y un poquito más de práctica mañana.',
+      'Cuando me tambaleo, imagino que mis raíces llegan muy hondo. Pruébalo. Los pies en el suelo.',
+      'Los huéspedes olvidan las palabras, pero recuerdan cómo les hiciste sentir. Me lo dijo Willa. Ella lo sabe todo.',
+      'Buenas noches, buen turno, buena persona. Ya está. Ese es todo el dicho.']
+  },
+  weather:{
+    rain:['La lluvia es solo el cielo haciendo servicio a la habitación.','Ofrece un paraguas antes de que te lo pidan. Para el huésped es como magia.'],
+    storm:['Las tormentas siempre pasan. Mantén la calma y quédate cerca de tus huéspedes hasta que pase esta.'],
+    snow:['La nieve es el huésped más silencioso. Aun así, ofrécele una toalla calentita.'],
+    fireflies:['Las luciérnagas se están registrando. Nunca necesitan llave.'],
+    petals:['Estoy arreglando mis pétalos para los huéspedes. Muy despacio. Con estilo.'],
+    leaves:['En otoño me pongo mis mejores colores. Todo el mundo merece una estación así.']
+  },
+  pins:{friend:['Amistad con los árboles','Escucha algo de los tres árboles que hablan en el Jardín del Festival.'],all:['Susurro de árboles','Escucha todo lo que los árboles del jardín tienen que decir.']}
+}};
+const TREES=TREE_TEXT[profile.lang]||TREE_TEXT.en;
+const TREES_KEY='mapachez_trees_v1';
+const treeForce={season:'',weather:''}; /* for tests and previews */
+/* x, y is where the trunk meets the grass. Placed clear of the booths, the stage and Muffin's spots. */
+const TALKING_TREES=[
+  {id:'oak',x:1128,y:326,s:1,phase:0},
+  {id:'willow',x:106,y:330,s:1,phase:2.1},
+  {id:'pip',x:508,y:712,s:.95,phase:4.2}
+].map(tr=>({...tr,said:-1e9,inside:false,next:0}));
+let treeTalk={version:1,heard:{oak:[],willow:[],pip:[]}};
+try{const v=JSON.parse(localStorage.getItem(TREES_KEY)||'null');if(v&&v.version===1&&v.heard)for(const k of Object.keys(treeTalk.heard)){const a=v.heard[k];
+  if(Array.isArray(a))treeTalk.heard[k]=[...new Set(a.filter(n=>Number.isInteger(n)&&n>=0&&n<TREES.lines[k].length))];}}catch{}
+function storeTrees(){try{localStorage.setItem(TREES_KEY,JSON.stringify(treeTalk));}catch{}}
+const treeTotal=()=>Object.values(TREES.lines).reduce((a,l)=>a+l.length,0);
+const treeHeard=()=>Object.values(treeTalk.heard).reduce((a,l)=>a+l.length,0);
+const treeUnheard=tr=>treeTalk.heard[tr.id].length<TREES.lines[tr.id].length;
+function treeWeather(){if(treeForce.weather)return treeForce.weather==='clear'?'':treeForce.weather;try{return castWeather()||'';}catch{return '';}}
+/* Next thing to say: unheard lines first, in order, with the odd weather remark mixed in. */
+function treeLine(tr){
+  const w=TREES.weather[treeWeather()],list=TREES.lines[tr.id],have=treeTalk.heard[tr.id];
+  if(w&&(!treeUnheard(tr)||Math.random()<.25))return {line:w[Math.random()*w.length|0],fresh:false};
+  const left=list.map((_,n)=>n).filter(n=>!have.includes(n));
+  if(left.length){const n=left[0];have.push(n);storeTrees();return {line:list[n],fresh:true};}
+  const n=tr.next++%list.length;return {line:list[n],fresh:false};
+}
+function treeSay(tr){
+  tr.said=performance.now();
+  const {line,fresh}=treeLine(tr);
+  toast('🌳 '+TREES.names[tr.id]+': “'+line+'”'+(fresh?'  ·  '+TREES.heard.replace('{n}',treeHeard()).replace('{total}',treeTotal()):''));
+  sound('soft');if(fresh)checkPins();
+}
+function treePoints(){
+  if(!festivalActive)return [];
+  return TALKING_TREES.map(tr=>({id:'tree-'+tr.id,x:tr.x,y:Math.max(tr.y+6,306),name:TREES.names[tr.id]+' · '+TREES.tag}));
+}
+/* Walking close makes a tree speak once; it will not repeat itself until you wander off and come back. */
+function treeNearby(){
+  if(!festivalActive||!state||world.options.paused())return;
+  const p=state.player,now=performance.now();
+  for(const tr of TALKING_TREES){const d=Math.hypot(p.x-tr.x,p.y-Math.max(tr.y+6,306));
+    if(d<70&&!tr.inside){tr.inside=true;if(now-tr.said>12000)treeSay(tr);}
+    else if(d>110)tr.inside=false;}
+}
+function treeTap(id){
+  const tr=TALKING_TREES.find(t=>'tree-'+t.id===id);if(!tr)return false;
+  if(performance.now()-tr.said<2500)tr.said=performance.now()-400;else treeSay(tr);
+  return true;
+}
+/* Seasonal leaves: [deep, mid, light, highlight], plus a little accent (blossoms, fruit or frost). */
+const TREE_LEAVES={
+  spring:{c:['#356f47','#4a8a55','#69a463','#93c47e'],acc:'#f6c3d2'},
+  summer:{c:['#2a6040','#3a7a4a','#529456','#7db46b'],acc:'#e2565e'},
+  autumn:{c:['#8f4526','#bd622c','#dd8a38','#f2bd5a'],acc:'#f6d36a'},
+  winter:{c:['#33574d','#466a60','#628a7d','#8fb0a3'],acc:'#f4f8fb'}
+};
+const WILLOW_LEAVES={spring:['#4f8a5a','#6aa36a','#8fc07e','#b8dd9c'],summer:['#3f7a55','#548f62','#76ab76','#9cc890'],autumn:['#a8802c','#c39a36','#dcbc52','#efd77a'],winter:['#4b6f66','#5f8479','#7d9e93','#a7c2b8']};
+const PIP_LEAVES={spring:['#d97898','#e892ae','#f3b0c6','#fcd6e2'],summer:['#3f8a52','#56a05d','#74b86b','#9fd08a'],autumn:['#c4562e','#de7838','#ef9d45','#f8c867'],winter:['#4e7a6c','#679385','#86ad9f','#b2cdc2']};
+function treeFace(c,x,y,o){
+  /* o: blink, look (-1..1), talk (0..1 mouth), mood ('', 'happy', 'wow', 'dreamy'), size */
+  const k=o.size||1,ex=6.4*k,ey=-1*k;
+  if(o.blink||o.mood==='happy'){c.strokeStyle='#2a1d17';c.lineWidth=1.5*k;c.lineCap='round';
+    for(const s of [-1,1]){c.beginPath();if(o.mood==='happy'){c.moveTo(x+s*ex-3*k,y+ey+1*k);c.quadraticCurveTo(x+s*ex,y+ey-2.6*k,x+s*ex+3*k,y+ey+1*k);}else{c.moveTo(x+s*ex-3*k,y+ey);c.quadraticCurveTo(x+s*ex,y+ey+2.2*k,x+s*ex+3*k,y+ey);}c.stroke();}}
+  else for(const s of [-1,1]){const big=o.mood==='wow'?1.15:1;
+    ellipse(c,x+s*ex,y+ey,3.6*k*big,4.4*k*big,'#2a1d17');
+    ellipse(c,x+s*ex+o.look*.6*k,y+ey-.2*k,2.7*k*big,3.4*k*big,'#4a3428');
+    ellipse(c,x+s*ex-1.1*k+o.look*.5*k,y+ey-1.7*k,1.3*k,1.3*k,'#fff');ellipse(c,x+s*ex+1.2*k+o.look*.5*k,y+ey+1.2*k,.6*k,.6*k,'#fff');
+    if(o.mood==='dreamy'){c.strokeStyle='#2a1d17';c.lineWidth=1.1*k;c.lineCap='round';c.beginPath();
+      for(const q of [0,1,2]){const bx=x+s*ex+s*(1.2+q*1.1)*k,by=y+ey-(4.1-q*1.3)*k;c.moveTo(bx,by);c.lineTo(bx+s*1.7*k,by-1.6*k);}c.stroke();}}
+  ellipse(c,x-11*k,y+3.6*k,3*k,1.9*k,'rgba(240,128,140,.55)');ellipse(c,x+11*k,y+3.6*k,3*k,1.9*k,'rgba(240,128,140,.55)');
+  if(o.talk>0||o.mood==='wow'){const h=o.mood==='wow'?2.4:.8+o.talk*2.2;ellipse(c,x,y+5*k,2.2*k,h*k,'#5a2a2a');ellipse(c,x,y+5*k+h*k*.45,1.3*k,h*k*.4,'#e48a96');}
+  else{c.strokeStyle='#2a1d17';c.lineWidth=1.3*k;c.lineCap='round';c.beginPath();c.moveTo(x-2.6*k,y+4*k);c.quadraticCurveTo(x,y+6.6*k,x+2.6*k,y+4*k);c.stroke();}
+}
+function treeCanopy(c,cx,cy,r,col){
+  for(const [dx,dy,q,i] of [[-.42,.18,.6,0],[.42,.2,.58,0],[0,-.14,.72,1],[-.26,-.04,.56,2],[.24,-.3,.48,2],[-.12,-.44,.36,3]])ellipse(c,cx+dx*r,cy+dy*r,q*r,q*r,col[i]);
+  ellipse(c,cx-r*.22,cy-r*.52,r*.17,r*.1,'rgba(240,250,210,.35)');
+}
+function drawTalkingTree(c,tr,now,calm,season,weather,player){
+  const t=calm?0:now,talkAge=now-tr.said,talking=talkAge<2600,wig=talkAge<1400&&!calm?Math.sin(talkAge/60)*.05*(1-talkAge/1400):0;
+  const shiver=weather==='storm'&&!calm?Math.sin(t/70+tr.phase)*.012:0;
+  const sway=(calm?0:Math.sin(t/1700+tr.phase)*.022)+wig+shiver;
+  const blink=!calm&&((t/1000+tr.phase*1.3)%4.2)<.13;
+  const look=player?Math.max(-1,Math.min(1,(player.x-tr.x)/160)):0;
+  const mood=weather==='storm'?'wow':(weather==='rain'&&!talking)?'happy':tr.id==='willow'?'dreamy':'';
+  const talk=talking&&!calm?Math.abs(Math.sin(talkAge/95)):talking?.6:0;
+  const L=TREE_LEAVES[season]||TREE_LEAVES.summer,snow=weather==='snow'||season==='winter';
+  c.save();c.translate(Math.round(tr.x),Math.round(tr.y));c.scale(tr.s,tr.s);
+  ellipse(c,4,4,tr.id==='pip'?24:44,tr.id==='pip'?6:10,'rgba(8,26,18,.35)');
+  if(weather==='rain'||weather==='storm')ellipse(c,-6,6,tr.id==='pip'?18:34,4,'rgba(150,190,200,.35)');
+  if(tr.id==='pip'){
+    const bark='#8a6240';rect(c,-4,-26,8,26,bark,3);
+    /* little branch arms that wave while Pip talks */
+    const wave=talking&&!calm?Math.sin(talkAge/120)*.5:0;c.strokeStyle=bark;c.lineWidth=3;c.lineCap='round';
+    for(const s of [-1,1]){c.beginPath();c.moveTo(0,-14);const ax=s*15,ay=-22-(s>0?wave*8:0);c.quadraticCurveTo(s*8,-14,ax,ay);c.stroke();ellipse(c,ax+s*2,ay-2,4,2.6,PIP_LEAVES.summer[2]);}
+    c.save();c.translate(0,-26);c.rotate(sway*1.4);
+    const P=PIP_LEAVES[season]||PIP_LEAVES.spring;
+    for(const [dx,dy,q,i] of [[-12,-10,15,0],[12,-10,15,0],[0,-20,20,1],[-8,-24,13,2],[9,-28,11,2],[-3,-33,8,3]])ellipse(c,dx,dy,q,q,P[i]);
+    c.strokeStyle='#5d8b3a';c.lineWidth=2;c.beginPath();c.moveTo(0,-40);c.quadraticCurveTo(1,-46,0,-50);c.stroke();ellipse(c,4,-49,5,2.6,'#7ab35e');
+    if(season==='summer')for(const [dx,dy] of [[-14,-4],[15,-6],[-18,-18]]){ellipse(c,dx,dy,2.6,2.6,L.acc);ellipse(c,dx-.8,dy-.8,.8,.8,'#fff9');}
+    if(season==='winter'){rect(c,-16,-40,32,9,'#c8454f',4);for(let k=-14;k<16;k+=5)rect(c,k,-40,2,9,'#e9737b');ellipse(c,0,-45,5,5,'#fbf4e8');}
+    else if(snow)ellipse(c,0,-36,14,5,'#f4f8fb');
+    treeFace(c,0,-14,{blink,look,talk,mood,size:1.05,bark:P[1]});
+    c.restore();
+  }else{
+    const willow=tr.id==='willow',bark=willow?'#76604a':'#8a6240',barkLt=willow?'#8d7659':'#a37752',W2=willow?15:18;
+    for(const s of [-1,1])ellipse(c,s*(W2-2),-1,9,4.4,bark);
+    rect(c,-W2,-52,W2*2,52,bark,9);rect(c,-W2+4,-48,6,44,barkLt,3);
+    c.strokeStyle='rgba(60,38,24,.35)';c.lineWidth=1.2;c.beginPath();c.moveTo(W2-6,-44);c.lineTo(W2-7,-36);c.moveTo(-W2+10,-10);c.lineTo(-W2+11,-4);c.stroke();
+    c.save();c.translate(0,-48);c.rotate(sway);
+    if(willow){
+      const WL=WILLOW_LEAVES[season]||WILLOW_LEAVES.summer;
+      ellipse(c,0,-46,50,36,WL[0]);ellipse(c,-4,-52,44,28,WL[1]);ellipse(c,-14,-60,24,14,WL[2]);ellipse(c,14,-64,14,8,WL[3]);
+      c.lineCap='round';
+      /* long soft strands, parted in the middle so the face peeks through */
+      for(let x0=-46;x0<=46;x0+=5.75){const ax=Math.abs(x0);if(ax<17)continue;const drift=calm?0:Math.sin(t/1300+x0*.2)*2.5,len=34+(ax>30?14:4)+((x0*7)%5);
+        c.strokeStyle=WL[(Math.round(x0)&3)%3];c.lineWidth=4.2;c.beginPath();c.moveTo(x0*.9,-36);c.quadraticCurveTo(x0*1.05,-36+len*.5,x0*1.12+drift,-36+len);c.stroke();
+        if(season==='spring'&&(Math.round(x0)%3===0))ellipse(c,x0*1.12+drift,-36+len,2,2,L.acc);}
+      /* a white lily tucked behind the ear */
+      const lx=-30,ly=-34;for(const a of [-.9,0,.9]){c.save();c.translate(lx,ly);c.rotate(a);ellipse(c,0,-5,2.6,5.4,'#fffaf0');c.restore();}ellipse(c,lx,ly,1.6,1.6,'#e8c26a');
+      if(snow){ellipse(c,-8,-80,24,6,'#f4f8fb');ellipse(c,16,-76,14,5,'#f4f8fb');}
+    }else{
+      treeCanopy(c,0,-48,54,L.c);
+      if(season==='spring')for(let i=0;i<9;i++){const a=i*2.4;ellipse(c,Math.cos(a)*28,-50+Math.sin(a)*24,2.2,2.2,L.acc);}
+      if(season==='autumn')for(const [dx,dy] of [[-22,-30],[18,-24],[2,-58]]){ellipse(c,dx,dy,3,3.6,'#8a5a2c');rect(c,dx-3,dy-4.6,6,2.4,'#5d3e22',1);}
+      if(snow){ellipse(c,-6,-86,24,7,'#f4f8fb');ellipse(c,24,-70,12,4,'#f4f8fb');ellipse(c,-30,-66,12,4,'#f4f8fb');}
+    }
+    c.restore();
+    /* the face lives on the trunk, so it stays steady while the leaves sway */
+    if(!willow){for(const s of [-1,1])ellipse(c,s*8.4,-37,5.4,2,'#5f8f4c');}
+    if(tr.id==='oak'&&season==='winter'){rect(c,-W2-1,-14,W2*2+2,7,'#c8454f',3);rect(c,W2-6,-10,6,14,'#c8454f',2);for(const k of [-10,-2,6])rect(c,k,-14,2,7,'#e9737b');}
+    treeFace(c,0,-27,{blink,look,talk,mood,size:willow?1.2:1.3,bark});
+  }
+  /* tiny weather touches: fireflies circle, petals and leaves drift down */
+  if(!calm&&weather==='fireflies')for(let i=0;i<3;i++){const a=t/900+i*2.1+tr.phase;ellipse(c,Math.cos(a)*34,-70+Math.sin(a*1.3)*20,1.8,1.8,'rgba(250,232,140,'+(.5+.4*Math.sin(t/260+i))+')');}
+  if(!calm&&(weather==='petals'||weather==='leaves'))for(let i=0;i<3;i++){const f=((t/3200)+i/3+tr.phase)%1;ellipse(c,-28+i*24+Math.sin(f*9)*5,-80+f*84,2.4,1.5,weather==='petals'?'#f6c3d2':'#dd8a38');}
+  /* a little bubble while speaking, and a soft note when it still has things to tell you */
+  const top=tr.id==="pip"?-84:-150;
+  if(talking){const msg=TREES.hello[tr.id];c.font='12px Georgia';const w=c.measureText(msg).width+18;
+    rect(c,-w/2,top-24,w,20,'#fbf4e1f2',10);stroke(c,-w/2,top-24,w,20,'#c9a45c',1,10);c.fillStyle='#fbf4e1f2';c.beginPath();c.moveTo(-4,top-4.5);c.lineTo(4,top-4.5);c.lineTo(0,top+2);c.fill();
+    text(c,msg,0,top-10,12,'#4b2f1c','Georgia');}
+  else if(treeUnheard(tr)){const f=calm?.4:((t/2600+tr.phase)%1);c.globalAlpha=calm?.85:Math.sin(f*Math.PI);text(c,'♪',8+f*6,top-4-f*14,15,'#f6e3ad','Georgia');c.globalAlpha=1;}
+  c.restore();
+}
+function drawTalkingTrees(c,calm,front){
+  if(!festivalActive)return;
+  const now=performance.now(),season=treeForce.season||castSeason(),weather=treeWeather(),p=state?.player;
+  for(const tr of TALKING_TREES){const inFront=!!p&&tr.y>p.y+4;if(inFront===front)drawTalkingTree(c,tr,now,calm,season,weather,p);}
+}
+/* Wiring: trees behind Muffin and the walker are drawn with the garden; a tree nearer the bottom
+   than the walker is drawn after them so nobody seems to stand inside a trunk. */
+const treesMuffinScene=drawMuffinScene;drawMuffinScene=function(c,time,calm){drawTalkingTrees(c,calm,false);return treesMuffinScene.apply(this,arguments);};
+const treesDrawVisitor=world.drawVisitor;world.drawVisitor=function(time,calm){const r=treesDrawVisitor.apply(this,arguments);if(this.options.festival?.()){drawTalkingTrees(this.ctx,calm,true);treeNearby();}return r;};
+const treesExtras=world.options.extras;world.options.extras=()=>[...treesExtras(),...treePoints()];
+const treesInteract=interact;interact=function(id){if(festivalActive&&typeof id==='string'&&id.startsWith('tree-')&&treeTap(id))return;return treesInteract.apply(this,arguments);};
+PINS.push(
+  {id:'tree-friend',icon:'🌳',name:TREES.pins.friend[0],hint:TREES.pins.friend[1],test:()=>Object.values(treeTalk.heard).every(l=>l.length>0)},
+  {id:'tree-whisperer',icon:'🍃',name:TREES.pins.all[0],hint:TREES.pins.all[1],test:()=>treeHeard()>=treeTotal()}
+);
+checkPins();
+/* ==== end TALKING TREES v1 ==== */
 
 
 })();
