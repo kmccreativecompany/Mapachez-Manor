@@ -987,7 +987,7 @@ const MEMORY_PAGES=[
   {id:'pot',kind:'care',title:'A hand, and a little breathing room',from:'A moment with Chef Mirelle',text:'You carried the heavy stockpot and covered for a break. Looking after the team is part of looking after the manor.'},
   {id:'gallery',kind:'festival',title:'Three little windows',from:'Tide & Fern · fictional demonstration',text:'You lingered over an imagined island in three paintings. The hotel clock waited while you took a look.'},
   {id:'umbrella-story',kind:'festival',title:'Correspondence, slightly damp',from:'Little Island Press · fictional demonstration',text:'An umbrella requested a garden view and left a damp thank-you note. Reception filed what it could.'},
-  {id:'fern-seat',kind:'manor',title:'Sparkling water for the fern',from:'Overheard by the lobby chairs',text:'A very serious seating dispute ended with room for everyone. The fern kept the chair, the hat, and a sparkling water. She seemed to sit up a little taller.'}
+  {id:'fern-seat',kind:'manor',title:'A letter sealed in gold',from:'Overheard by the lobby chairs',text:'A secret letter for the guest who always asks for two spoons. No name, just one musical note, drawn twice. Reception is saying nothing. Reception would very much like to know.'}
 ];
 function createMemoryBook(){return {version:1,moments:[],favorites:[]};}
 function normaliseMemoryBook(value){
@@ -4287,12 +4287,12 @@ en:{
   walked:'The chairs are free. Someone new will sit down soon.  ·  Overheard: {n} of {total}',
   pin:['All Ears','Overhear every conversation by the lobby chairs.'],
   list:[
-    {id:'fern',title:'A matter of seating',a:{name:'Sunny Marrow'},b:{name:'Zinnia Starling'},
-     intro:'Two guests are having a very quiet disagreement beside an armchair.',
-     lines:[[0,'You gave my chair to a fern.'],[1,'She was here first.'],[0,'She’s wearing my hat.'],
-       [1,'Someone keeps moving her. She deserves one nice night.'],[0,'Fine. She keeps the hat until dessert.'],[1,'She’s never had dessert.'],[0,'Then get her a water. Sparkling.']],
-     stage:'In the armchair sits a potted fern. The hat suits it. Annoyingly well.',
-     end:'The fern seems to sit up a little taller.'},
+    {id:'letter',memory:true,title:'A letter sealed in gold',a:{name:'Zinnia Starling'},b:{name:'Sunny Marrow'},
+     intro:'Two guests are whispering by the chairs. They stop when you walk past. Then they start again, louder.',
+     lines:[[0,'Did you see the letter at the desk?'],[1,'The one sealed with gold wax?'],[0,'It’s for someone in this lobby.'],
+       [1,'Who is it for?'],[0,'‘To the guest who always asks for two spoons.’'],[1,'Lady Vesper! Who is it from?'],[0,'No name. Just a tiny drawing.'],[1,'Of what?'],[0,'One musical note. The same one, twice.']],
+     stage:'They glance around the lobby. Slowly. Then at you.',
+     end:'Somewhere upstairs, one clear note rings out. Then, after some thought, the same note.'},
     {id:'bells',title:'One note, many spoons',a:{name:'Gwendolyn Butterfield'},b:{name:'Mr. Finch',cast:'finch'},
      intro:'A collector and a musician share the lobby sofa.',
      lines:[[0,'Is that a triangle?'],[1,'It is the triangle.'],[0,'How many do you own?'],
@@ -4334,12 +4334,12 @@ es:{
   walked:'Los sillones están libres. Pronto se sentará alguien más.  ·  Escuchadas: {n} de {total}',
   pin:['Todo oídos','Escucha todas las conversaciones junto a los sillones del vestíbulo.'],
   list:[
-    {id:'fern',title:'Una cuestión de asientos',a:{name:'Sunny Marrow'},b:{name:'Zinnia Starling'},
-     intro:'Dos huéspedes tienen un desacuerdo muy discreto junto a un sillón.',
-     lines:[[0,'Le diste mi silla a un helecho.'],[1,'Ella llegó primero.'],[0,'Lleva puesto mi sombrero.'],
-       [1,'Alguien no deja de moverla. Se merece una noche bonita.'],[0,'Está bien. Se queda el sombrero hasta el postre.'],[1,'Nunca ha probado el postre.'],[0,'Entonces pídele agua. Con gas.']],
-     stage:'En el sillón hay un helecho en maceta. El sombrero le queda bien. Demasiado bien.',
-     end:'El helecho parece sentarse un poquito más derecho.'},
+    {id:'letter',memory:true,title:'Una carta con sello dorado',a:{name:'Zinnia Starling'},b:{name:'Sunny Marrow'},
+     intro:'Dos huéspedes cuchichean junto a los sillones. Se callan cuando pasas. Luego siguen, más alto.',
+     lines:[[0,'¿Viste la carta en recepción?'],[1,'¿La del sello de cera dorada?'],[0,'Es para alguien de este vestíbulo.'],
+       [1,'¿Para quién?'],[0,'«Para quien siempre pide dos cucharas».'],[1,'¡Lady Vesper! ¿Y de quién es?'],[0,'Sin nombre. Solo un dibujito.'],[1,'¿De qué?'],[0,'Una nota musical. La misma, dos veces.']],
+     stage:'Miran el vestíbulo. Despacio. Luego te miran a ti.',
+     end:'En algún lugar de arriba suena una nota clara. Luego, tras pensarlo, la misma nota.'},
     {id:'bells',title:'Una nota, muchas cucharas',a:{name:'Gwendolyn Butterfield'},b:{name:'Mr. Finch',cast:'finch'},
      intro:'Una coleccionista y un músico comparten el sofá del vestíbulo.',
      lines:[[0,'¿Eso es un triángulo?'],[1,'Es el triángulo.'],[0,'¿Cuántos tiene?'],
@@ -4443,7 +4443,7 @@ updateLobbyOverlay=function(time,view){
 };
 function hearChat(c){
   if(!chats.heard.includes(c.id)){chats.heard.push(c.id);storeChats();}
-  if(c.id==='fern')state=finishLobbyConversation(state);
+  if(c.memory)state=finishLobbyConversation(state);
   if(!growth.story.listened){growth.story.listened=true;storeGrowth();}
   save();checkPins();
 }
@@ -4459,7 +4459,7 @@ openLobbyConversation=function(){
     hearChat(c);
     chatMove.pending=true;
     const opts=[{text:CHAT.done,run:closeModal}];
-    if(c.id==='fern'&&lobbySceneHeard(state))opts.push({text:CHAT.book[0],detail:CHAT.book[1],run:()=>openMemoryBook('manor')});
+    if(c.memory&&lobbySceneHeard(state))opts.push({text:CHAT.book[0],detail:CHAT.book[1],run:()=>openMemoryBook('manor')});
     choices(opts,'lobby-conversation');
   }else choices([{text:CHAT.keep[0],detail:CHAT.keep[1],run:()=>{chatMove.full=true;openLobbyConversation();}},{text:CHAT.leave[0],detail:CHAT.leave[1],run:closeModal}],'lobby-conversation');
   narrativeText=body.innerText;

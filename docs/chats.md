@@ -11,13 +11,13 @@ there is no walking: the pair simply goes, and the next pair simply appears.
 
 The code sits between `CHATS v1` markers at the end of the main script in `index.html`, with
 styles marked `/* CHATS v1 */`. It replaces the old single fern conversation and reuses its
-bubble, spot and Memory Book page.
+bubble, spot and Memory Book page (a chat with `memory:true` fills that page).
 
 ## The seven chats
 
 | id | Pair | Joke engine |
 | --- | --- | --- |
-| fern | Sunny Marrow, Zinnia Starling | Seating dispute with a fern. Callback to the wandering fern gag. |
+| letter | Zinnia Starling, Sunny Marrow | A secret letter for Lady Vesper, signed with one note drawn twice. Callback to Mr. Finch's one-note triangle. |
 | bells | Gwendolyn Butterfield, Mr. Finch | Spoons, bells, one triangle. Her next obsession is set up last. |
 | time | Ms. Chen, Dr. Merriweather | One has nine minutes, one has "centuries. I mean weeks." |
 | muffin | Cece Wrenwood, Basil Thorne | Muffin and Admiral both play asleep. "Two professionals." |
@@ -42,7 +42,7 @@ has `a` and `b` (a `cast` name keeps a guest's look the same as elsewhere), `lin
 ## Saving
 
 `mapachez_chats_v1` on the device: `next` (which pair is in the chairs) and `heard` (chat ids).
-Hearing the fern chat still sets the evening's fern flag for the Memory Book page. Hearing any chat
+Hearing the letter chat still sets the evening's old fern flag for the Memory Book page. Hearing any chat
 earns A Listening Ear; hearing all seven earns the new All Ears pin.
 
 ## Checks
