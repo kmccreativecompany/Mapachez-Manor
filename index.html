@@ -1204,7 +1204,11 @@ function pxPaint(r,dir,blink,frame,mood=''){
       const sh=i=>sw*Math.round(i*2/(pts.length-1));
       pts.forEach(([x,y],i)=>{const xx=(back?32-x:x)+sh(i);E(xx,y,rad,2.5,i%2?mask:fur,i%2?mask:fur);});if(st==='fluffy'){const [x,y]=pts[pts.length-1];E((back?32-x:x)+sh(pts.length-1),y-1,2.2,1.8,crm,crm);}};
     if(!back)tail();
-    legs(furDk,mask);torso(fur,fur,mask);if(!back){E(16.5,28.5,4.4,4.6,crm,crm,fur);}outfit();
+    /* Chubby baby legs: short round thighs and plump paw feet with pink toe beans (front only). */
+    {const lift=[frame===1?-1:0,frame===3?-1:0],leg=T(fur,-.12);shade.add(leg);
+      [12.9,20.1].forEach((cx,i)=>{const y=lift[i];E(cx,34.6+y,2.9,3,leg,leg);E(cx+(i?.4:-.4),37.6+y,3.2,1.6,mask,mask);
+        if(!back){R(Math.round(cx-1+(i?.4:-.4)),37+y,2,1,bean,mask);}});}
+    torso(fur,fur,mask);if(!back){E(16.5,28.5,4.4,4.6,crm,crm,fur);}outfit();
     /* Ears. */
     for(const ex0 of [9,23]){const t=ex0<16?-1:1,inner=back?furDk:pinkE;
       if(st==='classic'){for(let j=0;j<6;j++)R(ex0-3+(t<0?0:j>>1)+(t<0?j>>1:0)-(j>>1),2+j,1+j,1,fur);for(let j=0;j<5;j++)R(ex0-3+(t<0?0:j>>1)+(t<0?j>>1:0)-(j>>1)+2,4+j,Math.max(0,j-1),1,j>1?inner:fur,'ear');}

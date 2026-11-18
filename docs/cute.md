@@ -27,3 +27,8 @@ desk is cut out of her drawing so it stays in front of her.
 Reduced motion: no swish, hop or floating; the happy face and still hearts can still show.
 
 Tests: `tests/test_cute.py`. Picture: `docs/screenshots/cute/raccoons-before-after.jpg`.
+
+## Chubby baby legs
+Raccoons have their own legs instead of the shared chibi legs: short round thighs in a slightly deeper fur colour
+and plump dark paw feet with a pink toe bean on each (front view only). Feet still land on the same spot, so
+nothing on the map moves. Picture: `docs/screenshots/cute/chubby-legs.jpg`.
