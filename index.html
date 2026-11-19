@@ -6500,6 +6500,427 @@ PINS.push(
 checkPins();
 /* ==== end TALKING TREES v1 ==== */
 
+/* ==== COTTAGE v1: spend your tips on your own little staff cottage ====
+   Staff can live on the manor grounds. Yours starts bare: a bed, a window and one moving box.
+   Tips you earn for good work (best answers, desk computer games, Penny's coin checks) can be
+   spent on 18 cosy things, from a mushroom lamp to a tiny chandelier. Each one appears in the
+   room with a sparkle, and most of them do something when you tap them.
+   - The tip jar still fills from everything you earn, so spending never slows a gift box down.
+   - A "next for your cottage" card always shows the closest goal and how many tips are left.
+   - Friends drop by as the cottage fills up (Delores, then Penny), and Muffin naps on her cushion.
+   - The window shows the night sky only: weather stays outdoors.
+   Drawn with code, every word written here in English and Spanish, nothing downloaded, nothing
+   costs money to run. Progress lives in its own key, mapachez_cottage_v1. */
+const COTTAGE_TEXT={
+en:{
+  name:'Your little cottage',kicker:'STAFF COTTAGE · ON THE MANOR GROUNDS',button:'Your cottage',side:'🏡 Cottage',
+  wallet:'{n} tips to spend',walletOne:'1 tip to spend',
+  intro:'Delores hands you a little brass key. “Staff cottage number three. It’s yours for as long as you like. It’s a bit bare for now. Tips help with that.”',
+  hello:['Home. Your shoulders drop an inch.','The cottage is quiet, in the good way.','Your slippers are exactly where you left them.','Somewhere a cricket is practising. It is getting better.','The moon looks in, sees you are home, and seems pleased.'],
+  next:'Next for your cottage',more:'{n} more tips',ready:'You can buy it now!',buy:'Buy it · {n} 🪙',buyShort:'{n} 🪙',
+  home:'Home ✓',allHome:'Everything is home. This is the coziest cottage on the grounds.',
+  shop:'Things for your cottage',shopIntro:'Good work earns tips. Tips turn into cosy things. Tap anything in your cottage to see what it does.',
+  bought:'✨ The {name} is home!',spent:'Tips spent on your cottage: {n}',
+  earn:'Earn tips: best answers in quick shifts and with guests, the desk computer games, and Penny’s coin checks.',
+  levels:['Bare and hopeful','A little lived-in','Getting cozy','Snug as a sock','Very, very snug','The coziest cottage on the grounds'],
+  cozy:'Coziness',enough:'🏡 Enough tips for the {name}!',enoughShift:'Spend them in your cottage after your shift.',visit:'Visit your cottage →',
+  titleReady:'Something new for your cottage is ready',titleHome:'Your little cottage',
+  box:'A moving box. It says STUFF on the side, which is true.',
+  me:['Home.','You do a tiny happy spin.','You stretch. Your back says thank you.'],
+  lampOn:'Click. A warm little glow.',lampOff:'Click. Moonlight only.',
+  fish:['Blub.','The goldfish swims a slow, thoughtful lap.','Blub blub. (That means “welcome home.”)'],
+  record:'The record player plays a sleepy little tune.',
+  muffin:['Muffin is asleep. Very, very asleep.','Muffin opens one eye, decides you are fine, and closes it again.','Muffin is a very private cat, even in her sleep.'],
+  clock:'Cuckoo! (It is a tiny raccoon. It is doing its best.)',
+  fire:'Crackle. The fire tells a long, warm story.',
+  scope:'A shooting star! You wish for kind guests tomorrow.',
+  chime:'The chandelier tinkles like tiny spoons on teacups.',
+  tea:'The teapot hums. Tea will be ready exactly when you need it.',
+  visitorKick:'A VISITOR AT YOUR DOOR',
+  visitors:{
+    delores:{name:'Delores',arrive:'Delores stops by with a housewarming pie',lines:['I brought a pie. It is mostly crust, because I believe in crust.','Look at you, settling in. The manor is lucky to have you next door.','If you hear tapping on your roof at night, that is my cousin. He is just saying hello.']},
+    penny:{name:'Penny Puffwing',arrive:'Penny Puffwing flutters over to see your place',lines:['I appraised your cottage. Value: priceless. I checked twice, then once more for fun.','Fun fact: a comfy home helps people do their best work. I made that fact up, but I believe it.','Your cottage has excellent coin-pile potential. That is a compliment.']}
+  },
+  pins:{first:['Home Sweet Home','Buy something for your cottage.'],cozy:['Snug as a Sock','Fill your cottage with 9 things.'],all:['Coziest Cottage','Bring all 18 things home.'],concert:['Tiny Concert','Play the record player in your cottage.']}
+},
+es:{
+  name:'Tu casita',kicker:'CASITA DEL PERSONAL · EN LOS TERRENOS DE LA MANSIÓN',button:'Tu casita',side:'🏡 Casita',
+  wallet:'{n} propinas para gastar',walletOne:'1 propina para gastar',
+  intro:'Delores te da una llavecita de latón. “Casita del personal número tres. Es tuya el tiempo que quieras. Ahora está un poco vacía. Las propinas ayudan con eso.”',
+  hello:['En casa. Tus hombros bajan un centímetro.','La casita está en silencio, del bueno.','Tus pantuflas están justo donde las dejaste.','En algún lugar un grillo ensaya. Cada vez lo hace mejor.','La luna se asoma, ve que estás en casa y parece contenta.'],
+  next:'Lo próximo para tu casita',more:'Faltan {n} propinas',ready:'¡Ya puedes comprarlo!',buy:'Comprar · {n} 🪙',buyShort:'{n} 🪙',
+  home:'En casa ✓',allHome:'Todo está en casa. Es la casita más acogedora de la finca.',
+  shop:'Cosas para tu casita',shopIntro:'El buen trabajo da propinas. Las propinas se vuelven cosas acogedoras. Toca cualquier cosa de tu casita para ver qué hace.',
+  bought:'✨ ¡{name} ya está en casa!',spent:'Propinas gastadas en tu casita: {n}',
+  earn:'Gana propinas: mejores respuestas en turnos rápidos y con huéspedes, los juegos del ordenador del mostrador y las monedas de Penny.',
+  levels:['Vacía y con ilusión','Un poco vivida','Cada vez más acogedora','Calentita como un calcetín','Muy, muy calentita','La casita más acogedora de la finca'],
+  cozy:'Calidez',enough:'🏡 ¡Ya tienes propinas para: {name}!',enoughShift:'Gástalas en tu casita después del turno.',visit:'Ir a tu casita →',
+  titleReady:'Hay algo nuevo listo para tu casita',titleHome:'Tu casita',
+  box:'Una caja de mudanza. Dice COSAS en un lado, y es verdad.',
+  me:['En casa.','Das una vueltecita feliz.','Te estiras. Tu espalda te da las gracias.'],
+  lampOn:'Clic. Una lucecita cálida.',lampOff:'Clic. Solo la luz de la luna.',
+  fish:['Blub.','El pececito da una vuelta lenta y pensativa.','Blub blub. (Quiere decir “qué bien que volviste”.)'],
+  record:'El tocadiscos toca una cancioncita con sueño.',
+  muffin:['Muffin duerme. Muy, muy dormida.','Muffin abre un ojo, decide que todo está bien y lo vuelve a cerrar.','Muffin es una gata muy reservada, incluso dormida.'],
+  clock:'¡Cucú! (Es un mapachito. Hace lo que puede.)',
+  fire:'Crac. El fuego cuenta una historia larga y calentita.',
+  scope:'¡Una estrella fugaz! Pides huéspedes amables para mañana.',
+  chime:'La lámpara de araña tintinea como cucharitas en tazas de té.',
+  tea:'La tetera tararea. El té estará listo justo cuando lo necesites.',
+  visitorKick:'UNA VISITA EN TU PUERTA',
+  visitors:{
+    delores:{name:'Delores',arrive:'Delores pasa a verte con una tarta de bienvenida',lines:['Te traje una tarta. Casi todo es masa, porque creo en la masa.','Mírate, ya instalándote. La mansión tiene suerte de tenerte al lado.','Si oyes golpecitos en el tejado por la noche, es mi primo. Solo viene a saludar.']},
+    penny:{name:'Penny Puffwing',arrive:'Penny Puffwing viene volando a ver tu casa',lines:['Tasé tu casita. Valor: incalculable. Lo comprobé dos veces, y una más por diversión.','Dato curioso: un hogar cómodo ayuda a trabajar mejor. Me lo inventé, pero me lo creo.','Tu casita tiene un potencial excelente para montones de monedas. Es un cumplido.']}
+  },
+  pins:{first:['Hogar, dulce hogar','Compra algo para tu casita.'],cozy:['Calentita como un calcetín','Llena tu casita con 9 cosas.'],all:['La casita más acogedora','Lleva las 18 cosas a casa.'],concert:['Concierto diminuto','Toca el tocadiscos de tu casita.']}
+}};
+const CT=COTTAGE_TEXT[profile.lang]||COTTAGE_TEXT.en;
+const ctx_=(s,vars)=>String(s).replace(/\{(\w+)\}/g,(_,k)=>vars&&vars[k]!=null?String(vars[k]):'');
+const cL=o=>o[profile.lang]||o.en;
+
+/* 18 things for the cottage, cheapest first. The first is about one good quick shift away. */
+const COTTAGE_ITEMS=[
+  {id:'lamp',price:10,icon:'🍄',en:['Mushroom lamp','It glows softly, like it is thinking happy thoughts.'],es:['Lámpara de seta','Brilla suavecito, como si pensara cosas bonitas.']},
+  {id:'rug',price:15,icon:'🟠',en:['Round rag rug','Made from old manor napkins. Every ring has a story.'],es:['Alfombra redonda de trapo','Hecha con servilletas viejas de la mansión. Cada anillo tiene su historia.']},
+  {id:'plant',price:20,icon:'🌿',en:['Fern in a teacup','It drinks a little water and listens a lot.'],es:['Helecho en una taza','Bebe un poco de agua y escucha mucho.']},
+  {id:'quilt',price:25,icon:'🧵',en:['Patchwork quilt','Every square is a different happy colour.'],es:['Colcha de retazos','Cada cuadrito es de un color feliz distinto.']},
+  {id:'curtains',price:30,icon:'🪟',en:['Lace curtains','They make the moonlight look like it dressed up.'],es:['Cortinas de encaje','Hacen que la luz de la luna parezca vestida de fiesta.']},
+  {id:'tea',price:35,icon:'🫖',en:['Tea table and teapot','The teapot hums when it is happy, which is always.'],es:['Mesita y tetera','La tetera tararea cuando está feliz, o sea, siempre.']},
+  {id:'books',price:45,icon:'📚',en:['Little bookshelf','Mostly mysteries. One cookbook. One book about clouds.'],es:['Estantería pequeña','Casi todo misterio. Un libro de cocina. Un libro sobre nubes.']},
+  {id:'painting',price:50,icon:'🖼️',en:['Painting of the manor','The manor at night, every window lit, painted by a guest.'],es:['Cuadro de la mansión','La mansión de noche, todas las ventanas encendidas, pintada por un huésped.']},
+  {id:'armchair',price:60,icon:'🛋️',en:['Squishy armchair','Sit down for a second and it will hug you for an hour.'],es:['Sillón blandito','Siéntate un segundo y te abrazará una hora.']},
+  {id:'lights',price:70,icon:'💡',en:['Fairy lights','Twenty tiny lights, all twinkling slightly out of time.'],es:['Lucecitas de hada','Veinte lucecitas que parpadean un poco a destiempo.']},
+  {id:'fish',price:80,icon:'🐠',en:['Goldfish in a bowl','His name is Sir Bubbles. He chose it himself.'],es:['Pececito en su pecera','Se llama Sir Burbujas. Lo eligió él.']},
+  {id:'record',price:95,icon:'🎶',en:['Record player','It only knows one song, and it plays it beautifully.'],es:['Tocadiscos','Solo sabe una canción, y la toca de maravilla.']},
+  {id:'cushion',price:110,icon:'🐾',en:['Cushion for Muffin','Muffin visits to nap. She is a very private cat.'],es:['Cojín para Muffin','Muffin viene a dormir la siesta. Es una gata muy reservada.']},
+  {id:'fireplace',price:130,icon:'🔥',en:['Stone fireplace','Warm toes, warm heart, warm everything.'],es:['Chimenea de piedra','Pies calentitos, corazón calentito, todo calentito.']},
+  {id:'scope',price:150,icon:'🔭',en:['Brass telescope','Pointed at the window, for stars and the odd shooting star.'],es:['Telescopio de latón','Apunta a la ventana, para ver estrellas y alguna estrella fugaz.']},
+  {id:'clock',price:170,icon:'🕰️',en:['Cuckoo clock','A tiny raccoon pops out instead of a bird. Nobody minds.'],es:['Reloj de cucú','Sale un mapachito en vez de un pájaro. A nadie le importa.']},
+  {id:'wallpaper',price:200,icon:'✨',en:['Starry wallpaper','Midnight blue with little gold stars, like living inside the sky.'],es:['Papel pintado de estrellas','Azul medianoche con estrellitas doradas, como vivir dentro del cielo.']},
+  {id:'chandelier',price:240,icon:'🕯️',en:['Tiny chandelier','Just like the one in the manor, only it fits in a cottage.'],es:['Lámpara de araña diminuta','Igual que la de la mansión, pero cabe en una casita.']}
+];
+const COTTAGE_VISITORS=[{id:'delores',at:2},{id:'penny',at:6}];
+
+/* ---------- Save ---------- */
+const COTTAGE_KEY='mapachez_cottage_v1';
+function createCottage(){return {version:1,owned:[],spent:0,visits:0,lamp:true,met:[],plays:0};}
+function normaliseCottage(v){
+  const s=createCottage();if(!v||typeof v!=='object'||v.version!==1)return s;
+  if(Array.isArray(v.owned))s.owned=[...new Set(v.owned.filter(x=>COTTAGE_ITEMS.some(i=>i.id===x)))];
+  if(Array.isArray(v.met))s.met=[...new Set(v.met.filter(x=>COTTAGE_VISITORS.some(i=>i.id===x)))];
+  s.spent=Math.max(0,v.spent|0);s.visits=Math.max(0,v.visits|0);s.plays=Math.max(0,v.plays|0);s.lamp=v.lamp!==false;
+  return s;
+}
+let cottage=createCottage();
+try{cottage=normaliseCottage(JSON.parse(localStorage.getItem(COTTAGE_KEY)||'null'));}catch{}
+function storeCottage(){try{localStorage.setItem(COTTAGE_KEY,JSON.stringify(cottage));}catch{}}
+const cotHas=id=>cottage.owned.includes(id);
+const cotWallet=()=>Math.max(0,joy.tips|0);
+const cotNext=()=>COTTAGE_ITEMS.find(i=>!cotHas(i.id))||null;
+const cotCanBuy=()=>COTTAGE_ITEMS.some(i=>!cotHas(i.id)&&cotWallet()>=i.price);
+function cotLevel(n=cottage.owned.length){return n>=COTTAGE_ITEMS.length?5:n>=14?4:n>=9?3:n>=4?2:n>=1?1:0;}
+function cotVisitor(){return cot.visitor;}
+function cotPickVisitor(){
+  const open=COTTAGE_VISITORS.filter(v=>cottage.owned.length>=v.at);if(!open.length)return null;
+  const fresh=open.find(v=>!cottage.met.includes(v.id));if(fresh)return fresh.id;
+  return open[(dayKey().split('-').reduce((a,b)=>a+(+b),0))%open.length].id;
+}
+function cotBuy(id){
+  const it=COTTAGE_ITEMS.find(i=>i.id===id);if(!it||cotHas(id)||cotWallet()<it.price)return false;
+  joy.tips-=it.price;cottage.spent+=it.price;cottage.owned.push(id);storeJoy();storeCottage();return true;
+}
+
+/* ---------- Drawing the room: a 400 x 250 stage, scaled to fit ---------- */
+const COT_W=400,COT_H=250;
+const cot={visitor:null,t0:0,flash:{},hop:0,cuckoo:-1e9,shoot:-1e9,music:-1e9,bubbles:-1e9,sparks:-1e9,say:'',visitorLine:0,raf:0};
+function cotLeaf(c,x,y,len,ang,col){c.save();c.translate(x,y);c.rotate(ang);c.fillStyle=col;c.beginPath();c.ellipse(len/2,0,len/2,len/6,0,0,Math.PI*2);c.fill();c.restore();}
+function cotGlow(c,x,y,r,col){const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,'rgba(255,220,140,0)');c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+function cotPop(c,id,t,cx,cy){const at=cot.flash[id];if(!at)return 1;const a=(t-at)/650;if(a>=1){delete cot.flash[id];return 1;}
+  return 1+Math.sin(a*Math.PI)*.18;}
+function cotWith(c,id,t,cx,cy,fn){const s=cotPop(c,id,t);if(s===1){fn();return;}c.save();c.translate(cx,cy);c.scale(s,s);c.translate(-cx,-cy);fn();c.restore();}
+function drawCottageRoom(c,t,calm){
+  const tw=k=>calm?.9:.55+.45*Math.sin(t/420+k*1.7),stars=cotHas('wallpaper');
+  /* wall */
+  if(stars){rect(c,0,0,COT_W,172,'#33416f');for(let k=0;k<46;k++){const x=(k*97)%392+4,y=18+(k*53)%118;c.globalAlpha=.35+.5*tw(k);text(c,'✦',x,y,k%3?6:8,'#ecd283');}c.globalAlpha=1;}
+  else{rect(c,0,0,COT_W,172,'#f4e3c6');for(let x=0;x<COT_W;x+=22)rect(c,x,0,11,140,'#efdabb');}
+  rect(c,0,138,COT_W,34,stars?'#28345c':'#dcb78c');rect(c,0,138,COT_W,3,stars?'#1f2a4c':'#b08458');
+  rect(c,0,0,COT_W,12,'#7a4f33');rect(c,0,12,COT_W,3,'#5e3b26');
+  /* floor */
+  rect(c,0,172,COT_W,78,'#bb8758');for(let y=185,r=0;y<COT_H;y+=13,r++){rect(c,0,y,COT_W,1.4,'#a3714a');for(let x=(r%2)*40+20;x<COT_W;x+=80)rect(c,x,y-12,1.4,12,'#a3714a');}
+  rect(c,0,169,COT_W,5,'#7a4f33');
+  /* window with the night sky and the manor across the lawn (no weather indoors) */
+  rect(c,164,44,76,80,'#7a5236',4);
+  const sky=c.createLinearGradient(0,49,0,118);sky.addColorStop(0,'#23305e');sky.addColorStop(1,'#6b5f9f');c.fillStyle=sky;c.fillRect(169,49,66,70);
+  for(const [x,y,k] of [[176,58,1],[190,70,2],[184,90,3],[228,86,4],[208,56,5],[196,52,6]]){c.globalAlpha=tw(k);ellipse(c,x,y,.9,.9,'#fff');}c.globalAlpha=1;
+  cotGlow(c,222,62,16,'rgba(255,244,200,.35)');ellipse(c,222,62,7,7,'#fff4c9');ellipse(c,219.5,60,1.4,1.4,'#efe2b0');ellipse(c,224,65,1,1,'#efe2b0');
+  c.fillStyle='#2b4a3f';c.beginPath();c.moveTo(169,119);c.quadraticCurveTo(190,98,212,110);c.quadraticCurveTo(225,100,235,106);c.lineTo(235,119);c.fill();
+  rect(c,186,98,20,12,'#3d3352');c.fillStyle='#3d3352';c.beginPath();c.moveTo(183,99);c.lineTo(196,90);c.lineTo(209,99);c.fill();
+  for(const [x,y] of [[190,102],[196,102],[202,102]])rect(c,x-1.5,y,3,3,'#ffd77a');
+  if(t-cot.shoot<1600){const a=(t-cot.shoot)/1600,x=232-a*58,y=52+a*26;c.strokeStyle='rgba(255,250,220,'+(1-a)+')';c.lineWidth=1.6;c.beginPath();c.moveTo(x,y);c.lineTo(x+14,y-6);c.stroke();ellipse(c,x,y,1.8,1.8,'#fffbe0');}
+  rect(c,200,49,4,70,'#7a5236');rect(c,169,82,66,4,'#7a5236');
+  rect(c,160,118,84,7,'#8a5e3e',2);
+  if(cotHas('curtains'))cotWith(c,'curtains',t,202,80,()=>{rect(c,156,38,92,3,'#b08a4a',1.5);
+    for(const x0 of [160,244]){const d=x0<200?1:-1;c.fillStyle='#f7cfd9';c.beginPath();c.moveTo(x0,40);c.lineTo(x0+d*24,40);c.quadraticCurveTo(x0+d*14,84,x0+d*6,128);c.lineTo(x0,128);c.closePath();c.fill();
+      for(let k=0;k<6;k++)ellipse(c,x0+d*(4+(k%2)*5),48+k*13,1.4,1.4,'#fff');ellipse(c,x0+d*9,88,3.4,2.4,'#e98aa7');}});
+  if(cotHas('plant'))cotWith(c,'plant',t,182,110,()=>{const sw=calm?0:Math.sin(t/900)*.06;
+    for(const [a,l] of [[-2.3,16],[-1.9,19],[-1.57,21],[-1.25,19],[-.85,16]])cotLeaf(c,182,106,l,a+sw,a<-1.7?'#4f9a5a':'#69b36c');
+    ellipse(c,182,118,12,2.4,'#f1e6d6');rect(c,174,105,16,12,'#fffaf2',4);rect(c,174,108,16,2,'#f2a7bb');c.strokeStyle='#fffaf2';c.lineWidth=2;c.beginPath();c.arc(191,111,3.4,-1.4,1.4);c.stroke();});
+  if(cotHas('fish'))cotWith(c,'fish',t,222,108,()=>{ellipse(c,222,107,12,11,'rgba(176,222,255,.55)');rect(c,213,104,18,1.2,'rgba(255,255,255,.7)');
+    const fx=222+(calm?0:Math.sin(t/800)*5),dir=calm?1:Math.cos(t/800)>0?1:-1;ellipse(c,fx,110,4.2,2.8,'#ff9c3a');c.fillStyle='#ff9c3a';c.beginPath();c.moveTo(fx-dir*3.5,110);c.lineTo(fx-dir*7,107);c.lineTo(fx-dir*7,113);c.fill();ellipse(c,fx+dir*2,109.4,.8,.8,'#222');
+    rect(c,214,96,16,3,'rgba(220,240,255,.85)',1.5);
+    if(t-cot.bubbles<1800){const a=(t-cot.bubbles)/1800;for(let k=0;k<3;k++){c.globalAlpha=1-a;c.strokeStyle='#e8f6ff';c.lineWidth=.8;c.beginPath();c.arc(fx+dir*4+k*2,106-a*16-k*4,1.2+k*.4,0,Math.PI*2);c.stroke();}c.globalAlpha=1;}});
+  /* wall things */
+  if(cotHas('painting'))cotWith(c,'painting',t,325,91,()=>{rect(c,296,68,58,44,'#c9a04f',3);rect(c,300,72,50,36,'#2c3b63');ellipse(c,340,79,3.4,3.4,'#fff4c9');
+    rect(c,310,88,30,16,'#5a4870');c.fillStyle='#5a4870';c.beginPath();c.moveTo(307,89);c.lineTo(325,80);c.lineTo(343,89);c.fill();for(let k=0;k<5;k++)rect(c,312+k*6,92,2.4,3,'#ffd77a');for(let k=0;k<5;k++)rect(c,312+k*6,98,2.4,3,'#ffd77a');rect(c,300,104,50,4,'#3c6b52');});
+  if(cotHas('books'))cotWith(c,'books',t,36,124,()=>{rect(c,12,76,48,96,'#7d4f30',3);rect(c,16,80,40,88,'#5a3720');rect(c,16,108,40,3,'#7d4f30');rect(c,16,138,40,3,'#7d4f30');
+    const cols=['#d9665f','#e8b04a','#5f9fbf','#8a6fc2','#63a36b','#f09cb5','#c98a4b'];
+    for(const [y0,seed] of [[108,1],[138,3],[168,5]]){let x=17;for(let k=0;x<54;k++){const w=4+((k+seed)*7)%4,h=17+((k*5+seed)%3)*4;if(x+w>55)break;rect(c,x,y0-h,w,h,cols[(k+seed)%cols.length]);rect(c,x+1,y0-h+4,w-2,1,'rgba(255,255,255,.4)');x+=w+.6;}}});
+  if(cotHas('fireplace'))cotWith(c,'fireplace',t,107,134,()=>{rect(c,72,98,70,74,'#b8a796',3);
+    for(let r=0;r<6;r++)for(let k=0;k<5;k++)rect(c,74+k*14+(r%2)*6,100+r*12,11,9,r%2?'#c9b8a6':'#ad9b89',2);
+    rect(c,66,92,82,8,'#7a4f33',2);c.fillStyle='#2b1d18';c.beginPath();c.roundRect(88,124,38,48,[18,18,0,0]);c.fill();
+    rect(c,92,164,30,5,'#6b4128',2);const f=k=>calm?1:1+.14*Math.sin(t/120+k*2);
+    cotGlow(c,107,154,34,'rgba(255,170,80,.45)');ellipse(c,100,156,6,10*f(1),'#f07a3a');ellipse(c,114,156,6,9*f(2),'#f07a3a');ellipse(c,107,154,7,13*f(3),'#ffa646');ellipse(c,107,158,4,8*f(4),'#ffe08a');
+    if(t-cot.sparks<1200){const a=(t-cot.sparks)/1200;for(let k=0;k<6;k++){c.globalAlpha=1-a;ellipse(c,98+k*4+Math.sin(k*3)*4,150-a*30-k*3,1.2,1.2,'#ffd77a');}c.globalAlpha=1;}});
+  if(cotHas('clock'))cotWith(c,'clock',t,107,60,()=>{const sw=calm?0:Math.sin(t/500)*.35;
+    c.save();c.translate(107,76);c.rotate(sw);rect(c,-.6,0,1.2,14,'#b08a4a');ellipse(c,0,15,3,3,'#c99a3e');c.restore();
+    c.fillStyle='#6b4128';c.beginPath();c.moveTo(91,52);c.lineTo(107,40);c.lineTo(123,52);c.fill();rect(c,95,52,24,26,'#8a5a3a',2);ellipse(c,107,66,7,7,'#fbf3e0');
+    c.strokeStyle='#3a2a1e';c.lineWidth=1;c.beginPath();c.moveTo(107,66);c.lineTo(107,61);c.moveTo(107,66);c.lineTo(110.5,67);c.stroke();rect(c,103,53,8,6,'#5a3720',1);
+    if(t-cot.cuckoo<1300){const a=Math.min(1,(t-cot.cuckoo)/200),o=a*7;rect(c,101,51-o+6,12,2,'#7a4f33');ellipse(c,107,50-o+2,5,4.4,'#9a96a3');ellipse(c,104.3,50-o+2,1.8,1.2,'#3c3646');ellipse(c,109.7,50-o+2,1.8,1.2,'#3c3646');ellipse(c,104.3,49.6-o+2,.6,.6,'#fff');ellipse(c,109.7,49.6-o+2,.6,.6,'#fff');ellipse(c,107,52-o+2,.9,.7,'#2a2430');ellipse(c,103,46-o+2,1.6,1.8,'#9a96a3');ellipse(c,111,46-o+2,1.6,1.8,'#9a96a3');}});
+  if(cotHas('lights'))cotWith(c,'lights',t,200,24,()=>{c.strokeStyle='#4b5a3f';c.lineWidth=1;c.beginPath();for(let s=0;s<6;s++){const x0=4+s*65.3;c.moveTo(x0,18);c.quadraticCurveTo(x0+32,34,x0+65.3,18);}c.stroke();
+    const cols=['#ffd96b','#ff9fbd','#9fe3ff','#c7f59a','#d8b8ff'];for(let k=0;k<24;k++){const s=Math.floor(k/4),u=(k%4+.5)/4,x0=4+s*65.3,x=x0+u*65.3,y=18+2*u*(1-u)*16*1;
+      c.globalAlpha=.45+.55*tw(k);cotGlow(c,x,y+3,6,'rgba(255,236,170,.5)');ellipse(c,x,y+3,2,2.6,cols[k%cols.length]);}c.globalAlpha=1;});
+  if(cotHas('chandelier'))cotWith(c,'chandelier',t,200,30,()=>{rect(c,199.4,15,1.2,10,'#b08a4a');cotGlow(c,200,26,40,'rgba(255,228,150,.4)');
+    c.strokeStyle='#d9b44a';c.lineWidth=1.6;c.beginPath();c.moveTo(186,27);c.quadraticCurveTo(200,36,214,27);c.stroke();ellipse(c,200,30,5,3,'#d9b44a');
+    for(const x of [186,200,214]){rect(c,x-1.2,21,2.4,6,'#fff6e6');ellipse(c,x,19.5,1.4,2.4*(calm?1:1+.15*Math.sin(t/150+x)),'#ffc04d');}
+    for(const x of [190,196,204,210]){ellipse(c,x,34+(x%3),1,1.6,'rgba(230,245,255,.9)');}});
+  if(cotHas('scope'))cotWith(c,'scope',t,152,140,()=>{c.strokeStyle='#6b4128';c.lineWidth=1.8;c.beginPath();c.moveTo(152,132);c.lineTo(144,171);c.moveTo(152,132);c.lineTo(160,171);c.moveTo(152,132);c.lineTo(152,170);c.stroke();
+    c.save();c.translate(152,128);c.rotate(-.55);rect(c,-12,-3,26,6,'#c99a3e',2);rect(c,12,-4,4,8,'#a87a2a',1);rect(c,-14,-2,3,4,'#a87a2a',1);c.restore();});
+  /* floor things, back to front */
+  if(cotHas('rug'))cotWith(c,'rug',t,200,222,()=>{ellipse(c,200,222,80,18,'#c96f7a');ellipse(c,200,222,70,15,'#f4e2c4');ellipse(c,200,222,57,12,'#6fae9f');ellipse(c,200,222,43,9,'#f4e2c4');ellipse(c,200,222,28,6,'#e9a84f');});
+  /* the bed is always here */
+  cotWith(c,'quilt',t,334,172,()=>{rect(c,374,122,14,86,'#8a5a3a',5);rect(c,282,152,10,56,'#8a5a3a',4);rect(c,290,198,86,6,'#6b4128');rect(c,292,166,84,20,'#f7f2ea',4);ellipse(c,362,160,13,6,'#fffdf8');
+    if(cotHas('quilt')){const cols=['#f4a6b8','#ffd88a','#9fd3c7','#c7b3ef','#f7c59f','#b8e0a0'];for(let r=0;r<3;r++)for(let k=0;k<9;k++)rect(c,296+k*8.4,166+r*8,8.4,8,cols[(k+r*2)%cols.length]);rect(c,296,190,75.6,2,'#e98aa7');}
+    else{rect(c,298,166,74,24,'#b9c4d6',3);rect(c,298,166,74,4,'#d4dbe6',2);}});
+  if(cotHas('lamp'))cotWith(c,'lamp',t,262,180,()=>{rect(c,248,170,28,38,'#8f6040',3);rect(c,251,182,22,1.4,'#6b4128');ellipse(c,262,188,1.6,1.6,'#e0c080');
+    rect(c,259,152,6,18,'#f2e6d0',2);c.fillStyle='#e2655f';c.beginPath();c.ellipse(262,152,15,11,0,Math.PI,0);c.fill();
+    for(const [x,y,r] of [[255,146,2.2],[264,144,2.6],[270,149,1.8],[259,150,1.4]])ellipse(c,x,y,r,r,'#fff3ea');});
+  if(cotHas('armchair'))cotWith(c,'armchair',t,94,196,()=>{rect(c,70,164,48,38,'#7fa38f',12);rect(c,76,170,36,26,'#8fb39f',9);rect(c,64,188,60,20,'#6d917e',7);
+    ellipse(c,68,192,7,12,'#7fa38f');ellipse(c,120,192,7,12,'#7fa38f');rect(c,68,206,4,7,'#6b4128');rect(c,116,206,4,7,'#6b4128');heartPath(c,94,186,7,'#f2a7bb');});
+  if(cotHas('tea'))cotWith(c,'tea',t,146,198,()=>{ellipse(c,146,213,9,2.4,'#7a4f33');rect(c,144,196,4,17,'#7a4f33');ellipse(c,146,196,16,4.2,'#9a6a45');
+    ellipse(c,143,188,7,6,'#f3b6c4');rect(c,140,181,6,3,'#e48aa5',1.5);c.strokeStyle='#f3b6c4';c.lineWidth=2;c.beginPath();c.moveTo(149,188);c.lineTo(153,184);c.stroke();ellipse(c,156,193,3.4,2.2,'#fff8f0');
+    if(!calm)for(let k=0;k<2;k++){const a=((t/1400)+k*.5)%1;c.globalAlpha=(1-a)*.6;c.strokeStyle='#fff';c.lineWidth=1;c.beginPath();c.moveTo(153+k*2,182-a*14);c.quadraticCurveTo(156+k*2,178-a*14,153+k*2,174-a*14);c.stroke();}c.globalAlpha=1;});
+  if(cottage.owned.length<4){rect(c,104,200,30,22,'#c99a62',2);rect(c,104,200,30,4,'#b0844f');rect(c,117,200,4,22,'#d8b07a');text(c,profile.lang==='es'?'COSAS':'STUFF',119,215,6,'#6b4a2a');}
+  if(cotHas('cushion'))cotWith(c,'cushion',t,152,232,()=>{ellipse(c,152,236,22,7,'#e7a3c0');ellipse(c,152,234,17,5,'#f6c8da');try{drawMuffin(c,152,232,'sleep',1,calm?0:t);}catch{}});
+  /* you, at home */
+  const hop=t-cot.hop<600&&!calm?Math.sin((t-cot.hop)/600*Math.PI)*10:0;
+  try{c.save();c.translate(0,-hop);drawBeing(c,214,222,playerLook().recipe,0,'down',false,1.25);c.restore();}catch{c.restore();}
+  if(hop){heartPath(c,226,170-hop,4,'#f28aa8');heartPath(c,203,176-hop*.6,3,'#ffb3c9');}
+  const v=cotVisitor();
+  if(v==='delores')try{drawPerson(c,264,226,{cast:'delores'},0,'down',false,1.2);ellipse(c,284,214,8,3,'#c48a4c');ellipse(c,284,212,7,2.4,'#e8b46a');}catch{}
+  if(v==='penny')try{drawPenny(c,258,236,1.05,calm?0:t,calm,{pile:false});}catch{}
+  if(cotHas('record'))cotWith(c,'record',t,318,224,()=>{rect(c,300,216,36,26,'#a8784e',2);for(let k=0;k<3;k++)rect(c,300,222+k*7,36,1.2,'#8a5e3e');rect(c,302,206,32,10,'#6b3f2a',2);
+    ellipse(c,314,206,11,2.8,'#222');ellipse(c,314,206,3,1,'#e2655f');c.strokeStyle='#c99a3e';c.lineWidth=2;c.beginPath();c.moveTo(326,205);c.lineTo(332,194);c.stroke();
+    c.fillStyle='#e0b04a';c.beginPath();c.moveTo(332,194);c.lineTo(342,182);c.quadraticCurveTo(334,178,328,188);c.closePath();c.fill();
+    const on=t-cot.music<5000;if(on||!calm){const n=on?3:1;for(let k=0;k<n;k++){const a=((t/(on?1100:2600))+k/n)%1;c.globalAlpha=(1-a)*(on?1:.5);text(c,k%2?'♫':'♪',344+Math.sin(a*6+k)*5,172-a*28,on?11:9,'#8a5a9e','Georgia');}c.globalAlpha=1;}});
+  /* the lamp's warm glow sits over everything */
+  if(cotHas('lamp')&&cottage.lamp){cotGlow(c,262,150,70,'rgba(255,214,140,.32)');}
+  if(!cotHas('lamp')&&!cotHas('fireplace')&&!cotHas('chandelier')){c.fillStyle='rgba(40,40,80,.10)';c.fillRect(0,0,COT_W,COT_H);}
+}
+/* Tap targets, front-most first: [id, x, y, w, h] */
+function cotTargets(){
+  const v=cotVisitor(),list=[];
+  if(cotHas('record'))list.push(['record',298,170,50,72]);
+  if(v)list.push(['visitor',238,178,40,60]);
+  list.push(['me',196,170,38,58]);
+  if(cotHas('cushion'))list.push(['muffin',130,214,44,28]);
+  if(cotHas('tea'))list.push(['tea',128,178,34,38]);
+  if(cotHas('lamp'))list.push(['lamp',246,136,32,72]);
+  if(cotHas('armchair'))list.push(['armchair',62,162,64,52]);
+  if(cottage.owned.length<4)list.push(['box',102,198,34,26]);
+  list.push(['quilt',282,122,106,86]);
+  if(cotHas('fish'))list.push(['fish',208,92,28,30]);
+  if(cotHas('plant'))list.push(['plant',170,88,26,32]);
+  if(cotHas('scope'))list.push(['scope',138,110,30,62]);
+  if(cotHas('clock'))list.push(['clock',90,38,34,56]);
+  if(cotHas('painting'))list.push(['painting',294,66,62,48]);
+  if(cotHas('fireplace'))list.push(['fireplace',66,92,82,80]);
+  if(cotHas('books'))list.push(['books',10,74,52,100]);
+  list.push(['window',160,40,84,86]);
+  if(cotHas('chandelier'))list.push(['chandelier',180,12,40,28]);
+  if(cotHas('lights'))list.push(['lights',0,12,400,24]);
+  if(cotHas('rug'))list.push(['rug',120,204,160,36]);
+  return list;
+}
+const cotPick=a=>a[Math.random()*a.length|0];
+function cotTap(id){
+  const now=performance.now(),it=COTTAGE_ITEMS.find(i=>i.id===id);let say='';
+  cot.flash[id==='me'||id==='visitor'||id==='muffin'||id==='box'||id==='window'?'_':id]=now;
+  if(id==='me'){cot.hop=now;say=cotPick(CT.me);joySound('hop');}
+  else if(id==='visitor'){const v=cotVisitor(),V=CT.visitors[v];cot.visitorLine=(cot.visitorLine+1)%V.lines.length;say=V.name+': “'+V.lines[cot.visitorLine]+'”';joySound('pop');}
+  else if(id==='lamp'){cottage.lamp=!cottage.lamp;storeCottage();say=cottage.lamp?CT.lampOn:CT.lampOff;joySound('boop');}
+  else if(id==='fish'){cot.bubbles=now;say=cotPick(CT.fish);joySound('pop');}
+  else if(id==='record'){cot.music=now;cottage.plays++;storeCottage();say=CT.record;cotTune();checkPins();}
+  else if(id==='muffin'){say=cotPick(CT.muffin);}
+  else if(id==='clock'){cot.cuckoo=now;say=CT.clock;const a=joyAudio();if(a){joyNote(a,784,0,{vol:.03,dur:.25});joyNote(a,622,.28,{vol:.03,dur:.35});}}
+  else if(id==='fireplace'){cot.sparks=now;say=CT.fire;}
+  else if(id==='scope'||id==='window'&&cotHas('scope')){cot.shoot=now;say=CT.scope;joySound('tick',2);}
+  else if(id==='chandelier'){say=CT.chime;const a=joyAudio();if(a)[2093,2637,3136].forEach((hz,k)=>joyNote(a,hz,k*.08,{type:'triangle',vol:.012,dur:.5}));}
+  else if(id==='tea'){say=CT.tea;}
+  else if(id==='box'){say=CT.box;}
+  else if(id==='window'){say=cotPick(CT.hello);}
+  else if(it){say=it.icon+' '+cL(it)[0]+': '+cL(it)[1];}
+  cotSay(say);if(joyCalm())cotPaint();
+}
+function cotTune(){const a=joyAudio();if(!a)return;
+  const tune=[523.25,659.25,783.99,659.25,698.46,880,783.99,659.25,587.33,659.25,523.25];
+  tune.forEach((hz,k)=>{joyNote(a,hz,k*.34,{type:'triangle',vol:.03,dur:.6});if(k%2===0)joyNote(a,hz/2,k*.34,{vol:.015,dur:.7});});}
+function cotSay(s){const el=$('cot-say');if(el&&s){el.textContent=s;el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');}narrativeText=body.innerText;}
+function cotPaint(){
+  const cv=$('cot-room');if(!cv)return;const w=cv.clientWidth||COT_W,s=w/COT_W,dpr=Math.min(2,devicePixelRatio||1);
+  const W=Math.round(w*dpr),H=Math.round(w*COT_H/COT_W*dpr);if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  const c=cv.getContext('2d');c.setTransform(s*dpr,0,0,s*dpr,0,0);c.imageSmoothingEnabled=false;c.clearRect(0,0,COT_W,COT_H);
+  drawCottageRoom(c,joyCalm()?0:performance.now(),joyCalm());
+}
+function cotLoop(){cancelAnimationFrame(cot.raf);const step=()=>{if(!$('cot-room')||!modal.open)return;if(!document.hidden)cotPaint();if(!joyCalm())cot.raf=requestAnimationFrame(step);};step();}
+/* Sparkles over the spot where a new thing appeared. */
+const COT_SPOT={lamp:[262,160],rug:[200,222],plant:[182,104],quilt:[334,176],curtains:[202,70],tea:[146,192],books:[36,124],painting:[325,90],armchair:[94,190],lights:[200,26],fish:[222,106],record:[318,206],cushion:[152,228],fireplace:[107,140],scope:[152,134],clock:[107,60],wallpaper:[200,80],chandelier:[200,28]};
+function cotSparkle(id){const cv=$('cot-room');if(!cv)return;const r=cv.getBoundingClientRect(),s=r.width/COT_W,[x,y]=COT_SPOT[id]||[200,120];burst(r.left+x*s,r.top+y*s,1.3,{hearts:true});}
+
+/* ---------- The cottage screen ---------- */
+function openCottage(){
+  if(world)world.stop();
+  const first=cottage.visits===0;cottage.visits++;storeCottage();
+  const v=cot.visitor=cotPickVisitor(),fresh=v&&!cottage.met.includes(v);
+  openModal('<span class="overline">🏡 '+esc(CT.kicker)+'</span><h2 id="modal-heading">'+esc(CT.name)+'</h2>'+
+    '<div class="cot-stage"><canvas id="cot-room" role="img" aria-label="'+esc(CT.name)+'"></canvas><p class="cot-say" id="cot-say" aria-live="polite"></p></div>'+
+    '<div class="cot-top"><span class="cot-wallet" id="cot-wallet"></span><span class="cot-level" id="cot-level"></span></div>'+
+    '<div id="cot-next"></div><h3 class="pins-heading">'+esc(CT.shop)+'</h3><p class="joy-hint">'+esc(CT.shopIntro)+'</p><ul class="cot-shop" id="cot-shop"></ul>'+
+    '<p class="joy-hint" id="cot-earn">'+esc(CT.earn)+(cottage.spent?' · '+esc(ctx_(CT.spent,{n:cottage.spent})):'')+'</p><div class="action-row" id="cot-actions"></div>',true);
+  modal.classList.add('cot-modal');
+  const acts=$('cot-actions'),d=document.createElement('button');d.className='primary-button';d.textContent=titleVisible?t('Done'):t('Back to the manor');d.onclick=closeModal;acts.append(d);
+  const cv=$('cot-room');
+  cv.addEventListener('pointerdown',e=>{const r=cv.getBoundingClientRect(),s=r.width/COT_W,x=(e.clientX-r.left)/s,y=(e.clientY-r.top)/s;
+    const hit=cotTargets().find(([,a,b,w,h])=>x>=a&&x<=a+w&&y>=b&&y<=b+h);if(hit)cotTap(hit[0]);});
+  renderCottageShop();
+  if(fresh){cottage.met.push(v);storeCottage();const V=CT.visitors[v];cotSay(V.name+': “'+V.lines[0]+'”');celebrate({icon:v==='penny'?'🐉':'🥧',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
+  else cotSay(first?CT.intro:cotPick(CT.hello));
+  requestAnimationFrame(cotLoop);
+  narrativeText=body.innerText;
+}
+const cotCloseModal=closeModal;closeModal=function(){modal.classList.remove('cot-modal');cancelAnimationFrame(cot.raf);return cotCloseModal.apply(this,arguments);};
+const cotOpenModal=openModal;openModal=function(){modal.classList.remove('cot-modal');return cotOpenModal.apply(this,arguments);};
+function renderCottageShop(){
+  const w=cotWallet(),n=cottage.owned.length,lv=cotLevel();
+  $('cot-wallet').innerHTML='<span aria-hidden="true">🪙</span> <b>'+esc(w===1?CT.walletOne:ctx_(CT.wallet,{n:w}))+'</b>';
+  $('cot-level').innerHTML=esc(CT.cozy)+' <span class="cot-hearts" aria-hidden="true">'+'♥'.repeat(lv)+'<i>'+'♥'.repeat(5-lv)+'</i></span> <small>'+esc(CT.levels[lv])+' · '+n+' / '+COTTAGE_ITEMS.length+'</small>';
+  const next=cotNext(),host=$('cot-next');
+  if(!next)host.innerHTML='<div class="cot-next done"><b>🏡 '+esc(CT.allHome)+'</b></div>';
+  else{const L=cL(next),ok=w>=next.price,pct=Math.min(100,Math.round(w/next.price*100));
+    host.innerHTML='<div class="cot-next'+(ok?' ready':'')+'"><span class="cot-ic" aria-hidden="true">'+next.icon+'</span><div class="cot-nx"><small>'+esc(CT.next)+'</small><b>'+esc(L[0])+'</b>'+
+      '<span class="bar" role="meter" aria-label="'+esc(CT.next)+'" aria-valuemin="0" aria-valuemax="'+next.price+'" aria-valuenow="'+Math.min(w,next.price)+'"><i style="width:'+pct+'%"></i></span><span class="cot-left">'+esc(ok?CT.ready:ctx_(CT.more,{n:next.price-w}))+'</span></div>'+
+      (ok?'<button class="primary-button cot-buy" data-id="'+next.id+'">'+esc(ctx_(CT.buy,{n:next.price}))+'</button>':'')+'</div>';}
+  const shop=$('cot-shop');shop.innerHTML='';
+  for(const it of COTTAGE_ITEMS){const L=cL(it),own=cotHas(it.id),ok=!own&&w>=it.price,li=document.createElement('li');
+    li.className=own?'own':ok?'ok':'';
+    li.innerHTML='<span class="cot-ic" aria-hidden="true">'+it.icon+'</span><span class="cot-tx"><b>'+esc(L[0])+'</b><small>'+esc(L[1])+'</small></span>'+
+      (own?'<span class="cot-tag">'+esc(CT.home)+'</span>':'<button class="'+(ok?'primary-button':'secondary-button')+' cot-buy" data-id="'+it.id+'"'+(ok?'':' disabled')+'>'+esc(ctx_(CT.buyShort,{n:it.price}))+'</button>');
+    shop.append(li);}
+  body.querySelectorAll('.cot-buy').forEach(b=>b.onclick=()=>buyCottageThing(b.dataset.id,b));
+}
+function buyCottageThing(id,btn){
+  const before=cottage.owned.length,lvBefore=cotLevel();
+  if(!cotBuy(id))return;
+  const it=COTTAGE_ITEMS.find(i=>i.id===id),L=cL(it),now=performance.now();
+  cot.flash[id]=now;if(id==='lamp')cottage.lamp=true;
+  joySound('open',it.price>=150?2:it.price>=60?1:0);
+  if(btn&&btn.isConnected){const [x,y]=centerOf(btn);floatText(x,y-20,'-'+it.price+' 🪙',{size:18,col:'#fff3c4'});}
+  cotSparkle(id);cotSay(ctx_(CT.bought,{name:L[0]})+' '+L[1]);
+  renderCottageShop();if(joyCalm())cotPaint();
+  const v=COTTAGE_VISITORS.find(x=>before<x.at&&cottage.owned.length>=x.at);
+  if(v){cottage.met.push(v.id);cot.visitor=v.id;storeCottage();const V=CT.visitors[v.id];setTimeout(()=>{cotSay(V.name+': “'+V.lines[0]+'”');if(joyCalm())cotPaint();},1400);celebrate({icon:v.id==='penny'?'🐉':'🥧',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
+  else if(cotLevel()>lvBefore)celebrate({icon:'🏡',kicker:CT.cozy,label:CT.levels[cotLevel()],confetti:cotLevel()>=3});
+  checkPins();renderGrowth();narrativeText=body.innerText;
+}
+
+/* ---------- A gentle nudge when tips are enough for something new ---------- */
+const cotShowMomentResult=showMomentResult;
+showMomentResult=function(i,k,mode,host){
+  const before=cotWallet();cotShowMomentResult.apply(this,arguments);const after=cotWallet();
+  const target=COTTAGE_ITEMS.find(x=>!cotHas(x.id)&&before<x.price&&after>=x.price);
+  const box=body.querySelector('.gm-result');
+  if(target&&box){const L=cL(target),p=document.createElement('div');p.className='joy-panel cot-panel';
+    p.innerHTML='<small>'+esc(CT.kicker)+'</small><p><span class="joy-mini-gift" aria-hidden="true">'+target.icon+'</span>'+esc(ctx_(CT.enough,{name:L[0]}).replace(/^🏡 /,''))+'</p>'+
+      (mode==='shift'?'<p class="joy-hint">'+esc(CT.enoughShift)+'</p>':'<button class="secondary-button cot-open">'+esc(CT.visit)+'</button>');
+    const anchor=box.querySelector('.action-row');if(anchor)anchor.before(p);else box.append(p);p.querySelector('.cot-open')?.addEventListener('click',openCottage);narrativeText=body.innerText;}
+};
+/* Tips from the desk computer and Penny can unlock something too. */
+const cotHmsTip=hmsTip;
+hmsTip=function(n){const before=cotWallet();cotHmsTip.apply(this,arguments);
+  const target=COTTAGE_ITEMS.find(x=>!cotHas(x.id)&&before<x.price&&cotWallet()>=x.price);if(target)setTimeout(()=>toast(ctx_(CT.enough,{name:cL(target)[0]})),900);};
+
+/* ---------- Styles ---------- */
+{const st=document.createElement('style');st.textContent=`
+.cot-stage{position:relative;margin:6px 0 10px;border-radius:16px;overflow:hidden;border:3px solid #8a5a3a;box-shadow:0 10px 26px #4a2e1a33,inset 0 0 0 2px #e8c99a}
+#cot-room{display:block;width:100%;aspect-ratio:8/5;cursor:pointer;touch-action:manipulation;background:#f4e3c6}
+.cot-say{margin:0;padding:9px 14px;min-height:20px;background:linear-gradient(180deg,#fff9ec,#fdf0d6);border-top:1px solid #e8c99a;font:italic 15px/1.5 Georgia,serif;color:#4b3320}
+.cot-say.pop{animation:cotPop .35s ease}
+@keyframes cotPop{0%{opacity:.3;transform:translateY(4px)}100%{opacity:1;transform:none}}
+.cot-top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin:0 0 10px}
+.cot-wallet{font:15px Georgia,serif;color:#7a5414;background:linear-gradient(135deg,#fff6dc,#fdeccc);border:1px solid #ecd39a;border-radius:999px;padding:6px 14px}
+.cot-level{font-size:13px;color:#5b4a36}.cot-level small{color:#7a6a55}
+.cot-hearts{color:#e86a8e;letter-spacing:1px;font-size:15px}.cot-hearts i{color:#e8d6c6;font-style:normal}
+.cot-next{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;background:linear-gradient(160deg,#fffaf0,#f8efe0);border:1px solid #e0cf9e;box-shadow:0 6px 16px #6b442814}
+.cot-next.ready{background:linear-gradient(160deg,#fff6d6,#ffeaa8);border-color:#e6bf55;animation:cotGlow 2.2s ease-in-out infinite}
+.cot-next.done{justify-content:center;text-align:center;font-family:Georgia,serif}
+@keyframes cotGlow{50%{box-shadow:0 0 0 4px #ffe08a66,0 6px 16px #6b442814}}
+.cot-next .cot-ic{font-size:34px;line-height:1}
+.cot-nx{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.cot-nx small{font:10px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#7a6331}
+.cot-nx b{font:normal 19px Georgia,serif}
+.cot-nx .bar{display:block;height:9px;border-radius:9px;background:#efe3c8;overflow:hidden}.cot-nx .bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#f6c64f,#ffdf7e);transition:width .6s ease}
+.cot-left{font-size:12px;color:#6b5a40}
+.cot-shop{list-style:none;padding:0;margin:8px 0 10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:7px}
+.cot-shop li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;border:1px solid #e3d6bb;background:#fffdf8}
+.cot-shop li.ok{border-color:#e6bf55;background:linear-gradient(160deg,#fffaf0,#fff2cc)}
+.cot-shop li.own{background:#f2f7ee;border-color:#cfe0c4}
+.cot-shop .cot-ic{font-size:24px;width:30px;text-align:center;flex:none}
+.cot-tx{flex:1;min-width:0;display:flex;flex-direction:column}.cot-tx b{font-size:14px}.cot-tx small{font-size:12px;line-height:1.35;color:#6b604e}
+.cot-shop .cot-buy{flex:none;min-width:62px;min-height:40px;padding:6px 10px;font-size:13px}
+.cot-shop .cot-buy:disabled{opacity:.55;cursor:default}
+.cot-tag{flex:none;font-size:12px;color:#4f7a45;font-weight:600}
+.cot-next .cot-buy{flex:none}
+.joy-row #joy-side-cottage{background:linear-gradient(180deg,#fdf0dc,#f6dfbd);border-color:#e0bf8a}
+.joy-row #joy-side-cottage.ready{background:linear-gradient(180deg,#fff3c4,#ffe08a);border-color:#e6bf55;animation:cotGlow 2.2s ease-in-out infinite}
+.joy-title-mg.cottage{border-color:rgba(255,214,140,.6);background:rgba(190,130,70,.24);color:#fff4dc}
+.joy-title-mg.cottage.ready{background:rgba(230,180,70,.34)}
+@media(max-width:520px){.cot-shop{grid-template-columns:1fr}.cot-next .cot-ic{font-size:28px}.cot-next{flex-wrap:wrap}.cot-next .cot-buy{width:100%}.cot-say{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.cot-next.ready,.joy-row #joy-side-cottage.ready{animation:none}}
+body.reduce-motion .cot-next.ready,body.reduce-motion .joy-row #joy-side-cottage.ready,body.reduce-motion .cot-say.pop{animation:none}
+`;document.head.append(st);}
+
+/* ---------- Ways in: sidebar, under the map, title screen and the C key ---------- */
+const cotRenderGrowth=renderGrowth;
+renderGrowth=function(){
+  cotRenderGrowth();const row=$('growth')?.querySelector('.joy-row');if(!row)return;
+  const b=document.createElement('button');b.id='joy-side-cottage';b.className=cotCanBuy()?'ready':'';b.textContent=CT.side+(cotCanBuy()?' ✨':' · '+cottage.owned.length+'/'+COTTAGE_ITEMS.length);b.onclick=openCottage;row.append(b);
+};
+{const places=$('places-button');if(places){const b=document.createElement('button');b.className='text-button';b.id='cottage-button';b.innerHTML=esc(CT.button)+' '+icon('arrow');b.onclick=openCottage;places.after(b);}}
+{const anchor=$('penny-title')||$('hms-title')||$('joy-title-gift')||$('joy-title-mg')||document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg cottage'+(cotCanBuy()?' ready':'');b.id='cottage-title';
+  b.innerHTML='🏡 '+esc(cotCanBuy()?CT.titleReady:CT.titleHome)+' · <b>🪙 '+cotWallet()+'</b> →';b.onclick=openCottage;anchor.after(b);}}
+addEventListener('keydown',e=>{
+  if(e.key.toLowerCase()!=='c'||e.ctrlKey||e.altKey||e.metaKey||modal.open||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  e.preventDefault();openCottage();
+});
+PINS.push(
+  {id:'cottage-home',icon:'🏡',name:CT.pins.first[0],hint:CT.pins.first[1],test:()=>cottage.owned.length>=1},
+  {id:'cottage-cozy',icon:'🛋️',name:CT.pins.cozy[0],hint:CT.pins.cozy[1],test:()=>cottage.owned.length>=9},
+  {id:'cottage-all',icon:'🕯️',name:CT.pins.all[0],hint:CT.pins.all[1],test:()=>cottage.owned.length>=COTTAGE_ITEMS.length},
+  {id:'cottage-concert',icon:'🎶',name:CT.pins.concert[0],secret:true,hint:CT.pins.concert[1],test:()=>cottage.plays>=1}
+);
+renderGrowth();checkPins();
+/* ==== end COTTAGE v1 ==== */
+
 
 })();
 </script>
