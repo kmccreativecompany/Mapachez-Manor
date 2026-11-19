@@ -5376,9 +5376,7 @@ renderGrowth();checkPins();
 const HMS_TEXT={
 en:{
   name:'Desk computer',kicker:'HMS · HOTEL MANAGEMENT SYSTEM',title:'The desk computer',
-  intro:'HMS means hotel management system. Every booking, room, guest note and bill lives here. Look it up, then help.',
-  firstHi:'Delores: “This is the HMS. Short for hotel management system. Bookings, rooms, guests and bills all live in here. We’ll learn it one tap at a time. It doesn’t bite. The printer does, a little.”',
-  hi:'Delores: “Back at the keys? Lovely. What shall we look up?”',
+  intro:'Our hotel management system keeps bookings, room status, guest notes and bills in one place.',
   screenName:'Manor HMS',
   tabs:{bookings:['📅','Bookings'],rooms:['🛏️','Rooms'],guests:['🙂','Guests'],bills:['🧾','Bills']},
   back:'← Back',room:'Room',arrives:'Arrives',leaves:'Leaves',nights:'Nights',checkout:'Checkout',bookNote:'Booking note',
@@ -5388,8 +5386,9 @@ en:{
   roomTip:{ready:'Cleaned, inspected by a supervisor, and ready for a guest.',guest:'Someone is staying here.',tidy:'Housekeeping is on the way. Not ready yet.',clean:'Housekeeping finished cleaning. A housekeeping supervisor still has to inspect it. Not ready yet.',fix:'Engineering is fixing something. Not ready yet.'},
   pickRoom:'Pick a room for {name}. Look for ✨.',pickTidy:'Room {r} still needs a tidy. Pick one with ✨.',pickGuest:'Someone is already staying in {r} 🙂',pickFix:'Room {r} needs fixing first.',pickClean:'Room {r} is cleaned, but a housekeeping supervisor hasn’t inspected it yet. Pick one with ✨.',
   checkedInMsg:'{name} is checked in to Room {r} ✨',
-  lessonsH:'Lessons · about a minute each',gamesH:'Desk games',lesson:'Lesson {n}',lessonOf:'HMS LESSON {n} OF {total}',done:'Done ✓',start:'Start',play:'Play',
-  explore:'🔎 Explore on my own',bigLab:'Big practice lab →',bigLabHint:'For later: the full practice HMS at the training desk.',
+  allLessons:'All lessons',gamesH:'Desk games',lesson:'Lesson {n}',lessonOf:'HMS LESSON {n} OF {total}',done:'Done ✓',start:'Start',play:'Play',
+  lessonsProgress:'{done} of {total} lessons complete',startLesson:'Start lesson',continueLesson:'Start next lesson',
+  explore:'Browse records',practiceMore:'Skill & practice lab',bigLab:'Open Silver Key practice lab',
   levelLine:'HMS skill',xp:'{n} HMS points',toNext:'{n} to {level}',maxed:'Top level!',
   levels:['New at the desk','Finds things fast','Desk helper','HMS whiz','Desk wizard'],
   lessonDone:'Lesson done!',nextLesson:'Next lesson →',backHome:'Back to the desk computer',graduate:'🎓 You learned the whole HMS!',graduateGift:'Delores left you a gift box for it.',
@@ -5428,7 +5427,7 @@ en:{
   peekBonus:'🖥️ +1 tip for checking the HMS first',peekNext:'💡 Next time, peek in the HMS before you answer.',
   /* Mini-games */
   games:{rush:['🧹','Room Rush','Housekeeping radios in. Keep the room board right.'],build:['📝','Booking Builder','Listen to the guest and fill in the booking. Watch for typos!'],bill:['🔍','Bill Detective','One charge on each bill is wrong. Find it!']},
-  best:'Best: {v}',bestTime:'Best: {v}s',noBest:'New!',
+  best:'Best: {v}',bestTime:'Best: {v}s',
   rushTapRoom:'Tap the room.',rushPick:'Room {r} is now…',rushWrongRoom:'That’s Room {r}. Listen again 📻',rushWrongStatus:'Hmm, not that one. Listen again 📻',rushNotInspected:'🔍 Cleaned isn’t ready yet. A housekeeping supervisor inspects it first.',
   calls:{clean:'📻 Housekeeping: “Room {r} is sparkling clean! Ready for inspection.”',ready:'📻 Housekeeping supervisor: “I just inspected {r}. Every corner is perfect!”',tidy:'📻 Front desk: “The guest in {r} just checked out.”',guest:'📻 Bell team: “We just walked a guest up to {r}.”',fix:'📻 Engineering: “The tap in {r} is dripping. We’re on it.”',fixed:'📻 Engineering: “All fixed in {r}! It just needs a tidy now.”'},
   call:'CALL {n} OF {total}',time:'⏱️ {s}s',
@@ -5439,9 +5438,7 @@ en:{
 },
 es:{
   name:'Ordenador de recepción',kicker:'HMS · SISTEMA DE GESTIÓN HOTELERA',title:'El ordenador de recepción',
-  intro:'HMS es el sistema de gestión hotelera. Aquí viven todas las reservas, habitaciones, notas y cuentas. Primero consulta, luego ayuda.',
-  firstHi:'Delores: “Este es el HMS, el sistema de gestión hotelera. Reservas, habitaciones, huéspedes y cuentas: todo vive aquí. Lo aprenderemos toque a toque. No muerde. La impresora sí, un poquito.”',
-  hi:'Delores: “¿Otra vez al teclado? Qué bien. ¿Qué buscamos?”',
+  intro:'En el sistema de gestión hotelera puedes consultar reservas, habitaciones, fichas y cuentas.',
   screenName:'HMS de la mansión',
   tabs:{bookings:['📅','Reservas'],rooms:['🛏️','Habitaciones'],guests:['🙂','Huéspedes'],bills:['🧾','Cuentas']},
   back:'← Volver',room:'Habitación',arrives:'Llega',leaves:'Sale',nights:'Noches',checkout:'Salida',bookNote:'Nota de reserva',
@@ -5451,8 +5448,9 @@ es:{
   roomTip:{ready:'Limpia, inspeccionada por un supervisor y lista para un huésped.',guest:'Alguien se aloja aquí.',tidy:'Limpieza va de camino. Aún no está lista.',clean:'Limpieza terminó. Falta que una supervisora de limpieza la inspeccione. Aún no está lista.',fix:'Mantenimiento está arreglando algo. Aún no está lista.'},
   pickRoom:'Elige una habitación para {name}. Busca ✨.',pickTidy:'La {r} aún falta ordenarla. Elige una con ✨.',pickGuest:'Alguien ya se aloja en la {r} 🙂',pickFix:'Primero hay que arreglar la {r}.',pickClean:'La {r} está limpia, pero una supervisora de limpieza aún no la inspeccionó. Elige una con ✨.',
   checkedInMsg:'{name} ya está en la habitación {r} ✨',
-  lessonsH:'Lecciones · un minuto cada una',gamesH:'Juegos de recepción',lesson:'Lección {n}',lessonOf:'LECCIÓN HMS {n} DE {total}',done:'Hecha ✓',start:'Empezar',play:'Jugar',
-  explore:'🔎 Explorar por mi cuenta',bigLab:'Laboratorio grande →',bigLabHint:'Para más adelante: el HMS completo de práctica en el escritorio de formación.',
+  allLessons:'Todas las lecciones',gamesH:'Juegos de recepción',lesson:'Lección {n}',lessonOf:'LECCIÓN HMS {n} DE {total}',done:'Hecha ✓',start:'Empezar',play:'Jugar',
+  lessonsProgress:'{done} de {total} lecciones completadas',startLesson:'Empezar lección',continueLesson:'Empezar la siguiente lección',
+  explore:'Consultar registros',practiceMore:'Nivel y laboratorio de prácticas',bigLab:'Abrir el laboratorio de prácticas Silver Key',
   levelLine:'Habilidad HMS',xp:'{n} puntos HMS',toNext:'{n} para {level}',maxed:'¡Nivel máximo!',
   levels:['Primer día en el mostrador','Encuentra todo rápido','Ayudante de recepción','Estrella del HMS','Magia del mostrador'],
   lessonDone:'¡Lección hecha!',nextLesson:'Siguiente lección →',backHome:'Volver al ordenador',graduate:'🎓 ¡Aprendiste todo el HMS!',graduateGift:'Delores te dejó una caja de regalo.',
@@ -5489,7 +5487,7 @@ es:{
   peekHint:'💡 Este huésped tiene ficha en el HMS.',peekBtn:'🖥️ Mirar primero',peekTitle:'HMS · FICHA DEL HUÉSPED',peekLearn:'¿Primera vez con el HMS? Apréndelo en un minuto →',
   peekBonus:'🖥️ +1 propina por mirar primero el HMS',peekNext:'💡 La próxima vez, mira el HMS antes de responder.',
   games:{rush:['🧹','Carrera de habitaciones','Limpieza llama por radio. Mantén el tablero al día.'],build:['📝','Crea la reserva','Escucha al huésped y completa la reserva. ¡Ojo con las erratas!'],bill:['🔍','Detective de cuentas','Un cargo de cada cuenta está mal. ¡Encuéntralo!']},
-  best:'Mejor: {v}',bestTime:'Mejor: {v}s',noBest:'¡Nuevo!',
+  best:'Mejor: {v}',bestTime:'Mejor: {v}s',
   rushTapRoom:'Toca la habitación.',rushPick:'La {r} ahora está…',rushWrongRoom:'Esa es la {r}. Escucha otra vez 📻',rushWrongStatus:'Mmm, esa no. Escucha otra vez 📻',rushNotInspected:'🔍 Limpia aún no es lista. Primero la inspecciona una supervisora de limpieza.',
   calls:{clean:'📻 Limpieza: “¡La {r} está reluciente! Lista para inspección.”',ready:'📻 Supervisora de limpieza: “Acabo de inspeccionar la {r}. ¡Todo perfecto!”',tidy:'📻 Recepción: “El huésped de la {r} acaba de salir.”',guest:'📻 Botones: “Acabamos de subir a un huésped a la {r}.”',fix:'📻 Mantenimiento: “El grifo de la {r} gotea. Vamos para allá.”',fixed:'📻 Mantenimiento: “¡Arreglado en la {r}! Ahora solo falta ordenarla.”'},
   call:'LLAMADA {n} DE {total}',time:'⏱️ {s}s',
@@ -5630,27 +5628,40 @@ function hmsSkillHTML(){
 function openHms(){
   if(world)world.stop();
   const first=!hms.opened;hms.opened++;storeHms();
-  const next=[1,2,3,4,5].find(n=>!hms.lessons.includes(n));
-  openModal(titleHTML(HT.title,HT.kicker)+
-    '<div class="hms-coach"><canvas id="hms-delores" aria-hidden="true"></canvas><p>'+esc(first?HT.firstHi:HT.hi)+'</p></div>'+
-    '<p class="modal-description">'+esc(HT.intro)+'</p>'+hmsSkillHTML()+
-    '<h3 class="pins-heading">'+esc(HT.lessonsH)+'</h3><div class="hms-cards" id="hms-lessons"></div>'+
-    '<h3 class="pins-heading">'+esc(HT.gamesH)+'</h3><div class="hms-cards" id="hms-games"></div>'+
-    '<div class="action-row" id="hms-home-actions"></div><p class="joy-hint">'+esc(HT.bigLabHint)+'</p>',true);
+  const total=HT.lessons.length;
+  const done=HT.lessons.filter((_,i)=>hms.lessons.includes(i+1)).length;
+  const next=HT.lessons.findIndex((_,i)=>!hms.lessons.includes(i+1))+1;
+  const nextLesson=HT.lessons[next-1];
+  const section=(label,content)=>'<details name="hms-home-sections"><summary>'+esc(label)+'</summary>'+content+'</details>';
+  openModal('<h2 id="modal-heading">'+esc(HT.title)+'</h2>'+
+    '<div class="hms-coach"><canvas id="hms-delores" aria-hidden="true"></canvas><p>'+esc(HT.intro)+'</p></div>'+
+    '<div class="hms-home">'+
+    '<div class="hms-home-feature"><p class="hms-home-progress">'+esc(ht(HT.lessonsProgress,{done,total}))+'</p>'+
+    (nextLesson?'<h3>'+esc(nextLesson.t)+'</h3><p>'+esc(nextLesson.d)+'</p>':'')+
+    '<div class="hms-home-actions">'+
+    (nextLesson?'<button class="primary-button" id="hms-next" type="button">'+esc(done?HT.continueLesson:HT.startLesson)+'</button>':'')+
+    '<button class="'+(nextLesson?'secondary':'primary')+'-button" id="hms-browse" type="button">'+esc(HT.explore)+'</button></div></div>'+
+    section(HT.gamesH,'<div class="hms-cards" id="hms-games"></div>')+
+    section(HT.allLessons,'<div class="hms-cards" id="hms-lessons"></div>')+
+    section(HT.practiceMore,hmsSkillHTML()+'<button class="secondary-button" id="hms-lab" type="button">'+esc(HT.bigLab)+'</button>')+
+    '</div>');
   paintBust($('hms-delores'),{cast:'delores'},26,2);
-  HT.lessons.forEach((L,k)=>{const n=k+1,got=hms.lessons.includes(n),b=document.createElement('button');b.className='hms-lesson'+(got?' got':'')+(n===next?' next':'');b.dataset.lesson=n;
+  if(nextLesson)$('hms-next').onclick=()=>startLesson(next);
+  $('hms-browse').onclick=exploreHms;
+  $('hms-lab').onclick=()=>openSilverKeyTraining('lab');
+  HT.lessons.forEach((L,k)=>{const n=k+1,got=hms.lessons.includes(n),b=document.createElement('button');b.className='hms-lesson'+(got?' got':'');b.dataset.lesson=n;
     b.innerHTML='<span class="hms-num">'+(got?'✓':n)+'</span><span><b>'+esc(L.t)+'</b><small>'+esc(L.d)+'</small></span><span class="hms-go">'+esc(got?HT.done:HT.start)+'</span>';b.onclick=()=>startLesson(n);$('hms-lessons').append(b);});
   for(const id of ['rush','build','bill']){const [i,name,d]=HT.games[id],b=document.createElement('button');b.className='hms-lesson game';b.dataset.game=id;
-    const best=id==='rush'?(hms.time?ht(HT.bestTime,{v:hms.time}):HT.noBest):(hms.best[id]?ht(HT.best,{v:hms.best[id]+' ⭐'}):HT.noBest);
-    b.innerHTML='<span class="hms-num" aria-hidden="true">'+i+'</span><span><b>'+esc(name)+'</b><small>'+esc(d)+'</small></span><span class="hms-go">'+esc(best)+'</span>';b.onclick=()=>HMS_GAMES[id]();$('hms-games').append(b);}
-  const row=$('hms-home-actions');
-  const add=(label,cls,run)=>{const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=run;row.append(b);return b;};
-  add(HT.explore,'secondary-button',exploreHms);
-  add(HT.bigLab,'secondary-button',()=>{closeModal();openSilverKeyTraining('lab');});
-  add(titleVisible?t('Done'):t('Back to the manor'),'primary-button',closeModal);
+    const score=id==='rush'?hms.time:hms.best[id];
+    const best=score?ht(id==='rush'?HT.bestTime:HT.best,{v:id==='rush'?score:score+' ⭐'}):'';
+    b.innerHTML='<span class="hms-num" aria-hidden="true">'+i+'</span><span><b>'+esc(name)+'</b><small>'+esc(d)+'</small></span>'+
+      (best?'<span class="hms-go">'+esc(best)+'</span>':'');
+    b.onclick=()=>HMS_GAMES[id]();$('hms-games').append(b);}
+  body.querySelectorAll('.hms-home details').forEach(panel=>{
+    panel.ontoggle=()=>{if(panel.isConnected)narrativeText=body.innerText;};
+  });
   if(first)celebrate({icon:'🖥️',kicker:HT.name,label:HT.pins.login[0]});
   checkPins();renderGrowth();narrativeText=body.innerText;
-  requestAnimationFrame(()=>body.querySelector('.hms-lesson.next')?.focus());
 }
 function exploreHms(){
   openModal(titleHTML(HT.title,HT.kicker)+'<div id="hms-host"></div><div class="action-row" id="hms-x-actions"></div>',true);
@@ -6017,6 +6028,17 @@ const HMS_GAMES={rush:playRush,build:playBuild,bill:playBill};
 .hms-skill{display:flex;gap:12px;align-items:center;margin:10px 0;padding:10px 14px;border-radius:14px;background:linear-gradient(135deg,#1d4a40,#2c6152);color:#f3e3b5}
 .hms-skill-ic{font-size:30px}.hms-skill div{flex:1;display:grid;gap:3px}.hms-skill small{font:11px Arial,sans-serif;opacity:.85}.hms-skill b{font:bold 16px Georgia,serif;color:#fff}
 .hms-skill .bar{display:block;height:9px;border-radius:99px;background:#ffffff33;overflow:hidden}.hms-skill .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#7fdc6a,#ffd84d)}
+.hms-home{display:grid;gap:8px;margin:12px 0}
+.hms-home-feature{display:grid;gap:6px;padding:14px;border:1px solid #ddc68e;border-radius:14px;background:#fff7e5}
+.hms-home-feature h3,.hms-home-feature p{margin:0}
+.hms-home-feature h3{font-size:20px}
+.hms-home-feature .hms-home-progress{font-weight:bold;color:#385c50}
+.hms-home-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.hms-home details{padding:0 12px;border:1px solid #dfd3b3;border-radius:12px;background:#fffaf0}
+.hms-home details[open]{padding-bottom:10px}
+.hms-home summary{min-height:44px;padding:12px 0;color:#23493f;font-weight:bold;cursor:pointer}
+.hms-home summary:focus-visible{outline:2px solid #25745e;outline-offset:2px;border-radius:4px}
+@media(max-width:520px){.hms-home-actions>*{flex:1 1 auto}}
 .hms-cards{display:grid;gap:6px}
 .hms-lesson{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:14px;border:1px solid #e0cf9e;background:#fffaf0;cursor:pointer;text-align:left;color:var(--ink);min-height:56px}
 .hms-lesson:hover{background:#fff4d8}

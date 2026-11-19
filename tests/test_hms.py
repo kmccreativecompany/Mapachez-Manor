@@ -46,16 +46,31 @@ class Hms(base.Growth):
         if self.page.locator('#modal').evaluate('m=>m.open'):
             self.page.keyboard.press('Escape')
 
-    def test_01_title_button_opens_the_desk_computer_with_lessons_games_and_a_login_pin(self):
+    def test_01_title_button_opens_a_simple_home_with_lessons_games_and_a_login_pin(self):
         btn = self.page.locator('#hms-title')
         self.assertIn('Learn the HMS', btn.inner_text())
         btn.click()
-        self.page.wait_for_selector('.hms-skill')
-        text = self.page.locator('#modal-body').inner_text()
-        self.assertIn('hotel management system', text.lower())
-        self.assertEqual(self.page.locator('#hms-lessons .hms-lesson').count(), 5)
-        self.assertEqual(self.page.locator('#hms-games .hms-lesson').count(), 3)
+        home = self.page.locator('.hms-home')
+        self.assertIn('hotel management system', self.page.locator('#modal-body').inner_text().lower())
+        self.assertIn('0 of 5 lessons complete', home.inner_text())
+        self.assertIn('Find a booking', home.locator('h3').inner_text())
+        self.assertEqual(home.locator('details[open]').count(), 0)
+        self.assertFalse(self.page.locator('.hms-skill').is_visible())
         self.assertIn('hms-login', self.h()['pins'])
+
+        lessons = home.locator('summary').get_by_text('All lessons')
+        lessons.press('Enter')
+        self.assertEqual(home.locator('#hms-lessons button:visible').count(), 5)
+        home.locator('summary').get_by_text('Desk games').click()
+        self.assertFalse(home.locator('#hms-lessons').is_visible())
+        self.assertEqual(home.locator('#hms-games button:visible').count(), 3)
+        home.get_by_role('button', name='Room Rush').click()
+        self.page.wait_for_selector('.hms-radio')
+        self.page.keyboard.press('Escape')
+        btn.click()
+        self.assertEqual(home.locator('details[open]').count(), 0)
+        home.locator('#hms-next').click()
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Find a booking')
 
     def test_02_lesson_glows_the_next_tap_and_ends_with_a_quiz_tips_and_points(self):
         self.page.evaluate('window.hmsTest.lesson(1)')
@@ -138,7 +153,7 @@ class Hms(base.Growth):
         self.enter_manor()
         self.assertIn('hms', self.page.evaluate('hmsTest.enterPlay()'))
         self.page.evaluate("hmsTest.interact('hms')")
-        self.page.wait_for_selector('.hms-skill')
+        self.page.wait_for_selector('.hms-home')
 
     def test_09_quick_shift_includes_one_hms_guest_after_a_lesson(self):
         self.page.evaluate('hmsTest.firstLesson()')
@@ -228,6 +243,11 @@ class Hms(base.Growth):
         self.page.wait_for_selector('#hms-title')
         self.assertEqual(self.h()['hms']['lessons'], [1])
         self.assertIn('1 / 5', self.page.locator('#hms-title').inner_text())
+        self.page.locator('#hms-title').click()
+        self.assertIn('1 of 5 lessons complete', self.page.locator('.hms-home-progress').inner_text())
+        self.assertEqual(self.page.locator('.hms-home h3').inner_text(), 'Check a room')
+        self.page.get_by_role('button', name='Start next lesson').click()
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Check a room')
 
     def test_15_phone_layout_fits(self):
         self.context.close()
@@ -251,6 +271,44 @@ class Hms(base.Growth):
                 rooms[c['r']] = c['to']
         self.assertIn('inspected', self.page.evaluate('hmsTest.pickClean()'))
         self.assertEqual(self.errors, [])
+
+    def test_17_browsing_records_becomes_the_main_action_after_graduation(self):
+        self.page.evaluate('hmsTest.lessonsDone()')
+        self.page.locator('#hms-title').click()
+        home = self.page.locator('.hms-home')
+        self.assertIn('5 of 5 lessons complete', home.inner_text())
+        self.assertEqual(home.locator('#hms-next').count(), 0)
+        home.locator('#hms-browse.primary-button').click()
+        self.assertEqual(self.page.get_by_role('tab').count(), 4)
+        self.page.get_by_role('tab', name='Rooms').click()
+        self.assertTrue(self.page.locator('[data-act="room:205"]').is_visible())
+        self.page.get_by_role('button', name='Back to the desk computer').click()
+        home.locator('summary').get_by_text('Skill & practice lab').click()
+        self.assertTrue(home.locator('.hms-skill').is_visible())
+        self.page.get_by_role('button', name='Open Silver Key practice lab').click()
+        self.page.frame_locator('#silver-key-frame').locator('#globalHmsPanel').wait_for()
+
+    def test_18_spanish_phone_home_keeps_the_main_actions_in_view(self):
+        self.page.set_viewport_size({'width': 360, 'height': 640})
+        self.page.evaluate("""() => {
+            const key = 'mapachez_profile_v1';
+            const profile = JSON.parse(localStorage.getItem(key));
+            localStorage.setItem(key, JSON.stringify({...profile, lang: 'es'}));
+        }""")
+        self.page.reload()
+        self.page.locator('#hms-title').click()
+        home = self.page.locator('.hms-home')
+        self.assertIn('0 de 5 lecciones completadas', home.inner_text())
+        self.assertIn('Encontrar una reserva', home.locator('h3').inner_text())
+        for name in ('Empezar lección', 'Consultar registros'):
+            action = home.get_by_role('button', name=name).bounding_box()
+            self.assertGreaterEqual(action['height'], 44)
+            self.assertLess(action['y'] + action['height'], 640)
+        self.assertEqual(home.locator('details[open]').count(), 0)
+        home.locator('summary').get_by_text('Juegos de recepción').click()
+        self.assertEqual(home.locator('#hms-games button:visible').count(), 3)
+        w = self.page.locator('#modal').evaluate('m => m.scrollWidth - m.clientWidth')
+        self.assertLessEqual(w, 1)
 
 
 if __name__ == '__main__':

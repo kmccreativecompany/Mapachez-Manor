@@ -20,6 +20,13 @@ nothing is downloaded and nothing costs money to run. Progress is saved on the d
 | Every third guest in the manor | A guest asks something only the HMS knows ("Is my room ready yet?"). The hint names the tab, and the tab glows once the HMS opens. |
 | Quick shifts | After the first lesson, guest 2 of every quick shift is an HMS question (skipped when rush hour starts that early). |
 
+## The desk computer home
+
+The home shows how many of the five lessons you have finished and suggests the next one.
+**Browse records** opens the HMS screen directly and becomes the main action after you finish
+all five lessons. Open **All lessons** to choose or replay a lesson, **Desk games** to pick a
+game, or **Skill & practice lab** to see your HMS skill and open the Silver Key practice lab.
+
 ## The HMS screen
 
 Four big tabs: 📅 Bookings, 🛏️ Rooms, 🙂 Guests, 🧾 Bills. The data is the manor's own six
@@ -71,7 +78,7 @@ Peek First, Look It Up (5 looked-up answers), Room Board Hero, Neat Bookings, Bi
 ## The bigger lab
 
 The full Silver Key practice HMS still lives at the training desk (T → HMS practice). The desk
-computer's home links to it as "Big practice lab →" for later.
+computer links to it as **Silver Key practice lab** under **Skill & practice lab**.
 
 ## Tests
 
