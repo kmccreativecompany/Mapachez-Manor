@@ -6344,7 +6344,7 @@ function openPenny(mode){
   if(mode!=='again'){penny.visits++;pennyPuffAt=performance.now();storePenny();checkPins();}
   const first=penny.tries===0&&!penny.got.length;
   const isNew=pennyLeft()>0&&!!pennyNext();
-  const fact=isNew?pennyNext():penny.got.length?PENNY_FACTS.find(f=>f.id===penny.got[Math.random()*penny.got.length|0]):null;
+  const fact=isNew?pennyNext():penny.got.length?(id=>PENNY_FACTS.find(f=>f.id===id))(penny.got[Math.random()*penny.got.length|0]):null;
   const say=first?PT.first:!fact?PT.rest:!isNew?(pennyNext()?PT.rest:PT.allDone):PT.hello[(penny.visits+dayKey().length)%PT.hello.length];
   let html='<div class="penny-head"><canvas id="penny-face" aria-hidden="true"></canvas><div><span class="overline">🪙 '+esc(PT.kicker)+'</span><h2 id="modal-heading">'+esc(PT.name)+'</h2><p class="penny-say">'+esc(say)+'</p></div></div>';
   if(fact){const L=pL(fact),n=PENNY_FACTS.indexOf(fact)+1;
