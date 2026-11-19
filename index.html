@@ -1788,7 +1788,7 @@ class ManorWorld {
         }
         let dx=(this.keys.has('d')||this.keys.has('arrowright')?1:0)-(this.keys.has('a')||this.keys.has('arrowleft')?1:0);
         let dy=(this.keys.has('s')||this.keys.has('arrowdown')?1:0)-(this.keys.has('w')||this.keys.has('arrowup')?1:0);
-        const manual=Math.hypot(dx,dy);let budget=176*dt;
+        const manual=Math.hypot(dx,dy);let budget=176*(this.options.speed?.()||1)*dt;
         while(budget>0&&(manual||this.path.length)){
           if(!manual){const target=this.path[0];dx=target.x-p.x;dy=target.y-p.y;}
           const distance=Math.hypot(dx,dy);
@@ -5384,9 +5384,9 @@ en:{
   back:'← Back',room:'Room',arrives:'Arrives',leaves:'Leaves',nights:'Nights',checkout:'Checkout',bookNote:'Booking note',
   nightsN:n=>n===1?'1 night':n+' nights',inHouse:'In house',arriving:'Arriving tonight',checkedIn:'Checked in ✓',
   profile:'🙂 Profile',bill:'🧾 Bill',checkIn:'✅ Check in',notes:'Notes',features:'Room',total:'Total',paid:'Paid',
-  status:{ready:['✨','Clean & ready'],guest:['🛌','Guest inside'],tidy:['🧹','Needs a tidy'],fix:['🔧','Needs fixing']},
-  roomTip:{ready:'Ready for a guest.',guest:'Someone is staying here.',tidy:'Housekeeping is on the way. Not ready yet.',fix:'Engineering is fixing something. Not ready yet.'},
-  pickRoom:'Pick a room for {name}. Look for ✨.',pickTidy:'Room {r} still needs a tidy. Pick one with ✨.',pickGuest:'Someone is already staying in {r} 🙂',pickFix:'Room {r} needs fixing first.',
+  status:{ready:['✨','Clean, inspected & ready'],guest:['🛌','Guest inside'],tidy:['🧹','Needs a tidy'],clean:['🔍','Cleaned, not inspected'],fix:['🔧','Needs fixing']},
+  roomTip:{ready:'Cleaned, inspected by a supervisor, and ready for a guest.',guest:'Someone is staying here.',tidy:'Housekeeping is on the way. Not ready yet.',clean:'Housekeeping finished cleaning. A housekeeping supervisor still has to inspect it. Not ready yet.',fix:'Engineering is fixing something. Not ready yet.'},
+  pickRoom:'Pick a room for {name}. Look for ✨.',pickTidy:'Room {r} still needs a tidy. Pick one with ✨.',pickGuest:'Someone is already staying in {r} 🙂',pickFix:'Room {r} needs fixing first.',pickClean:'Room {r} is cleaned, but a housekeeping supervisor hasn’t inspected it yet. Pick one with ✨.',
   checkedInMsg:'{name} is checked in to Room {r} ✨',
   lessonsH:'Lessons · about a minute each',gamesH:'Desk games',lesson:'Lesson {n}',lessonOf:'HMS LESSON {n} OF {total}',done:'Done ✓',start:'Start',play:'Play',
   explore:'🔎 Explore on my own',bigLab:'Big practice lab →',bigLabHint:'For later: the full practice HMS at the training desk.',
@@ -5402,7 +5402,7 @@ en:{
     {t:'Check a room',d:'Is it ready? The little picture tells you.',steps:[
       {say:'Tap 🛏️ Rooms. Each square is a room, and the picture shows how it is.',want:'tab:rooms'},
       {say:'Captain Fuzz arrives soon, in Room 205. Tap 205.',want:'room:205'},
-      {say:'✨ means ready. 🧹 means housekeeping isn’t done yet.',quiz:{q:'Can Captain Fuzz go up to 205 right now?',opts:[['Not yet. It needs a tidy first.',1],['Yes, hand over the key!',0],['No, that room is gone.',0]],hint:'What does the 🧹 mean?'}}]},
+      {say:'✨ means cleaned AND inspected by a housekeeping supervisor, so a guest can go in. 🔍 means cleaned, but not inspected yet. 🧹 means housekeeping isn’t done yet.',quiz:{q:'Can Captain Fuzz go up to 205 right now?',opts:[['Not yet. It needs a tidy first.',1],['Yes, hand over the key!',0],['No, that room is gone.',0]],hint:'What does the 🧹 mean?'}}]},
     {t:'Read guest notes',d:'Allergies and wishes, so nobody has to repeat them.',steps:[
       {say:'Tap 🙂 Guests. That’s where the notes live.',want:'tab:guests'},
       {say:'The kitchen is making Lady Vesper’s supper. Tap her name.',want:'guest:vesper'},
@@ -5415,7 +5415,7 @@ en:{
       {say:'Juniper Glow just walked in! Tap 📅 Bookings.',want:'tab:bookings'},
       {say:'Tap Juniper Glow. See “Arriving tonight”?',want:'booking:juniper'},
       {say:'Tap ✅ Check in.',want:'checkin:juniper'},
-      {say:'Now pick a room with ✨. Those are clean and ready.',want:'pick:201'}]}
+      {say:'Now pick a room with ✨. Cleaned isn’t enough on its own: only a room a supervisor has inspected is ready.',want:'pick:201'}]}
   ],
   coachEnd:'You did it! That’s exactly how it’s done at the desk.',
   /* Look-it-up questions */
@@ -5429,8 +5429,8 @@ en:{
   /* Mini-games */
   games:{rush:['🧹','Room Rush','Housekeeping radios in. Keep the room board right.'],build:['📝','Booking Builder','Listen to the guest and fill in the booking. Watch for typos!'],bill:['🔍','Bill Detective','One charge on each bill is wrong. Find it!']},
   best:'Best: {v}',bestTime:'Best: {v}s',noBest:'New!',
-  rushTapRoom:'Tap the room.',rushPick:'Room {r} is now…',rushWrongRoom:'That’s Room {r}. Listen again 📻',rushWrongStatus:'Hmm, not that one. Listen again 📻',
-  calls:{ready:'📻 Housekeeping: “Room {r} is sparkling clean!”',tidy:'📻 Front desk: “The guest in {r} just checked out.”',guest:'📻 Bell team: “We just walked a guest up to {r}.”',fix:'📻 Engineering: “The tap in {r} is dripping. We’re on it.”',fixed:'📻 Engineering: “All fixed in {r}! It just needs a tidy now.”'},
+  rushTapRoom:'Tap the room.',rushPick:'Room {r} is now…',rushWrongRoom:'That’s Room {r}. Listen again 📻',rushWrongStatus:'Hmm, not that one. Listen again 📻',rushNotInspected:'🔍 Cleaned isn’t ready yet. A housekeeping supervisor inspects it first.',
+  calls:{clean:'📻 Housekeeping: “Room {r} is sparkling clean! Ready for inspection.”',ready:'📻 Housekeeping supervisor: “I just inspected {r}. Every corner is perfect!”',tidy:'📻 Front desk: “The guest in {r} just checked out.”',guest:'📻 Bell team: “We just walked a guest up to {r}.”',fix:'📻 Engineering: “The tap in {r} is dripping. We’re on it.”',fixed:'📻 Engineering: “All fixed in {r}! It just needs a tidy now.”'},
   call:'CALL {n} OF {total}',time:'⏱️ {s}s',
   buildFields:{name:'Name',nights:'Nights',note:'Note',room:'Room'},buildPick:'Tap the right {f}.',buildRoom:'Pick a ✨ room.',buildWrong:'Hmm, listen again 👂',buildSaved:'Booking saved! ✨',guestOf:'GUEST {n} OF {total}',
   billFind:'Tap the charge that’s wrong.',billOk:'That one looks right 🙂',billFixed:'FIXED',billCase:'BILL {n} OF {total}',
@@ -5447,9 +5447,9 @@ es:{
   back:'← Volver',room:'Habitación',arrives:'Llega',leaves:'Sale',nights:'Noches',checkout:'Salida',bookNote:'Nota de reserva',
   nightsN:n=>n===1?'1 noche':n+' noches',inHouse:'Alojado',arriving:'Llega esta noche',checkedIn:'Registrado ✓',
   profile:'🙂 Ficha',bill:'🧾 Cuenta',checkIn:'✅ Registrar entrada',notes:'Notas',features:'Habitación',total:'Total',paid:'Pagado',
-  status:{ready:['✨','Limpia y lista'],guest:['🛌','Huésped dentro'],tidy:['🧹','Falta ordenar'],fix:['🔧','Hay que arreglarla']},
-  roomTip:{ready:'Lista para un huésped.',guest:'Alguien se aloja aquí.',tidy:'Limpieza va de camino. Aún no está lista.',fix:'Mantenimiento está arreglando algo. Aún no está lista.'},
-  pickRoom:'Elige una habitación para {name}. Busca ✨.',pickTidy:'La {r} aún falta ordenarla. Elige una con ✨.',pickGuest:'Alguien ya se aloja en la {r} 🙂',pickFix:'Primero hay que arreglar la {r}.',
+  status:{ready:['✨','Limpia, inspeccionada y lista'],guest:['🛌','Huésped dentro'],tidy:['🧹','Falta ordenar'],clean:['🔍','Limpia, sin inspeccionar'],fix:['🔧','Hay que arreglarla']},
+  roomTip:{ready:'Limpia, inspeccionada por un supervisor y lista para un huésped.',guest:'Alguien se aloja aquí.',tidy:'Limpieza va de camino. Aún no está lista.',clean:'Limpieza terminó. Falta que una supervisora de limpieza la inspeccione. Aún no está lista.',fix:'Mantenimiento está arreglando algo. Aún no está lista.'},
+  pickRoom:'Elige una habitación para {name}. Busca ✨.',pickTidy:'La {r} aún falta ordenarla. Elige una con ✨.',pickGuest:'Alguien ya se aloja en la {r} 🙂',pickFix:'Primero hay que arreglar la {r}.',pickClean:'La {r} está limpia, pero una supervisora de limpieza aún no la inspeccionó. Elige una con ✨.',
   checkedInMsg:'{name} ya está en la habitación {r} ✨',
   lessonsH:'Lecciones · un minuto cada una',gamesH:'Juegos de recepción',lesson:'Lección {n}',lessonOf:'LECCIÓN HMS {n} DE {total}',done:'Hecha ✓',start:'Empezar',play:'Jugar',
   explore:'🔎 Explorar por mi cuenta',bigLab:'Laboratorio grande →',bigLabHint:'Para más adelante: el HMS completo de práctica en el escritorio de formación.',
@@ -5465,7 +5465,7 @@ es:{
     {t:'Revisar una habitación',d:'¿Está lista? El dibujito te lo dice.',steps:[
       {say:'Toca 🛏️ Habitaciones. Cada cuadro es una habitación, y el dibujo dice cómo está.',want:'tab:rooms'},
       {say:'El capitán Fuzz llega pronto, a la 205. Toca la 205.',want:'room:205'},
-      {say:'✨ es lista. 🧹 es que limpieza aún no terminó.',quiz:{q:'¿Puede el capitán Fuzz subir a la 205 ahora?',opts:[['Aún no. Falta ordenarla.',1],['¡Sí, dale la llave!',0],['No, esa habitación ya no existe.',0]],hint:'¿Qué significa 🧹?'}}]},
+      {say:'✨ es limpia E inspeccionada por una supervisora de limpieza: ya puede entrar un huésped. 🔍 es limpia, pero aún sin inspeccionar. 🧹 es que limpieza aún no terminó.',quiz:{q:'¿Puede el capitán Fuzz subir a la 205 ahora?',opts:[['Aún no. Falta ordenarla.',1],['¡Sí, dale la llave!',0],['No, esa habitación ya no existe.',0]],hint:'¿Qué significa 🧹?'}}]},
     {t:'Leer las notas',d:'Alergias y deseos, para que nadie tenga que repetirlos.',steps:[
       {say:'Toca 🙂 Huéspedes. Ahí viven las notas.',want:'tab:guests'},
       {say:'La cocina prepara la cena de Lady Vesper. Toca su nombre.',want:'guest:vesper'},
@@ -5478,7 +5478,7 @@ es:{
       {say:'¡Acaba de llegar Juniper Glow! Toca 📅 Reservas.',want:'tab:bookings'},
       {say:'Toca Juniper Glow. ¿Ves “Llega esta noche”?',want:'booking:juniper'},
       {say:'Toca ✅ Registrar entrada.',want:'checkin:juniper'},
-      {say:'Ahora elige una habitación con ✨. Están limpias y listas.',want:'pick:201'}]}
+      {say:'Ahora elige una habitación con ✨. Limpia no basta: solo está lista si una supervisora la inspeccionó.',want:'pick:201'}]}
   ],
   coachEnd:'¡Lo lograste! Así se hace en recepción.',
   qKicker:'UN HUÉSPED TIENE UNA PREGUNTA',qShift:'TURNO RÁPIDO · HUÉSPED {n} DE {total} · HMS',
@@ -5490,8 +5490,8 @@ es:{
   peekBonus:'🖥️ +1 propina por mirar primero el HMS',peekNext:'💡 La próxima vez, mira el HMS antes de responder.',
   games:{rush:['🧹','Carrera de habitaciones','Limpieza llama por radio. Mantén el tablero al día.'],build:['📝','Crea la reserva','Escucha al huésped y completa la reserva. ¡Ojo con las erratas!'],bill:['🔍','Detective de cuentas','Un cargo de cada cuenta está mal. ¡Encuéntralo!']},
   best:'Mejor: {v}',bestTime:'Mejor: {v}s',noBest:'¡Nuevo!',
-  rushTapRoom:'Toca la habitación.',rushPick:'La {r} ahora está…',rushWrongRoom:'Esa es la {r}. Escucha otra vez 📻',rushWrongStatus:'Mmm, esa no. Escucha otra vez 📻',
-  calls:{ready:'📻 Limpieza: “¡La {r} está reluciente!”',tidy:'📻 Recepción: “El huésped de la {r} acaba de salir.”',guest:'📻 Botones: “Acabamos de subir a un huésped a la {r}.”',fix:'📻 Mantenimiento: “El grifo de la {r} gotea. Vamos para allá.”',fixed:'📻 Mantenimiento: “¡Arreglado en la {r}! Ahora solo falta ordenarla.”'},
+  rushTapRoom:'Toca la habitación.',rushPick:'La {r} ahora está…',rushWrongRoom:'Esa es la {r}. Escucha otra vez 📻',rushWrongStatus:'Mmm, esa no. Escucha otra vez 📻',rushNotInspected:'🔍 Limpia aún no es lista. Primero la inspecciona una supervisora de limpieza.',
+  calls:{clean:'📻 Limpieza: “¡La {r} está reluciente! Lista para inspección.”',ready:'📻 Supervisora de limpieza: “Acabo de inspeccionar la {r}. ¡Todo perfecto!”',tidy:'📻 Recepción: “El huésped de la {r} acaba de salir.”',guest:'📻 Botones: “Acabamos de subir a un huésped a la {r}.”',fix:'📻 Mantenimiento: “El grifo de la {r} gotea. Vamos para allá.”',fixed:'📻 Mantenimiento: “¡Arreglado en la {r}! Ahora solo falta ordenarla.”'},
   call:'LLAMADA {n} DE {total}',time:'⏱️ {s}s',
   buildFields:{name:'Nombre',nights:'Noches',note:'Nota',room:'Habitación'},buildPick:'Toca: {f}.',buildRoom:'Elige una habitación ✨.',buildWrong:'Mmm, escucha otra vez 👂',buildSaved:'¡Reserva guardada! ✨',guestOf:'HUÉSPED {n} DE {total}',
   billFind:'Toca el cargo que está mal.',billOk:'Ese parece correcto 🙂',billFixed:'CORREGIDO',billCase:'CUENTA {n} DE {total}',
@@ -5614,7 +5614,7 @@ function hmsScreen(host,opt={}){
     if(kind==='checkin')return act(a,()=>{S.picking=arg;S.msg='';});
     if(kind==='pick'){
       const st=S.rooms[arg],g=hmsGuest(S.picking);
-      if(st!=='ready'){S.msg=ht(st==='tidy'?HT.pickTidy:st==='fix'?HT.pickFix:HT.pickGuest,{r:arg});render();pc.querySelector('[data-act="pick:'+arg+'"]')?.classList.add('hms-no');joySound('boop');return;}
+      if(st!=='ready'){S.msg=ht(st==='clean'?HT.pickClean:st==='tidy'?HT.pickTidy:st==='fix'?HT.pickFix:HT.pickGuest,{r:arg});render();pc.querySelector('[data-act="pick:'+arg+'"]')?.classList.add('hms-no');joySound('boop');return;}
       return act(a,()=>{S.checked[g.id]=arg;S.rooms[arg]='guest';S.picking='';S.msg=ht(HT.checkedInMsg,{name:hL(g).name,r:arg});const [x,y]=centerOf(el);burst(x,y,1,{hearts:true});joySound('hop');});
     }
   }
@@ -5714,7 +5714,7 @@ const HMS_QS=[
   {id:'deposit',g:'fuzz',tab:'bills',en:['Did my deposit go through?',[['Yes, your $50 deposit is paid. It’s right here on your bill.',1],['I can’t see bills, sorry.',0],['Better pay it again, just in case.',0]],'Captain Fuzz’s bill: Deposit paid, −$50.'],es:['¿Se cobró mi depósito?',[['Sí, su depósito de $50 está pagado. Aquí está en su cuenta.',1],['No puedo ver las cuentas, lo siento.',0],['Mejor páguelo otra vez, por si acaso.',0]],'Cuenta del capitán Fuzz: depósito pagado, −$50.']},
   {id:'access',g:'vale',tab:'guests',en:['Is my room the accessible one?',[['Yes. Room 204 is accessible, and it’s noted on your record.',1],['All our rooms are the same.',0],['You’d have to ask housekeeping.',0]],'Ms. Vale’s record: ⚠️ Accessible room needed. Room: Accessible.'],es:['¿Mi habitación es la accesible?',[['Sí. La 204 es accesible, y está anotado en su ficha.',1],['Todas las habitaciones son iguales.',0],['Eso tendría que preguntarlo a limpieza.',0]],'Ficha de la señora Vale: ⚠️ necesita habitación accesible.']},
   {id:'wake',g:'nine',tab:'guests',en:['Is my 6:30 wake-up call booked?',[['It is. 6:30 AM exactly, right on your record.',1],['Wake-up calls are only for weddings.',0],['Set your own alarm, just in case?',0]],'M. Nine’s record: ⚠️ Wake-up call at 6:30 AM.'],es:['¿Está programado mi despertador de las 6:30?',[['Sí. A las 6:30 AM exactas, está en su ficha.',1],['Los despertadores son solo para bodas.',0],['¿Ponga su propia alarma, por si acaso?',0]],'Ficha de M. Nine: ⚠️ despertador a las 6:30 AM.']},
-  {id:'whichroom',g:'juniper',tab:'rooms',en:['Which room will I be in?',[['Room 201. It’s clean and ready for you, with the window seat.',1],['Room 205, top of the stairs.',0],['Any room you like, just pick one.',0]],'Room 201 shows ✨ Clean & ready. 205 still needs a tidy.'],es:['¿En qué habitación estaré?',[['En la 201. Está limpia y lista, con el asiento de la ventana.',1],['En la 205, subiendo la escalera.',0],['La que quiera, elija una.',0]],'La 201 muestra ✨ Limpia y lista. La 205 aún falta ordenarla.']},
+  {id:'whichroom',g:'juniper',tab:'rooms',en:['Which room will I be in?',[['Room 201. It’s clean, inspected and ready for you, with the window seat.',1],['Room 205, top of the stairs.',0],['Any room you like, just pick one.',0]],'Room 201 shows ✨ Clean, inspected & ready. 205 still needs a tidy.'],es:['¿En qué habitación estaré?',[['En la 201. Está limpia, inspeccionada y lista, con el asiento de la ventana.',1],['En la 205, subiendo la escalera.',0],['La que quiera, elija una.',0]],'La 201 muestra ✨ Limpia, inspeccionada y lista. La 205 aún falta ordenarla.']},
   {id:'privacy',g:'finch',who:{en:'A friend of Mr. Finch',es:'Una amistad del señor Finch'},tab:'guests',en:['What room is Mr. Finch in? I want to surprise him!',[['I can’t share room numbers, but I’d be glad to call him for you.',1],['Room 202! Go on up.',0],['He’s on the second floor, third door.',0]],'Mr. Finch’s record: ⚠️ Please don’t say his room number out loud.'],es:['¿En qué habitación está el señor Finch? ¡Quiero darle una sorpresa!',[['No puedo dar números de habitación, pero con gusto le llamo.',1],['¡En la 202! Suba.',0],['Segundo piso, tercera puerta.',0]],'Ficha del señor Finch: ⚠️ no digas en voz alta su número de habitación.']}
 ];
 function nextHmsQ(){
@@ -5831,7 +5831,7 @@ function gameOver(id,{score,max,slips,extra=''}){
   narrativeText=body.innerText;
 }
 /* Room Rush: housekeeping radios in, you keep the room board true. */
-const RUSH_MOVES={ready:['tidy'],tidy:['guest','fix'],guest:['ready'],fix:['tidy','guest','ready']};
+const RUSH_MOVES={clean:['tidy'],ready:['clean'],tidy:['guest','fix'],guest:['ready'],fix:['tidy','guest','ready','clean']};
 function rushCalls(n=6){
   const rooms={...HMS_ROOMS,'202':'guest','204':'guest'},calls=[];let last='';
   while(calls.length<n){const r=hmsShuffle(Object.keys(rooms)).find(x=>x!==last);const from=rooms[r];
@@ -5855,7 +5855,7 @@ function playRush(){
     const nope=(el,text)=>{slips++;run=0;clean=false;msg.hidden=false;msg.textContent=text;el.classList.remove('hms-no');void el.offsetWidth;el.classList.add('hms-no');joySound('boop');};
     g.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>{if(b.dataset.room!==c.r)return nope(b,ht(HT.rushWrongRoom,{r:b.dataset.room}));picked=c.r;joySound('tick',1);draw();});
     g.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{
-      if(b.dataset.st!==c.to)return nope(b,HT.rushWrongStatus);
+      if(b.dataset.st!==c.to)return nope(b,c.to==='clean'&&b.dataset.st==='ready'?HT.rushNotInspected:HT.rushWrongStatus);
       rooms[c.r]=c.to;if(clean){score++;run++;}picked='';clean=true;k++;
       const tile=g.querySelector('[data-room="'+c.r+'"]');const [x,y]=tile?centerOf(tile):centerOf(b);
       burst(x,y,.6+run*.15,{rainbow:run>=4});floatText(x,y-20,'+1 ⭐',{size:18});joySound('coin',run);gameCombo(tile,run);
@@ -5884,7 +5884,7 @@ function playBuild(){
   const g=$('hms-game');
   function guest(){
     const G=list[gi],[line,notes]=hL(G),nightsOpts=hmsShuffle([1,2,3]);
-    const roomPlan=hmsShuffle(['ready','tidy','guest','fix','guest','ready']).slice(0,6);if(!roomPlan.includes('ready'))roomPlan[0]='ready';
+    const roomPlan=hmsShuffle(['ready','tidy','guest','fix','clean','ready']).slice(0,6);if(!roomPlan.includes('ready'))roomPlan[0]='ready';
     const rooms=Object.fromEntries(['201','202','203','204','205','206'].map((r,k)=>[r,roomPlan[k]]));
     const fields=['name','nights','note','room'],val={};let f=0,clean=true;
     function draw(){
@@ -5902,7 +5902,7 @@ function playBuild(){
       const msg=g.querySelector('.hms-msg');
       g.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{
         const v=b.dataset.v,right=key==='name'?v===G.name[0]:key==='nights'?+v===G.n:key==='note'?v===notes[0]:rooms[v]==='ready';
-        if(!right){slips++;run=0;clean=false;msg.hidden=false;msg.textContent=key==='room'?ht(rooms[v]==='tidy'?HT.pickTidy:rooms[v]==='fix'?HT.pickFix:HT.pickGuest,{r:v}):HT.buildWrong;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');return;}
+        if(!right){slips++;run=0;clean=false;msg.hidden=false;msg.textContent=key==='room'?ht(rooms[v]==='clean'?HT.pickClean:rooms[v]==='tidy'?HT.pickTidy:rooms[v]==='fix'?HT.pickFix:HT.pickGuest,{r:v}):HT.buildWrong;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');return;}
         val[key]=key==='nights'?HT.nightsN(+v):key==='room'?HT.room+' '+v:v;f++;
         const [x,y]=centerOf(b);burst(x,y,.4);joySound('tick',f);
         if(f>=fields.length){if(clean){score++;run++;}draw();const form=g.querySelector('.hms-form');form.classList.add('saved');
@@ -5995,12 +5995,12 @@ const HMS_GAMES={rush:playRush,build:playBuild,bill:playBill};
 .hms-rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .hms-room{display:grid;justify-items:center;gap:0;padding:6px 2px;border-radius:12px;border:2px solid #d5e5d9;background:#fff;cursor:pointer;color:var(--ink);min-height:74px;perspective:400px}
 .hms-room b{font:bold 16px Georgia,serif}.hms-room-ic{font-size:22px;line-height:1.1}.hms-room small{font:10px Arial,sans-serif;color:#5b6b60}
-.hms-room.ready{background:#effbe9;border-color:#a6dc94}.hms-room.tidy{background:#fff6dc;border-color:#f0cf74}.hms-room.fix{background:#fdecec;border-color:#e6a2a2}.hms-room.guest{background:#eef3fb;border-color:#b5c7e6}
+.hms-room.ready{background:#effbe9;border-color:#a6dc94}.hms-room.tidy{background:#fff6dc;border-color:#f0cf74}.hms-room.clean{background:#eef8fb;border-color:#93cfe0}.hms-room.fix{background:#fdecec;border-color:#e6a2a2}.hms-room.guest{background:#eef3fb;border-color:#b5c7e6}
 .hms-room.on{box-shadow:0 0 0 3px #2c6152}
 .hms-room-note{margin-top:8px}
 .hms-legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
 .hms-st{display:inline-block;padding:2px 8px;border-radius:999px;font:bold 11px Arial,sans-serif;background:#eef3fb}
-.hms-st.ready{background:#effbe9}.hms-st.tidy{background:#fff6dc}.hms-st.fix{background:#fdecec}
+.hms-st.ready{background:#effbe9}.hms-st.tidy{background:#fff6dc}.hms-st.clean{background:#eef8fb}.hms-st.fix{background:#fdecec}
 .hms-say{margin:8px 0 6px;font:bold 14px Georgia,serif;color:#23493f}
 .hms-msg{margin:6px 0 0;padding:6px 10px;border-radius:10px;background:#fff6dc;font:13px Arial,sans-serif;color:#6b4a12}
 .hms-msg.ok{background:#e4f8dc;color:#1f5a26}
@@ -6039,7 +6039,7 @@ const HMS_GAMES={rush:playRush,build:playBuild,bill:playBill};
 .hms-radio small{font:bold 11px Arial,sans-serif;letter-spacing:.06em;opacity:.85}.hms-radio p{margin:4px 0 0;font:bold 16px/1.4 Georgia,serif;color:#fff}
 .hms-status-pick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .hms-st-btn{min-height:46px;border-radius:12px;border:2px solid #d5e5d9;background:#fff;cursor:pointer;font:bold 13px Arial,sans-serif;color:var(--ink)}
-.hms-st-btn.ready{border-color:#a6dc94}.hms-st-btn.tidy{border-color:#f0cf74}.hms-st-btn.fix{border-color:#e6a2a2}.hms-st-btn.guest{border-color:#b5c7e6}
+.hms-st-btn.ready{border-color:#a6dc94}.hms-st-btn.tidy{border-color:#f0cf74}.hms-st-btn.clean{border-color:#93cfe0}.hms-st-btn.fix{border-color:#e6a2a2}.hms-st-btn.guest{border-color:#b5c7e6}
 .hms-speech{display:flex;gap:10px;align-items:center;margin:8px 0;padding:10px 12px;border-radius:14px;background:#fffaf0;border:1px solid #ecd39a}
 .hms-speech small{font:bold 10px Arial,sans-serif;letter-spacing:.08em;color:#8f6a2b}.hms-speech p{margin:2px 0 0;font:15px/1.45 Georgia,serif}
 .hms-form{display:grid;grid-template-columns:1fr 1fr;gap:6px}
@@ -6803,12 +6803,20 @@ const COTTAGE_VISITORS=[{id:'delores',at:2},{id:'penny',at:6}];
 
 /* ---------- Save ---------- */
 const COTTAGE_KEY='mapachez_cottage_v1';
-function createCottage(){return {version:1,owned:[],spent:0,visits:0,lamp:true,met:[],plays:0};}
+function createCottage(){return {version:1,owned:[],spent:0,visits:0,lamp:true,met:[],plays:0,live:null,home:'toadstool',rides:[],ride:'',snail:0,grade:-1,house:{own:false,done:[]}};}
 function normaliseCottage(v){
   const s=createCottage();if(!v||typeof v!=='object'||v.version!==1)return s;
   if(Array.isArray(v.owned))s.owned=[...new Set(v.owned.filter(x=>COTTAGE_ITEMS.some(i=>i.id===x)))];
   if(Array.isArray(v.met))s.met=[...new Set(v.met.filter(x=>COTTAGE_VISITORS.some(i=>i.id===x)))];
   s.spent=Math.max(0,v.spent|0);s.visits=Math.max(0,v.visits|0);s.plays=Math.max(0,v.plays|0);s.lamp=v.lamp!==false;
+  /* v2 fields: older saves that already furnished the cottage simply live there. */
+  s.live=v.live===true||v.live===false?v.live:(s.owned.length||s.visits?true:null);
+  if(['toadstool','lighthouse','treehouse','seashell','dream'].includes(v.home))s.home=v.home;
+  if(Array.isArray(v.rides))s.rides=[...new Set(v.rides.filter(x=>['skate','scooter','bike','snail','cart','broom','carpet','teacup','car'].includes(x)))];
+  if(typeof v.ride==='string'&&s.rides.includes(v.ride))s.ride=v.ride;s.snail=v.snail?1:0;
+  s.grade=Number.isInteger(v.grade)&&v.grade>=0&&v.grade<=4?v.grade:-1;
+  if(v.house&&typeof v.house==='object'){s.house.own=v.house.own===true;if(s.house.own&&Array.isArray(v.house.done))s.house.done=[...new Set(v.house.done.filter(x=>['windows','door','fence','porch','roof','paint','garden','swing'].includes(x)))];}
+  if(s.home==='dream'&&s.house.done.length<8)s.home='toadstool';
   return s;
 }
 let cottage=createCottage();
@@ -6842,11 +6850,12 @@ function drawCottageRoom(c,t,calm){
   const tw=k=>calm?.9:.55+.45*Math.sin(t/420+k*1.7),stars=cotHas('wallpaper');
   /* wall */
   if(stars){rect(c,0,0,COT_W,172,'#33416f');for(let k=0;k<46;k++){const x=(k*97)%392+4,y=18+(k*53)%118;c.globalAlpha=.35+.5*tw(k);text(c,'✦',x,y,k%3?6:8,'#ecd283');}c.globalAlpha=1;}
-  else{rect(c,0,0,COT_W,172,'#f4e3c6');for(let x=0;x<COT_W;x+=22)rect(c,x,0,11,140,'#efdabb');}
-  rect(c,0,138,COT_W,34,stars?'#28345c':'#dcb78c');rect(c,0,138,COT_W,3,stars?'#1f2a4c':'#b08458');
+  const P=cotPalette();
+  if(!stars){rect(c,0,0,COT_W,172,P.wall);for(let x=0;x<COT_W;x+=22)rect(c,x,0,11,140,P.stripe);}
+  rect(c,0,138,COT_W,34,stars?'#28345c':P.wains);rect(c,0,138,COT_W,3,stars?'#1f2a4c':P.wainsTop);
   rect(c,0,0,COT_W,12,'#7a4f33');rect(c,0,12,COT_W,3,'#5e3b26');
   /* floor */
-  rect(c,0,172,COT_W,78,'#bb8758');for(let y=185,r=0;y<COT_H;y+=13,r++){rect(c,0,y,COT_W,1.4,'#a3714a');for(let x=(r%2)*40+20;x<COT_W;x+=80)rect(c,x,y-12,1.4,12,'#a3714a');}
+  rect(c,0,172,COT_W,78,P.floor);for(let y=185,r=0;y<COT_H;y+=13,r++){rect(c,0,y,COT_W,1.4,P.seam);for(let x=(r%2)*40+20;x<COT_W;x+=80)rect(c,x,y-12,1.4,12,P.seam);}
   rect(c,0,169,COT_W,5,'#7a4f33');
   /* window with the night sky and the manor across the lawn (no weather indoors) */
   rect(c,164,44,76,80,'#7a5236',4);
@@ -6987,13 +6996,16 @@ const COT_SPOT={lamp:[262,160],rug:[200,222],plant:[182,104],quilt:[334,176],cur
 function cotSparkle(id){const cv=$('cot-room');if(!cv)return;const r=cv.getBoundingClientRect(),s=r.width/COT_W,[x,y]=COT_SPOT[id]||[200,120];burst(r.left+x*s,r.top+y*s,1.3,{hearts:true});}
 
 /* ---------- The cottage screen ---------- */
-function openCottage(){
+function openCottage(tab){
   if(world)world.stop();
+  tab=typeof tab==='string'?tab:cot.tab||'inside';cot.tab=tab;cancelAnimationFrame(cot.raf);
+  if(tab==='rides')return openCottageRides();if(tab==='homes')return openCottageHomes();if(tab==='dream')return openCottageDream();
+  if(cottage.live!==true)return openCottageLane();
   const first=cottage.visits===0;cottage.visits++;storeCottage();
   const v=cot.visitor=cotPickVisitor(),fresh=v&&!cottage.met.includes(v);
-  openModal('<span class="overline">🏡 '+esc(CT.kicker)+'</span><h2 id="modal-heading">'+esc(CT.name)+'</h2>'+
+  openModal(cotHead('inside')+
     '<div class="cot-stage"><canvas id="cot-room" role="img" aria-label="'+esc(CT.name)+'"></canvas><p class="cot-say" id="cot-say" aria-live="polite"></p></div>'+
-    '<div class="cot-top"><span class="cot-wallet" id="cot-wallet"></span><span class="cot-level" id="cot-level"></span></div>'+
+    '<div class="cot-top"><span class="cot-wallet" id="cot-wallet"></span><span class="cot-level" id="cot-level"></span></div>'+payHTML()+
     '<div id="cot-next"></div><h3 class="pins-heading">'+esc(CT.shop)+'</h3><p class="joy-hint">'+esc(CT.shopIntro)+'</p><ul class="cot-shop" id="cot-shop"></ul>'+
     '<p class="joy-hint" id="cot-earn">'+esc(CT.earn)+(cottage.spent?' · '+esc(ctx_(CT.spent,{n:cottage.spent})):'')+'</p><div class="action-row" id="cot-actions"></div>',true);
   modal.classList.add('cot-modal');
@@ -7005,7 +7017,7 @@ function openCottage(){
   if(fresh){cottage.met.push(v);storeCottage();const V=CT.visitors[v];cotSay(V.name+': “'+V.lines[0]+'”');celebrate({icon:v==='penny'?'🐉':'🥧',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
   else cotSay(first?CT.intro:cotPick(CT.hello));
   requestAnimationFrame(cotLoop);
-  narrativeText=body.innerText;
+  cotWire();
 }
 const cotCloseModal=closeModal;closeModal=function(){modal.classList.remove('cot-modal');cancelAnimationFrame(cot.raf);return cotCloseModal.apply(this,arguments);};
 const cotOpenModal=openModal;openModal=function(){modal.classList.remove('cot-modal');return cotOpenModal.apply(this,arguments);};
@@ -7042,6 +7054,16 @@ function buyCottageThing(id,btn){
   checkPins();renderGrowth();narrativeText=body.innerText;
 }
 
+/* ---------- Raises: a best answer earns extra tips as your pay grade grows ---------- */
+const payShowMomentResult=showMomentResult;
+showMomentResult=function(i,k,mode,host){
+  payShowMomentResult.apply(this,arguments);
+  const box=body.querySelector('.gm-result');if(!box||!box.classList.contains('best'))return cotRaiseCheck();
+  const r=payGrade();if(r>0){joy.tips+=r;joy.jar+=r;if(joy.jar>=JOY_JAR){joy.jar-=JOY_JAR;joy.jars++;joy.gifts.push('jar');}
+    if(mode==='shift'&&shift)shift.joyTips=(shift.joyTips||0)+r;storeJoy();
+    box.querySelector('.joy-tips b')?.insertAdjacentHTML('beforeend',' <span class="cot-raise">'+esc(ctx_(CT2.raiseChip,{n:r}))+'</span>');}
+  cotRaiseCheck();renderGrowth();
+};
 /* ---------- A gentle nudge when tips are enough for something new ---------- */
 const cotShowMomentResult=showMomentResult;
 showMomentResult=function(i,k,mode,host){
@@ -7058,6 +7080,343 @@ const cotHmsTip=hmsTip;
 hmsTip=function(n){const before=cotWallet();cotHmsTip.apply(this,arguments);
   const target=COTTAGE_ITEMS.find(x=>!cotHas(x.id)&&before<x.price&&cotWallet()>=x.price);if(target)setTimeout(()=>toast(ctx_(CT.enough,{name:cL(target)[0]})),900);};
 
+/* ---------- COTTAGE v2: Staff Lane, rides and raises ----------
+   - Living on the grounds is a choice. Four cottages on Staff Lane, each with its own look inside.
+     Players can live in town instead and move in (or out) any time.
+   - Rides bought with tips: they follow you around the manor and the festival grounds, and most
+     are faster than walking. Four of them fly. One is a giant snail, which is not fast at all.
+   - Raises: as your Silver Key skills grow, every best answer earns extra tips. Better work, more
+     tips, bigger dreams (like the flying car). */
+const CT2_TEXT={
+en:{
+  lane:'STAFF LANE · {name}',townKick:'STAFF COTTAGES · OPTIONAL',townTitle:'Staff Lane',
+  tabs:{inside:'🏡 Inside',rides:'🛵 Rides',homes:'🗝️ Cottages'},
+  offerQ:'Would you like to live on the grounds?',
+  offer:'Staff can live in a little cottage on Staff Lane, a short walk from the manor. It is free, it is optional, and you can change your mind any time.',
+  offerYes:'Yes, pick a cottage →',offerNo:'Not now, I live in town',
+  town:'You live in town. The cottages on Staff Lane are always there if you want one, and tips still buy rides for the trip in.',
+  moveIn:'Move into a cottage →',seeRides:'See the rides →',
+  homesIntro:'Four cottages, all free for staff. Pick the one that feels like you. You can move any time, and your things come with you.',
+  moveHere:'Move in here',liveHere:'You live here ✓',moveTown:'Live in town instead',movedIn:'🗝️ Welcome home to {name}!',movedTown:'You live in town now. Your cottage things will wait for you.',
+  ridesIntro:'Rides go wherever you walk: the manor halls and the festival grounds. Most are faster than walking. Some fly.',
+  ride:'Ride it',riding:'Riding ✓',walk:'Walk instead',nowRiding:'Now riding: {name}',walking:'Back on your own two feet.',
+  speed:'Speed',flies:'Flies',
+  pay:'Your pay',payNow:'+{n} tips on every best answer',payNone:'Best answers earn the usual tips',
+  payNext:'Next raise: {name} in {n} skill points',payTop:'Top pay. The manor is lucky to have you.',
+  payHow:'Raises come from your Silver Key skills. Best answers grow them.',
+  raiseKick:'YOU GOT A RAISE!',raiseLine:'Delores slides an envelope across the desk. “The guests keep mentioning you. That deserves a raise.”',
+  raiseChip:'+{n} raise',
+  grades:['New night host','Trusted host','Senior host','Night lead','Silver Key host'],
+  pins:{ride:['Wheels','Buy your first ride.'],sky:['Sky High','Buy a ride that flies.'],garage:['Whole Garage','Own every ride.'],snail:['Slow and Steady','Ride the giant snail.'],raise:['First Raise','Earn your first raise.']}
+},
+es:{
+  lane:'CALLE DEL PERSONAL · {name}',townKick:'CASITAS DEL PERSONAL · OPCIONAL',townTitle:'Calle del Personal',
+  tabs:{inside:'🏡 Dentro',rides:'🛵 Vehículos',homes:'🗝️ Casitas'},
+  offerQ:'¿Te gustaría vivir en la finca?',
+  offer:'El personal puede vivir en una casita en la Calle del Personal, a un paseo de la mansión. Es gratis, es opcional y puedes cambiar de idea cuando quieras.',
+  offerYes:'Sí, elegir una casita →',offerNo:'Ahora no, vivo en el pueblo',
+  town:'Vives en el pueblo. Las casitas de la Calle del Personal siguen ahí si quieres una, y las propinas también compran vehículos para el viaje.',
+  moveIn:'Mudarme a una casita →',seeRides:'Ver los vehículos →',
+  homesIntro:'Cuatro casitas, todas gratis para el personal. Elige la que más se parezca a ti. Puedes mudarte cuando quieras y tus cosas van contigo.',
+  moveHere:'Mudarme aquí',liveHere:'Vives aquí ✓',moveTown:'Vivir en el pueblo',movedIn:'🗝️ ¡Bienvenida a casa, a {name}!',movedTown:'Ahora vives en el pueblo. Tus cosas te esperan en la casita.',
+  ridesIntro:'Los vehículos van contigo a todas partes: los pasillos de la mansión y el recinto del festival. Casi todos son más rápidos que caminar. Algunos vuelan.',
+  ride:'Usarlo',riding:'En uso ✓',walk:'Ir a pie',nowRiding:'Ahora vas en: {name}',walking:'De vuelta a tus propios pies.',
+  speed:'Velocidad',flies:'Vuela',
+  pay:'Tu sueldo',payNow:'+{n} propinas en cada mejor respuesta',payNone:'Las mejores respuestas dan las propinas de siempre',
+  payNext:'Próximo aumento: {name} en {n} puntos de habilidad',payTop:'Sueldo máximo. La mansión tiene suerte de tenerte.',
+  payHow:'Los aumentos vienen de tus habilidades Silver Key. Las mejores respuestas las hacen crecer.',
+  raiseKick:'¡TE SUBIERON EL SUELDO!',raiseLine:'Delores te pasa un sobre por el mostrador. “Los huéspedes no paran de hablar de ti. Eso merece un aumento.”',
+  raiseChip:'+{n} aumento',
+  grades:['Anfitrión de noche nuevo','Anfitrión de confianza','Anfitrión sénior','Líder de noche','Anfitrión Silver Key'],
+  pins:{ride:['Sobre ruedas','Compra tu primer vehículo.'],sky:['Por las nubes','Compra un vehículo que vuela.'],garage:['Garaje completo','Ten todos los vehículos.'],snail:['Despacito y con buena letra','Monta el caracol gigante.'],raise:['Primer aumento','Consigue tu primer aumento.']}
+}};
+const CT2=CT2_TEXT[profile.lang]||CT2_TEXT.en;
+/* fix the Spanish welcome so it stays gender-neutral */
+if(profile.lang==='es')CT2.movedIn='🗝️ ¡Ya estás en casa, en {name}!';
+
+/* ---------- The four cottages on Staff Lane ---------- */
+const COT_HOMES=[
+  {id:'toadstool',en:['The Toadstool','A round little house under a big red cap. It smells like rain and cinnamon.'],es:['La Seta','Una casita redonda bajo un gran sombrero rojo. Huele a canela.'],
+   pal:{wall:'#f4e3c6',stripe:'#efdabb',wains:'#dcb78c',wainsTop:'#b08458',floor:'#bb8758',seam:'#a3714a'}},
+  {id:'lighthouse',en:['The Little Lighthouse','A tiny striped tower. The lamp on top is a nightlight now.'],es:['El Farito','Una torre diminuta a rayas. La luz de arriba ahora es una lamparita de noche.'],
+   pal:{wall:'#f7f6f2',stripe:'#e2eef6',wains:'#9fc3d9',wainsTop:'#6f9ab7',floor:'#cdb38c',seam:'#b39770'}},
+  {id:'treehouse',en:['The Treehouse','Up a friendly old oak, with a rope ladder and a squirrel landlord.'],es:['La Casa del Árbol','En lo alto de un roble amable, con escalera de cuerda y una ardilla casera.'],
+   pal:{wall:'#d3a674',stripe:'#c79a68',wains:'#8f6a43',wainsTop:'#6f4f30',floor:'#9c6f45',seam:'#84593a'}},
+  {id:'seashell',en:['The Seashell','A spiral pink shell by the dunes. If you listen, it hums the sea.'],es:['La Caracola','Una caracola rosa en espiral junto a las dunas. Si escuchas, tararea el mar.'],
+   pal:{wall:'#f8e2e4',stripe:'#f3d2d8',wains:'#e7b7bf',wainsTop:'#cf8f9c',floor:'#dcb88e',seam:'#c49f75'}}
+];
+const cotHome=()=>COT_HOMES.find(h=>h.id===cottage.home)||COT_HOMES[0];
+function cotPalette(){return cotHome().pal;}
+/* An outside view of one cottage, centred on (x, ground y), about 70 wide. */
+function drawCotHome(c,id,x,y,t,calm,k=1){
+  c.save();c.translate(x,y);c.scale(k,k);
+  ellipse(c,0,1,30,4,'rgba(30,60,40,.18)');
+  const win=(wx,wy,r=5)=>{ellipse(c,wx,wy,r+1.5,r+1.5,'#7a5236');ellipse(c,wx,wy,r,r,'#ffd77a');cotGlow(c,wx,wy,r*3,'rgba(255,220,140,.35)');};
+  if(id==='toadstool'){rect(c,-20,-34,40,34,'#f6ead2',8);rect(c,-6,-18,12,18,'#8a5a3a',[6,6,0,0]);ellipse(c,3,-9,1,1,'#e0c080');win(-13,-22,4);win(13,-22,4);
+    c.fillStyle='#e2655f';c.beginPath();c.ellipse(0,-34,34,22,0,Math.PI,0);c.fill();rect(c,-34,-36,68,4,'#c94f4a',2);
+    for(const [a,b,r] of [[-18,-44,4],[0,-50,5],[17,-43,3.5],[-6,-40,2.5],[24,-37,2]])ellipse(c,a,b,r,r,'#fff3ea');}
+  else if(id==='lighthouse'){c.fillStyle='#fffaf2';c.beginPath();c.moveTo(-16,0);c.lineTo(-10,-62);c.lineTo(10,-62);c.lineTo(16,0);c.fill();
+    c.fillStyle='#e2655f';
+    for(const yy of [-12,-36]){const w0=16-(-yy)*6/62,w1=16-(-yy+12)*6/62;c.beginPath();c.moveTo(-w0,yy);c.lineTo(-w1,yy-12);c.lineTo(w1,yy-12);c.lineTo(w0,yy);c.fill();}
+    rect(c,-13,-70,26,8,'#3d5a45',2);const g=calm?1:.75+.25*Math.sin(t/500);c.globalAlpha=g;cotGlow(c,0,-76,26,'rgba(255,232,150,.6)');c.globalAlpha=1;rect(c,-8,-82,16,12,'#ffe08a',2);
+    c.fillStyle='#3d5a45';c.beginPath();c.moveTo(-11,-82);c.lineTo(0,-92);c.lineTo(11,-82);c.fill();rect(c,-5,-14,10,14,'#5e7fa3',[5,5,0,0]);win(0,-48,3.5);}
+  else if(id==='treehouse'){rect(c,-6,-46,12,46,'#7a5236',3);c.strokeStyle='#7a5236';c.lineWidth=4;c.beginPath();c.moveTo(0,-38);c.lineTo(-22,-52);c.moveTo(0,-34);c.lineTo(20,-48);c.stroke();
+    for(const [a,b,r,col] of [[-20,-70,20,'#4f8a5a'],[18,-72,22,'#4f8a5a'],[0,-84,22,'#5f9d63'],[-6,-66,16,'#6aa96b']])ellipse(c,a,b,r,r*.85,col);
+    rect(c,-18,-60,36,20,'#c99a62',3);c.fillStyle='#8a5a3a';c.beginPath();c.moveTo(-22,-60);c.lineTo(0,-74);c.lineTo(22,-60);c.fill();win(-8,-50,3.5);rect(c,4,-56,8,16,'#8a5a3a',2);
+    c.strokeStyle='#e0c58e';c.lineWidth=1.2;c.beginPath();c.moveTo(14,-40);c.lineTo(14,-2);c.moveTo(20,-40);c.lineTo(20,-2);for(let r=-36;r<-2;r+=6){c.moveTo(14,r);c.lineTo(20,r);}c.stroke();}
+  else{c.fillStyle='#f6c3cd';c.beginPath();c.moveTo(-30,0);c.quadraticCurveTo(-34,-40,0,-46);c.quadraticCurveTo(30,-44,30,-14);c.quadraticCurveTo(28,0,10,0);c.closePath();c.fill();
+    c.strokeStyle='#e79aab';c.lineWidth=2;c.beginPath();for(let a=0;a<9;a+=.25){const r=3+a*3.2,xx=6+Math.cos(a)*r,yy=-24+Math.sin(a)*r*.85;a?c.lineTo(xx,yy):c.moveTo(xx,yy);}c.stroke();
+    rect(c,-22,-16,12,16,'#c98a5a',[6,6,0,0]);win(-16,-30,3.5);ellipse(c,-40,0,4,2,'#f3e2c4');ellipse(c,34,-1,3,2,'#fff3ea');}
+  c.restore();
+}
+function paintCotHome(cv,id,{w=150,h=112,lane=false}={}){
+  if(!cv)return;cv.style.width=lane?'100%':w+'px';cv.style.aspectRatio=w+'/'+h;
+  const dpr=Math.min(2,devicePixelRatio||1)*(lane?Math.max(1,(cv.clientWidth||w)/w):1);cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  const sky=c.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#23305e');sky.addColorStop(1,'#6b5f9f');c.fillStyle=sky;c.fillRect(0,0,w,h);
+  for(let k=0;k<(lane?26:8);k++)ellipse(c,(k*53)%w+3,(k*29)%(h*.5)+4,.9,.9,'#fff');ellipse(c,w-18,16,7,7,'#fff4c9');
+  c.fillStyle='#3c6b52';c.beginPath();c.moveTo(0,h-18);c.quadraticCurveTo(w*.3,h-30,w*.6,h-22);c.quadraticCurveTo(w*.85,h-16,w,h-24);c.lineTo(w,h);c.lineTo(0,h);c.fill();
+  if(lane){rect(c,0,h-12,w,12,'#d9c49a');COT_HOMES.forEach((hm,i)=>drawCotHome(c,hm.id,w*(i+.5)/4,h-12,0,true,1));}
+  else drawCotHome(c,id,w/2,h-14,0,true,1.05);
+}
+
+/* ---------- Rides ---------- */
+/* speed: how much faster than walking. lift: how high you sit. fly: floats and bobs. */
+const COT_RIDES=[
+  {id:'skate',price:30,speed:1.3,lift:4,en:['Skateboard','Pink with yellow wheels. Goes “clackety-clack” over the floor tiles.'],es:['Monopatín','Rosa con ruedas amarillas. Hace “clac-clac” sobre las baldosas.']},
+  {id:'scooter',price:45,speed:1.4,lift:4,en:['Kick scooter','One kick and you are gliding. It has a tiny bell.'],es:['Patinete','Una patada y ya vas deslizándote. Tiene una campanita.']},
+  {id:'bike',price:60,speed:1.55,lift:10,en:['Bike with a basket','The basket holds one sandwich and one daisy, as is tradition.'],es:['Bici con cesta','En la cesta caben un bocadillo y una margarita, como manda la tradición.']},
+  {id:'snail',price:75,speed:.75,lift:16,en:['Giant snail','The slowest ride on the island. Everyone waves.'],es:['Caracol gigante','El vehículo más lento de la isla. Todo el mundo saluda.']},
+  {id:'cart',price:100,speed:1.6,lift:5,en:['Manor golf cart','Mint green, with a little crest on the side and a cup holder for tea.'],es:['Carrito de la mansión','Verde menta, con un escudito en el lado y un portavasos para el té.']},
+  {id:'broom',price:130,speed:1.75,lift:6,fly:true,en:['Flying broom','It sweeps the air as it goes. Very tidy.'],es:['Escoba voladora','Barre el aire mientras vuela. Muy ordenada.']},
+  {id:'carpet',price:160,speed:1.75,lift:2,fly:true,en:['Magic carpet','Woven from sunset colours. Ripples like a happy cat.'],es:['Alfombra mágica','Tejida con colores de atardecer. Ondula como un gato feliz.']},
+  {id:'teacup',price:200,speed:1.7,lift:9,fly:true,en:['Flying teacup','You ride inside it. It never spills.'],es:['Taza voladora','Vas dentro. Nunca se derrama.']},
+  {id:'car',price:280,speed:2,lift:10,fly:true,en:['Flying car','Bubble-shaped, mint and silver, with a soft “whirr”. The dream.'],es:['Coche volador','Con forma de burbuja, menta y plata, con un suave “zumm”. El sueño.']}
+];
+const cotRide=()=>COT_RIDES.find(r=>r.id===cottage.ride&&cottage.rides.includes(r.id))||null;
+/* Draws a ride at the ground point (0,0), facing right. pass 'back' is under you, 'front' over you. */
+function drawRide(c,id,t,calm,pass){
+  const bob=calm?0:Math.sin(t/380)*2.2,wheel=(x,y,r,col='#3a3040')=>{ellipse(c,x,y,r,r,col);ellipse(c,x,y,r*.45,r*.45,'#d8d2c6');};
+  if(id==='skate'&&pass==='back'){rect(c,-17,-6,34,4,'#f28aa8',2);rect(c,-15,-6,30,1.4,'#ffc2d4',1);wheel(-10,-1,2.4,'#ffd84d');wheel(10,-1,2.4,'#ffd84d');}
+  if(id==='scooter'){if(pass==='back'){rect(c,-15,-6,28,3.5,'#5f9fbf',2);wheel(-13,-2,3,'#333');wheel(13,-2,3,'#333');}
+    else{c.strokeStyle='#8fb4c9';c.lineWidth=2.4;c.beginPath();c.moveTo(11,-6);c.lineTo(15,-38);c.stroke();rect(c,9,-40,12,3,'#5f9fbf',1.5);ellipse(c,20,-41,1.8,1.8,'#ffd84d');}}
+  if(id==='bike'){if(pass==='back'){c.strokeStyle='#e2655f';c.lineWidth=2;c.beginPath();c.arc(-15,-9,9,0,Math.PI*2);c.arc(15,-9,9,0,Math.PI*2);c.stroke();
+      c.strokeStyle='#d9534f';c.lineWidth=2.4;c.beginPath();c.moveTo(-15,-9);c.lineTo(-3,-22);c.lineTo(11,-22);c.lineTo(15,-9);c.moveTo(-3,-22);c.lineTo(2,-9);c.lineTo(-15,-9);c.stroke();rect(c,-8,-26,10,3,'#5a3720',1.5);}
+    else{c.strokeStyle='#d9534f';c.lineWidth=2.2;c.beginPath();c.moveTo(11,-22);c.lineTo(13,-32);c.lineTo(8,-33);c.stroke();rect(c,14,-30,12,8,'#d8b07a',2);for(let k=0;k<3;k++)rect(c,15+k*4,-30,1,8,'#b08458');ellipse(c,22,-31,2.4,2.4,'#fff');ellipse(c,22,-31,1,1,'#ffd84d');}}
+  if(id==='snail'){if(pass==='back'){c.fillStyle='#b8d98f';c.beginPath();c.moveTo(-26,0);c.quadraticCurveTo(-28,-8,-10,-8);c.lineTo(22,-8);c.quadraticCurveTo(30,-8,30,-16);c.quadraticCurveTo(34,-22,28,-22);c.lineTo(20,-12);c.lineTo(20,0);c.closePath();c.fill();
+      ellipse(c,-4,-20,17,15,'#e9a84f');c.strokeStyle='#c4782f';c.lineWidth=2;c.beginPath();for(let a=0;a<10;a+=.3){const r=1+a*1.4,xx=-4+Math.cos(a)*r,yy=-20+Math.sin(a)*r;a?c.lineTo(xx,yy):c.moveTo(xx,yy);}c.stroke();}
+    else{c.strokeStyle='#9cc477';c.lineWidth=1.6;c.beginPath();c.moveTo(29,-20);c.lineTo(31,-30);c.moveTo(27,-20);c.lineTo(25,-29);c.stroke();ellipse(c,31,-31,2,2,'#2a2430');ellipse(c,25,-30,2,2,'#2a2430');ellipse(c,30.5,-31.5,.6,.6,'#fff');c.fillStyle='#f28aa8';c.globalAlpha=.6;ellipse(c,26,-17,2,1.2,'#f28aa8');c.globalAlpha=1;}}
+  if(id==='cart'){if(pass==='back'){rect(c,-22,-44,44,4,'#f6f1e4',2);rect(c,-20,-40,2.4,26,'#b8b0a0');rect(c,17,-40,2.4,26,'#b8b0a0');rect(c,-18,-26,12,14,'#7fb8a3',3);}
+    else{rect(c,-24,-16,48,12,'#8fd6c4',5);rect(c,-24,-16,48,3,'#bfeee0',2);ellipse(c,0,-10,4,4,'#d9b44a');wheel(-14,-3,4.4);wheel(14,-3,4.4);ellipse(c,22,-12,2,1.4,'#fff6c4');}}
+  if(id==='broom'&&pass==='back'){c.save();c.translate(0,bob);c.strokeStyle='#8a5a3a';c.lineWidth=3;c.beginPath();c.moveTo(-24,-4);c.lineTo(22,-8);c.stroke();
+    c.fillStyle='#e8c46a';c.beginPath();c.moveTo(-22,-4);c.lineTo(-36,-12);c.lineTo(-38,2);c.closePath();c.fill();c.strokeStyle='#c99a3e';c.lineWidth=.8;c.beginPath();for(let k=0;k<4;k++){c.moveTo(-23,-4);c.lineTo(-37,-10+k*4);}c.stroke();rect(c,-24,-7,4,6,'#d9534f',1);
+    if(!calm)for(let k=0;k<3;k++){const a=((t/500)+k/3)%1;c.globalAlpha=1-a;ellipse(c,-38-a*14,-4+Math.sin(k*2)*4,1.4,1.4,'#ffe9a6');}c.globalAlpha=1;c.restore();}
+  if(id==='carpet'&&pass==='back'){c.save();c.translate(0,bob);const wv=k=>calm?0:Math.sin(t/220+k)*1.6;
+    c.fillStyle='#c4506a';c.beginPath();c.moveTo(-26,-2+wv(0));for(let k=1;k<=4;k++)c.lineTo(-26+k*13,-2+wv(k));c.lineTo(26,4+wv(4));for(let k=3;k>=0;k--)c.lineTo(-26+k*13,4+wv(k));c.closePath();c.fill();
+    c.fillStyle='#ffd77a';for(let k=0;k<4;k++)rect(c,-22+k*13,0+wv(k+.5),6,2,'#ffd77a',1);c.fillStyle='#7d5bb8';for(let k=0;k<5;k++)rect(c,-25+k*12.5,1+wv(k),2,1.4,'#7d5bb8');
+    c.strokeStyle='#ffd77a';c.lineWidth=1;c.beginPath();for(const [x,s] of [[-26,-1],[26,1]])for(let k=0;k<3;k++){c.moveTo(x,-1+k*2+wv(s>0?4:0));c.lineTo(x+s*4,k*2+wv(s>0?4:0));}c.stroke();c.restore();}
+  if(id==='teacup'){c.save();c.translate(0,bob);if(pass==='back'){ellipse(c,0,-2,22,4,'#f1e6d6');ellipse(c,0,-20,17,4.4,'#f6c3cd');ellipse(c,0,-20,14.5,3,'#c48a5a');}
+    else{c.fillStyle='#fffaf2';c.beginPath();c.moveTo(-17,-20);c.quadraticCurveTo(-16,-2,0,-2);c.quadraticCurveTo(16,-2,17,-20);c.closePath();c.fill();rect(c,-16,-15,32,3,'#f2a7bb');
+      c.strokeStyle='#fffaf2';c.lineWidth=3;c.beginPath();c.arc(19,-13,5,-1.3,1.3);c.stroke();heartPath(c,0,-8,3.4,'#f28aa8');}c.restore();}
+  if(id==='car'){c.save();c.translate(0,bob);if(pass==='back'){c.fillStyle='rgba(200,240,255,.45)';c.beginPath();c.ellipse(0,-20,16,14,0,Math.PI,0);c.fill();}
+    else{rect(c,-28,-20,56,15,'#8fd6c4',8);rect(c,-28,-20,56,4,'#c8f2e6',4);rect(c,-26,-11,52,3,'#c9d3d6',1.5);ellipse(c,25,-14,2.6,2,'#fff6c4');ellipse(c,-26,-14,2,1.6,'#f28aa8');
+      c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=1.2;c.beginPath();c.ellipse(0,-20,16,14,0,Math.PI*1.1,Math.PI*1.45);c.stroke();
+      const g=calm?1:.7+.3*Math.sin(t/90);for(const x of [-16,16]){c.globalAlpha=g;cotGlow(c,x,-2,9,'rgba(140,220,255,.7)');ellipse(c,x,-4,4,2,'#bfeaff');}c.globalAlpha=1;}c.restore();}
+}
+function paintRide(cv,id){
+  if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),W=96,H=72;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);const r=COT_RIDES.find(x=>x.id===id);
+  ellipse(c,W/2,H-8,24,4,'rgba(60,40,30,.15)');c.save();c.translate(W/2,H-8-(r.fly?6:0));c.scale(1.4,1.4);drawRide(c,id,0,true,'back');drawRide(c,id,0,true,'front');c.restore();
+}
+/* In the world: the ride goes under you, you sit up on it, the front parts go over you. */
+const cotFace={dir:1};
+const rideDrawPerson=drawPerson;
+drawPerson=function(c,x,y,person={},step=0,dir='down',carrying=false,scale=1){
+  const r=person&&person.cast==='player'&&!titleVisible?cotRide():null;
+  if(!r)return rideDrawPerson.apply(this,arguments);
+  if(dir==='left')cotFace.dir=-1;else if(dir==='right')cotFace.dir=1;
+  const t=castNow(),calm=!!settings.motion,gy=y+12*scale,k=scale,hover=r.fly?10:0,bob=r.fly&&!calm?Math.sin(t/380)*2.2*k:0;
+  if(r.fly){ellipse(c,x,gy+1,18,4.5,'rgba(20,40,30,.22)');}
+  c.save();c.translate(x,gy-hover);c.scale(cotFace.dir*k,k);drawRide(c,r.id,t,calm,'back');c.restore();
+  c.save();c.translate(0,-(r.lift*k+hover)-bob);const out=rideDrawPerson.call(this,c,x,y,person,0,dir,carrying,scale);c.restore();
+  c.save();c.translate(x,gy-hover);c.scale(cotFace.dir*k,k);drawRide(c,r.id,t,calm,'front');c.restore();
+  return out;
+};
+world.options.speed=()=>{const r=cotRide();return r?r.speed:1;};
+
+/* ---------- Raises ---------- */
+const PAY_AT=[0,80,220,450,800];
+const skillPoints=()=>{const p=growth.pts||{};return (p.trust|0)+(p.care|0)+(p.team|0);};
+function payGrade(pts=skillPoints()){let g=0;PAY_AT.forEach((v,k)=>{if(pts>=v)g=k;});return g;}
+if(cottage.grade<0)cottage.grade=payGrade();storeCottage();
+function cotRaiseCheck(){const g=payGrade();if(g>cottage.grade){cottage.grade=g;storeCottage();joySound('open',2);
+  celebrate({icon:'💰',kicker:CT2.raiseKick,label:CT2.grades[g]+' · '+ctx_(CT2.payNow,{n:g}),confetti:true});toast(CT2.raiseLine);checkPins();}}
+function payHTML(){
+  const g=payGrade(),pts=skillPoints(),next=PAY_AT[g+1];
+  const pct=next==null?100:Math.round((pts-PAY_AT[g])/(next-PAY_AT[g])*100);
+  return '<div class="cot-pay"><span class="cot-ic" aria-hidden="true">💰</span><div class="cot-nx"><small>'+esc(CT2.pay)+' · '+esc(CT2.grades[g])+'</small><b>'+esc(g?ctx_(CT2.payNow,{n:g}):CT2.payNone)+'</b>'+
+    '<span class="bar" role="meter" aria-label="'+esc(CT2.pay)+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><i style="width:'+pct+'%"></i></span>'+
+    '<span class="cot-left">'+esc(next==null?CT2.payTop:ctx_(CT2.payNext,{name:CT2.grades[g+1],n:next-pts}))+' · '+esc(CT2.payHow)+'</span></div></div>';
+}
+
+/* ---------- Tabs, the lane, rides and cottages screens ---------- */
+function cotTabs(tab){return '<div class="cot-tabs" role="tablist">'+['inside','rides','homes','dream'].map(k=>'<button role="tab" class="cot-tab'+(k===tab?' on':'')+'" aria-selected="'+(k===tab)+'" data-tab="'+k+'">'+esc(k==='dream'?DT.tab:CT2.tabs[k])+'</button>').join('')+'</div>';}
+function cotHead(tab){
+  const live=cottage.live===true;
+  return '<span class="overline">'+(live?'🏡 '+esc(ctx_(CT2.lane,{name:cL(cotHome())[0].toUpperCase()})):'🗝️ '+esc(CT2.townKick))+'</span><h2 id="modal-heading">'+esc(live?CT.name:CT2.townTitle)+'</h2>'+cotTabs(tab);
+}
+function cotWire(){body.querySelectorAll('.cot-tab').forEach(b=>b.onclick=()=>openCottage(b.dataset.tab));
+  const acts=$('cot-actions');if(acts&&!acts.children.length){const d=document.createElement('button');d.className='primary-button';d.textContent=titleVisible?t('Done'):t('Back to the manor');d.onclick=closeModal;acts.append(d);}
+  modal.classList.add('cot-modal');narrativeText=body.innerText;}
+function cotWalletHTML(){const w=cotWallet();return '<div class="cot-top"><span class="cot-wallet"><span aria-hidden="true">🪙</span> <b>'+esc(w===1?CT.walletOne:ctx_(CT.wallet,{n:w}))+'</b></span></div>';}
+function openCottageLane(){
+  const ask=cottage.live==null;
+  openModal(cotHead('inside')+'<div class="cot-stage lane"><canvas id="cot-lane" aria-hidden="true"></canvas></div>'+
+    '<div class="cot-offer"><h3>'+esc(ask?CT2.offerQ:CT2.townTitle)+'</h3><p>'+esc(ask?CT2.offer:CT2.town)+'</p><div class="cot-offer-row" id="cot-offer-row"></div></div>'+payHTML()+'<div class="action-row" id="cot-actions"></div>',true);
+  paintCotHome($('cot-lane'),'',{w:400,h:130,lane:true});
+  const row=$('cot-offer-row'),add=(label,primary,fn)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=fn;row.append(b);};
+  add(ask?CT2.offerYes:CT2.moveIn,true,()=>openCottage('homes'));
+  if(ask)add(CT2.offerNo,false,()=>{cottage.live=false;storeCottage();openCottage('inside');});else add(CT2.seeRides,false,()=>openCottage('rides'));
+  cotWire();
+}
+function openCottageHomes(){
+  openModal(cotHead('homes')+'<p class="joy-hint">'+esc(CT2.homesIntro)+'</p><ul class="cot-homes" id="cot-homes"></ul><div class="action-row" id="cot-actions"></div>',true);
+  const ul=$('cot-homes');
+  COT_HOMES.filter(h=>!h.dream||dreamDone()).forEach((h,i)=>{const L=cL(h),here=cottage.live===true&&cottage.home===h.id,li=document.createElement('li');li.className=here?'on':'';
+    li.innerHTML='<canvas aria-hidden="true"></canvas><b>'+(i+1)+' · '+esc(L[0])+'</b><small>'+esc(L[1])+'</small>'+(here?'<span class="cot-tag">'+esc(CT2.liveHere)+'</span>':'<button class="secondary-button">'+esc(CT2.moveHere)+'</button>');
+    ul.append(li);paintCotHome(li.querySelector('canvas'),h.id);
+    li.querySelector('button')?.addEventListener('click',()=>{cottage.live=true;cottage.home=h.id;storeCottage();joySound('open',1);toast(ctx_(CT2.movedIn,{name:L[0]}));openCottage('inside');});});
+  if(cottage.live===true){const b=document.createElement('button');b.className='text-button cot-town';b.textContent=CT2.moveTown;b.onclick=()=>{cottage.live=false;storeCottage();toast(CT2.movedTown);openCottage('inside');};ul.after(b);}
+  cotWire();
+}
+function openCottageRides(){
+  openModal(cotHead('rides')+cotWalletHTML()+payHTML()+'<p class="joy-hint">'+esc(CT2.ridesIntro)+'</p><ul class="cot-rides" id="cot-rides"></ul><div class="action-row" id="cot-actions"></div>',true);
+  const ul=$('cot-rides'),w=cotWallet(),cur=cotRide();
+  for(const r of COT_RIDES){const L=cL(r),own=cottage.rides.includes(r.id),ok=!own&&w>=r.price,li=document.createElement('li');li.className=(own?'own':ok?'ok':'')+(cur&&cur.id===r.id?' on':'');
+    const stars=Math.max(1,Math.round((r.speed-.5)*2.4));
+    li.innerHTML='<canvas aria-hidden="true"></canvas><span class="cot-tx"><b>'+esc(L[0])+'</b><small>'+esc(L[1])+'</small><small class="cot-spd">'+esc(CT2.speed)+' '+'★'.repeat(stars)+'<i>'+'★'.repeat(Math.max(0,5-stars))+'</i>'+(r.fly?' · '+esc(CT2.flies)+' ☁️':'')+'</small></span>';
+    const b=document.createElement('button');
+    if(own){const on=cur&&cur.id===r.id;b.className=on?'secondary-button':'primary-button';b.textContent=on?CT2.walk:CT2.ride;
+      b.onclick=()=>{cottage.ride=on?'':r.id;storeCottage();if(!on){joySound('hop');toast(ctx_(CT2.nowRiding,{name:L[0]}));if(r.id==='snail'){cottage.snail=1;}}else toast(CT2.walking);checkPins();renderGrowth();openCottage('rides');};
+      if(on){const tag=document.createElement('span');tag.className='cot-tag';tag.textContent=CT2.riding;li.append(tag);}}
+    else{b.className=ok?'primary-button':'secondary-button';b.textContent=ctx_(CT.buyShort,{n:r.price});b.disabled=!ok;
+      b.onclick=()=>{if(cotWallet()<r.price||cottage.rides.includes(r.id))return;joy.tips-=r.price;cottage.spent+=r.price;cottage.rides.push(r.id);cottage.ride=r.id;if(r.id==='snail')cottage.snail=1;storeJoy();storeCottage();
+        const [x,y]=centerOf(b);burst(x,y,1.4,{hearts:true,rainbow:r.fly});floatText(x,y-20,'-'+r.price+' 🪙',{size:18,col:'#fff3c4'});joySound('open',r.price>=150?2:1);
+        celebrate({icon:'🛵',kicker:CT2.tabs.rides.replace(/^\S+ /,''),label:ctx_(CT2.nowRiding,{name:L[0]}),confetti:r.price>=150});checkPins();renderGrowth();openCottage('rides');};}
+    li.append(b);ul.append(li);paintRide(li.querySelector('canvas'),r.id);}
+  cotWire();
+}
+
+/* ---------- The dream house: a sleepy old fixer-upper at the end of Staff Lane ----------
+   A big goal to save for. Buy the deed, then fix it up one project at a time. Nothing ever
+   breaks again or costs upkeep: every project only makes it lovelier. */
+const DREAM_TEXT={
+en:{
+  tab:'🏚️ Dream house',name:'Willowbrook House',kick:'THE END OF STAFF LANE · A FIXER-UPPER',
+  intro:'An old house at the end of Staff Lane, a little sleepy and very loved. It is for sale to staff. Save up, make it yours, then fix it up one project at a time.',
+  deed:'Buy the house',deedLine:'The keys, the deed, and one very old doorbell that plays half a tune.',
+  bought:'🔑 Willowbrook House is yours!',saving:'Saving for your own house',left:'{n} more tips',
+  projects:'Fix-up projects',projIntro:'Pick any project you can afford. Tap Fix it and watch the house wake up.',
+  fix:'Fix it · {n} 🪙',fixed:'Done ✓',
+  doneAll:'Willowbrook House is finished, and it is beautiful. Everyone you know came to the housewarming.',
+  liveHere:'Live here',livingHere:'You live here ✓',
+  status:'{n} of {total} projects done',
+  pins:{deed:['Homeowner','Buy Willowbrook House.'],done:['Labour of Love','Finish every fix-up project.']}
+},
+es:{
+  tab:'🏚️ Casa soñada',name:'Casa Willowbrook',kick:'AL FINAL DE LA CALLE DEL PERSONAL · PARA REFORMAR',
+  intro:'Una casa antigua al final de la Calle del Personal, un poco dormida y muy querida. Está a la venta para el personal. Ahorra, hazla tuya y arréglala proyecto a proyecto.',
+  deed:'Comprar la casa',deedLine:'Las llaves, la escritura y un timbre muy viejo que toca media canción.',
+  bought:'🔑 ¡La Casa Willowbrook es tuya!',saving:'Ahorrando para tu propia casa',left:'Faltan {n} propinas',
+  projects:'Proyectos de reforma',projIntro:'Elige cualquier proyecto que puedas pagar. Toca Arreglar y mira cómo la casa despierta.',
+  fix:'Arreglar · {n} 🪙',fixed:'Hecho ✓',
+  doneAll:'La Casa Willowbrook está terminada, y es preciosa. Todo el mundo vino a la inauguración.',
+  liveHere:'Vivir aquí',livingHere:'Vives aquí ✓',
+  status:'{n} de {total} proyectos hechos',
+  pins:{deed:['Propietario','Compra la Casa Willowbrook.'],done:['Hecho con amor','Termina todos los proyectos de reforma.']}
+}};
+const DT=DREAM_TEXT[profile.lang]||DREAM_TEXT.en;
+const DREAM_PRICE=500;
+const DREAM_PROJECTS=[
+  {id:'windows',price:60,icon:'🪟',en:['Wash the windows','Years of dust off. Now they glow at night.'],es:['Limpiar las ventanas','Años de polvo fuera. Ahora brillan de noche.']},
+  {id:'door',price:80,icon:'🚪',en:['A new front door','Round at the top, sage green, with a wreath.'],es:['Una puerta nueva','Redonda arriba, verde salvia, con una corona de flores.']},
+  {id:'fence',price:90,icon:'🪵',en:['White picket fence','Every picket stands up straight and proud.'],es:['Valla blanca','Cada tabla está derecha y orgullosa.']},
+  {id:'porch',price:100,icon:'🪜',en:['Mend the porch','No more creaky step. (It still creaks a little, for charm.)'],es:['Arreglar el porche','Se acabó el escalón que cruje. (Cruje un poquito, por encanto.)']},
+  {id:'roof',price:120,icon:'🏠',en:['Fix the roof','Brand new shingles in a cheerful red.'],es:['Arreglar el tejado','Tejas nuevas de un rojo alegre.']},
+  {id:'paint',price:150,icon:'🎨',en:['Paint the house','Soft blue with white trim, like a summer morning.'],es:['Pintar la casa','Azul suave con bordes blancos, como una mañana de verano.']},
+  {id:'garden',price:170,icon:'🌷',en:['Plant a garden','Tulips, roses and one sunflower that is taller than you.'],es:['Plantar un jardín','Tulipanes, rosas y un girasol más alto que tú.']},
+  {id:'swing',price:200,icon:'🪑',en:['Porch swing','For slow evenings, cups of tea and waving at neighbours.'],es:['Columpio del porche','Para tardes lentas, tazas de té y saludar a los vecinos.']}
+];
+const dreamHas=id=>cottage.house.done.includes(id);
+const dreamDone=()=>cottage.house.own&&DREAM_PROJECTS.every(p=>dreamHas(p.id));
+COT_HOMES.push({id:'dream',dream:true,en:['Willowbrook House','Your very own house, fixed up with your own tips.'],es:['Casa Willowbrook','Tu propia casa, reformada con tus propias propinas.'],
+  pal:{wall:'#e6eef7',stripe:'#d8e4f1',wains:'#f6f1e4',wainsTop:'#c9bfa8',floor:'#b98a5e',seam:'#a2734a'}});
+function drawDreamHouse(c,W,H,t,calm){
+  const own=cottage.house.own,h=id=>own&&dreamHas(id);
+  const sky=c.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#23305e');sky.addColorStop(1,'#7a6aa8');c.fillStyle=sky;c.fillRect(0,0,W,H);
+  for(let k=0;k<30;k++){c.globalAlpha=calm?.8:.5+.5*Math.sin(t/500+k);ellipse(c,(k*137.5)%W+4,(k*53.7)%100+6,.9,.9,'#fff');}c.globalAlpha=1;ellipse(c,W-50,36,12,12,'#fff4c9');
+  c.fillStyle='#3c6b52';c.fillRect(0,H-48,W,48);c.fillStyle='#467a5d';c.beginPath();c.moveTo(0,H-48);c.quadraticCurveTo(W/2,H-62,W,H-48);c.lineTo(W,H-40);c.lineTo(0,H-40);c.fill();
+  rect(c,186,H-44,28,44,'#d9c49a');
+  const X=110,Y=H-48,Wd=180,Hh=92;
+  /* chimney and walls */
+  rect(c,X+130,Y-Hh-46,18,40,h('roof')?'#b9655a':'#8e8580');
+  rect(c,X,Y-Hh,Wd,Hh,h('paint')?'#9fc3e6':'#b9b0a2');
+  if(!h('paint')){for(const [a,b,w2] of [[X+18,Y-70,14],[X+120,Y-40,18],[X+70,Y-82,10],[X+150,Y-74,12]])rect(c,a,b,w2,6,'#cfc7b8',3);}
+  else{rect(c,X,Y-Hh,Wd,4,'#fffaf2');rect(c,X,Y-4,Wd,4,'#fffaf2');rect(c,X,Y-Hh,4,Hh,'#fffaf2');rect(c,X+Wd-4,Y-Hh,4,Hh,'#fffaf2');}
+  /* roof */
+  c.fillStyle=h('roof')?'#d9665f':'#7f7a80';c.beginPath();c.moveTo(X-14,Y-Hh+2);c.lineTo(X+Wd/2,Y-Hh-58);c.lineTo(X+Wd+14,Y-Hh+2);c.closePath();c.fill();
+  if(h('roof')){c.strokeStyle='#bf514c';c.lineWidth=1.4;for(let k=1;k<5;k++){const yy=Y-Hh+2-k*11.5,hw=(Wd/2+14)*(1-k*11.5/60);c.beginPath();c.moveTo(X+Wd/2-hw,yy);c.lineTo(X+Wd/2+hw,yy);c.stroke();}
+    if(!calm)for(let k=0;k<3;k++){const a=((t/2200)+k/3)%1;c.globalAlpha=(1-a)*.5;ellipse(c,X+139+Math.sin(a*5)*4,Y-Hh-52-a*34,4+a*5,3+a*4,'#e8e8f0');}c.globalAlpha=1;}
+  else{rect(c,X+40,Y-Hh-24,34,20,'#5f9fbf',2);for(const [a,b] of [[X+110,Y-Hh-18],[X+92,Y-Hh-34]])rect(c,a,b,10,6,'#4a4550',1);}
+  /* windows */
+  for(const wx of [X+22,X+122]){rect(c,wx,Y-70,36,30,'#7a5236',3);
+    if(h('windows')){c.fillStyle='#ffd77a';c.fillRect(wx+3,Y-67,30,24);cotGlow(c,wx+18,Y-55,40,'rgba(255,215,130,.35)');rect(c,wx+17,Y-67,2,24,'#7a5236');rect(c,wx+3,Y-56,30,2,'#7a5236');}
+    else{c.fillStyle='#6f7480';c.fillRect(wx+3,Y-67,30,24);c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=.8;c.beginPath();c.moveTo(wx+3,Y-67);c.lineTo(wx+12,Y-58);c.moveTo(wx+3,Y-61);c.lineTo(wx+8,Y-67);c.stroke();}}
+  /* door */
+  if(h('door')){c.fillStyle='#7fa38f';c.beginPath();c.roundRect(X+76,Y-58,28,54,[14,14,0,0]);c.fill();ellipse(c,X+98,Y-30,1.8,1.8,'#d9b44a');c.strokeStyle='#4f8a5a';c.lineWidth=3;c.beginPath();c.arc(X+90,Y-44,6,0,Math.PI*2);c.stroke();ellipse(c,X+90,Y-38,2,2,'#e2655f');}
+  else{rect(c,X+76,Y-58,28,54,'#8a7560');for(const yy of [-50,-30])rect(c,X+72,Y+yy,36,5,'#a3906f',1);}
+  /* porch */
+  if(h('porch')){rect(c,X-6,Y-6,Wd+12,8,'#c99a62',2);rect(c,X+70,Y+2,40,5,'#b08458',1);rect(c,X+66,Y+7,48,5,'#a8784e',1);for(const px of [X-4,X+Wd+0])rect(c,px,Y-48,4,44,'#fffaf2');rect(c,X-6,Y-50,Wd+12,4,'#fffaf2');}
+  else{c.save();c.translate(X+Wd/2,Y);c.rotate(.03);rect(c,-Wd/2-6,-6,Wd+12,8,'#9b8a72',2);c.restore();rect(c,X+40,Y-6,16,8,'#3c3640');}
+  if(h('swing')){const sw=calm?0:Math.sin(t/900)*.06;c.save();c.translate(X+150,Y-46);c.rotate(sw);c.strokeStyle='#8a6a4a';c.lineWidth=1;c.beginPath();c.moveTo(-14,0);c.lineTo(-14,30);c.moveTo(14,0);c.lineTo(14,30);c.stroke();rect(c,-17,30,34,6,'#c99a62',2);rect(c,-15,25,30,6,'#f2a7bb',3);c.restore();}
+  /* fence */
+  if(h('fence')){for(let x=8;x<W-4;x+=14){if(x>176&&x<224)continue;rect(c,x,H-40,8,24,'#fffaf2',[4,4,0,0]);}rect(c,0,H-34,176,3,'#fffaf2');rect(c,224,H-34,W-224,3,'#fffaf2');}
+  else for(const [x,a] of [[30,.2],[70,-.15],[330,.25],[372,-.1]]){c.save();c.translate(x,H-18);c.rotate(a);rect(c,-3,-22,6,22,'#8a7a66',1);c.restore();}
+  /* garden */
+  if(h('garden')){const cols=['#f28aa8','#ffd84d','#e2655f','#c7b3ef','#fff'];for(let k=0;k<22;k++){const x=k<11?20+k*14:226+(k-11)*15,y=H-14+(k%3)*3;rect(c,x,y-6,1.4,8,'#4f8a5a');ellipse(c,x+.7,y-7,3,3,cols[k%cols.length]);}
+    rect(c,X-30,Y-60,2,58,'#4f8a5a');ellipse(c,X-29,Y-64,8,8,'#ffd84d');ellipse(c,X-29,Y-64,3.4,3.4,'#8a5a3a');}
+  else for(let k=0;k<12;k++){const x=16+k*32,y=H-12;c.strokeStyle='#5f7a4a';c.lineWidth=1.2;c.beginPath();c.moveTo(x,y);c.lineTo(x-3,y-8);c.moveTo(x,y);c.lineTo(x+3,y-9);c.stroke();}
+  if(!own){rect(c,300,H-74,64,26,'#fbf3e0',3);stroke(c,300,H-74,64,26,'#8a5a3a',1.5,3);text(c,profile.lang==='es'?'SE VENDE':'FOR SALE',332,H-57,10,'#8a3a3a');rect(c,330,H-48,4,30,'#8a5a3a');}
+  if(dreamDone()&&!calm)for(let k=0;k<8;k++){const a=((t/3000)+k/8)%1;c.globalAlpha=Math.sin(a*Math.PI);ellipse(c,30+k*48,H-60-a*40,1.6,1.6,'#fff3a0');}c.globalAlpha=1;
+}
+function dreamPaint(){const cv=$('dream-cv');if(!cv)return;const w=cv.clientWidth||400,dpr=Math.min(2,devicePixelRatio||1),W=400,H=220;cv.width=Math.round(w*dpr);cv.height=Math.round(w*H/W*dpr);
+  const c=cv.getContext('2d');c.setTransform(w/W*dpr,0,0,w/W*dpr,0,0);drawDreamHouse(c,W,H,joyCalm()?0:performance.now(),joyCalm());}
+function dreamLoop(){cancelAnimationFrame(cot.raf);const step=()=>{if(!$('dream-cv')||!modal.open)return;if(!document.hidden)dreamPaint();if(!joyCalm())cot.raf=requestAnimationFrame(step);};step();}
+function openCottageDream(){
+  const own=cottage.house.own,w=cotWallet(),n=cottage.house.done.length;
+  let html=cotHead('dream')+'<div class="cot-stage"><canvas id="dream-cv" role="img" aria-label="'+esc(DT.name)+'" style="display:block;width:100%;aspect-ratio:400/220"></canvas><p class="cot-say" id="cot-say">'+esc(!own?DT.intro:dreamDone()?DT.doneAll:DT.projIntro)+'</p></div>'+cotWalletHTML();
+  if(!own){const ok=w>=DREAM_PRICE,pct=Math.min(100,Math.round(w/DREAM_PRICE*100));
+    html+='<div class="cot-next'+(ok?' ready':'')+'"><span class="cot-ic" aria-hidden="true">🔑</span><div class="cot-nx"><small>'+esc(DT.saving)+'</small><b>'+esc(DT.name)+' · '+DREAM_PRICE+' 🪙</b><span class="bar" role="meter" aria-label="'+esc(DT.saving)+'" aria-valuemin="0" aria-valuemax="'+DREAM_PRICE+'" aria-valuenow="'+Math.min(w,DREAM_PRICE)+'"><i style="width:'+pct+'%"></i></span><span class="cot-left">'+esc(ok?CT.ready:ctx_(DT.left,{n:DREAM_PRICE-w}))+' · '+esc(DT.deedLine)+'</span></div>'+
+      (ok?'<button class="primary-button" id="dream-buy">'+esc(DT.deed)+' · '+DREAM_PRICE+' 🪙</button>':'')+'</div>'+payHTML();}
+  else{html+='<h3 class="pins-heading">'+esc(DT.projects)+' · '+esc(ctx_(DT.status,{n,total:DREAM_PROJECTS.length}))+'</h3><ul class="cot-shop" id="dream-shop"></ul>';
+    if(dreamDone())html+=(cottage.live===true&&cottage.home==='dream'?'<p class="cot-tag">🏡 '+esc(DT.livingHere)+'</p>':'<button class="primary-button" id="dream-live">🏡 '+esc(DT.liveHere)+'</button>');}
+  html+='<div class="action-row" id="cot-actions"></div>';
+  openModal(html,true);
+  if($('dream-buy'))$('dream-buy').onclick=()=>{if(cotWallet()<DREAM_PRICE||cottage.house.own)return;joy.tips-=DREAM_PRICE;cottage.spent+=DREAM_PRICE;cottage.house.own=true;storeJoy();storeCottage();joySound('open',2);
+    celebrate({icon:'🔑',kicker:DT.kick,label:DT.bought,confetti:true});checkPins();renderGrowth();openCottage('dream');};
+  if($('dream-live'))$('dream-live').onclick=()=>{cottage.live=true;cottage.home='dream';storeCottage();toast(ctx_(CT2.movedIn,{name:DT.name}));openCottage('inside');};
+  const ul=$('dream-shop');
+  if(ul)for(const p of DREAM_PROJECTS){const L=cL(p),done=dreamHas(p.id),ok=!done&&cotWallet()>=p.price,li=document.createElement('li');li.className=done?'own':ok?'ok':'';
+    li.innerHTML='<span class="cot-ic" aria-hidden="true">'+p.icon+'</span><span class="cot-tx"><b>'+esc(L[0])+'</b><small>'+esc(L[1])+'</small></span>'+(done?'<span class="cot-tag">'+esc(DT.fixed)+'</span>':'<button class="'+(ok?'primary-button':'secondary-button')+' cot-buy"'+(ok?'':' disabled')+'>'+esc(ctx_(CT.buyShort,{n:p.price}))+'</button>');
+    li.querySelector('button')?.addEventListener('click',e=>{if(cotWallet()<p.price||dreamHas(p.id))return;joy.tips-=p.price;cottage.spent+=p.price;cottage.house.done.push(p.id);storeJoy();storeCottage();
+      const [x,y]=centerOf(e.currentTarget);floatText(x,y-20,'-'+p.price+' 🪙',{size:18,col:'#fff3c4'});joySound('open',1);
+      if(dreamDone())celebrate({icon:'🏡',kicker:DT.kick,label:DT.pins.done[0],confetti:true});
+      checkPins();renderGrowth();openCottage('dream');const cv=$('dream-cv');if(cv){const r=cv.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height*.55,1.6,{hearts:true,rainbow:dreamDone()});}
+      cotSay('✨ '+L[0]+': '+L[1]);});
+    ul.append(li);}
+  requestAnimationFrame(dreamLoop);
+  cotWire();
+}
 /* ---------- Styles ---------- */
 {const st=document.createElement('style');st.textContent=`
 .cot-stage{position:relative;margin:6px 0 10px;border-radius:16px;overflow:hidden;border:3px solid #8a5a3a;box-shadow:0 10px 26px #4a2e1a33,inset 0 0 0 2px #e8c99a}
@@ -7093,6 +7452,29 @@ hmsTip=function(n){const before=cotWallet();cotHmsTip.apply(this,arguments);
 .joy-row #joy-side-cottage.ready{background:linear-gradient(180deg,#fff3c4,#ffe08a);border-color:#e6bf55;animation:cotGlow 2.2s ease-in-out infinite}
 .joy-title-mg.cottage{border-color:rgba(255,214,140,.6);background:rgba(190,130,70,.24);color:#fff4dc}
 .joy-title-mg.cottage.ready{background:rgba(230,180,70,.34)}
+.cot-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px}
+.cot-tab{border:1px solid #e0cf9e;background:#fffaf0;color:var(--ink);border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;min-height:40px}
+.cot-tab.on{background:linear-gradient(180deg,#fff3c4,#ffe08a);border-color:#e6bf55;font-weight:600}
+.cot-stage.lane canvas{display:block;width:100%}
+.cot-offer{padding:14px 16px;border-radius:16px;background:linear-gradient(160deg,#fffaf0,#f8efe0);border:1px solid #e0cf9e;margin-bottom:10px}
+.cot-offer h3{font:normal 21px Georgia,serif;margin:0 0 6px}.cot-offer p{margin:0 0 10px;line-height:1.55}
+.cot-offer-row{display:flex;gap:8px;flex-wrap:wrap}
+.cot-pay{display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:16px;background:linear-gradient(160deg,#f3fbf6,#e6f6ee);border:1px solid #b9dfc9;margin:0 0 10px}
+.cot-pay .cot-ic{font-size:28px}.cot-pay .bar i{background:linear-gradient(90deg,#5fb79a,#9fe0c4)!important}.cot-pay b{font-size:16px!important}
+.cot-raise{font:600 12px Arial,sans-serif;color:#2f6b4f;background:#dff3e8;border:1px solid #9fd3b6;border-radius:999px;padding:1px 7px}
+.cot-homes{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
+.cot-homes li{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:16px;border:1px solid #e3d6bb;background:#fffdf8}
+.cot-homes li.on{border-color:#e6bf55;background:linear-gradient(160deg,#fffaf0,#fff2cc)}
+.cot-homes canvas{border-radius:12px;width:100%!important;height:auto!important}.cot-homes small{color:#6b604e;line-height:1.4}.cot-homes button{margin-top:auto}
+.cot-town{margin:2px 0 8px}
+.cot-rides{list-style:none;padding:0;margin:8px 0 10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.cot-rides li{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:8px 12px;padding:10px;border-radius:14px;border:1px solid #e3d6bb;background:#fffdf8}
+.cot-rides li>button,.cot-rides li>.cot-tag{grid-column:1/-1}.cot-rides .cot-tx{display:flex;flex-direction:column;gap:2px}.cot-rides .cot-tx small{font-size:12px;line-height:1.35;color:#6b604e}
+.cot-rides li.ok{border-color:#e6bf55;background:linear-gradient(160deg,#fffaf0,#fff2cc)}.cot-rides li.own{background:#f2f7ee;border-color:#cfe0c4}.cot-rides li.on{box-shadow:0 0 0 2px #5fb79a inset}
+.cot-rides canvas{flex:none;border-radius:10px;background:linear-gradient(180deg,#eef4fb,#f7f0e4)}
+.cot-rides button{min-height:40px;font-size:13px;padding:6px 12px}.cot-rides button:disabled{opacity:.55}
+.cot-spd{color:#8a6a2a!important}.cot-spd i{color:#e3d6bb;font-style:normal}
+@media(max-width:520px){.cot-tab{padding:7px 10px;font-size:13px}.cot-homes{grid-template-columns:1fr 1fr}.cot-rides{grid-template-columns:1fr}.cot-pay .cot-left{font-size:11px}}
 @media(max-width:520px){.cot-shop{grid-template-columns:1fr}.cot-next .cot-ic{font-size:28px}.cot-next{flex-wrap:wrap}.cot-next .cot-buy{width:100%}.cot-say{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.cot-next.ready,.joy-row #joy-side-cottage.ready{animation:none}}
 body.reduce-motion .cot-next.ready,body.reduce-motion .joy-row #joy-side-cottage.ready,body.reduce-motion .cot-say.pop{animation:none}
@@ -7116,7 +7498,14 @@ PINS.push(
   {id:'cottage-home',icon:'🏡',name:CT.pins.first[0],hint:CT.pins.first[1],test:()=>cottage.owned.length>=1},
   {id:'cottage-cozy',icon:'🛋️',name:CT.pins.cozy[0],hint:CT.pins.cozy[1],test:()=>cottage.owned.length>=9},
   {id:'cottage-all',icon:'🕯️',name:CT.pins.all[0],hint:CT.pins.all[1],test:()=>cottage.owned.length>=COTTAGE_ITEMS.length},
-  {id:'cottage-concert',icon:'🎶',name:CT.pins.concert[0],secret:true,hint:CT.pins.concert[1],test:()=>cottage.plays>=1}
+  {id:'cottage-concert',icon:'🎶',name:CT.pins.concert[0],secret:true,hint:CT.pins.concert[1],test:()=>cottage.plays>=1},
+  {id:'ride-first',icon:'🛹',name:CT2.pins.ride[0],hint:CT2.pins.ride[1],test:()=>cottage.rides.length>=1},
+  {id:'ride-sky',icon:'🧹',name:CT2.pins.sky[0],hint:CT2.pins.sky[1],test:()=>cottage.rides.some(id=>COT_RIDES.find(r=>r.id===id)?.fly)},
+  {id:'ride-garage',icon:'🚗',name:CT2.pins.garage[0],hint:CT2.pins.garage[1],test:()=>cottage.rides.length>=COT_RIDES.length},
+  {id:'ride-snail',icon:'🐌',name:CT2.pins.snail[0],secret:true,hint:CT2.pins.snail[1],test:()=>!!cottage.snail},
+  {id:'pay-raise',icon:'💰',name:CT2.pins.raise[0],hint:CT2.pins.raise[1],test:()=>payGrade()>=1},
+  {id:'dream-deed',icon:'🔑',name:DT.pins.deed[0],hint:DT.pins.deed[1],test:()=>cottage.house.own},
+  {id:'dream-done',icon:'🏡',name:DT.pins.done[0],hint:DT.pins.done[1],test:()=>dreamDone()}
 );
 renderGrowth();checkPins();
 /* ==== end COTTAGE v1 ==== */
@@ -7566,6 +7955,531 @@ PINS.push(
 `;document.head.append(st);}
 checkPins();
 /* ==== end KNOCK v1 ==== */
+
+/* ==== STAR SERVICE v1: three habits the world's best hotels share, as quick little games ====
+   Borrowed ideas only (no hotel names, ratings brands or logos anywhere in the game):
+   - 📒 Little Things: a guest mentions what they love, you save it in the HMS notes, and when they
+     come back (the next night) you set up their room before they ask. Guest preference memory.
+   - 🪙 Magic coins: three coins a night to fix a problem or make a moment on the spot, without asking
+     a manager. Staff empowerment and service recovery. One case teaches that not every fix needs a coin.
+   - ☎️ Three-ring phone: answer before the third ring, greet the caller warmly (by name, or with the
+     manor's name on an outside line), then pick the reply that helps best. Gentle 🐢 relaxed rings option.
+   Find it on the title screen, the sidebar, the house ledger, the little brass bell on the front desk,
+   or press G. Drawn with code, every word written here in English and Spanish, nothing downloaded,
+   nothing costs money to run. Progress lives in its own key, mapachez_star_v1. */
+const STAR_TEXT={
+en:{
+  name:'Star service',kicker:'HOW THE BEST HOTELS DO IT',bell:'Star service',
+  hello:'Delores: “The loveliest hotels in the world all share three little habits. They remember people. They fix things on the spot. And they answer the phone like it’s good news. Shall we practise?”',
+  hi:'Delores: “Back for a little star practice? Pick one. They’re all short.”',
+  games:{lt:['📒','Little Things','Notice what a guest loves. Have it ready next time.'],coin:['🪙','Magic coins','Fix it or make a moment, right now. No manager needed.'],phone:['☎️','Three-ring phone','Answer before ring three, warmly, and help.']},
+  ltStatus:'{n} / {total} welcomed back',ltDue:'🛎️ {name} is back tonight!',ltNew:'{n} new guests tonight',ltRest:'New guests tomorrow',
+  coinStatus:'{n} left tonight',coinRest:'Coins return tomorrow',phoneBest:'Best: {n} ⭐',phoneNone:'No calls yet',
+  back:'Back to the manor',done:'Done',hub:'🌟 Star service',side:'🌟 Star service',title:'🌟 Star service: how the best hotels do it',
+  /* Little Things */
+  ltKick:'📒 LITTLE THINGS',ltListen:'Listening at the desk · Room {r}',ltAsk:'📒 Which little thing should go in the HMS notes?',
+  ltSaved:'Saved to the HMS notes ✓',ltRight:['Good ears! That’s the one that matters next time.','Exactly. That’s a little thing worth keeping.','Lovely noticing. Into the notes it goes.'],
+  ltMiss:'That’s nice to know, but it won’t matter on their next visit. The little thing is:',
+  ltSoon:'{name} comes back tomorrow night. Be ready!',ltSkip:'✨ See it pay off: a week later →',
+  ltReturn:'Arriving tonight · Room {r}',ltBack:'{name} is coming back!',ltSet:'Set up the room before they arrive. What did they love?',
+  ltPeek:'🖥️ Peek at the HMS notes',ltNote:'📒 HMS note',ltPeeked:'Peeking first is what the best desks do.',
+  ltYes:'💛 {name} lights up:',ltNo:'🌱 {name} smiles kindly:',ltNoAfter:'The note said: {note}. They’ll be back, and you’ll nail it.',
+  ltReview:'A favourite guest is back again · Room {r}',
+  ltRestT:'Your notebook is ready',ltRestP:'Everyone you met tonight is in the HMS notes. They’ll start coming back tomorrow night.',
+  ltNext:'Next guest →',ltBook:'📒 The notebook',ltBookT:'Little Things notebook',ltBookP:'Everything guests have told you. Real hotels keep notes like these so every shift can remember.',
+  ltLocked:'Not met yet',ltWelcomed:'Welcomed back ✓',ltWaiting:'Coming back soon',
+  /* Magic coins */
+  coinKick:'🪙 MAGIC COINS',coinIntro:'Each night you get 3 magic coins. Spend one to fix a problem or make a moment, right away. You don’t need to ask anyone.',
+  coinPick:'What do you do?',coinCost:'🪙 1 coin',coinFree:'free',
+  coinRight:['✨ Perfect. Quick, kind and just the right size.','✨ That’s the magic. Small, fast, personal.','✨ Exactly what the best hotels would do.'],
+  coinKeep:'✨ You kept your coin! Not every fix needs one. Sometimes it’s just doing it now, with a smile.',
+  coinMiss:'🌱 Close. The best move was:',coinTip:'⭐ Real tip:',coinNext:'Next moment →',
+  coinRestT:'Coins all spent',coinRestP:'Every coin went to a guest tonight. They come back tomorrow night.',coinLeft:'{n} coins left tonight',
+  /* Three-ring phone */
+  phKick:'☎️ THREE-RING PHONE',phIntro:'The best hotels answer before the third ring. Then: a warm hello (use their name!) and a helpful answer. Five calls.',
+  phRelaxed:'🐢 Relaxed rings',phStart:'📞 Start the calls',phAnswer:'📞 Answer',phRing:'Ring {n}',
+  phCall:'CALL {n} OF {total}',phRingOk:'Ring {n}! ⭐',phRingLate:'Ring {n}. They waited a little. Try before ring three next time.',
+  phRoom:'Room {r} · {who}',phOutside:'Outside line',phGreet:'How do you say hello?',phHelp:'They ask: “{ask}”',phReply:'What do you say?',
+  phNext:'Next call →',phEnd:'See how you did →',phDoneT:'Calls done!',phStars:'{n} / {total} ⭐',phBestNew:'New best!',phAgain:'📞 Five more calls',
+  phLearn:'Little lessons from tonight’s calls:',phPerfect:'Every call perfect. Guests can hear that smile.',
+  greet:{room:['Good evening, {first}! Front desk. How can I help?','Yeah? What is it?','Hello? Who’s calling?'],
+    out:['Good evening, Mapáchez Manor, front desk. How may I help?','Hello?','Front desk, hold please.']},
+  greetWhy:{room:'Their name is on the screen. Use it, warmly.',out:'On an outside line, say the manor’s name so they know they reached the right place.'},
+  pins:{remember:['You Remembered','Welcome a guest back with the little thing they love.'],keeper:['Little Things Keeper','Welcome back every guest in the notebook.'],
+    coin:['Magic Coin','Use a magic coin just right.'],miracle:['Little Miracles','Solve all eight magic coin moments.'],
+    ring:['Three Rings','Finish a round of phone calls.'],smile:['Picks Up Smiling','Get every star in a round of calls.'],first:['Before It Finished','Answer ten calls on the very first ring.']}
+},
+es:{
+  name:'Servicio estrella',kicker:'CÓMO LO HACEN LOS MEJORES HOTELES',bell:'Servicio estrella',
+  hello:'Delores: “Los hoteles más bonitos del mundo comparten tres costumbres. Recuerdan a las personas. Arreglan las cosas al momento. Y contestan el teléfono como si fuera una buena noticia. ¿Practicamos?”',
+  hi:'Delores: “¿Otra vez a practicar estrellas? Elige una. Todas son cortitas.”',
+  games:{lt:['📒','Pequeños detalles','Fíjate en lo que le encanta a un huésped. Tenlo listo la próxima vez.'],coin:['🪙','Monedas mágicas','Arréglalo o crea un momento, ya mismo. Sin pedir permiso.'],phone:['☎️','Teléfono de tres tonos','Contesta antes del tercer tono, con calidez, y ayuda.']},
+  ltStatus:'{n} / {total} recibidos de vuelta',ltDue:'🛎️ ¡{name} vuelve esta noche!',ltNew:'{n} huéspedes nuevos esta noche',ltRest:'Más huéspedes mañana',
+  coinStatus:'Quedan {n} esta noche',coinRest:'Las monedas vuelven mañana',phoneBest:'Récord: {n} ⭐',phoneNone:'Aún sin llamadas',
+  back:'Volver a la mansión',done:'Listo',hub:'🌟 Servicio estrella',side:'🌟 Servicio estrella',title:'🌟 Servicio estrella: cómo lo hacen los mejores hoteles',
+  ltKick:'📒 PEQUEÑOS DETALLES',ltListen:'Escuchando en recepción · Habitación {r}',ltAsk:'📒 ¿Qué pequeño detalle va a las notas del HMS?',
+  ltSaved:'Guardado en las notas del HMS ✓',ltRight:['¡Buen oído! Eso es lo que importará la próxima vez.','Exacto. Ese detalle merece guardarse.','Qué bien te has fijado. A las notas va.'],
+  ltMiss:'Es bonito saberlo, pero no importará en su próxima visita. El pequeño detalle es:',
+  ltSoon:'{name} vuelve mañana por la noche. ¡Prepárate!',ltSkip:'✨ Mira cómo da fruto: una semana después →',
+  ltReturn:'Llega esta noche · Habitación {r}',ltBack:'¡{name} vuelve!',ltSet:'Prepara la habitación antes de que llegue. ¿Qué le encantaba?',
+  ltPeek:'🖥️ Mirar las notas del HMS',ltNote:'📒 Nota del HMS',ltPeeked:'Mirar primero es lo que hacen las mejores recepciones.',
+  ltYes:'💛 A {name} se le ilumina la cara:',ltNo:'🌱 {name} sonríe con cariño:',ltNoAfter:'La nota decía: {note}. Volverá, y lo harás genial.',
+  ltReview:'Un huésped muy querido vuelve otra vez · Habitación {r}',
+  ltRestT:'Tu cuaderno está listo',ltRestP:'Todas las personas que conociste esta noche están en las notas del HMS. Empezarán a volver mañana por la noche.',
+  ltNext:'Siguiente huésped →',ltBook:'📒 El cuaderno',ltBookT:'Cuaderno de pequeños detalles',ltBookP:'Todo lo que te han contado los huéspedes. Los hoteles de verdad guardan notas así para que cada turno pueda recordar.',
+  ltLocked:'Aún sin conocer',ltWelcomed:'Recibido de vuelta ✓',ltWaiting:'Vuelve pronto',
+  coinKick:'🪙 MONEDAS MÁGICAS',coinIntro:'Cada noche tienes 3 monedas mágicas. Usa una para arreglar un problema o crear un momento, al instante. No necesitas pedir permiso a nadie.',
+  coinPick:'¿Qué haces?',coinCost:'🪙 1 moneda',coinFree:'gratis',
+  coinRight:['✨ Perfecto. Rápido, amable y del tamaño justo.','✨ Esa es la magia. Pequeño, rápido y personal.','✨ Justo lo que harían los mejores hoteles.'],
+  coinKeep:'✨ ¡Te quedas la moneda! No todo arreglo la necesita. A veces basta con hacerlo ya, con una sonrisa.',
+  coinMiss:'🌱 Casi. Lo mejor era:',coinTip:'⭐ Consejo real:',coinNext:'Siguiente momento →',
+  coinRestT:'Monedas gastadas',coinRestP:'Cada moneda fue para un huésped esta noche. Vuelven mañana por la noche.',coinLeft:'Quedan {n} monedas esta noche',
+  phKick:'☎️ TELÉFONO DE TRES TONOS',phIntro:'Los mejores hoteles contestan antes del tercer tono. Después: un saludo cálido (¡usa su nombre!) y una respuesta útil. Cinco llamadas.',
+  phRelaxed:'🐢 Tonos tranquilos',phStart:'📞 Empezar las llamadas',phAnswer:'📞 Contestar',phRing:'Tono {n}',
+  phCall:'LLAMADA {n} DE {total}',phRingOk:'¡Tono {n}! ⭐',phRingLate:'Tono {n}. Esperaron un poquito. La próxima, antes del tercer tono.',
+  phRoom:'Habitación {r} · {who}',phOutside:'Línea externa',phGreet:'¿Cómo saludas?',phHelp:'Te dicen: “{ask}”',phReply:'¿Qué respondes?',
+  phNext:'Siguiente llamada →',phEnd:'Ver cómo te fue →',phDoneT:'¡Llamadas terminadas!',phStars:'{n} / {total} ⭐',phBestNew:'¡Nuevo récord!',phAgain:'📞 Cinco llamadas más',
+  phLearn:'Pequeñas lecciones de las llamadas de hoy:',phPerfect:'Todas las llamadas perfectas. Los huéspedes oyen esa sonrisa.',
+  greet:{room:['¡Buenas noches, {first}! Recepción. ¿En qué puedo ayudarle?','¿Sí? ¿Qué pasa?','¿Hola? ¿Quién llama?'],
+    out:['Buenas noches, Mapáchez Manor, recepción. ¿En qué puedo ayudarle?','¿Hola?','Recepción, espere, por favor.']},
+  greetWhy:{room:'Su nombre está en la pantalla. Úsalo, con calidez.',out:'En una línea externa, di el nombre de la mansión para que sepan que llamaron al lugar correcto.'},
+  pins:{remember:['Te acordaste','Recibe a un huésped con el pequeño detalle que le encanta.'],keeper:['Guardián de detalles','Recibe de vuelta a cada huésped del cuaderno.'],
+    coin:['Moneda mágica','Usa una moneda mágica justo como hace falta.'],miracle:['Pequeños milagros','Resuelve los ocho momentos de monedas mágicas.'],
+    ring:['Tres tonos','Termina una ronda de llamadas.'],smile:['Contesta sonriendo','Consigue todas las estrellas en una ronda de llamadas.'],first:['Antes de que acabe','Contesta diez llamadas en el primer tono.']}
+}};
+const ST=STAR_TEXT[profile.lang]||STAR_TEXT.en;
+const sf=(s,vars)=>String(s).replace(/\{(\w+)\}/g,(_,k)=>vars&&vars[k]!=null?String(vars[k]):'');
+const sL=o=>o[profile.lang]||o.en;
+const sShuffle=a=>{const r=[...a];for(let k=r.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[r[k],r[j]]=[r[j],r[k]];}return r;};
+
+/* Little Things guests. pick: the little thing first, then two that won't matter next visit.
+   items: the right room set-up first. Names from every continent, used naturally. */
+const STAR_GUESTS=[
+ {id:'amara',name:'Amara Nwosu',room:'203',
+  en:{say:'“What a long drive. I always sleep better with a fan humming, even in winter. Oh, and your lobby flowers are gorgeous.”',pick:['Sleeps better with a fan humming','Thinks the lobby flowers are pretty','Had a long drive'],
+   items:[['🌀','A little fan by the bed'],['🕯️','A scented candle'],['🧸','A teddy bear'],['🍫','A chocolate bar']],yes:'“A fan! You remembered. I’m going to sleep like a cloud.”',no:'“How sweet of you. I don’t suppose there’s a fan somewhere?”'},
+  es:{say:'“Qué viaje tan largo. Siempre duermo mejor con un ventilador zumbando, incluso en invierno. Ah, y las flores del vestíbulo son preciosas.”',pick:['Duerme mejor con un ventilador zumbando','Le parecen bonitas las flores del vestíbulo','Tuvo un viaje largo'],
+   items:[['🌀','Un ventilador junto a la cama'],['🕯️','Una vela perfumada'],['🧸','Un osito de peluche'],['🍫','Una tableta de chocolate']],yes:'“¡Un ventilador! Te acordaste. Voy a dormir como una nube.”',no:'“Qué detalle. ¿No habrá por ahí un ventilador?”'}},
+ {id:'tomas',name:'Tomás Herrera',room:'205',
+  en:{say:'“Could I get some tea later? With honey, never sugar. Is it always this peaceful here at night?”',pick:['Takes tea with honey, never sugar','Thinks the manor is peaceful','Wants tea later tonight'],
+   items:[['🍯','A little jar of honey with the tea tray'],['🧂','Extra sugar cubes'],['☕','A big pot of coffee'],['🍪','A plate of cookies']],yes:'“Honey! You remembered how I take my tea. That’s the nicest welcome.”',no:'“Thank you, truly. Is there any honey, by chance? I’m funny about sugar.”'},
+  es:{say:'“¿Podría tomar un té más tarde? Con miel, nunca con azúcar. ¿Siempre es tan tranquilo esto por la noche?”',pick:['Toma el té con miel, nunca con azúcar','Le parece tranquila la mansión','Quiere té más tarde'],
+   items:[['🍯','Un tarrito de miel con la bandeja de té'],['🧂','Más terrones de azúcar'],['☕','Una cafetera grande'],['🍪','Un plato de galletas']],yes:'“¡Miel! Te acordaste de cómo tomo el té. Qué bienvenida tan bonita.”',no:'“Gracias, de verdad. ¿Habrá un poco de miel? Con el azúcar soy especial.”'}},
+ {id:'leilani',name:'Leilani Kahale',room:'201',
+  en:{say:'“I’m a very light sleeper. A room at the quiet end of the hall would be heaven. Your raccoon at the desk has lovely manners, by the way.”',pick:['Light sleeper: loves the quiet end of the hall','Likes Delores’s manners','Arrived in the evening'],
+   items:[['🔇','The quiet room at the end of the hall'],['🎵','A room by the music lounge'],['🛗','The room right by the lift'],['🎈','A balloon']],yes:'“The quiet end! You remembered. I might actually sleep in.”',no:'“That’s kind. Would there be anything at the quiet end of the hall?”'},
+  es:{say:'“Tengo el sueño muy ligero. Una habitación al fondo tranquilo del pasillo sería el paraíso. Por cierto, la mapache de recepción tiene unos modales preciosos.”',pick:['Sueño ligero: le encanta el fondo tranquilo del pasillo','Le gustan los modales de Delores','Llegó por la tarde'],
+   items:[['🔇','La habitación tranquila al fondo del pasillo'],['🎵','Una habitación junto al salón de música'],['🛗','La habitación junto al ascensor'],['🎈','Un globo']],yes:'“¡El fondo tranquilo! Te acordaste. Igual hasta duermo de más.”',no:'“Qué amable. ¿Habría algo al fondo tranquilo del pasillo?”'}},
+ {id:'rahul',name:'Rahul Mehta',room:'202',
+  en:{say:'“Feathers make me sneeze, so I carry my own pillow everywhere. It’s heavier than my suitcase. I’m here for a conference.”',pick:['Sneezes at feathers: feather-free pillows','Carries a heavy pillow','Here for a conference'],
+   items:[['🌿','Feather-free pillows, already on the bed'],['🪶','Extra fluffy feather pillows'],['🛁','Bath salts'],['📰','A newspaper']],yes:'“Feather-free! I can leave my pillow at home next time. You’re a hero.”',no:'“So kind. Are those feather pillows, though? Achoo. Sorry!”'},
+  es:{say:'“Las plumas me hacen estornudar, así que llevo mi propia almohada a todas partes. Pesa más que la maleta. Vengo a un congreso.”',pick:['Las plumas le hacen estornudar: almohadas sin plumas','Lleva una almohada pesada','Viene a un congreso'],
+   items:[['🌿','Almohadas sin plumas, ya en la cama'],['🪶','Almohadas de plumas extra mullidas'],['🛁','Sales de baño'],['📰','Un periódico']],yes:'“¡Sin plumas! La próxima vez dejo mi almohada en casa. Eres un sol.”',no:'“Qué amable. ¿Pero son de plumas? ¡Achís! Perdón.”'}},
+ {id:'meilin',name:'Mei Lin Zhou',room:'206',
+  en:{say:'“I run at sunrise every morning. A cold bottle of water afterwards is my favourite thing in the world. Is that a cat over there? Oh. Interesting cat.”',pick:['Runs at sunrise: loves cold water afterwards','Spotted Muffin','Is a morning person'],
+   items:[['💧','Chilled water and a map of a garden running path'],['🍰','A slice of cake'],['😴','A sleep mask'],['🎻','A violin']],yes:'“Cold water and a running map! You remembered. Tomorrow’s run is going to be glorious.”',no:'“Thank you! Is there cold water anywhere? I’m off running at dawn.”'},
+  es:{say:'“Salgo a correr al amanecer cada mañana. Una botella de agua fría después es lo que más me gusta del mundo. ¿Eso es un gato? Ah. Gato interesante.”',pick:['Corre al amanecer: le encanta el agua fría después','Vio a Muffin','Es de mañanas'],
+   items:[['💧','Agua fría y un mapa de un camino para correr por el jardín'],['🍰','Una porción de tarta'],['😴','Un antifaz para dormir'],['🎻','Un violín']],yes:'“¡Agua fría y un mapa para correr! Te acordaste. La carrera de mañana va a ser gloriosa.”',no:'“¡Gracias! ¿Hay agua fría por algún lado? Salgo a correr al amanecer.”'}},
+ {id:'aroha',name:'Aroha Ngata',room:'203',
+  en:{say:'“I’m a total night owl. I read until two in the morning, every night, with a stack of books. This one’s a mystery. Don’t tell me who did it.”',pick:['Reads late: loves a good reading lamp','Is reading a mystery','Doesn’t want spoilers'],
+   items:[['💡','A warm reading lamp and a bookmark'],['🌙','Blackout everything, lights off early'],['📺','A bigger TV'],['🧦','Fuzzy socks']],yes:'“A reading lamp and a bookmark! You remembered. Two o’clock, here I come.”',no:'“Lovely. Is there a lamp I could read by? I’ll be up late.”'},
+  es:{say:'“Soy ave nocturna. Leo hasta las dos de la madrugada, cada noche, con una pila de libros. Este es de misterio. No me digas quién fue.”',pick:['Lee hasta tarde: le encanta una buena lámpara de lectura','Lee una novela de misterio','No quiere spoilers'],
+   items:[['💡','Una lámpara de lectura cálida y un marcapáginas'],['🌙','Todo a oscuras, luces apagadas temprano'],['📺','Una tele más grande'],['🧦','Calcetines peludos']],yes:'“¡Una lámpara de lectura y un marcapáginas! Te acordaste. Las dos de la madrugada, allá voy.”',no:'“Precioso. ¿Hay alguna lámpara para leer? Estaré leyendo hasta tarde.”'}},
+ {id:'ingrid',name:'Ingrid Solberg',room:'204',
+  en:{say:'“My knees and stairs are not friends, so I’m glad you have a lift. I’m in town to hear my granddaughter sing.”',pick:['Knees don’t love stairs: a room near the lift','Here to hear a granddaughter sing','Glad the manor has a lift today'],
+   items:[['🛗','A room right by the lift'],['🪜','The attic room up the spiral stairs'],['🌹','A rose'],['🎲','A board game']],yes:'“Right by the lift! You remembered my knees. They send their thanks.”',no:'“That’s lovely, dear. Is there a room nearer the lift, though? My knees ask.”'},
+  es:{say:'“Mis rodillas y las escaleras no se llevan bien, así que me alegra que haya ascensor. Vengo a oír cantar a mi nieta.”',pick:['Las escaleras le cuestan: una habitación junto al ascensor','Viene a oír cantar a su nieta','Le alegra que hoy haya ascensor'],
+   items:[['🛗','Una habitación junto al ascensor'],['🪜','La buhardilla subiendo la escalera de caracol'],['🌹','Una rosa'],['🎲','Un juego de mesa']],yes:'“¡Junto al ascensor! Te acordaste de mis rodillas. Te dan las gracias.”',no:'“Qué bonito. ¿Pero habría una habitación más cerca del ascensor? Lo piden mis rodillas.”'}},
+ {id:'sofia',name:'Sofia Petrova',room:'205',
+  en:{say:'“Watching the garden birds with my morning coffee is my little ritual. Your garden has a robin! I named him already. He doesn’t know yet.”',pick:['Loves watching garden birds with morning coffee','Named the robin','Drinks coffee'],
+   items:[['🐦','The garden-view room, with a little bird guide'],['🏙️','The room facing the car park'],['🎧','Headphones'],['🧴','Hand cream']],yes:'“The garden view, and a bird guide! You remembered. Hello again, robin.”',no:'“Thank you, dear. Could I see the garden from here? My robin will wonder.”'},
+  es:{say:'“Mirar los pájaros del jardín con el café de la mañana es mi pequeño ritual. ¡Su jardín tiene un petirrojo! Ya le puse nombre. Él aún no lo sabe.”',pick:['Le encanta mirar los pájaros con el café de la mañana','Le puso nombre al petirrojo','Toma café'],
+   items:[['🐦','La habitación con vista al jardín y una guía de pájaros'],['🏙️','La habitación que da al aparcamiento'],['🎧','Unos auriculares'],['🧴','Crema de manos']],yes:'“¡Vista al jardín y una guía de pájaros! Te acordaste. Hola otra vez, petirrojo.”',no:'“Gracias. ¿Se vería el jardín desde aquí? Mi petirrojo se va a preguntar.”'}}
+];
+/* Magic coin moments. opts: the best move first ([text, costs a coin?]); shuffled on screen. */
+const STAR_CASES=[
+ {id:'pizza',icon:'🍕',room:'204',
+  en:{t:'A cold pizza',s:'Room 204 calls. Their room-service pizza arrived cold, and they’re very hungry.',opts:[['Send a fresh hot pizza now, with a cookie and a sorry note',1],['Tell them a manager can look into it in the morning',0],['Give them a whole week free',1]],ok:'“A fresh one already? And a cookie! Honestly, that’s better than if it had been hot the first time.”',tip:'Fix it fast and make it just a little better. Then write the gift in their notes so the next shift knows.'},
+  es:{t:'Una pizza fría',s:'Llaman de la 204. La pizza del servicio de habitaciones llegó fría y tienen mucha hambre.',opts:[['Mandar ya una pizza recién hecha, con una galleta y una nota de disculpa',1],['Decirles que alguien de la dirección lo mirará por la mañana',0],['Regalarles una semana entera',1]],ok:'“¿Ya una nueva? ¡Y una galleta! La verdad, mejor que si hubiera llegado caliente.”',tip:'Arréglalo rápido y hazlo un poquito mejor. Después apunta el regalo en sus notas para que el siguiente turno lo sepa.'}},
+ {id:'birthday',icon:'🎂',room:'201',
+  en:{t:'A quiet birthday',s:'At check-in, a guest in 201 mentions it’s their birthday. They’re travelling alone.',opts:[['A tiny cake and a handwritten card waiting in the room',1],['Announce it loudly to the whole lobby',0],['Say nothing. It’s not our job',0]],ok:'“Oh! Nobody’s ever… thank you. This is the best birthday I’ve had in years.”',tip:'Listen at check-in. Small details are invitations. Keep it personal and private.'},
+  es:{t:'Un cumpleaños tranquilo',s:'Al registrarse, alguien en la 201 comenta que es su cumpleaños. Viaja sin compañía.',opts:[['Una tartita y una tarjeta escrita a mano esperando en la habitación',1],['Anunciarlo en voz alta a todo el vestíbulo',0],['No decir nada. No es cosa nuestra',0]],ok:'“¡Oh! Nadie nunca… gracias. Es el mejor cumpleaños en años.”',tip:'Escucha al registrar. Los pequeños detalles son invitaciones. Que sea personal y discreto.'}},
+ {id:'teddy',icon:'🧸',room:'206',
+  en:{t:'A teddy left behind',s:'A family just checked out of 206, and their little one’s teddy is still on the pillow. They’re already on the road.',opts:[['Post it home, with a note from the teddy about its adventures at the manor',1],['Put it in the lost-and-found box and wait',0],['Keep it at the desk as a mascot',0]],ok:'A week later, a drawing arrives in the post: a teddy waving from a little hotel. “THANK YOU” is spelled with two Ks.',tip:'Don’t wait for the guest to notice. Reach out first.'},
+  es:{t:'Un osito olvidado',s:'Una familia acaba de dejar la 206 y el osito de su peque sigue en la almohada. Ya están de camino.',opts:[['Enviarlo a casa con una nota del osito contando sus aventuras en la mansión',1],['Dejarlo en objetos perdidos y esperar',0],['Quedárnoslo en recepción como mascota',0]],ok:'Una semana después llega un dibujo por correo: un osito saludando desde un hotelito. “GRACIAS” está escrito con dos C.',tip:'No esperes a que el huésped se dé cuenta. Contacta tú primero.'}},
+ {id:'pipes',icon:'🔧',room:'202',
+  en:{t:'Noisy pipes',s:'The guest in 202 comes down yawning. The pipes clanked all night and they barely slept.',opts:[['Say sorry, move them to a quiet room, and send breakfast up',1],['Explain that old houses make noises',0],['Tell them to buy earplugs in town',0]],ok:'“A quiet room and breakfast in bed? I feel like a new person. Thank you for not making me explain twice.”',tip:'Listen, say sorry, fix it, then follow up later to check it worked.'},
+  es:{t:'Tuberías ruidosas',s:'Quien se aloja en la 202 baja bostezando. Las tuberías sonaron toda la noche y apenas durmió.',opts:[['Pedir perdón, pasarle a una habitación tranquila y subirle el desayuno',1],['Explicar que las casas viejas hacen ruido',0],['Decirle que compre tapones en el pueblo',0]],ok:'“¿Habitación tranquila y desayuno en la cama? Me siento otra persona. Gracias por no hacerme explicarlo dos veces.”',tip:'Escucha, pide perdón, arréglalo y después pregunta si funcionó.'}},
+ {id:'towels',icon:'🧺',room:'203',
+  en:{t:'Just some towels',s:'The guest in 203 looks tired and asks if they could have two more towels.',opts:[['Bring them right now, with a smile. No coin needed!',0],['Send a giant fruit basket with the towels',1],['Say housekeeping comes tomorrow',0]],ok:'“That was so quick! Thank you. That’s all I needed.”',tip:'Not every fix needs a gift. Fast and friendly is often the whole magic.'},
+  es:{t:'Solo unas toallas',s:'Quien está en la 203 tiene cara de sueño y pide dos toallas más.',opts:[['Llevarlas ahora mismo, con una sonrisa. ¡Sin moneda!',0],['Mandar una cesta de fruta gigante con las toallas',1],['Decir que limpieza pasa mañana',0]],ok:'“¡Qué rápido! Gracias. Era todo lo que necesitaba.”',tip:'No todo arreglo necesita un regalo. Rápido y amable suele ser toda la magia.'}},
+ {id:'picnic',icon:'🧺',room:'205',
+  en:{t:'A rained-out picnic',s:'The guests in 205 planned a picnic for their anniversary. It’s pouring.',opts:[['Set up an indoor picnic by the conservatory window, blanket and all',1],['Lend them one umbrella',0],['Tell them the forecast was clear yesterday',0]],ok:'“A picnic inside, with the rain on the glass? This is even better than the plan.”',tip:'When plans fall through, bring a new plan, not just sympathy.'},
+  es:{t:'Un picnic pasado por agua',s:'Quienes están en la 205 planearon un picnic por su aniversario. Llueve a cántaros.',opts:[['Montar un picnic dentro, junto a la ventana del invernadero, con manta y todo',1],['Prestarles un paraguas',0],['Decirles que ayer el pronóstico era bueno',0]],ok:'“¿Un picnic dentro, con la lluvia en el cristal? Es aún mejor que el plan.”',tip:'Cuando un plan se cae, trae un plan nuevo, no solo comprensión.'}},
+ {id:'flight',icon:'✈️',room:'201',
+  en:{t:'A cancelled flight',s:'The guest in 201 was checking out, but their flight was just cancelled. They look worried.',opts:[['Keep their room for another night, send up a warm dinner, and help them rebook',1],['Tell them checkout is at 11 sharp',0],['Point them to the airport website',0]],ok:'“You made a bad day feel okay. I didn’t know a hotel could do that.”',tip:'Help first, explain later. A worried guest needs a hand more than a rule.'},
+  es:{t:'Un vuelo cancelado',s:'Quien está en la 201 iba a irse, pero acaban de cancelar su vuelo. Se nota la preocupación en su cara.',opts:[['Guardarle la habitación otra noche, subirle una cena caliente y ayudarle a cambiar el vuelo',1],['Recordarle que la salida es a las 11 en punto',0],['Mandarle a la web del aeropuerto',0]],ok:'“Has hecho que un mal día se sienta bien. No sabía que un hotel pudiera hacer eso.”',tip:'Primero ayuda, luego explica. Alguien preocupado necesita una mano más que una norma.'}},
+ {id:'proposal',icon:'💍',room:'204',
+  en:{t:'A secret plan',s:'A guest in 204 whispers that they’re proposing tonight, and asks you to keep it secret.',opts:[['Rose petals and two warm cocoas waiting in the garden gazebo, and not a word to anyone',1],['Tell the other staff so everyone can watch',0],['Wish them luck and do nothing',0]],ok:'Later, two happy guests wave from the gazebo. One of them mouths “thank you” over the other’s shoulder.',tip:'Some magic is in what you don’t say. Keep secrets safe.'},
+  es:{t:'Un plan secreto',s:'Alguien en la 204 te susurra que esta noche va a pedir matrimonio, y te pide que lo guardes en secreto.',opts:[['Pétalos de rosa y dos chocolates calientes esperando en el cenador del jardín, y ni una palabra a nadie',1],['Contárselo al resto del equipo para que todos lo vean',0],['Desearle suerte y no hacer nada',0]],ok:'Más tarde, dos huéspedes felices saludan desde el cenador. Una de las dos personas te dice “gracias” sin voz, por encima del hombro de la otra.',tip:'Parte de la magia está en lo que no dices. Guarda bien los secretos.'}}
+];
+/* Phone calls. The best reply first; shuffled on screen. room:'' means an outside line. */
+const STAR_CALLS=[
+ {id:'towels',room:'202',who:'Rahul Mehta',en:{ask:'Could I get two more towels, please?',opts:['Two fresh towels, coming up in 10 minutes!','Sure.','Housekeeping is closed, sorry.'],why:'Say the request back and give a time. Nothing gets lost.'},
+  es:{ask:'¿Podrían traerme dos toallas más, por favor?',opts:['¡Dos toallas limpias, en 10 minutos!','Vale.','Limpieza está cerrada, lo siento.'],why:'Repite la petición y da una hora. Así no se pierde nada.'}},
+ {id:'oat',room:'205',who:'Sofia Petrova',en:{ask:'Do you have oat milk for my tea?',opts:['We’re out of oat milk, but I can bring almond or warm soy. Which would you like?','No.','Maybe try the shop tomorrow.'],why:'Never just “no”. Bring an option along with it.'},
+  es:{ask:'¿Tienen leche de avena para el té?',opts:['Nos quedamos sin avena, pero puedo llevarle de almendra o de soja caliente. ¿Cuál prefiere?','No.','Pruebe en la tienda mañana.'],why:'Nunca un “no” a secas. Ofrece otra opción.'}},
+ {id:'breakfast',room:'201',who:'Leilani Kahale',en:{ask:'What time is breakfast?',opts:['From 7 to 10 in the garden room. Shall I save you a window seat?','Morning.','It’s on the website.'],why:'Answer clearly, then offer one small extra.'},
+  es:{ask:'¿A qué hora es el desayuno?',opts:['De 7 a 10 en el salón del jardín. ¿Le guardo una mesa junto a la ventana?','Por la mañana.','Está en la web.'],why:'Responde claro y ofrece un pequeño extra.'}},
+ {id:'friend',room:'',who:'',en:{ask:'Hi! Which room is Rahul in? I want to surprise my friend.',opts:['I can’t share room numbers, but I’m happy to put your call through.','Rahul’s in 202!','I can’t tell you anything. Bye.'],why:'Keep room numbers private, and still help.'},
+  es:{ask:'¡Hola! ¿Me dice en qué habitación está Rahul? Quiero darle una sorpresa.',opts:['No puedo dar números de habitación, pero con gusto le paso la llamada.','¡Está en la 202!','No puedo decirle nada. Adiós.'],why:'Los números de habitación son privados, pero puedes ayudar igual.'}},
+ {id:'wake',room:'206',who:'Mei Lin Zhou',en:{ask:'Could I get a wake-up call at 6?',opts:['A wake-up call at 6:00 AM for room 206. Sleep well!','Okay.','Just set an alarm on your phone.'],why:'Say it back with the exact time and room.'},
+  es:{ask:'¿Me pueden despertar a las 6?',opts:['Llamada despertador a las 6:00 AM para la 206. ¡Que descanse!','Vale.','Ponga una alarma en el móvil.'],why:'Repítelo con la hora exacta y la habitación.'}},
+ {id:'remote',room:'204',who:'Ingrid Solberg',en:{ask:'The TV remote isn’t working.',opts:['So sorry! I’ll bring fresh batteries in 5 minutes.','Try hitting it a bit.','That remote is very old.'],why:'Say sorry, fix it fast, and say when.'},
+  es:{ask:'El mando de la tele no funciona.',opts:['¡Lo siento mucho! Le llevo pilas nuevas en 5 minutos.','Dele unos golpecitos.','Ese mando es muy viejo.'],why:'Pide perdón, arréglalo rápido y di cuándo.'}},
+ {id:'noise',room:'203',who:'Amara Nwosu',en:{ask:'There’s a funny tapping noise in my room.',opts:['I’ll come up right now to check, and I can stay on the line until I’m there.','It’s an old house.','It usually stops eventually.'],why:'Go and see for yourself. Calm and quick.'},
+  es:{ask:'Hay un ruidito raro en mi habitación, como golpecitos.',opts:['Subo ahora mismo a mirarlo, y si quiere sigo al teléfono hasta llegar.','Es una casa vieja.','Normalmente acaba parando.'],why:'Ve a verlo en persona. Con calma y rapidez.'}},
+ {id:'friday',room:'',who:'',en:{ask:'Do you have a room for this Friday?',opts:['Let me look that up for you. Is it for one night or more?','We’re probably full.','Call back later.'],why:'Look it up, then ask one helpful question.'},
+  es:{ask:'¿Tienen habitación para este viernes?',opts:['Déjeme mirarlo. ¿Sería una noche o más?','Seguramente estamos llenos.','Llame más tarde.'],why:'Míralo y haz una pregunta útil.'}},
+ {id:'dinner',room:'202',who:'Tomás Herrera',en:{ask:'Where can I get a good dinner nearby?',opts:['I’d love to help! Shall I book you a table at the little bistro by the garden?','Somewhere in town.','I don’t really eat out.'],why:'Turn a question into a small kindness.'},
+  es:{ask:'¿Dónde puedo cenar bien cerca de aquí?',opts:['¡Con gusto! ¿Le reservo mesa en el pequeño bistró junto al jardín?','Por el pueblo.','Yo no suelo salir a cenar.'],why:'Convierte una pregunta en un pequeño detalle.'}}
+];
+const STAR_KEY='mapachez_star_v1',STAR_COINS=3,STAR_LISTENS=2,STAR_CALLS_PER=5;
+function createStar(){return {version:1,lt:{noted:{},back:[],day:{key:'',n:0},peeks:0,skip:false},coin:{day:{key:'',used:0},solved:[],tries:0},phone:{best:0,rounds:0,ring1:0,perfect:0},opened:0};}
+function normaliseStar(v){
+  const s=createStar();if(!v||typeof v!=='object'||v.version!==1)return s;
+  const gids=new Set(STAR_GUESTS.map(g=>g.id)),cids=new Set(STAR_CASES.map(c=>c.id));
+  const day=d=>d&&typeof d==='object'?{key:typeof d.key==='string'?d.key.slice(0,10):'',n:Math.max(0,d.n|0),used:Math.max(0,d.used|0)}:null;
+  if(v.lt&&typeof v.lt==='object'){
+    if(v.lt.noted&&typeof v.lt.noted==='object')for(const [k,d] of Object.entries(v.lt.noted))if(gids.has(k)&&typeof d==='string')s.lt.noted[k]=d.slice(0,10);
+    if(Array.isArray(v.lt.back))s.lt.back=[...new Set(v.lt.back.filter(id=>gids.has(id)&&s.lt.noted[id]))];
+    const d=day(v.lt.day);if(d)s.lt.day={key:d.key,n:d.n};s.lt.peeks=Math.max(0,v.lt.peeks|0);s.lt.skip=!!v.lt.skip;}
+  if(v.coin&&typeof v.coin==='object'){const d=day(v.coin.day);if(d)s.coin.day={key:d.key,used:Math.min(STAR_COINS,d.used)};
+    if(Array.isArray(v.coin.solved))s.coin.solved=[...new Set(v.coin.solved.filter(id=>cids.has(id)))];s.coin.tries=Math.max(0,v.coin.tries|0);}
+  if(v.phone&&typeof v.phone==='object')for(const k of ['best','rounds','ring1','perfect'])s.phone[k]=Math.max(0,v.phone[k]|0);
+  s.opened=Math.max(0,v.opened|0);
+  return s;
+}
+let star=createStar();
+try{star=normaliseStar(JSON.parse(localStorage.getItem(STAR_KEY)||'null'));}catch{}
+function storeStar(){try{localStorage.setItem(STAR_KEY,JSON.stringify(star));}catch{}}
+function starTip(n,el,{big=false}={}){
+  if(typeof hmsTip==='function')hmsTip(n);
+  if(el&&el.isConnected){const [x,y]=centerOf(el);burst(x,y,big?1.3:.7,{hearts:big,rainbow:big});if(n)floatText(x,y-20,'+'+n+' 🪙',{size:big?24:19});}
+  joySound(big?'open':'pop',big?1:0);if(n)setTimeout(()=>joySound('coin',2),120);
+  checkPins();renderGrowth();
+}
+function starFace(cv,name,size=26){if(cv)paintBust(cv,{cast:name},size,2);}
+const ltG=id=>STAR_GUESTS.find(g=>g.id===id);
+const ltFirst=g=>g.name.split(' ')[0];
+function ltToday(){if(star.lt.day.key!==dayKey())star.lt.day={key:dayKey(),n:0};return star.lt.day;}
+/* A guest comes back the night after you noted them (or right away, once, in the first-time preview). */
+function ltDue(){return STAR_GUESTS.find(g=>star.lt.noted[g.id]&&star.lt.noted[g.id]<dayKey()&&!star.lt.back.includes(g.id))||null;}
+function ltNextNew(){return ltToday().n<STAR_LISTENS?STAR_GUESTS.find(g=>!star.lt.noted[g.id])||null:null;}
+function coinsLeft(){if(star.coin.day.key!==dayKey())star.coin.day={key:dayKey(),used:0};return STAR_COINS-star.coin.day.used;}
+function coinNext(){return STAR_CASES.find(c=>!star.coin.solved.includes(c.id))||STAR_CASES[(star.coin.tries*5+dayKey().length)%STAR_CASES.length];}
+const starNew=()=>!!ltDue()||!!ltNextNew()||coinsLeft()>0;
+
+/* ---------- The hub: three cards, one tap each ---------- */
+function openStar(){
+  if(world)world.stop();
+  const first=!star.opened;star.opened++;storeStar();
+  openModal(titleHTML(ST.name,ST.kicker)+'<div class="hms-coach"><canvas id="star-delores" aria-hidden="true"></canvas><p>'+esc(first?ST.hello:ST.hi)+'</p></div><div class="hms-cards" id="star-cards"></div><div class="action-row" id="star-actions"></div>',true);
+  paintBust($('star-delores'),{cast:'delores'},26,2);
+  const due=ltDue(),nw=ltNextNew();
+  const status={
+    lt:due?sf(ST.ltDue,{name:ltFirst(due)}):nw?sf(ST.ltNew,{n:Math.min(STAR_LISTENS-ltToday().n,STAR_GUESTS.filter(g=>!star.lt.noted[g.id]).length)}):star.lt.back.length<STAR_GUESTS.length?ST.ltRest:sf(ST.ltStatus,{n:star.lt.back.length,total:STAR_GUESTS.length}),
+    coin:coinsLeft()?'🪙'.repeat(coinsLeft())+' '+sf(ST.coinStatus,{n:coinsLeft()}):ST.coinRest,
+    phone:star.phone.rounds?sf(ST.phoneBest,{n:star.phone.best}):ST.phoneNone};
+  const hot={lt:!!(due||nw),coin:coinsLeft()>0,phone:!star.phone.rounds};
+  for(const id of ['lt','coin','phone']){const [i,name,d]=ST.games[id],b=document.createElement('button');b.className='hms-lesson game star-card'+(hot[id]?' next':'');b.dataset.star=id;
+    b.innerHTML='<span class="hms-num" aria-hidden="true">'+i+'</span><span><b>'+esc(name)+'</b><small>'+esc(d)+'</small></span><span class="hms-go">'+esc(status[id])+'</span>';
+    b.onclick=()=>({lt:openLittle,coin:openCoins,phone:openPhone})[id]();$('star-cards').append(b);}
+  const row=$('star-actions');const add=(label,cls,run)=>{const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=run;row.append(b);};
+  add(ST.ltBook,'secondary-button',openLtBook);add(titleVisible?ST.done:ST.back,'primary-button',closeModal);
+  narrativeText=body.innerText;requestAnimationFrame(()=>body.querySelector('.star-card.next')?.focus());
+}
+function starFooter(id,items){const row=$(id);row.innerHTML='';for(const [label,primary,fn] of items){const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=fn;row.append(b);}}
+const starHome=()=>[ST.hub,false,openStar];
+
+/* ---------- 📒 Little Things ---------- */
+function openLittle(){
+  if(world)world.stop();
+  const due=ltDue();if(due)return ltReturn(due);
+  const g=ltNextNew();if(g)return ltListen(g);
+  if(star.lt.back.length>=STAR_GUESTS.length)return ltReturn(ltG(star.lt.back[(star.coin.tries+star.phone.rounds+dayKey().length+star.lt.peeks)%star.lt.back.length]),true);
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(ST.ltRestT)+'</h2><p class="modal-description">'+esc(ST.ltRestP)+'</p><div class="action-row" id="lt-actions"></div>');
+  starFooter('lt-actions',[[ST.ltBook,false,openLtBook],starHome(),[titleVisible?ST.done:ST.back,true,closeModal]]);narrativeText=body.innerText;
+}
+function ltHead(g,line){return '<div class="star-guest"><canvas id="star-face" aria-hidden="true"></canvas><div><small>'+esc(line)+'</small><b>'+esc(g.name)+'</b></div></div>';}
+function ltListen(g){
+  const L=sL(g);
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(ST.games.lt[1])+'</h2>'+ltHead(g,sf(ST.ltListen,{r:g.room}))+
+    '<p class="star-say">'+esc(L.say)+'</p><p class="star-ask">'+esc(ST.ltAsk)+'</p><div class="penny-opts" id="lt-opts">'+
+    sShuffle(L.pick.map((o,i)=>[o,i===0])).map(([o,r])=>'<button class="penny-opt lt-opt" data-right="'+(r?1:0)+'">'+esc(o)+'</button>').join('')+
+    '</div><div id="lt-res" class="star-res" hidden></div><div class="action-row" id="lt-actions"></div>');
+  starFace($('star-face'),g.name);
+  starFooter('lt-actions',[starHome()]);
+  body.querySelectorAll('.lt-opt').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1';
+    body.querySelectorAll('.lt-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});if(!right)b.classList.add('miss');
+    const firstEver=!Object.keys(star.lt.noted).length&&!star.lt.skip;
+    star.lt.noted[g.id]=dayKey();ltToday().n++;storeStar();
+    const res=$('lt-res');res.hidden=false;
+    res.innerHTML='<div class="star-note"><small>'+esc(ST.ltNote)+' · '+esc(g.name)+'</small><b>'+esc(L.pick[0])+'</b><span>'+esc(ST.ltSaved)+'</span></div><p>'+(right?'✨ '+esc(ST.ltRight[Object.keys(star.lt.noted).length%ST.ltRight.length]):'🌱 '+esc(ST.ltMiss)+' <b>'+esc(L.pick[0])+'</b>')+'</p><p class="joy-hint">'+esc(sf(ST.ltSoon,{name:ltFirst(g)}))+'</p>';
+    if(right)starTip(1,b);else joySound('boop');
+    const items=[];
+    if(firstEver)items.push([ST.ltSkip,true,()=>{star.lt.skip=true;storeStar();ltReturn(g,false,true);}]);
+    else if(ltDue())items.push([ST.ltNext,true,openLittle]);
+    else if(ltNextNew())items.push([ST.ltNext,true,openLittle]);
+    items.push(starHome());items.push([titleVisible?ST.done:ST.back,!items.length,closeModal]);
+    starFooter('lt-actions',items);narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+function ltReturn(g,review=false,preview=false){
+  const L=sL(g);let peeked=false;
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(sf(ST.ltBack,{name:ltFirst(g)}))+'</h2>'+ltHead(g,sf(review?ST.ltReview:ST.ltReturn,{r:g.room}))+
+    '<p class="star-ask">'+esc(ST.ltSet)+'</p><button class="secondary-button star-peek" id="lt-peek">'+esc(ST.ltPeek)+'</button><div id="lt-note" hidden></div>'+
+    '<div class="star-items" id="lt-items">'+sShuffle(L.items.map((it,i)=>[it,i===0])).map(([[ic,label],r])=>'<button class="star-item" data-right="'+(r?1:0)+'"><span aria-hidden="true">'+ic+'</span><small>'+esc(label)+'</small></button>').join('')+'</div>'+
+    '<div id="lt-res" class="star-res" hidden></div><div class="action-row" id="lt-actions"></div>');
+  starFace($('star-face'),g.name);
+  $('lt-peek').classList.add('hms-glow');
+  $('lt-peek').onclick=()=>{peeked=true;star.lt.peeks++;storeStar();const n=$('lt-note');n.hidden=false;n.innerHTML='<div class="star-note"><small>🖥️ '+esc(ST.ltNote)+' · '+esc(g.name)+' · '+esc(g.room)+'</small><b>'+esc(L.pick[0])+'</b><span>'+esc(ST.ltPeeked)+'</span></div>';$('lt-peek').remove();joySound('tick',1);};
+  starFooter('lt-actions',[starHome()]);
+  body.querySelectorAll('.star-item').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1';
+    body.querySelectorAll('.star-item').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});if(!right)b.classList.add('miss');
+    $('lt-peek')?.remove();
+    const res=$('lt-res');res.hidden=false;
+    if(right){if(!star.lt.back.includes(g.id))star.lt.back.push(g.id);storeStar();
+      res.innerHTML='<p class="star-quote yes">'+esc(sf(ST.ltYes,{name:ltFirst(g)}))+' '+esc(L.yes)+'</p>';
+      $('star-face')?.closest('.star-guest')?.classList.add('happy');
+      starTip(review?1:peeked?3:2,b,{big:!review});
+      if(star.lt.back.length===STAR_GUESTS.length&&!review)celebrate({icon:'📒',kicker:ST.games.lt[1],label:ST.pins.keeper[0],confetti:true});}
+    else{res.innerHTML='<p class="star-quote no">'+esc(sf(ST.ltNo,{name:ltFirst(g)}))+' '+esc(L.no)+'</p><p class="joy-hint">'+esc(sf(ST.ltNoAfter,{note:L.pick[0]}))+'</p>';joySound('boop');}
+    const items=[];
+    if(ltDue()||ltNextNew())items.push([ST.ltNext,true,openLittle]);
+    items.push([ST.ltBook,false,openLtBook]);items.push(starHome());items.push([titleVisible?ST.done:ST.back,items.length===2,closeModal]);
+    starFooter('lt-actions',items);narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+function openLtBook(){
+  if(world)world.stop();
+  const rows=STAR_GUESTS.map(g=>{const L=sL(g),noted=!!star.lt.noted[g.id],back=star.lt.back.includes(g.id);
+    return noted?'<div class="penny-coin got star-page"><canvas data-face="'+esc(g.name)+'" aria-hidden="true"></canvas><span><b>'+esc(g.name)+'</b><small>📒 '+esc(L.pick[0])+'</small><small class="'+(back?'ok':'')+'">'+esc(back?ST.ltWelcomed:ST.ltWaiting)+'</small></span></div>':'<div class="penny-coin"><span aria-hidden="true">○</span> '+esc(ST.ltLocked)+'</div>';}).join('');
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(ST.ltBookT)+'</h2><p class="modal-description">'+esc(ST.ltBookP)+'</p><p class="joy-hint">'+esc(sf(ST.ltStatus,{n:star.lt.back.length,total:STAR_GUESTS.length}))+'</p><div class="penny-book">'+rows+'</div><div class="action-row" id="lt-actions"></div>');
+  body.querySelectorAll('canvas[data-face]').forEach(cv=>starFace(cv,cv.dataset.face,22));
+  starFooter('lt-actions',[[ST.games.lt[0]+' '+ST.games.lt[1]+' →',false,openLittle],starHome(),[titleVisible?ST.done:ST.back,true,closeModal]]);
+  narrativeText=body.innerText;
+}
+
+/* ---------- 🪙 Magic coins ---------- */
+function coinRow(){const left=coinsLeft();return '<div class="star-coins" aria-label="'+esc(sf(ST.coinLeft,{n:left}))+'">'+Array.from({length:STAR_COINS},(_,k)=>'<span class="'+(k<left?'on':'')+'">🪙</span>').join('')+'</div>';}
+function openCoins(){
+  if(world)world.stop();
+  if(coinsLeft()<=0){openModal('<span class="overline">'+esc(ST.coinKick)+'</span><h2 id="modal-heading">'+esc(ST.coinRestT)+'</h2>'+coinRow()+'<p class="modal-description">'+esc(ST.coinRestP)+'</p><div class="action-row" id="coin-actions"></div>');
+    starFooter('coin-actions',[starHome(),[titleVisible?ST.done:ST.back,true,closeModal]]);narrativeText=body.innerText;return;}
+  const c=coinNext(),L=sL(c);
+  openModal('<span class="overline">'+esc(ST.coinKick)+'</span><h2 id="modal-heading">'+c.icon+' '+esc(L.t)+'</h2>'+coinRow()+'<p class="joy-hint">'+esc(sf(ST.coinIntro,{n:coinsLeft()}))+'</p>'+
+    '<div class="penny-card"><small>'+esc(c.room?(profile.lang==='es'?'HABITACIÓN ':'ROOM ')+c.room:'')+'</small><p>'+esc(L.s)+'</p><div class="penny-q"><b>'+esc(ST.coinPick)+'</b><div class="penny-opts">'+
+    sShuffle(L.opts.map((o,i)=>[o,i===0])).map(([[o,cost],r])=>'<button class="penny-opt coin-opt" data-right="'+(r?1:0)+'" data-cost="'+cost+'"><span>'+esc(o)+'</span><em class="'+(cost?'':'free')+'">'+esc(cost?ST.coinCost:ST.coinFree)+'</em></button>').join('')+
+    '</div><div id="coin-res" class="star-res" hidden></div></div></div><div class="action-row" id="coin-actions"></div>');
+  starFooter('coin-actions',[starHome()]);
+  body.querySelectorAll('.coin-opt').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1',best=L.opts[0];
+    body.querySelectorAll('.coin-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});if(!right)b.classList.add('miss');
+    star.coin.tries++;
+    const keep=right&&!best[1];
+    if(!keep)star.coin.day.used=Math.min(STAR_COINS,star.coin.day.used+1);
+    if(right&&!star.coin.solved.includes(c.id))star.coin.solved.push(c.id);
+    storeStar();
+    const res=$('coin-res');res.hidden=false;
+    res.innerHTML=(right?'<p>'+esc(keep?ST.coinKeep:ST.coinRight[star.coin.tries%ST.coinRight.length])+'</p><p class="star-quote yes">'+esc(L.ok)+'</p>':'<p>'+esc(ST.coinMiss)+' <b>'+esc(best[0])+'</b></p>')+'<p class="star-tip"><b>'+esc(ST.coinTip)+'</b> '+esc(L.tip)+'</p>';
+    body.querySelector('.star-coins').outerHTML=coinRow();
+    if(right)starTip(2,b,{big:true});else joySound('boop');
+    if(right&&star.coin.solved.length===STAR_CASES.length)celebrate({icon:'✨',kicker:ST.games.coin[1],label:ST.pins.miracle[0],confetti:true});
+    const items=[];if(coinsLeft()>0)items.push([ST.coinNext,true,openCoins]);
+    items.push(starHome());items.push([titleVisible?ST.done:ST.back,!coinsLeft(),closeModal]);
+    starFooter('coin-actions',items);narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+
+/* ---------- ☎️ Three-ring phone ---------- */
+let starRelaxed=false;
+try{starRelaxed=localStorage.getItem('mapachez_star_relaxed')==='1';}catch{}
+function ringSound(){const a=typeof joyAudio==='function'?joyAudio():null;if(!a)return;try{for(let k=0;k<4;k++){joyNote(a,1318.5,k*.07,{type:'triangle',vol:.02,dur:.06});joyNote(a,1046.5,k*.07+.035,{type:'triangle',vol:.02,dur:.06});}}catch{}}
+function openPhone(){
+  if(world)world.stop();
+  openModal('<span class="overline">'+esc(ST.phKick)+'</span><h2 id="modal-heading">'+esc(ST.games.phone[1])+'</h2><div class="star-phone idle" aria-hidden="true">☎️</div><p class="modal-description">'+esc(ST.phIntro)+'</p>'+
+    '<label class="star-relax"><input type="checkbox" id="ph-relax"'+(starRelaxed?' checked':'')+'> '+esc(ST.phRelaxed)+'</label><div class="action-row" id="ph-actions"></div>');
+  $('ph-relax').onchange=e=>{starRelaxed=e.target.checked;try{localStorage.setItem('mapachez_star_relaxed',starRelaxed?'1':'0');}catch{}};
+  starFooter('ph-actions',[starHome(),[ST.phStart,true,()=>phoneRound()]]);
+  narrativeText=body.innerText;requestAnimationFrame(()=>$('ph-actions')?.lastChild?.focus());
+}
+function phoneRound(){
+  const calls=sShuffle(STAR_CALLS);const round=[];for(const c of calls){if(round.length>=STAR_CALLS_PER)break;if(!c.room&&round.filter(x=>!x.room).length>=1)continue;round.push(c);}
+  const R={calls:round,i:0,stars:0,lessons:[]};phoneCall(R);
+}
+function phoneCall(R){
+  const c=R.calls[R.i],L=sL(c),ringMs=starRelaxed?2400:1200,total=R.calls.length;
+  openModal('<span class="overline">'+esc(sf(ST.phCall,{n:R.i+1,total}))+'</span><h2 id="modal-heading">'+esc(ST.games.phone[1])+'</h2>'+
+    '<div class="gm-dots" aria-hidden="true">'+R.calls.map((_,k)=>'<i class="'+(k<R.i?'done':k===R.i?'now':'')+'"></i>').join('')+'</div>'+
+    '<div id="ph-live" class="star-phone-live"><div class="star-phone ringing" aria-hidden="true">☎️</div><div class="star-rings" id="ph-rings">'+[1,2,3].map(n=>'<i data-n="'+n+'">'+n+'</i>').join('')+'</div>'+
+    '<p class="star-ringline" id="ph-ringline" aria-live="polite">'+esc(sf(ST.phRing,{n:1}))+'</p><button class="primary-button star-answer" id="ph-answer">'+esc(ST.phAnswer)+'</button></div>'+
+    '<div id="ph-talk" hidden></div><div class="action-row" id="ph-actions"></div>');
+  let ring=1;const t0=performance.now();
+  const paint=()=>{body.querySelectorAll('#ph-rings i').forEach(i=>{const n=+i.dataset.n;i.className=n<ring?'gone':n===ring?'now':'';});const l=$('ph-ringline');if(l)l.textContent=sf(ST.phRing,{n:ring});};
+  paint();ringSound();
+  const timer=setInterval(()=>{if(!$('ph-answer')||!modal.open){clearInterval(timer);return;}
+    const n=1+Math.floor((performance.now()-t0)/ringMs);if(n!==ring){ring=n;paint();ringSound();}},120);
+  $('ph-answer').focus();
+  $('ph-answer').onclick=()=>{
+    clearInterval(timer);const fast=ring<=2;if(fast)R.stars++;
+    if(ring===1){star.phone.ring1++;storeStar();checkPins();}
+    $('ph-live').innerHTML='<div class="star-phone talking" aria-hidden="true">📞</div><p class="star-ringline '+(fast?'ok':'')+'">'+esc(fast?sf(ST.phRingOk,{n:ring}):sf(ST.phRingLate,{n:ring}))+'</p>';
+    if(fast){const el=$('ph-live');starPop(el,'⭐');}else{joySound('boop');R.lessons.push(sf(ST.phRingLate,{n:ring}).split('. ').slice(1).join('. '));}
+    const out=!c.room,first=c.who.split(' ')[0];
+    const greets=(out?ST.greet.out:ST.greet.room).map((g,i)=>[sf(g,{first}),i===0]);
+    const talk=$('ph-talk');talk.hidden=false;
+    talk.innerHTML='<div class="star-caller"><span aria-hidden="true">'+(out?'🌐':'🛏️')+'</span>'+(out?'':'<canvas id="star-face" aria-hidden="true"></canvas>')+'<b>'+esc(out?ST.phOutside:sf(ST.phRoom,{r:c.room,who:c.who}))+'</b></div>'+
+      '<p class="star-ask">'+esc(ST.phGreet)+'</p><div class="penny-opts" id="ph-greet">'+sShuffle(greets).map(([g,r])=>'<button class="penny-opt" data-right="'+(r?1:0)+'">'+esc(g)+'</button>').join('')+'</div><div id="ph-help"></div>';
+    if(!out)starFace($('star-face'),c.who,22);
+    talk.querySelectorAll('#ph-greet .penny-opt').forEach(b=>b.onclick=()=>{
+      const right=b.dataset.right==='1';talk.querySelectorAll('#ph-greet .penny-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});
+      if(right){R.stars++;starPop(b,'⭐');}else{b.classList.add('miss');joySound('boop');R.lessons.push(out?ST.greetWhy.out:ST.greetWhy.room);}
+      const help=$('ph-help');
+      help.innerHTML='<p class="star-say">'+esc(sf(ST.phHelp,{ask:L.ask}))+'</p><p class="star-ask">'+esc(ST.phReply)+'</p><div class="penny-opts" id="ph-reply">'+sShuffle(L.opts.map((o,i)=>[o,i===0])).map(([o,r])=>'<button class="penny-opt" data-right="'+(r?1:0)+'">'+esc(o)+'</button>').join('')+'</div><p class="star-tip" id="ph-why" hidden></p>';
+      help.querySelectorAll('.penny-opt').forEach(x=>x.onclick=()=>{
+        const ok=x.dataset.right==='1';help.querySelectorAll('.penny-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});
+        if(ok){R.stars++;starPop(x,'⭐');}else{x.classList.add('miss');joySound('boop');R.lessons.push(L.why);}
+        const w=$('ph-why');w.hidden=false;w.innerHTML='<b>'+esc(ST.coinTip)+'</b> '+esc(L.why);
+        const last=R.i>=total-1;
+        starFooter('ph-actions',[[last?ST.phEnd:ST.phNext,true,()=>{if(last)phoneEnd(R);else{R.i++;phoneCall(R);}}]]);
+        requestAnimationFrame(()=>$('ph-actions')?.firstChild?.focus());narrativeText=body.innerText;
+      });
+      help.scrollIntoView?.({block:'nearest',behavior:'smooth'});narrativeText=body.innerText;
+    });
+    narrativeText=body.innerText;
+  };
+  narrativeText=body.innerText;
+}
+function starPop(el,word){if(!el||!el.isConnected)return;const [x,y]=centerOf(el);burst(x,y,.5);floatText(x,y-16,word,{size:20});joySound('pop');}
+function phoneEnd(R){
+  const total=R.calls.length*3,perfect=R.stars===total,isBest=R.stars>star.phone.best;
+  star.phone.rounds++;if(perfect)star.phone.perfect++;if(isBest)star.phone.best=R.stars;storeStar();checkPins();
+  const tips=Math.ceil(R.stars/3)+(perfect?2:0);
+  const lessons=[...new Set(R.lessons.filter(Boolean))];
+  openModal('<span class="overline">'+esc(ST.phKick)+'</span><h2 id="modal-heading">'+esc(ST.phDoneT)+'</h2><div class="star-score" id="ph-score"><b>'+esc(sf(ST.phStars,{n:R.stars,total}))+'</b>'+(isBest&&star.phone.rounds>1?'<span>'+esc(ST.phBestNew)+'</span>':'')+'</div>'+
+    (perfect?'<p class="star-quote yes">'+esc(ST.phPerfect)+'</p>':lessons.length?'<p class="star-ask">'+esc(ST.phLearn)+'</p><ul class="star-lessons">'+lessons.map(l=>'<li>'+esc(l)+'</li>').join('')+'</ul>':'')+
+    '<div class="action-row" id="ph-actions"></div>');
+  starFooter('ph-actions',[starHome(),[ST.phAgain,true,()=>phoneRound()]]);
+  requestAnimationFrame(()=>starTip(tips,$('ph-score'),{big:perfect}));
+  if(perfect)celebrate({icon:'📞',kicker:ST.games.phone[1],label:sf(ST.phStars,{n:R.stars,total}),confetti:true});
+  narrativeText=body.innerText;
+}
+
+{const st=document.createElement('style');st.textContent=`
+.star-guest{display:flex;gap:12px;align-items:center;margin:4px 0 10px;padding:8px 12px;border-radius:14px;background:linear-gradient(160deg,#fffaf0,#f4f0ff);border:1px solid #e3d6b2}
+.star-guest canvas{width:56px;height:52px;flex-shrink:0;image-rendering:pixelated;border-radius:12px;background:radial-gradient(circle at 50% 60%,#fff6d8,#efe8ff 75%)}
+.star-guest small{display:block;font:11px Arial,sans-serif;letter-spacing:.06em;color:#7a6331;text-transform:uppercase}
+.star-guest b{font:normal 20px Georgia,serif}
+.star-guest.happy canvas{animation:starHop .5s ease 3}
+@keyframes starHop{50%{transform:translateY(-6px) scale(1.05)}}
+.star-say{font:italic 16px/1.6 Georgia,serif;color:#3b3220;margin:0 0 10px}
+.star-ask{font-weight:600;font-size:15px;margin:10px 0 8px}
+.star-res{margin-top:10px}.star-res p{margin:8px 0;font-size:15px;line-height:1.55}
+.star-note{display:grid;gap:3px;padding:10px 14px;border-radius:12px;background:#eef9f1;border:1px solid #9fd6b0;border-left:5px solid #4f9a6a;margin:8px 0;animation:starIn .35s ease}
+.star-note small{font:11px Arial,sans-serif;letter-spacing:.06em;color:#2f6b45;text-transform:uppercase}.star-note b{font-size:16px}.star-note span{font-size:12px;color:#2f6b45}
+@keyframes starIn{from{opacity:0;transform:translateY(6px)}}
+.star-peek{margin:0 0 6px}
+.star-items{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.star-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:14px;border:1px solid #d9cfae;background:#fffdf7;color:var(--ink);cursor:pointer;min-height:92px;font:inherit}
+.star-item span{font-size:34px;line-height:1}.star-item small{font-size:13px;line-height:1.35;text-align:center}
+.star-item:hover:not(:disabled){border-color:#e0b84a;background:#fff8e1;transform:translateY(-2px)}
+.star-item.right{border-color:#4f9a45;background:#e3f6dc;box-shadow:0 0 0 3px #bfe8b4}.star-item.miss{border-color:#d9b38c;background:#fbefe3}
+.star-quote{font:italic 16px/1.6 Georgia,serif;padding:10px 14px;border-radius:12px}
+.star-quote.yes{background:#fff3c4;color:#5b4310}.star-quote.no{background:#eef7ef;color:#2f5236}
+.star-tip{font-size:14px;line-height:1.5;background:#f1f0ff;border-radius:12px;padding:8px 12px;color:#3a3466}
+.star-coins{display:flex;gap:6px;margin:4px 0 6px;font-size:28px}.star-coins span{filter:grayscale(1);opacity:.3;transition:.3s}.star-coins span.on{filter:none;opacity:1;animation:joyWiggle 2.6s ease-in-out infinite}
+.coin-opt{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.coin-opt em{font-style:normal;font-size:11px;white-space:nowrap;padding:2px 8px;border-radius:999px;background:#fff1c2;color:#7a5410}.coin-opt em.free{background:#e3f6dc;color:#2f6b2a}
+.star-phone{font-size:64px;text-align:center;line-height:1.1;margin:6px 0}
+.star-phone.ringing{animation:starRing .35s ease-in-out infinite}
+@keyframes starRing{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+.star-phone-live{text-align:center}
+.star-rings{display:flex;justify-content:center;gap:12px;margin:6px 0}
+.star-rings i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:bold 16px Georgia,serif;font-style:normal;border:2px solid #d9cfae;color:#a89a74;background:#fffdf7}
+.star-rings i.now{border-color:#e0a93a;background:#ffe58a;color:#5b4310;animation:joyWiggle .6s ease-in-out infinite}
+.star-rings i.gone{background:#f3e3c7;color:#b49a6a}
+.star-rings i[data-n="3"].now{background:#ffd0b0;border-color:#e0864a}
+.star-ringline{font-size:15px;margin:6px 0}.star-ringline.ok{color:#2f6b2a;font-weight:600}
+.star-answer{font-size:20px;padding:14px 34px;min-height:56px;border-radius:999px}
+.star-caller{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:#f4f0ff;border:1px solid #d6cbf2;margin:6px 0}
+.star-caller span{font-size:22px}.star-caller canvas{width:44px;height:42px;image-rendering:pixelated}
+.star-relax{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 4px;cursor:pointer}
+.star-score{text-align:center;margin:8px 0 10px}.star-score b{display:block;font:normal 40px Georgia,serif;color:#7a5414}.star-score span{display:inline-block;margin-top:4px;padding:3px 12px;border-radius:999px;background:#ffe58a;font-size:13px;font-weight:600}
+.star-lessons{margin:0 0 6px;padding-left:20px;font-size:14px;line-height:1.6}
+.star-page{display:flex;gap:10px;align-items:center}.star-page canvas{width:44px;height:42px;image-rendering:pixelated;flex-shrink:0}
+.star-page span{display:grid;gap:2px}.star-page small{font-size:12px;color:#6b5a3a}.star-page small.ok{color:#2f6b2a;font-weight:600}
+.joy-row #joy-side-star{background:linear-gradient(180deg,#fff6d8,#ffe7a8);border-color:#e0c060}
+.joy-title-mg.star{border-color:rgba(255,216,77,.6);background:rgba(200,160,40,.22);color:#fff6d6}
+@media(max-width:520px){.star-items{grid-template-columns:1fr 1fr}.star-item span{font-size:28px}.star-phone{font-size:52px}}
+.star-item:disabled,#lt-opts .penny-opt:disabled,#ph-greet .penny-opt:disabled,#ph-reply .penny-opt:disabled,.coin-opt:disabled{opacity:.6}
+.star-item.right:disabled,.star-item.miss:disabled,#lt-opts .penny-opt.right,#ph-greet .penny-opt.right,#ph-reply .penny-opt.right,.coin-opt.right,#lt-opts .penny-opt.miss,#ph-greet .penny-opt.miss,#ph-reply .penny-opt.miss,.coin-opt.miss{opacity:1;color:var(--ink)}
+@media(prefers-reduced-motion:reduce){.star-phone.ringing,.star-rings i.now,.star-coins span.on,.star-guest.happy canvas{animation:none}}
+`;document.head.append(st);}
+
+/* ---------- In the manor: a little brass service bell on the front desk ---------- */
+const STAR_SPOT={x:150,y:566};
+function drawStarBell(c,time,calm){
+  if(festivalActive||!state||titleVisible)return;
+  const x=176,y=526,ding=!calm&&starNew()&&(time%3000)<260?Math.sin((time%3000)/260*Math.PI*3)*.18:0;
+  ellipse(c,x,y+5,12,3.4,'rgba(60,40,10,.25)');
+  c.save();c.translate(x,y);c.rotate(ding);
+  c.fillStyle='#8a5d1a';c.beginPath();c.roundRect(-11,1,22,4,2);c.fill();
+  const g=c.createLinearGradient(-9,-10,9,0);g.addColorStop(0,'#fff0a8');g.addColorStop(.5,'#ffd84d');g.addColorStop(1,'#c9952f');
+  c.fillStyle=g;c.beginPath();c.moveTo(-9,1);c.quadraticCurveTo(-9,-10,0,-10);c.quadraticCurveTo(9,-10,9,1);c.closePath();c.fill();
+  c.fillStyle='#c9952f';c.beginPath();c.arc(0,-11.5,2.2,0,Math.PI*2);c.fill();
+  ellipse(c,-3.5,-6,1.6,2.6,'rgba(255,255,255,.6)');c.restore();
+  if(starNew()){const bob=calm?0:Math.sin(time/320)*2;text(c,'★',x+13,y-14+bob,13,'#ffd84d');}
+  if(ding)text(c,'♪',x-14,y-14,10,'#fff3c4');
+  if(LABELS)plaque(c,'🌟 '+ST.bell,x-22,y-24);
+}
+const starExtras=world.options.extras;
+world.options.extras=()=>{const list=starExtras();if(state&&!festivalActive&&!titleVisible)list.push({id:'star',...STAR_SPOT,name:ST.name});return list;};
+const starDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{starDrawExtras(c,time,calm);drawStarBell(c,time,calm);};
+const starInteract=interact;interact=function(id){if(id==='star'){openStar();return;}return starInteract.apply(this,arguments);};
+addEventListener('keydown',e=>{
+  if(e.key.toLowerCase()!=='g'||e.ctrlKey||e.altKey||e.metaKey||modal.open||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  e.preventDefault();openStar();
+});
+
+/* ---------- Sidebar, house ledger, title and pins ---------- */
+const starRenderGrowth=renderGrowth;
+renderGrowth=function(){
+  starRenderGrowth();const row=$('growth')?.querySelector('.joy-row');if(!row)return;
+  const b=document.createElement('button');b.id='joy-side-star';b.textContent=ST.side+(starNew()?' ★':'');b.onclick=()=>openStar();row.append(b);
+};
+const starOpenLedger=openLedger;
+openLedger=function(){const r=starOpenLedger.apply(this,arguments);const tabs=$('ledger-tabs');
+  if(tabs&&!$('ledger-star')){const b=document.createElement('button');b.id='ledger-star';b.textContent=ST.hub;b.onclick=openStar;tabs.append(b);}return r;};
+{const anchor=$('penny-title')||$('hms-title')||$('joy-title-gift')||document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg star';b.id='star-title';b.innerHTML=esc(ST.title)+' →';b.onclick=()=>openStar();anchor.after(b);}}
+PINS.push(
+  {id:'star-remember',icon:'📒',name:ST.pins.remember[0],hint:ST.pins.remember[1],test:()=>star.lt.back.length>=1},
+  {id:'star-keeper',icon:'📔',name:ST.pins.keeper[0],hint:ST.pins.keeper[1],test:()=>star.lt.back.length>=STAR_GUESTS.length},
+  {id:'star-coin',icon:'🪙',name:ST.pins.coin[0],hint:ST.pins.coin[1],test:()=>star.coin.solved.length>=1},
+  {id:'star-miracle',icon:'✨',name:ST.pins.miracle[0],hint:ST.pins.miracle[1],test:()=>star.coin.solved.length>=STAR_CASES.length},
+  {id:'star-ring',icon:'☎️',name:ST.pins.ring[0],hint:ST.pins.ring[1],test:()=>star.phone.rounds>=1},
+  {id:'star-smile',icon:'📞',name:ST.pins.smile[0],hint:ST.pins.smile[1],test:()=>star.phone.perfect>=1},
+  {id:'star-first',icon:'🔔',name:ST.pins.first[0],secret:true,hint:ST.pins.first[1],test:()=>star.phone.ring1>=10}
+);
+renderGrowth();checkPins();
+/* ==== end STAR SERVICE v1 ==== */
 
 
 })();

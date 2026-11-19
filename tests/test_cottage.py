@@ -16,9 +16,11 @@ Object.defineProperty(window,'cotTest',{get:()=>({
  visitor:cot.visitor,targets:cotTargets().map(t=>t[0]),
  setTips:n=>{joy.tips=n;storeJoy();renderGrowth();},
  own:ids=>{cottage.owned=ids;storeCottage();},
- open:()=>openCottage(),tap:id=>cotTap(id),say:()=>document.getElementById('cot-say').textContent,
+ open:(tab)=>{if(cottage.live==null&&!tab)cottage.live=true;openCottage(tab||'inside');},tap:id=>cotTap(id),say:()=>document.getElementById('cot-say').textContent,
  motion:on=>{settings.motion=on;applySettings();},
- enterPlay:()=>{state.flags.briefed=true;state.phase='playing';}
+ enterPlay:()=>{state.flags.briefed=true;state.phase='playing';},
+ setPts:n=>{growth.pts={trust:n,care:0,team:0};},grade:()=>payGrade(),speed:()=>world.options.speed(),
+ setLive:v=>{cottage.live=v;storeCottage();},rides:COT_RIDES.map(r=>r.id),projects:DREAM_PROJECTS.map(p=>p.id),dreamText:DREAM_TEXT,ct2:CT2_TEXT
 })});
 """
 base.TEST_HTML = base.TEST_HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
@@ -34,7 +36,12 @@ class Cottage(base.Growth):
         btn = self.page.locator('#cottage-title')
         self.assertIn('Your little cottage', btn.inner_text())
         btn.click()
+        self.page.wait_for_selector('.cot-offer')
+        self.assertIn('live on the grounds', self.page.locator('.cot-offer').inner_text())
+        self.page.locator('.cot-offer button', has_text='pick a cottage').click()
+        self.page.locator('.cot-homes li', has_text='The Toadstool').locator('button').click()
         self.page.wait_for_selector('#cot-room')
+        self.assertTrue(self.c()['cottage']['live'])
         self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Your little cottage')
         self.assertIn('brass key', self.page.locator('#cot-say').inner_text())
         self.assertIn('0 tips to spend', self.page.locator('#cot-wallet').inner_text())
@@ -146,6 +153,7 @@ class Cottage(base.Growth):
         self.page.evaluate('document.querySelector(".title-actions button").click()')
         self.page.evaluate('cotTest.enterPlay()')
         self.page.evaluate('cotTest.setTips(12)')
+        self.page.evaluate('cotTest.setLive(true)')
         side = self.page.locator('#joy-side-cottage')
         self.assertIn('Cottage', side.inner_text())
         self.assertIn('ready', side.get_attribute('class'))
@@ -223,6 +231,91 @@ class Cottage(base.Growth):
         btn = self.page.locator('.cot-next .cot-buy').bounding_box()
         self.assertGreaterEqual(btn['height'], 40)
         self.assertEqual(self.errors, [])
+
+    def test_14_living_in_town_is_fine_and_you_can_move_in_later(self):
+        self.page.locator('#cottage-title').click()
+        self.page.locator('.cot-offer button', has_text='I live in town').click()
+        self.assertFalse(self.c()['cottage']['live'])
+        self.assertIn('You live in town', self.page.locator('.cot-offer').inner_text())
+        self.page.locator('.cot-tab[data-tab="homes"]').click()
+        self.assertEqual(self.page.locator('.cot-homes li').count(), 4)
+        self.page.locator('.cot-homes li', has_text='The Seashell').locator('button').click()
+        st = self.c()['cottage']
+        self.assertTrue(st['live'])
+        self.assertEqual(st['home'], 'seashell')
+        self.assertIn('THE SEASHELL', self.page.locator('#modal-body .overline').first.inner_text().upper())
+
+    def test_15_rides_cost_tips_follow_you_and_change_speed(self):
+        self.page.evaluate('cotTest.setTips(100)')
+        self.page.evaluate("cotTest.open('rides')")
+        self.assertEqual(self.page.locator('.cot-rides li').count(), 9)
+        self.page.locator('.cot-rides li', has_text='Bike with a basket').locator('button').click()
+        st = self.c()
+        self.assertEqual(st['cottage']['rides'], ['bike'])
+        self.assertEqual(st['cottage']['ride'], 'bike')
+        self.assertEqual(st['joy']['tips'], 40)
+        self.assertIn('ride-first', st['pins'])
+        self.assertAlmostEqual(self.page.evaluate('cotTest.speed()'), 1.55)
+        self.page.locator('.cot-rides li', has_text='Bike with a basket').locator('button', has_text='Walk instead').click()
+        self.assertEqual(self.c()['cottage']['ride'], '')
+        self.assertEqual(self.page.evaluate('cotTest.speed()'), 1)
+        self.assertTrue(self.page.locator('.cot-rides li', has_text='Flying car').locator('button').is_disabled())
+
+    def test_16_the_snail_is_slow_and_the_flying_car_flies(self):
+        self.page.evaluate('cotTest.setTips(400)')
+        self.page.evaluate("cotTest.open('rides')")
+        self.page.locator('.cot-rides li', has_text='Giant snail').locator('button').click()
+        self.assertLess(self.page.evaluate('cotTest.speed()'), 1)
+        self.assertIn('ride-snail', self.c()['pins'])
+        self.page.locator('.cot-rides li', has_text='Flying car').locator('button').click()
+        self.assertEqual(self.page.evaluate('cotTest.speed()'), 2)
+        self.assertIn('ride-sky', self.c()['pins'])
+        # The ride is drawn in the manor without errors.
+        self.page.keyboard.press('Escape')
+        self.page.evaluate('document.querySelector(".title-actions button").click()')
+        self.page.evaluate('cotTest.enterPlay()')
+        self.page.wait_for_timeout(300)
+
+    def test_17_raises_add_tips_to_every_best_answer(self):
+        self.assertEqual(self.page.evaluate('cotTest.grade()'), 0)
+        self.page.evaluate('cotTest.setPts(230)')
+        self.page.locator('#title-quick').click()
+        self.answer(best=True)
+        self.assertIn('+2 raise', self.page.locator('.gm-result .joy-stage').inner_text())
+        st = self.c()
+        self.assertEqual(st['joy']['tips'], 5)
+        self.assertIn('pay-raise', st['pins'])
+        self.assertGreaterEqual(st['cottage']['grade'], 2)
+        self.page.keyboard.press('Escape')
+        self.page.evaluate("cotTest.open('rides')")
+        self.assertIn('+2 tips on every best answer', self.page.locator('.cot-pay').inner_text())
+
+    def test_18_dream_house_buy_then_fix_up_then_live_there(self):
+        total = 500 + 60 + 80 + 90 + 100 + 120 + 150 + 170 + 200
+        self.page.evaluate(f'cotTest.setTips({total})')
+        self.page.evaluate("cotTest.open('dream')")
+        self.assertIn('Willowbrook House', self.page.locator('.cot-next').inner_text())
+        self.page.locator('#dream-buy').click()
+        self.assertTrue(self.c()['cottage']['house']['own'])
+        self.assertIn('dream-deed', self.c()['pins'])
+        for _ in range(8):
+            self.page.locator('#dream-shop .cot-buy:not(:disabled)').first.click()
+        st = self.c()
+        self.assertEqual(len(st['cottage']['house']['done']), 8)
+        self.assertEqual(st['joy']['tips'], 0)
+        self.assertIn('dream-done', st['pins'])
+        self.page.locator('#dream-live').click()
+        self.assertEqual(self.c()['cottage']['home'], 'dream')
+        self.page.wait_for_selector('#cot-room')
+
+    def test_19_new_words_are_written_in_both_languages(self):
+        st = self.c()
+        for name in ('ct2', 'dreamText'):
+            en, es = st[name]['en'], st[name]['es']
+            self.assertEqual(set(en), set(es), name)
+        words = (str(st['ct2']) + str(st['dreamText'])).lower()
+        for banned in ('opossum', 'infp', 'broken', 'repair bill', 'rent due'):
+            self.assertNotIn(banned, words)
 
 
 if __name__ == '__main__':
