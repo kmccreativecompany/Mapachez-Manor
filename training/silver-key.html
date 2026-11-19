@@ -9180,6 +9180,21 @@ body .main,body:has(.resume-strip:not([hidden])) .main,body.global-search-collap
 .main>.top,.main>.manor-about{display:none}
 .main>.global-search-shell{position:relative;left:auto;right:auto;top:auto;margin:0 0 14px;width:auto}
 html{scroll-padding-top:14px}
+/* Practice desk tidy (2026-11-19): one page scroll, and the quick reference
+   layer sits in the page instead of floating over lessons and investor pages. */
+@media(min-width:641px){
+  .main{display:flow-root}
+  .main>.manor-mobile-controls{float:left;width:var(--side-width);margin:calc(-14px) 0 0 calc(-1 * var(--global-tools-gap) - var(--side-width))}
+  .main>.manor-mobile-controls .side{position:static;width:100%;height:auto;min-height:100vh;max-height:none;overflow:visible}
+}
+.global-hms-panel{position:static;max-height:none;overflow:visible;margin:10px 0 0;box-shadow:0 8px 22px rgba(27,43,34,.10)}
+.global-hms-card .glossary-hotterm,.global-hms-tags .glossary-hotterm{display:inline;margin:0}
+.global-hms-card .global-hms-tags{display:flex;flex-wrap:wrap;gap:6px}
+.global-hms-tags i{white-space:nowrap}
+.global-hms-card span,.global-hms-card em{overflow-wrap:anywhere}
+.global-hms-tab{line-height:1.2}
+@media(max-width:940px){.global-hms-tabs>.global-hms-tab:last-child:nth-child(odd){grid-column:1 / -1}}
+@media(max-width:940px){.global-hms-grid,.global-hms-view-grid{grid-template-columns:minmax(0,1fr)}}
 .manor-mobile-controls>summary{display:none}
 @media(max-width:640px){
   body .main{margin-left:0;padding-left:10px;padding-right:10px}
@@ -18839,6 +18854,8 @@ html{scroll-padding-top:14px}
       });
     }
 
+    var globalHmsReturnY = null;
+
     function closeGlobalHmsPanel() {
       const panel = getGlobalHmsPanel();
       if (panel) {
@@ -18847,6 +18864,11 @@ html{scroll-padding-top:14px}
       }
       activeGlobalHmsTool = "";
       setGlobalHmsActiveTab("");
+      if (globalHmsReturnY !== null) {
+        const y = globalHmsReturnY;
+        globalHmsReturnY = null;
+        window.scrollTo(0, y);
+      }
     }
 
     function getSelectedGuestRecord() {
@@ -19910,7 +19932,7 @@ html{scroll-padding-top:14px}
           </div>
         `;
       panel.innerHTML = `
-        ${getGlobalHmsHeader(view === "investor" ? "HMS Lab - Investor View" : "HMS Lab - Staff View", "Keep practice tools open as a reference layer. It will not move the game or change your scroll position.")}
+        ${getGlobalHmsHeader(view === "investor" ? "HMS Lab - Investor View" : "HMS Lab - Staff View", "Practice tools open right here. Press Close to go back to what you were doing.")}
         ${getPainPointNoteMarkup("hmsLab", { compact: true })}
         <div class="hms-lab-head-controls" style="justify-content:flex-start;margin-bottom:8px">
           <div class="hms-view-switch">${getHmsPracticeViewSwitcherMarkup(view, "global-hms-lab-view")}</div>
@@ -20159,6 +20181,19 @@ html{scroll-padding-top:14px}
       }
       closeGlobalSearchResults();
       renderGlobalHmsTool(tool, options);
+      revealGlobalHmsPanel();
+    }
+
+    // The quick reference layer now sits in the page, so bring it into view when it opens.
+    function revealGlobalHmsPanel() {
+      const panel = getGlobalHmsPanel();
+      if (!panel || panel.hidden || typeof panel.scrollIntoView !== "function") return;
+      const top = panel.getBoundingClientRect().top;
+      if (top >= 0 && top <= window.innerHeight * 0.6) return;
+      if (globalHmsReturnY === null) globalHmsReturnY = window.scrollY;
+      const tabs = document.querySelector(".global-hms-tabs") || panel;
+      const calm = document.body.classList.contains("comfort-reduced-motion") || matchMedia("(prefers-reduced-motion: reduce)").matches;
+      tabs.scrollIntoView({ block: "start", behavior: calm ? "auto" : "smooth" });
     }
 
     function toggleGlobalHmsTool(tool) {
