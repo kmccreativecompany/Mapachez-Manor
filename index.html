@@ -6500,6 +6500,531 @@ PINS.push(
 checkPins();
 /* ==== end TALKING TREES v1 ==== */
 
+/* ==== STAR SERVICE v1: three habits the world's best hotels share, as quick little games ====
+   Borrowed ideas only (no hotel names, ratings brands or logos anywhere in the game):
+   - 📒 Little Things: a guest mentions what they love, you save it in the HMS notes, and when they
+     come back (the next night) you set up their room before they ask. Guest preference memory.
+   - 🪙 Magic coins: three coins a night to fix a problem or make a moment on the spot, without asking
+     a manager. Staff empowerment and service recovery. One case teaches that not every fix needs a coin.
+   - ☎️ Three-ring phone: answer before the third ring, greet the caller warmly (by name, or with the
+     manor's name on an outside line), then pick the reply that helps best. Gentle 🐢 relaxed rings option.
+   Find it on the title screen, the sidebar, the house ledger, the little brass bell on the front desk,
+   or press G. Drawn with code, every word written here in English and Spanish, nothing downloaded,
+   nothing costs money to run. Progress lives in its own key, mapachez_star_v1. */
+const STAR_TEXT={
+en:{
+  name:'Star service',kicker:'HOW THE BEST HOTELS DO IT',bell:'Star service',
+  hello:'Delores: “The loveliest hotels in the world all share three little habits. They remember people. They fix things on the spot. And they answer the phone like it’s good news. Shall we practise?”',
+  hi:'Delores: “Back for a little star practice? Pick one. They’re all short.”',
+  games:{lt:['📒','Little Things','Notice what a guest loves. Have it ready next time.'],coin:['🪙','Magic coins','Fix it or make a moment, right now. No manager needed.'],phone:['☎️','Three-ring phone','Answer before ring three, warmly, and help.']},
+  ltStatus:'{n} / {total} welcomed back',ltDue:'🛎️ {name} is back tonight!',ltNew:'{n} new guests tonight',ltRest:'New guests tomorrow',
+  coinStatus:'{n} left tonight',coinRest:'Coins return tomorrow',phoneBest:'Best: {n} ⭐',phoneNone:'No calls yet',
+  back:'Back to the manor',done:'Done',hub:'🌟 Star service',side:'🌟 Star service',title:'🌟 Star service: how the best hotels do it',
+  /* Little Things */
+  ltKick:'📒 LITTLE THINGS',ltListen:'Listening at the desk · Room {r}',ltAsk:'📒 Which little thing should go in the HMS notes?',
+  ltSaved:'Saved to the HMS notes ✓',ltRight:['Good ears! That’s the one that matters next time.','Exactly. That’s a little thing worth keeping.','Lovely noticing. Into the notes it goes.'],
+  ltMiss:'That’s nice to know, but it won’t matter on their next visit. The little thing is:',
+  ltSoon:'{name} comes back tomorrow night. Be ready!',ltSkip:'✨ See it pay off: a week later →',
+  ltReturn:'Arriving tonight · Room {r}',ltBack:'{name} is coming back!',ltSet:'Set up the room before they arrive. What did they love?',
+  ltPeek:'🖥️ Peek at the HMS notes',ltNote:'📒 HMS note',ltPeeked:'Peeking first is what the best desks do.',
+  ltYes:'💛 {name} lights up:',ltNo:'🌱 {name} smiles kindly:',ltNoAfter:'The note said: {note}. They’ll be back, and you’ll nail it.',
+  ltReview:'A favourite guest is back again · Room {r}',
+  ltRestT:'Your notebook is ready',ltRestP:'Everyone you met tonight is in the HMS notes. They’ll start coming back tomorrow night.',
+  ltNext:'Next guest →',ltBook:'📒 The notebook',ltBookT:'Little Things notebook',ltBookP:'Everything guests have told you. Real hotels keep notes like these so every shift can remember.',
+  ltLocked:'Not met yet',ltWelcomed:'Welcomed back ✓',ltWaiting:'Coming back soon',
+  /* Magic coins */
+  coinKick:'🪙 MAGIC COINS',coinIntro:'Each night you get 3 magic coins. Spend one to fix a problem or make a moment, right away. You don’t need to ask anyone.',
+  coinPick:'What do you do?',coinCost:'🪙 1 coin',coinFree:'free',
+  coinRight:['✨ Perfect. Quick, kind and just the right size.','✨ That’s the magic. Small, fast, personal.','✨ Exactly what the best hotels would do.'],
+  coinKeep:'✨ You kept your coin! Not every fix needs one. Sometimes it’s just doing it now, with a smile.',
+  coinMiss:'🌱 Close. The best move was:',coinTip:'⭐ Real tip:',coinNext:'Next moment →',
+  coinRestT:'Coins all spent',coinRestP:'Every coin went to a guest tonight. They come back tomorrow night.',coinLeft:'{n} coins left tonight',
+  /* Three-ring phone */
+  phKick:'☎️ THREE-RING PHONE',phIntro:'The best hotels answer before the third ring. Then: a warm hello (use their name!) and a helpful answer. Five calls.',
+  phRelaxed:'🐢 Relaxed rings',phStart:'📞 Start the calls',phAnswer:'📞 Answer',phRing:'Ring {n}',
+  phCall:'CALL {n} OF {total}',phRingOk:'Ring {n}! ⭐',phRingLate:'Ring {n}. They waited a little. Try before ring three next time.',
+  phRoom:'Room {r} · {who}',phOutside:'Outside line',phGreet:'How do you say hello?',phHelp:'They ask: “{ask}”',phReply:'What do you say?',
+  phNext:'Next call →',phEnd:'See how you did →',phDoneT:'Calls done!',phStars:'{n} / {total} ⭐',phBestNew:'New best!',phAgain:'📞 Five more calls',
+  phLearn:'Little lessons from tonight’s calls:',phPerfect:'Every call perfect. Guests can hear that smile.',
+  greet:{room:['Good evening, {first}! Front desk. How can I help?','Yeah? What is it?','Hello? Who’s calling?'],
+    out:['Good evening, Mapáchez Manor, front desk. How may I help?','Hello?','Front desk, hold please.']},
+  greetWhy:{room:'Their name is on the screen. Use it, warmly.',out:'On an outside line, say the manor’s name so they know they reached the right place.'},
+  pins:{remember:['You Remembered','Welcome a guest back with the little thing they love.'],keeper:['Little Things Keeper','Welcome back every guest in the notebook.'],
+    coin:['Magic Coin','Use a magic coin just right.'],miracle:['Little Miracles','Solve all eight magic coin moments.'],
+    ring:['Three Rings','Finish a round of phone calls.'],smile:['Picks Up Smiling','Get every star in a round of calls.'],first:['Before It Finished','Answer ten calls on the very first ring.']}
+},
+es:{
+  name:'Servicio estrella',kicker:'CÓMO LO HACEN LOS MEJORES HOTELES',bell:'Servicio estrella',
+  hello:'Delores: “Los hoteles más bonitos del mundo comparten tres costumbres. Recuerdan a las personas. Arreglan las cosas al momento. Y contestan el teléfono como si fuera una buena noticia. ¿Practicamos?”',
+  hi:'Delores: “¿Otra vez a practicar estrellas? Elige una. Todas son cortitas.”',
+  games:{lt:['📒','Pequeños detalles','Fíjate en lo que le encanta a un huésped. Tenlo listo la próxima vez.'],coin:['🪙','Monedas mágicas','Arréglalo o crea un momento, ya mismo. Sin pedir permiso.'],phone:['☎️','Teléfono de tres tonos','Contesta antes del tercer tono, con calidez, y ayuda.']},
+  ltStatus:'{n} / {total} recibidos de vuelta',ltDue:'🛎️ ¡{name} vuelve esta noche!',ltNew:'{n} huéspedes nuevos esta noche',ltRest:'Más huéspedes mañana',
+  coinStatus:'Quedan {n} esta noche',coinRest:'Las monedas vuelven mañana',phoneBest:'Récord: {n} ⭐',phoneNone:'Aún sin llamadas',
+  back:'Volver a la mansión',done:'Listo',hub:'🌟 Servicio estrella',side:'🌟 Servicio estrella',title:'🌟 Servicio estrella: cómo lo hacen los mejores hoteles',
+  ltKick:'📒 PEQUEÑOS DETALLES',ltListen:'Escuchando en recepción · Habitación {r}',ltAsk:'📒 ¿Qué pequeño detalle va a las notas del HMS?',
+  ltSaved:'Guardado en las notas del HMS ✓',ltRight:['¡Buen oído! Eso es lo que importará la próxima vez.','Exacto. Ese detalle merece guardarse.','Qué bien te has fijado. A las notas va.'],
+  ltMiss:'Es bonito saberlo, pero no importará en su próxima visita. El pequeño detalle es:',
+  ltSoon:'{name} vuelve mañana por la noche. ¡Prepárate!',ltSkip:'✨ Mira cómo da fruto: una semana después →',
+  ltReturn:'Llega esta noche · Habitación {r}',ltBack:'¡{name} vuelve!',ltSet:'Prepara la habitación antes de que llegue. ¿Qué le encantaba?',
+  ltPeek:'🖥️ Mirar las notas del HMS',ltNote:'📒 Nota del HMS',ltPeeked:'Mirar primero es lo que hacen las mejores recepciones.',
+  ltYes:'💛 A {name} se le ilumina la cara:',ltNo:'🌱 {name} sonríe con cariño:',ltNoAfter:'La nota decía: {note}. Volverá, y lo harás genial.',
+  ltReview:'Un huésped muy querido vuelve otra vez · Habitación {r}',
+  ltRestT:'Tu cuaderno está listo',ltRestP:'Todas las personas que conociste esta noche están en las notas del HMS. Empezarán a volver mañana por la noche.',
+  ltNext:'Siguiente huésped →',ltBook:'📒 El cuaderno',ltBookT:'Cuaderno de pequeños detalles',ltBookP:'Todo lo que te han contado los huéspedes. Los hoteles de verdad guardan notas así para que cada turno pueda recordar.',
+  ltLocked:'Aún sin conocer',ltWelcomed:'Recibido de vuelta ✓',ltWaiting:'Vuelve pronto',
+  coinKick:'🪙 MONEDAS MÁGICAS',coinIntro:'Cada noche tienes 3 monedas mágicas. Usa una para arreglar un problema o crear un momento, al instante. No necesitas pedir permiso a nadie.',
+  coinPick:'¿Qué haces?',coinCost:'🪙 1 moneda',coinFree:'gratis',
+  coinRight:['✨ Perfecto. Rápido, amable y del tamaño justo.','✨ Esa es la magia. Pequeño, rápido y personal.','✨ Justo lo que harían los mejores hoteles.'],
+  coinKeep:'✨ ¡Te quedas la moneda! No todo arreglo la necesita. A veces basta con hacerlo ya, con una sonrisa.',
+  coinMiss:'🌱 Casi. Lo mejor era:',coinTip:'⭐ Consejo real:',coinNext:'Siguiente momento →',
+  coinRestT:'Monedas gastadas',coinRestP:'Cada moneda fue para un huésped esta noche. Vuelven mañana por la noche.',coinLeft:'Quedan {n} monedas esta noche',
+  phKick:'☎️ TELÉFONO DE TRES TONOS',phIntro:'Los mejores hoteles contestan antes del tercer tono. Después: un saludo cálido (¡usa su nombre!) y una respuesta útil. Cinco llamadas.',
+  phRelaxed:'🐢 Tonos tranquilos',phStart:'📞 Empezar las llamadas',phAnswer:'📞 Contestar',phRing:'Tono {n}',
+  phCall:'LLAMADA {n} DE {total}',phRingOk:'¡Tono {n}! ⭐',phRingLate:'Tono {n}. Esperaron un poquito. La próxima, antes del tercer tono.',
+  phRoom:'Habitación {r} · {who}',phOutside:'Línea externa',phGreet:'¿Cómo saludas?',phHelp:'Te dicen: “{ask}”',phReply:'¿Qué respondes?',
+  phNext:'Siguiente llamada →',phEnd:'Ver cómo te fue →',phDoneT:'¡Llamadas terminadas!',phStars:'{n} / {total} ⭐',phBestNew:'¡Nuevo récord!',phAgain:'📞 Cinco llamadas más',
+  phLearn:'Pequeñas lecciones de las llamadas de hoy:',phPerfect:'Todas las llamadas perfectas. Los huéspedes oyen esa sonrisa.',
+  greet:{room:['¡Buenas noches, {first}! Recepción. ¿En qué puedo ayudarle?','¿Sí? ¿Qué pasa?','¿Hola? ¿Quién llama?'],
+    out:['Buenas noches, Mapáchez Manor, recepción. ¿En qué puedo ayudarle?','¿Hola?','Recepción, espere, por favor.']},
+  greetWhy:{room:'Su nombre está en la pantalla. Úsalo, con calidez.',out:'En una línea externa, di el nombre de la mansión para que sepan que llamaron al lugar correcto.'},
+  pins:{remember:['Te acordaste','Recibe a un huésped con el pequeño detalle que le encanta.'],keeper:['Guardián de detalles','Recibe de vuelta a cada huésped del cuaderno.'],
+    coin:['Moneda mágica','Usa una moneda mágica justo como hace falta.'],miracle:['Pequeños milagros','Resuelve los ocho momentos de monedas mágicas.'],
+    ring:['Tres tonos','Termina una ronda de llamadas.'],smile:['Contesta sonriendo','Consigue todas las estrellas en una ronda de llamadas.'],first:['Antes de que acabe','Contesta diez llamadas en el primer tono.']}
+}};
+const ST=STAR_TEXT[profile.lang]||STAR_TEXT.en;
+const sf=(s,vars)=>String(s).replace(/\{(\w+)\}/g,(_,k)=>vars&&vars[k]!=null?String(vars[k]):'');
+const sL=o=>o[profile.lang]||o.en;
+const sShuffle=a=>{const r=[...a];for(let k=r.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[r[k],r[j]]=[r[j],r[k]];}return r;};
+
+/* Little Things guests. pick: the little thing first, then two that won't matter next visit.
+   items: the right room set-up first. Names from every continent, used naturally. */
+const STAR_GUESTS=[
+ {id:'amara',name:'Amara Nwosu',room:'203',
+  en:{say:'“What a long drive. I always sleep better with a fan humming, even in winter. Oh, and your lobby flowers are gorgeous.”',pick:['Sleeps better with a fan humming','Thinks the lobby flowers are pretty','Had a long drive'],
+   items:[['🌀','A little fan by the bed'],['🕯️','A scented candle'],['🧸','A teddy bear'],['🍫','A chocolate bar']],yes:'“A fan! You remembered. I’m going to sleep like a cloud.”',no:'“How sweet of you. I don’t suppose there’s a fan somewhere?”'},
+  es:{say:'“Qué viaje tan largo. Siempre duermo mejor con un ventilador zumbando, incluso en invierno. Ah, y las flores del vestíbulo son preciosas.”',pick:['Duerme mejor con un ventilador zumbando','Le parecen bonitas las flores del vestíbulo','Tuvo un viaje largo'],
+   items:[['🌀','Un ventilador junto a la cama'],['🕯️','Una vela perfumada'],['🧸','Un osito de peluche'],['🍫','Una tableta de chocolate']],yes:'“¡Un ventilador! Te acordaste. Voy a dormir como una nube.”',no:'“Qué detalle. ¿No habrá por ahí un ventilador?”'}},
+ {id:'tomas',name:'Tomás Herrera',room:'205',
+  en:{say:'“Could I get some tea later? With honey, never sugar. Is it always this peaceful here at night?”',pick:['Takes tea with honey, never sugar','Thinks the manor is peaceful','Wants tea later tonight'],
+   items:[['🍯','A little jar of honey with the tea tray'],['🧂','Extra sugar cubes'],['☕','A big pot of coffee'],['🍪','A plate of cookies']],yes:'“Honey! You remembered how I take my tea. That’s the nicest welcome.”',no:'“Thank you, truly. Is there any honey, by chance? I’m funny about sugar.”'},
+  es:{say:'“¿Podría tomar un té más tarde? Con miel, nunca con azúcar. ¿Siempre es tan tranquilo esto por la noche?”',pick:['Toma el té con miel, nunca con azúcar','Le parece tranquila la mansión','Quiere té más tarde'],
+   items:[['🍯','Un tarrito de miel con la bandeja de té'],['🧂','Más terrones de azúcar'],['☕','Una cafetera grande'],['🍪','Un plato de galletas']],yes:'“¡Miel! Te acordaste de cómo tomo el té. Qué bienvenida tan bonita.”',no:'“Gracias, de verdad. ¿Habrá un poco de miel? Con el azúcar soy especial.”'}},
+ {id:'leilani',name:'Leilani Kahale',room:'201',
+  en:{say:'“I’m a very light sleeper. A room at the quiet end of the hall would be heaven. Your raccoon at the desk has lovely manners, by the way.”',pick:['Light sleeper: loves the quiet end of the hall','Likes Delores’s manners','Arrived in the evening'],
+   items:[['🔇','The quiet room at the end of the hall'],['🎵','A room by the music lounge'],['🛗','The room right by the lift'],['🎈','A balloon']],yes:'“The quiet end! You remembered. I might actually sleep in.”',no:'“That’s kind. Would there be anything at the quiet end of the hall?”'},
+  es:{say:'“Tengo el sueño muy ligero. Una habitación al fondo tranquilo del pasillo sería el paraíso. Por cierto, la mapache de recepción tiene unos modales preciosos.”',pick:['Sueño ligero: le encanta el fondo tranquilo del pasillo','Le gustan los modales de Delores','Llegó por la tarde'],
+   items:[['🔇','La habitación tranquila al fondo del pasillo'],['🎵','Una habitación junto al salón de música'],['🛗','La habitación junto al ascensor'],['🎈','Un globo']],yes:'“¡El fondo tranquilo! Te acordaste. Igual hasta duermo de más.”',no:'“Qué amable. ¿Habría algo al fondo tranquilo del pasillo?”'}},
+ {id:'rahul',name:'Rahul Mehta',room:'202',
+  en:{say:'“Feathers make me sneeze, so I carry my own pillow everywhere. It’s heavier than my suitcase. I’m here for a conference.”',pick:['Sneezes at feathers: feather-free pillows','Carries a heavy pillow','Here for a conference'],
+   items:[['🌿','Feather-free pillows, already on the bed'],['🪶','Extra fluffy feather pillows'],['🛁','Bath salts'],['📰','A newspaper']],yes:'“Feather-free! I can leave my pillow at home next time. You’re a hero.”',no:'“So kind. Are those feather pillows, though? Achoo. Sorry!”'},
+  es:{say:'“Las plumas me hacen estornudar, así que llevo mi propia almohada a todas partes. Pesa más que la maleta. Vengo a un congreso.”',pick:['Las plumas le hacen estornudar: almohadas sin plumas','Lleva una almohada pesada','Viene a un congreso'],
+   items:[['🌿','Almohadas sin plumas, ya en la cama'],['🪶','Almohadas de plumas extra mullidas'],['🛁','Sales de baño'],['📰','Un periódico']],yes:'“¡Sin plumas! La próxima vez dejo mi almohada en casa. Eres un sol.”',no:'“Qué amable. ¿Pero son de plumas? ¡Achís! Perdón.”'}},
+ {id:'meilin',name:'Mei Lin Zhou',room:'206',
+  en:{say:'“I run at sunrise every morning. A cold bottle of water afterwards is my favourite thing in the world. Is that a cat over there? Oh. Interesting cat.”',pick:['Runs at sunrise: loves cold water afterwards','Spotted Muffin','Is a morning person'],
+   items:[['💧','Chilled water and a map of a garden running path'],['🍰','A slice of cake'],['😴','A sleep mask'],['🎻','A violin']],yes:'“Cold water and a running map! You remembered. Tomorrow’s run is going to be glorious.”',no:'“Thank you! Is there cold water anywhere? I’m off running at dawn.”'},
+  es:{say:'“Salgo a correr al amanecer cada mañana. Una botella de agua fría después es lo que más me gusta del mundo. ¿Eso es un gato? Ah. Gato interesante.”',pick:['Corre al amanecer: le encanta el agua fría después','Vio a Muffin','Es de mañanas'],
+   items:[['💧','Agua fría y un mapa de un camino para correr por el jardín'],['🍰','Una porción de tarta'],['😴','Un antifaz para dormir'],['🎻','Un violín']],yes:'“¡Agua fría y un mapa para correr! Te acordaste. La carrera de mañana va a ser gloriosa.”',no:'“¡Gracias! ¿Hay agua fría por algún lado? Salgo a correr al amanecer.”'}},
+ {id:'aroha',name:'Aroha Ngata',room:'203',
+  en:{say:'“I’m a total night owl. I read until two in the morning, every night, with a stack of books. This one’s a mystery. Don’t tell me who did it.”',pick:['Reads late: loves a good reading lamp','Is reading a mystery','Doesn’t want spoilers'],
+   items:[['💡','A warm reading lamp and a bookmark'],['🌙','Blackout everything, lights off early'],['📺','A bigger TV'],['🧦','Fuzzy socks']],yes:'“A reading lamp and a bookmark! You remembered. Two o’clock, here I come.”',no:'“Lovely. Is there a lamp I could read by? I’ll be up late.”'},
+  es:{say:'“Soy ave nocturna. Leo hasta las dos de la madrugada, cada noche, con una pila de libros. Este es de misterio. No me digas quién fue.”',pick:['Lee hasta tarde: le encanta una buena lámpara de lectura','Lee una novela de misterio','No quiere spoilers'],
+   items:[['💡','Una lámpara de lectura cálida y un marcapáginas'],['🌙','Todo a oscuras, luces apagadas temprano'],['📺','Una tele más grande'],['🧦','Calcetines peludos']],yes:'“¡Una lámpara de lectura y un marcapáginas! Te acordaste. Las dos de la madrugada, allá voy.”',no:'“Precioso. ¿Hay alguna lámpara para leer? Estaré leyendo hasta tarde.”'}},
+ {id:'ingrid',name:'Ingrid Solberg',room:'204',
+  en:{say:'“My knees and stairs are not friends, so I’m glad you have a lift. I’m in town to hear my granddaughter sing.”',pick:['Knees don’t love stairs: a room near the lift','Here to hear a granddaughter sing','Glad the manor has a lift today'],
+   items:[['🛗','A room right by the lift'],['🪜','The attic room up the spiral stairs'],['🌹','A rose'],['🎲','A board game']],yes:'“Right by the lift! You remembered my knees. They send their thanks.”',no:'“That’s lovely, dear. Is there a room nearer the lift, though? My knees ask.”'},
+  es:{say:'“Mis rodillas y las escaleras no se llevan bien, así que me alegra que haya ascensor. Vengo a oír cantar a mi nieta.”',pick:['Las escaleras le cuestan: una habitación junto al ascensor','Viene a oír cantar a su nieta','Le alegra que hoy haya ascensor'],
+   items:[['🛗','Una habitación junto al ascensor'],['🪜','La buhardilla subiendo la escalera de caracol'],['🌹','Una rosa'],['🎲','Un juego de mesa']],yes:'“¡Junto al ascensor! Te acordaste de mis rodillas. Te dan las gracias.”',no:'“Qué bonito. ¿Pero habría una habitación más cerca del ascensor? Lo piden mis rodillas.”'}},
+ {id:'sofia',name:'Sofia Petrova',room:'205',
+  en:{say:'“Watching the garden birds with my morning coffee is my little ritual. Your garden has a robin! I named him already. He doesn’t know yet.”',pick:['Loves watching garden birds with morning coffee','Named the robin','Drinks coffee'],
+   items:[['🐦','The garden-view room, with a little bird guide'],['🏙️','The room facing the car park'],['🎧','Headphones'],['🧴','Hand cream']],yes:'“The garden view, and a bird guide! You remembered. Hello again, robin.”',no:'“Thank you, dear. Could I see the garden from here? My robin will wonder.”'},
+  es:{say:'“Mirar los pájaros del jardín con el café de la mañana es mi pequeño ritual. ¡Su jardín tiene un petirrojo! Ya le puse nombre. Él aún no lo sabe.”',pick:['Le encanta mirar los pájaros con el café de la mañana','Le puso nombre al petirrojo','Toma café'],
+   items:[['🐦','La habitación con vista al jardín y una guía de pájaros'],['🏙️','La habitación que da al aparcamiento'],['🎧','Unos auriculares'],['🧴','Crema de manos']],yes:'“¡Vista al jardín y una guía de pájaros! Te acordaste. Hola otra vez, petirrojo.”',no:'“Gracias. ¿Se vería el jardín desde aquí? Mi petirrojo se va a preguntar.”'}}
+];
+/* Magic coin moments. opts: the best move first ([text, costs a coin?]); shuffled on screen. */
+const STAR_CASES=[
+ {id:'pizza',icon:'🍕',room:'204',
+  en:{t:'A cold pizza',s:'Room 204 calls. Their room-service pizza arrived cold, and they’re very hungry.',opts:[['Send a fresh hot pizza now, with a cookie and a sorry note',1],['Tell them a manager can look into it in the morning',0],['Give them a whole week free',1]],ok:'“A fresh one already? And a cookie! Honestly, that’s better than if it had been hot the first time.”',tip:'Fix it fast and make it just a little better. Then write the gift in their notes so the next shift knows.'},
+  es:{t:'Una pizza fría',s:'Llaman de la 204. La pizza del servicio de habitaciones llegó fría y tienen mucha hambre.',opts:[['Mandar ya una pizza recién hecha, con una galleta y una nota de disculpa',1],['Decirles que alguien de la dirección lo mirará por la mañana',0],['Regalarles una semana entera',1]],ok:'“¿Ya una nueva? ¡Y una galleta! La verdad, mejor que si hubiera llegado caliente.”',tip:'Arréglalo rápido y hazlo un poquito mejor. Después apunta el regalo en sus notas para que el siguiente turno lo sepa.'}},
+ {id:'birthday',icon:'🎂',room:'201',
+  en:{t:'A quiet birthday',s:'At check-in, a guest in 201 mentions it’s their birthday. They’re travelling alone.',opts:[['A tiny cake and a handwritten card waiting in the room',1],['Announce it loudly to the whole lobby',0],['Say nothing. It’s not our job',0]],ok:'“Oh! Nobody’s ever… thank you. This is the best birthday I’ve had in years.”',tip:'Listen at check-in. Small details are invitations. Keep it personal and private.'},
+  es:{t:'Un cumpleaños tranquilo',s:'Al registrarse, alguien en la 201 comenta que es su cumpleaños. Viaja sin compañía.',opts:[['Una tartita y una tarjeta escrita a mano esperando en la habitación',1],['Anunciarlo en voz alta a todo el vestíbulo',0],['No decir nada. No es cosa nuestra',0]],ok:'“¡Oh! Nadie nunca… gracias. Es el mejor cumpleaños en años.”',tip:'Escucha al registrar. Los pequeños detalles son invitaciones. Que sea personal y discreto.'}},
+ {id:'teddy',icon:'🧸',room:'206',
+  en:{t:'A teddy left behind',s:'A family just checked out of 206, and their little one’s teddy is still on the pillow. They’re already on the road.',opts:[['Post it home, with a note from the teddy about its adventures at the manor',1],['Put it in the lost-and-found box and wait',0],['Keep it at the desk as a mascot',0]],ok:'A week later, a drawing arrives in the post: a teddy waving from a little hotel. “THANK YOU” is spelled with two Ks.',tip:'Don’t wait for the guest to notice. Reach out first.'},
+  es:{t:'Un osito olvidado',s:'Una familia acaba de dejar la 206 y el osito de su peque sigue en la almohada. Ya están de camino.',opts:[['Enviarlo a casa con una nota del osito contando sus aventuras en la mansión',1],['Dejarlo en objetos perdidos y esperar',0],['Quedárnoslo en recepción como mascota',0]],ok:'Una semana después llega un dibujo por correo: un osito saludando desde un hotelito. “GRACIAS” está escrito con dos C.',tip:'No esperes a que el huésped se dé cuenta. Contacta tú primero.'}},
+ {id:'pipes',icon:'🔧',room:'202',
+  en:{t:'Noisy pipes',s:'The guest in 202 comes down yawning. The pipes clanked all night and they barely slept.',opts:[['Say sorry, move them to a quiet room, and send breakfast up',1],['Explain that old houses make noises',0],['Tell them to buy earplugs in town',0]],ok:'“A quiet room and breakfast in bed? I feel like a new person. Thank you for not making me explain twice.”',tip:'Listen, say sorry, fix it, then follow up later to check it worked.'},
+  es:{t:'Tuberías ruidosas',s:'Quien se aloja en la 202 baja bostezando. Las tuberías sonaron toda la noche y apenas durmió.',opts:[['Pedir perdón, pasarle a una habitación tranquila y subirle el desayuno',1],['Explicar que las casas viejas hacen ruido',0],['Decirle que compre tapones en el pueblo',0]],ok:'“¿Habitación tranquila y desayuno en la cama? Me siento otra persona. Gracias por no hacerme explicarlo dos veces.”',tip:'Escucha, pide perdón, arréglalo y después pregunta si funcionó.'}},
+ {id:'towels',icon:'🧺',room:'203',
+  en:{t:'Just some towels',s:'The guest in 203 looks tired and asks if they could have two more towels.',opts:[['Bring them right now, with a smile. No coin needed!',0],['Send a giant fruit basket with the towels',1],['Say housekeeping comes tomorrow',0]],ok:'“That was so quick! Thank you. That’s all I needed.”',tip:'Not every fix needs a gift. Fast and friendly is often the whole magic.'},
+  es:{t:'Solo unas toallas',s:'Quien está en la 203 tiene cara de sueño y pide dos toallas más.',opts:[['Llevarlas ahora mismo, con una sonrisa. ¡Sin moneda!',0],['Mandar una cesta de fruta gigante con las toallas',1],['Decir que limpieza pasa mañana',0]],ok:'“¡Qué rápido! Gracias. Era todo lo que necesitaba.”',tip:'No todo arreglo necesita un regalo. Rápido y amable suele ser toda la magia.'}},
+ {id:'picnic',icon:'🧺',room:'205',
+  en:{t:'A rained-out picnic',s:'The guests in 205 planned a picnic for their anniversary. It’s pouring.',opts:[['Set up an indoor picnic by the conservatory window, blanket and all',1],['Lend them one umbrella',0],['Tell them the forecast was clear yesterday',0]],ok:'“A picnic inside, with the rain on the glass? This is even better than the plan.”',tip:'When plans fall through, bring a new plan, not just sympathy.'},
+  es:{t:'Un picnic pasado por agua',s:'Quienes están en la 205 planearon un picnic por su aniversario. Llueve a cántaros.',opts:[['Montar un picnic dentro, junto a la ventana del invernadero, con manta y todo',1],['Prestarles un paraguas',0],['Decirles que ayer el pronóstico era bueno',0]],ok:'“¿Un picnic dentro, con la lluvia en el cristal? Es aún mejor que el plan.”',tip:'Cuando un plan se cae, trae un plan nuevo, no solo comprensión.'}},
+ {id:'flight',icon:'✈️',room:'201',
+  en:{t:'A cancelled flight',s:'The guest in 201 was checking out, but their flight was just cancelled. They look worried.',opts:[['Keep their room for another night, send up a warm dinner, and help them rebook',1],['Tell them checkout is at 11 sharp',0],['Point them to the airport website',0]],ok:'“You made a bad day feel okay. I didn’t know a hotel could do that.”',tip:'Help first, explain later. A worried guest needs a hand more than a rule.'},
+  es:{t:'Un vuelo cancelado',s:'Quien está en la 201 iba a irse, pero acaban de cancelar su vuelo. Se nota la preocupación en su cara.',opts:[['Guardarle la habitación otra noche, subirle una cena caliente y ayudarle a cambiar el vuelo',1],['Recordarle que la salida es a las 11 en punto',0],['Mandarle a la web del aeropuerto',0]],ok:'“Has hecho que un mal día se sienta bien. No sabía que un hotel pudiera hacer eso.”',tip:'Primero ayuda, luego explica. Alguien preocupado necesita una mano más que una norma.'}},
+ {id:'proposal',icon:'💍',room:'204',
+  en:{t:'A secret plan',s:'A guest in 204 whispers that they’re proposing tonight, and asks you to keep it secret.',opts:[['Rose petals and two warm cocoas waiting in the garden gazebo, and not a word to anyone',1],['Tell the other staff so everyone can watch',0],['Wish them luck and do nothing',0]],ok:'Later, two happy guests wave from the gazebo. One of them mouths “thank you” over the other’s shoulder.',tip:'Some magic is in what you don’t say. Keep secrets safe.'},
+  es:{t:'Un plan secreto',s:'Alguien en la 204 te susurra que esta noche va a pedir matrimonio, y te pide que lo guardes en secreto.',opts:[['Pétalos de rosa y dos chocolates calientes esperando en el cenador del jardín, y ni una palabra a nadie',1],['Contárselo al resto del equipo para que todos lo vean',0],['Desearle suerte y no hacer nada',0]],ok:'Más tarde, dos huéspedes felices saludan desde el cenador. Una de las dos personas te dice “gracias” sin voz, por encima del hombro de la otra.',tip:'Parte de la magia está en lo que no dices. Guarda bien los secretos.'}}
+];
+/* Phone calls. The best reply first; shuffled on screen. room:'' means an outside line. */
+const STAR_CALLS=[
+ {id:'towels',room:'202',who:'Rahul Mehta',en:{ask:'Could I get two more towels, please?',opts:['Two fresh towels, coming up in 10 minutes!','Sure.','Housekeeping is closed, sorry.'],why:'Say the request back and give a time. Nothing gets lost.'},
+  es:{ask:'¿Podrían traerme dos toallas más, por favor?',opts:['¡Dos toallas limpias, en 10 minutos!','Vale.','Limpieza está cerrada, lo siento.'],why:'Repite la petición y da una hora. Así no se pierde nada.'}},
+ {id:'oat',room:'205',who:'Sofia Petrova',en:{ask:'Do you have oat milk for my tea?',opts:['We’re out of oat milk, but I can bring almond or warm soy. Which would you like?','No.','Maybe try the shop tomorrow.'],why:'Never just “no”. Bring an option along with it.'},
+  es:{ask:'¿Tienen leche de avena para el té?',opts:['Nos quedamos sin avena, pero puedo llevarle de almendra o de soja caliente. ¿Cuál prefiere?','No.','Pruebe en la tienda mañana.'],why:'Nunca un “no” a secas. Ofrece otra opción.'}},
+ {id:'breakfast',room:'201',who:'Leilani Kahale',en:{ask:'What time is breakfast?',opts:['From 7 to 10 in the garden room. Shall I save you a window seat?','Morning.','It’s on the website.'],why:'Answer clearly, then offer one small extra.'},
+  es:{ask:'¿A qué hora es el desayuno?',opts:['De 7 a 10 en el salón del jardín. ¿Le guardo una mesa junto a la ventana?','Por la mañana.','Está en la web.'],why:'Responde claro y ofrece un pequeño extra.'}},
+ {id:'friend',room:'',who:'',en:{ask:'Hi! Which room is Rahul in? I want to surprise my friend.',opts:['I can’t share room numbers, but I’m happy to put your call through.','Rahul’s in 202!','I can’t tell you anything. Bye.'],why:'Keep room numbers private, and still help.'},
+  es:{ask:'¡Hola! ¿Me dice en qué habitación está Rahul? Quiero darle una sorpresa.',opts:['No puedo dar números de habitación, pero con gusto le paso la llamada.','¡Está en la 202!','No puedo decirle nada. Adiós.'],why:'Los números de habitación son privados, pero puedes ayudar igual.'}},
+ {id:'wake',room:'206',who:'Mei Lin Zhou',en:{ask:'Could I get a wake-up call at 6?',opts:['A wake-up call at 6:00 AM for room 206. Sleep well!','Okay.','Just set an alarm on your phone.'],why:'Say it back with the exact time and room.'},
+  es:{ask:'¿Me pueden despertar a las 6?',opts:['Llamada despertador a las 6:00 AM para la 206. ¡Que descanse!','Vale.','Ponga una alarma en el móvil.'],why:'Repítelo con la hora exacta y la habitación.'}},
+ {id:'remote',room:'204',who:'Ingrid Solberg',en:{ask:'The TV remote isn’t working.',opts:['So sorry! I’ll bring fresh batteries in 5 minutes.','Try hitting it a bit.','That remote is very old.'],why:'Say sorry, fix it fast, and say when.'},
+  es:{ask:'El mando de la tele no funciona.',opts:['¡Lo siento mucho! Le llevo pilas nuevas en 5 minutos.','Dele unos golpecitos.','Ese mando es muy viejo.'],why:'Pide perdón, arréglalo rápido y di cuándo.'}},
+ {id:'noise',room:'203',who:'Amara Nwosu',en:{ask:'There’s a funny tapping noise in my room.',opts:['I’ll come up right now to check, and I can stay on the line until I’m there.','It’s an old house.','It usually stops eventually.'],why:'Go and see for yourself. Calm and quick.'},
+  es:{ask:'Hay un ruidito raro en mi habitación, como golpecitos.',opts:['Subo ahora mismo a mirarlo, y si quiere sigo al teléfono hasta llegar.','Es una casa vieja.','Normalmente acaba parando.'],why:'Ve a verlo en persona. Con calma y rapidez.'}},
+ {id:'friday',room:'',who:'',en:{ask:'Do you have a room for this Friday?',opts:['Let me look that up for you. Is it for one night or more?','We’re probably full.','Call back later.'],why:'Look it up, then ask one helpful question.'},
+  es:{ask:'¿Tienen habitación para este viernes?',opts:['Déjeme mirarlo. ¿Sería una noche o más?','Seguramente estamos llenos.','Llame más tarde.'],why:'Míralo y haz una pregunta útil.'}},
+ {id:'dinner',room:'202',who:'Tomás Herrera',en:{ask:'Where can I get a good dinner nearby?',opts:['I’d love to help! Shall I book you a table at the little bistro by the garden?','Somewhere in town.','I don’t really eat out.'],why:'Turn a question into a small kindness.'},
+  es:{ask:'¿Dónde puedo cenar bien cerca de aquí?',opts:['¡Con gusto! ¿Le reservo mesa en el pequeño bistró junto al jardín?','Por el pueblo.','Yo no suelo salir a cenar.'],why:'Convierte una pregunta en un pequeño detalle.'}}
+];
+const STAR_KEY='mapachez_star_v1',STAR_COINS=3,STAR_LISTENS=2,STAR_CALLS_PER=5;
+function createStar(){return {version:1,lt:{noted:{},back:[],day:{key:'',n:0},peeks:0,skip:false},coin:{day:{key:'',used:0},solved:[],tries:0},phone:{best:0,rounds:0,ring1:0,perfect:0},opened:0};}
+function normaliseStar(v){
+  const s=createStar();if(!v||typeof v!=='object'||v.version!==1)return s;
+  const gids=new Set(STAR_GUESTS.map(g=>g.id)),cids=new Set(STAR_CASES.map(c=>c.id));
+  const day=d=>d&&typeof d==='object'?{key:typeof d.key==='string'?d.key.slice(0,10):'',n:Math.max(0,d.n|0),used:Math.max(0,d.used|0)}:null;
+  if(v.lt&&typeof v.lt==='object'){
+    if(v.lt.noted&&typeof v.lt.noted==='object')for(const [k,d] of Object.entries(v.lt.noted))if(gids.has(k)&&typeof d==='string')s.lt.noted[k]=d.slice(0,10);
+    if(Array.isArray(v.lt.back))s.lt.back=[...new Set(v.lt.back.filter(id=>gids.has(id)&&s.lt.noted[id]))];
+    const d=day(v.lt.day);if(d)s.lt.day={key:d.key,n:d.n};s.lt.peeks=Math.max(0,v.lt.peeks|0);s.lt.skip=!!v.lt.skip;}
+  if(v.coin&&typeof v.coin==='object'){const d=day(v.coin.day);if(d)s.coin.day={key:d.key,used:Math.min(STAR_COINS,d.used)};
+    if(Array.isArray(v.coin.solved))s.coin.solved=[...new Set(v.coin.solved.filter(id=>cids.has(id)))];s.coin.tries=Math.max(0,v.coin.tries|0);}
+  if(v.phone&&typeof v.phone==='object')for(const k of ['best','rounds','ring1','perfect'])s.phone[k]=Math.max(0,v.phone[k]|0);
+  s.opened=Math.max(0,v.opened|0);
+  return s;
+}
+let star=createStar();
+try{star=normaliseStar(JSON.parse(localStorage.getItem(STAR_KEY)||'null'));}catch{}
+function storeStar(){try{localStorage.setItem(STAR_KEY,JSON.stringify(star));}catch{}}
+function starTip(n,el,{big=false}={}){
+  if(typeof hmsTip==='function')hmsTip(n);
+  if(el&&el.isConnected){const [x,y]=centerOf(el);burst(x,y,big?1.3:.7,{hearts:big,rainbow:big});if(n)floatText(x,y-20,'+'+n+' 🪙',{size:big?24:19});}
+  joySound(big?'open':'pop',big?1:0);if(n)setTimeout(()=>joySound('coin',2),120);
+  checkPins();renderGrowth();
+}
+function starFace(cv,name,size=26){if(cv)paintBust(cv,{cast:name},size,2);}
+const ltG=id=>STAR_GUESTS.find(g=>g.id===id);
+const ltFirst=g=>g.name.split(' ')[0];
+function ltToday(){if(star.lt.day.key!==dayKey())star.lt.day={key:dayKey(),n:0};return star.lt.day;}
+/* A guest comes back the night after you noted them (or right away, once, in the first-time preview). */
+function ltDue(){return STAR_GUESTS.find(g=>star.lt.noted[g.id]&&star.lt.noted[g.id]<dayKey()&&!star.lt.back.includes(g.id))||null;}
+function ltNextNew(){return ltToday().n<STAR_LISTENS?STAR_GUESTS.find(g=>!star.lt.noted[g.id])||null:null;}
+function coinsLeft(){if(star.coin.day.key!==dayKey())star.coin.day={key:dayKey(),used:0};return STAR_COINS-star.coin.day.used;}
+function coinNext(){return STAR_CASES.find(c=>!star.coin.solved.includes(c.id))||STAR_CASES[(star.coin.tries*5+dayKey().length)%STAR_CASES.length];}
+const starNew=()=>!!ltDue()||!!ltNextNew()||coinsLeft()>0;
+
+/* ---------- The hub: three cards, one tap each ---------- */
+function openStar(){
+  if(world)world.stop();
+  const first=!star.opened;star.opened++;storeStar();
+  openModal(titleHTML(ST.name,ST.kicker)+'<div class="hms-coach"><canvas id="star-delores" aria-hidden="true"></canvas><p>'+esc(first?ST.hello:ST.hi)+'</p></div><div class="hms-cards" id="star-cards"></div><div class="action-row" id="star-actions"></div>',true);
+  paintBust($('star-delores'),{cast:'delores'},26,2);
+  const due=ltDue(),nw=ltNextNew();
+  const status={
+    lt:due?sf(ST.ltDue,{name:ltFirst(due)}):nw?sf(ST.ltNew,{n:Math.min(STAR_LISTENS-ltToday().n,STAR_GUESTS.filter(g=>!star.lt.noted[g.id]).length)}):star.lt.back.length<STAR_GUESTS.length?ST.ltRest:sf(ST.ltStatus,{n:star.lt.back.length,total:STAR_GUESTS.length}),
+    coin:coinsLeft()?'🪙'.repeat(coinsLeft())+' '+sf(ST.coinStatus,{n:coinsLeft()}):ST.coinRest,
+    phone:star.phone.rounds?sf(ST.phoneBest,{n:star.phone.best}):ST.phoneNone};
+  const hot={lt:!!(due||nw),coin:coinsLeft()>0,phone:!star.phone.rounds};
+  for(const id of ['lt','coin','phone']){const [i,name,d]=ST.games[id],b=document.createElement('button');b.className='hms-lesson game star-card'+(hot[id]?' next':'');b.dataset.star=id;
+    b.innerHTML='<span class="hms-num" aria-hidden="true">'+i+'</span><span><b>'+esc(name)+'</b><small>'+esc(d)+'</small></span><span class="hms-go">'+esc(status[id])+'</span>';
+    b.onclick=()=>({lt:openLittle,coin:openCoins,phone:openPhone})[id]();$('star-cards').append(b);}
+  const row=$('star-actions');const add=(label,cls,run)=>{const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=run;row.append(b);};
+  add(ST.ltBook,'secondary-button',openLtBook);add(titleVisible?ST.done:ST.back,'primary-button',closeModal);
+  narrativeText=body.innerText;requestAnimationFrame(()=>body.querySelector('.star-card.next')?.focus());
+}
+function starFooter(id,items){const row=$(id);row.innerHTML='';for(const [label,primary,fn] of items){const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=fn;row.append(b);}}
+const starHome=()=>[ST.hub,false,openStar];
+
+/* ---------- 📒 Little Things ---------- */
+function openLittle(){
+  if(world)world.stop();
+  const due=ltDue();if(due)return ltReturn(due);
+  const g=ltNextNew();if(g)return ltListen(g);
+  if(star.lt.back.length>=STAR_GUESTS.length)return ltReturn(ltG(star.lt.back[(star.coin.tries+star.phone.rounds+dayKey().length+star.lt.peeks)%star.lt.back.length]),true);
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(ST.ltRestT)+'</h2><p class="modal-description">'+esc(ST.ltRestP)+'</p><div class="action-row" id="lt-actions"></div>');
+  starFooter('lt-actions',[[ST.ltBook,false,openLtBook],starHome(),[titleVisible?ST.done:ST.back,true,closeModal]]);narrativeText=body.innerText;
+}
+function ltHead(g,line){return '<div class="star-guest"><canvas id="star-face" aria-hidden="true"></canvas><div><small>'+esc(line)+'</small><b>'+esc(g.name)+'</b></div></div>';}
+function ltListen(g){
+  const L=sL(g);
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(ST.games.lt[1])+'</h2>'+ltHead(g,sf(ST.ltListen,{r:g.room}))+
+    '<p class="star-say">'+esc(L.say)+'</p><p class="star-ask">'+esc(ST.ltAsk)+'</p><div class="penny-opts" id="lt-opts">'+
+    sShuffle(L.pick.map((o,i)=>[o,i===0])).map(([o,r])=>'<button class="penny-opt lt-opt" data-right="'+(r?1:0)+'">'+esc(o)+'</button>').join('')+
+    '</div><div id="lt-res" class="star-res" hidden></div><div class="action-row" id="lt-actions"></div>');
+  starFace($('star-face'),g.name);
+  starFooter('lt-actions',[starHome()]);
+  body.querySelectorAll('.lt-opt').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1';
+    body.querySelectorAll('.lt-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});if(!right)b.classList.add('miss');
+    const firstEver=!Object.keys(star.lt.noted).length&&!star.lt.skip;
+    star.lt.noted[g.id]=dayKey();ltToday().n++;storeStar();
+    const res=$('lt-res');res.hidden=false;
+    res.innerHTML='<div class="star-note"><small>'+esc(ST.ltNote)+' · '+esc(g.name)+'</small><b>'+esc(L.pick[0])+'</b><span>'+esc(ST.ltSaved)+'</span></div><p>'+(right?'✨ '+esc(ST.ltRight[Object.keys(star.lt.noted).length%ST.ltRight.length]):'🌱 '+esc(ST.ltMiss)+' <b>'+esc(L.pick[0])+'</b>')+'</p><p class="joy-hint">'+esc(sf(ST.ltSoon,{name:ltFirst(g)}))+'</p>';
+    if(right)starTip(1,b);else joySound('boop');
+    const items=[];
+    if(firstEver)items.push([ST.ltSkip,true,()=>{star.lt.skip=true;storeStar();ltReturn(g,false,true);}]);
+    else if(ltDue())items.push([ST.ltNext,true,openLittle]);
+    else if(ltNextNew())items.push([ST.ltNext,true,openLittle]);
+    items.push(starHome());items.push([titleVisible?ST.done:ST.back,!items.length,closeModal]);
+    starFooter('lt-actions',items);narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+function ltReturn(g,review=false,preview=false){
+  const L=sL(g);let peeked=false;
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(sf(ST.ltBack,{name:ltFirst(g)}))+'</h2>'+ltHead(g,sf(review?ST.ltReview:ST.ltReturn,{r:g.room}))+
+    '<p class="star-ask">'+esc(ST.ltSet)+'</p><button class="secondary-button star-peek" id="lt-peek">'+esc(ST.ltPeek)+'</button><div id="lt-note" hidden></div>'+
+    '<div class="star-items" id="lt-items">'+sShuffle(L.items.map((it,i)=>[it,i===0])).map(([[ic,label],r])=>'<button class="star-item" data-right="'+(r?1:0)+'"><span aria-hidden="true">'+ic+'</span><small>'+esc(label)+'</small></button>').join('')+'</div>'+
+    '<div id="lt-res" class="star-res" hidden></div><div class="action-row" id="lt-actions"></div>');
+  starFace($('star-face'),g.name);
+  $('lt-peek').classList.add('hms-glow');
+  $('lt-peek').onclick=()=>{peeked=true;star.lt.peeks++;storeStar();const n=$('lt-note');n.hidden=false;n.innerHTML='<div class="star-note"><small>🖥️ '+esc(ST.ltNote)+' · '+esc(g.name)+' · '+esc(g.room)+'</small><b>'+esc(L.pick[0])+'</b><span>'+esc(ST.ltPeeked)+'</span></div>';$('lt-peek').remove();joySound('tick',1);};
+  starFooter('lt-actions',[starHome()]);
+  body.querySelectorAll('.star-item').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1';
+    body.querySelectorAll('.star-item').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});if(!right)b.classList.add('miss');
+    $('lt-peek')?.remove();
+    const res=$('lt-res');res.hidden=false;
+    if(right){if(!star.lt.back.includes(g.id))star.lt.back.push(g.id);storeStar();
+      res.innerHTML='<p class="star-quote yes">'+esc(sf(ST.ltYes,{name:ltFirst(g)}))+' '+esc(L.yes)+'</p>';
+      $('star-face')?.closest('.star-guest')?.classList.add('happy');
+      starTip(review?1:peeked?3:2,b,{big:!review});
+      if(star.lt.back.length===STAR_GUESTS.length&&!review)celebrate({icon:'📒',kicker:ST.games.lt[1],label:ST.pins.keeper[0],confetti:true});}
+    else{res.innerHTML='<p class="star-quote no">'+esc(sf(ST.ltNo,{name:ltFirst(g)}))+' '+esc(L.no)+'</p><p class="joy-hint">'+esc(sf(ST.ltNoAfter,{note:L.pick[0]}))+'</p>';joySound('boop');}
+    const items=[];
+    if(ltDue()||ltNextNew())items.push([ST.ltNext,true,openLittle]);
+    items.push([ST.ltBook,false,openLtBook]);items.push(starHome());items.push([titleVisible?ST.done:ST.back,items.length===2,closeModal]);
+    starFooter('lt-actions',items);narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+function openLtBook(){
+  if(world)world.stop();
+  const rows=STAR_GUESTS.map(g=>{const L=sL(g),noted=!!star.lt.noted[g.id],back=star.lt.back.includes(g.id);
+    return noted?'<div class="penny-coin got star-page"><canvas data-face="'+esc(g.name)+'" aria-hidden="true"></canvas><span><b>'+esc(g.name)+'</b><small>📒 '+esc(L.pick[0])+'</small><small class="'+(back?'ok':'')+'">'+esc(back?ST.ltWelcomed:ST.ltWaiting)+'</small></span></div>':'<div class="penny-coin"><span aria-hidden="true">○</span> '+esc(ST.ltLocked)+'</div>';}).join('');
+  openModal('<span class="overline">'+esc(ST.ltKick)+'</span><h2 id="modal-heading">'+esc(ST.ltBookT)+'</h2><p class="modal-description">'+esc(ST.ltBookP)+'</p><p class="joy-hint">'+esc(sf(ST.ltStatus,{n:star.lt.back.length,total:STAR_GUESTS.length}))+'</p><div class="penny-book">'+rows+'</div><div class="action-row" id="lt-actions"></div>');
+  body.querySelectorAll('canvas[data-face]').forEach(cv=>starFace(cv,cv.dataset.face,22));
+  starFooter('lt-actions',[[ST.games.lt[0]+' '+ST.games.lt[1]+' →',false,openLittle],starHome(),[titleVisible?ST.done:ST.back,true,closeModal]]);
+  narrativeText=body.innerText;
+}
+
+/* ---------- 🪙 Magic coins ---------- */
+function coinRow(){const left=coinsLeft();return '<div class="star-coins" aria-label="'+esc(sf(ST.coinLeft,{n:left}))+'">'+Array.from({length:STAR_COINS},(_,k)=>'<span class="'+(k<left?'on':'')+'">🪙</span>').join('')+'</div>';}
+function openCoins(){
+  if(world)world.stop();
+  if(coinsLeft()<=0){openModal('<span class="overline">'+esc(ST.coinKick)+'</span><h2 id="modal-heading">'+esc(ST.coinRestT)+'</h2>'+coinRow()+'<p class="modal-description">'+esc(ST.coinRestP)+'</p><div class="action-row" id="coin-actions"></div>');
+    starFooter('coin-actions',[starHome(),[titleVisible?ST.done:ST.back,true,closeModal]]);narrativeText=body.innerText;return;}
+  const c=coinNext(),L=sL(c);
+  openModal('<span class="overline">'+esc(ST.coinKick)+'</span><h2 id="modal-heading">'+c.icon+' '+esc(L.t)+'</h2>'+coinRow()+'<p class="joy-hint">'+esc(sf(ST.coinIntro,{n:coinsLeft()}))+'</p>'+
+    '<div class="penny-card"><small>'+esc(c.room?(profile.lang==='es'?'HABITACIÓN ':'ROOM ')+c.room:'')+'</small><p>'+esc(L.s)+'</p><div class="penny-q"><b>'+esc(ST.coinPick)+'</b><div class="penny-opts">'+
+    sShuffle(L.opts.map((o,i)=>[o,i===0])).map(([[o,cost],r])=>'<button class="penny-opt coin-opt" data-right="'+(r?1:0)+'" data-cost="'+cost+'"><span>'+esc(o)+'</span><em class="'+(cost?'':'free')+'">'+esc(cost?ST.coinCost:ST.coinFree)+'</em></button>').join('')+
+    '</div><div id="coin-res" class="star-res" hidden></div></div></div><div class="action-row" id="coin-actions"></div>');
+  starFooter('coin-actions',[starHome()]);
+  body.querySelectorAll('.coin-opt').forEach(b=>b.onclick=()=>{
+    const right=b.dataset.right==='1',best=L.opts[0];
+    body.querySelectorAll('.coin-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});if(!right)b.classList.add('miss');
+    star.coin.tries++;
+    const keep=right&&!best[1];
+    if(!keep)star.coin.day.used=Math.min(STAR_COINS,star.coin.day.used+1);
+    if(right&&!star.coin.solved.includes(c.id))star.coin.solved.push(c.id);
+    storeStar();
+    const res=$('coin-res');res.hidden=false;
+    res.innerHTML=(right?'<p>'+esc(keep?ST.coinKeep:ST.coinRight[star.coin.tries%ST.coinRight.length])+'</p><p class="star-quote yes">'+esc(L.ok)+'</p>':'<p>'+esc(ST.coinMiss)+' <b>'+esc(best[0])+'</b></p>')+'<p class="star-tip"><b>'+esc(ST.coinTip)+'</b> '+esc(L.tip)+'</p>';
+    body.querySelector('.star-coins').outerHTML=coinRow();
+    if(right)starTip(2,b,{big:true});else joySound('boop');
+    if(right&&star.coin.solved.length===STAR_CASES.length)celebrate({icon:'✨',kicker:ST.games.coin[1],label:ST.pins.miracle[0],confetti:true});
+    const items=[];if(coinsLeft()>0)items.push([ST.coinNext,true,openCoins]);
+    items.push(starHome());items.push([titleVisible?ST.done:ST.back,!coinsLeft(),closeModal]);
+    starFooter('coin-actions',items);narrativeText=body.innerText;
+  });
+  narrativeText=body.innerText;
+}
+
+/* ---------- ☎️ Three-ring phone ---------- */
+let starRelaxed=false;
+try{starRelaxed=localStorage.getItem('mapachez_star_relaxed')==='1';}catch{}
+function ringSound(){const a=typeof joyAudio==='function'?joyAudio():null;if(!a)return;try{for(let k=0;k<4;k++){joyNote(a,1318.5,k*.07,{type:'triangle',vol:.02,dur:.06});joyNote(a,1046.5,k*.07+.035,{type:'triangle',vol:.02,dur:.06});}}catch{}}
+function openPhone(){
+  if(world)world.stop();
+  openModal('<span class="overline">'+esc(ST.phKick)+'</span><h2 id="modal-heading">'+esc(ST.games.phone[1])+'</h2><div class="star-phone idle" aria-hidden="true">☎️</div><p class="modal-description">'+esc(ST.phIntro)+'</p>'+
+    '<label class="star-relax"><input type="checkbox" id="ph-relax"'+(starRelaxed?' checked':'')+'> '+esc(ST.phRelaxed)+'</label><div class="action-row" id="ph-actions"></div>');
+  $('ph-relax').onchange=e=>{starRelaxed=e.target.checked;try{localStorage.setItem('mapachez_star_relaxed',starRelaxed?'1':'0');}catch{}};
+  starFooter('ph-actions',[starHome(),[ST.phStart,true,()=>phoneRound()]]);
+  narrativeText=body.innerText;requestAnimationFrame(()=>$('ph-actions')?.lastChild?.focus());
+}
+function phoneRound(){
+  const calls=sShuffle(STAR_CALLS);const round=[];for(const c of calls){if(round.length>=STAR_CALLS_PER)break;if(!c.room&&round.filter(x=>!x.room).length>=1)continue;round.push(c);}
+  const R={calls:round,i:0,stars:0,lessons:[]};phoneCall(R);
+}
+function phoneCall(R){
+  const c=R.calls[R.i],L=sL(c),ringMs=starRelaxed?2400:1200,total=R.calls.length;
+  openModal('<span class="overline">'+esc(sf(ST.phCall,{n:R.i+1,total}))+'</span><h2 id="modal-heading">'+esc(ST.games.phone[1])+'</h2>'+
+    '<div class="gm-dots" aria-hidden="true">'+R.calls.map((_,k)=>'<i class="'+(k<R.i?'done':k===R.i?'now':'')+'"></i>').join('')+'</div>'+
+    '<div id="ph-live" class="star-phone-live"><div class="star-phone ringing" aria-hidden="true">☎️</div><div class="star-rings" id="ph-rings">'+[1,2,3].map(n=>'<i data-n="'+n+'">'+n+'</i>').join('')+'</div>'+
+    '<p class="star-ringline" id="ph-ringline" aria-live="polite">'+esc(sf(ST.phRing,{n:1}))+'</p><button class="primary-button star-answer" id="ph-answer">'+esc(ST.phAnswer)+'</button></div>'+
+    '<div id="ph-talk" hidden></div><div class="action-row" id="ph-actions"></div>');
+  let ring=1;const t0=performance.now();
+  const paint=()=>{body.querySelectorAll('#ph-rings i').forEach(i=>{const n=+i.dataset.n;i.className=n<ring?'gone':n===ring?'now':'';});const l=$('ph-ringline');if(l)l.textContent=sf(ST.phRing,{n:ring});};
+  paint();ringSound();
+  const timer=setInterval(()=>{if(!$('ph-answer')||!modal.open){clearInterval(timer);return;}
+    const n=1+Math.floor((performance.now()-t0)/ringMs);if(n!==ring){ring=n;paint();ringSound();}},120);
+  $('ph-answer').focus();
+  $('ph-answer').onclick=()=>{
+    clearInterval(timer);const fast=ring<=2;if(fast)R.stars++;
+    if(ring===1){star.phone.ring1++;storeStar();checkPins();}
+    $('ph-live').innerHTML='<div class="star-phone talking" aria-hidden="true">📞</div><p class="star-ringline '+(fast?'ok':'')+'">'+esc(fast?sf(ST.phRingOk,{n:ring}):sf(ST.phRingLate,{n:ring}))+'</p>';
+    if(fast){const el=$('ph-live');starPop(el,'⭐');}else{joySound('boop');R.lessons.push(sf(ST.phRingLate,{n:ring}).split('. ').slice(1).join('. '));}
+    const out=!c.room,first=c.who.split(' ')[0];
+    const greets=(out?ST.greet.out:ST.greet.room).map((g,i)=>[sf(g,{first}),i===0]);
+    const talk=$('ph-talk');talk.hidden=false;
+    talk.innerHTML='<div class="star-caller"><span aria-hidden="true">'+(out?'🌐':'🛏️')+'</span>'+(out?'':'<canvas id="star-face" aria-hidden="true"></canvas>')+'<b>'+esc(out?ST.phOutside:sf(ST.phRoom,{r:c.room,who:c.who}))+'</b></div>'+
+      '<p class="star-ask">'+esc(ST.phGreet)+'</p><div class="penny-opts" id="ph-greet">'+sShuffle(greets).map(([g,r])=>'<button class="penny-opt" data-right="'+(r?1:0)+'">'+esc(g)+'</button>').join('')+'</div><div id="ph-help"></div>';
+    if(!out)starFace($('star-face'),c.who,22);
+    talk.querySelectorAll('#ph-greet .penny-opt').forEach(b=>b.onclick=()=>{
+      const right=b.dataset.right==='1';talk.querySelectorAll('#ph-greet .penny-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});
+      if(right){R.stars++;starPop(b,'⭐');}else{b.classList.add('miss');joySound('boop');R.lessons.push(out?ST.greetWhy.out:ST.greetWhy.room);}
+      const help=$('ph-help');
+      help.innerHTML='<p class="star-say">'+esc(sf(ST.phHelp,{ask:L.ask}))+'</p><p class="star-ask">'+esc(ST.phReply)+'</p><div class="penny-opts" id="ph-reply">'+sShuffle(L.opts.map((o,i)=>[o,i===0])).map(([o,r])=>'<button class="penny-opt" data-right="'+(r?1:0)+'">'+esc(o)+'</button>').join('')+'</div><p class="star-tip" id="ph-why" hidden></p>';
+      help.querySelectorAll('.penny-opt').forEach(x=>x.onclick=()=>{
+        const ok=x.dataset.right==='1';help.querySelectorAll('.penny-opt').forEach(o=>{o.disabled=true;if(o.dataset.right==='1')o.classList.add('right');});
+        if(ok){R.stars++;starPop(x,'⭐');}else{x.classList.add('miss');joySound('boop');R.lessons.push(L.why);}
+        const w=$('ph-why');w.hidden=false;w.innerHTML='<b>'+esc(ST.coinTip)+'</b> '+esc(L.why);
+        const last=R.i>=total-1;
+        starFooter('ph-actions',[[last?ST.phEnd:ST.phNext,true,()=>{if(last)phoneEnd(R);else{R.i++;phoneCall(R);}}]]);
+        requestAnimationFrame(()=>$('ph-actions')?.firstChild?.focus());narrativeText=body.innerText;
+      });
+      help.scrollIntoView?.({block:'nearest',behavior:'smooth'});narrativeText=body.innerText;
+    });
+    narrativeText=body.innerText;
+  };
+  narrativeText=body.innerText;
+}
+function starPop(el,word){if(!el||!el.isConnected)return;const [x,y]=centerOf(el);burst(x,y,.5);floatText(x,y-16,word,{size:20});joySound('pop');}
+function phoneEnd(R){
+  const total=R.calls.length*3,perfect=R.stars===total,isBest=R.stars>star.phone.best;
+  star.phone.rounds++;if(perfect)star.phone.perfect++;if(isBest)star.phone.best=R.stars;storeStar();checkPins();
+  const tips=Math.ceil(R.stars/3)+(perfect?2:0);
+  const lessons=[...new Set(R.lessons.filter(Boolean))];
+  openModal('<span class="overline">'+esc(ST.phKick)+'</span><h2 id="modal-heading">'+esc(ST.phDoneT)+'</h2><div class="star-score" id="ph-score"><b>'+esc(sf(ST.phStars,{n:R.stars,total}))+'</b>'+(isBest&&star.phone.rounds>1?'<span>'+esc(ST.phBestNew)+'</span>':'')+'</div>'+
+    (perfect?'<p class="star-quote yes">'+esc(ST.phPerfect)+'</p>':lessons.length?'<p class="star-ask">'+esc(ST.phLearn)+'</p><ul class="star-lessons">'+lessons.map(l=>'<li>'+esc(l)+'</li>').join('')+'</ul>':'')+
+    '<div class="action-row" id="ph-actions"></div>');
+  starFooter('ph-actions',[starHome(),[ST.phAgain,true,()=>phoneRound()]]);
+  requestAnimationFrame(()=>starTip(tips,$('ph-score'),{big:perfect}));
+  if(perfect)celebrate({icon:'📞',kicker:ST.games.phone[1],label:sf(ST.phStars,{n:R.stars,total}),confetti:true});
+  narrativeText=body.innerText;
+}
+
+{const st=document.createElement('style');st.textContent=`
+.star-guest{display:flex;gap:12px;align-items:center;margin:4px 0 10px;padding:8px 12px;border-radius:14px;background:linear-gradient(160deg,#fffaf0,#f4f0ff);border:1px solid #e3d6b2}
+.star-guest canvas{width:56px;height:52px;flex-shrink:0;image-rendering:pixelated;border-radius:12px;background:radial-gradient(circle at 50% 60%,#fff6d8,#efe8ff 75%)}
+.star-guest small{display:block;font:11px Arial,sans-serif;letter-spacing:.06em;color:#7a6331;text-transform:uppercase}
+.star-guest b{font:normal 20px Georgia,serif}
+.star-guest.happy canvas{animation:starHop .5s ease 3}
+@keyframes starHop{50%{transform:translateY(-6px) scale(1.05)}}
+.star-say{font:italic 16px/1.6 Georgia,serif;color:#3b3220;margin:0 0 10px}
+.star-ask{font-weight:600;font-size:15px;margin:10px 0 8px}
+.star-res{margin-top:10px}.star-res p{margin:8px 0;font-size:15px;line-height:1.55}
+.star-note{display:grid;gap:3px;padding:10px 14px;border-radius:12px;background:#eef9f1;border:1px solid #9fd6b0;border-left:5px solid #4f9a6a;margin:8px 0;animation:starIn .35s ease}
+.star-note small{font:11px Arial,sans-serif;letter-spacing:.06em;color:#2f6b45;text-transform:uppercase}.star-note b{font-size:16px}.star-note span{font-size:12px;color:#2f6b45}
+@keyframes starIn{from{opacity:0;transform:translateY(6px)}}
+.star-peek{margin:0 0 6px}
+.star-items{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.star-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;border-radius:14px;border:1px solid #d9cfae;background:#fffdf7;color:var(--ink);cursor:pointer;min-height:92px;font:inherit}
+.star-item span{font-size:34px;line-height:1}.star-item small{font-size:13px;line-height:1.35;text-align:center}
+.star-item:hover:not(:disabled){border-color:#e0b84a;background:#fff8e1;transform:translateY(-2px)}
+.star-item.right{border-color:#4f9a45;background:#e3f6dc;box-shadow:0 0 0 3px #bfe8b4}.star-item.miss{border-color:#d9b38c;background:#fbefe3}
+.star-quote{font:italic 16px/1.6 Georgia,serif;padding:10px 14px;border-radius:12px}
+.star-quote.yes{background:#fff3c4;color:#5b4310}.star-quote.no{background:#eef7ef;color:#2f5236}
+.star-tip{font-size:14px;line-height:1.5;background:#f1f0ff;border-radius:12px;padding:8px 12px;color:#3a3466}
+.star-coins{display:flex;gap:6px;margin:4px 0 6px;font-size:28px}.star-coins span{filter:grayscale(1);opacity:.3;transition:.3s}.star-coins span.on{filter:none;opacity:1;animation:joyWiggle 2.6s ease-in-out infinite}
+.coin-opt{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.coin-opt em{font-style:normal;font-size:11px;white-space:nowrap;padding:2px 8px;border-radius:999px;background:#fff1c2;color:#7a5410}.coin-opt em.free{background:#e3f6dc;color:#2f6b2a}
+.star-phone{font-size:64px;text-align:center;line-height:1.1;margin:6px 0}
+.star-phone.ringing{animation:starRing .35s ease-in-out infinite}
+@keyframes starRing{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+.star-phone-live{text-align:center}
+.star-rings{display:flex;justify-content:center;gap:12px;margin:6px 0}
+.star-rings i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:bold 16px Georgia,serif;font-style:normal;border:2px solid #d9cfae;color:#a89a74;background:#fffdf7}
+.star-rings i.now{border-color:#e0a93a;background:#ffe58a;color:#5b4310;animation:joyWiggle .6s ease-in-out infinite}
+.star-rings i.gone{background:#f3e3c7;color:#b49a6a}
+.star-rings i[data-n="3"].now{background:#ffd0b0;border-color:#e0864a}
+.star-ringline{font-size:15px;margin:6px 0}.star-ringline.ok{color:#2f6b2a;font-weight:600}
+.star-answer{font-size:20px;padding:14px 34px;min-height:56px;border-radius:999px}
+.star-caller{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:#f4f0ff;border:1px solid #d6cbf2;margin:6px 0}
+.star-caller span{font-size:22px}.star-caller canvas{width:44px;height:42px;image-rendering:pixelated}
+.star-relax{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0 4px;cursor:pointer}
+.star-score{text-align:center;margin:8px 0 10px}.star-score b{display:block;font:normal 40px Georgia,serif;color:#7a5414}.star-score span{display:inline-block;margin-top:4px;padding:3px 12px;border-radius:999px;background:#ffe58a;font-size:13px;font-weight:600}
+.star-lessons{margin:0 0 6px;padding-left:20px;font-size:14px;line-height:1.6}
+.star-page{display:flex;gap:10px;align-items:center}.star-page canvas{width:44px;height:42px;image-rendering:pixelated;flex-shrink:0}
+.star-page span{display:grid;gap:2px}.star-page small{font-size:12px;color:#6b5a3a}.star-page small.ok{color:#2f6b2a;font-weight:600}
+.joy-row #joy-side-star{background:linear-gradient(180deg,#fff6d8,#ffe7a8);border-color:#e0c060}
+.joy-title-mg.star{border-color:rgba(255,216,77,.6);background:rgba(200,160,40,.22);color:#fff6d6}
+@media(max-width:520px){.star-items{grid-template-columns:1fr 1fr}.star-item span{font-size:28px}.star-phone{font-size:52px}}
+.star-item:disabled,#lt-opts .penny-opt:disabled,#ph-greet .penny-opt:disabled,#ph-reply .penny-opt:disabled,.coin-opt:disabled{opacity:.6}
+.star-item.right:disabled,.star-item.miss:disabled,#lt-opts .penny-opt.right,#ph-greet .penny-opt.right,#ph-reply .penny-opt.right,.coin-opt.right,#lt-opts .penny-opt.miss,#ph-greet .penny-opt.miss,#ph-reply .penny-opt.miss,.coin-opt.miss{opacity:1;color:var(--ink)}
+@media(prefers-reduced-motion:reduce){.star-phone.ringing,.star-rings i.now,.star-coins span.on,.star-guest.happy canvas{animation:none}}
+`;document.head.append(st);}
+
+/* ---------- In the manor: a little brass service bell on the front desk ---------- */
+const STAR_SPOT={x:150,y:566};
+function drawStarBell(c,time,calm){
+  if(festivalActive||!state||titleVisible)return;
+  const x=176,y=526,ding=!calm&&starNew()&&(time%3000)<260?Math.sin((time%3000)/260*Math.PI*3)*.18:0;
+  ellipse(c,x,y+5,12,3.4,'rgba(60,40,10,.25)');
+  c.save();c.translate(x,y);c.rotate(ding);
+  c.fillStyle='#8a5d1a';c.beginPath();c.roundRect(-11,1,22,4,2);c.fill();
+  const g=c.createLinearGradient(-9,-10,9,0);g.addColorStop(0,'#fff0a8');g.addColorStop(.5,'#ffd84d');g.addColorStop(1,'#c9952f');
+  c.fillStyle=g;c.beginPath();c.moveTo(-9,1);c.quadraticCurveTo(-9,-10,0,-10);c.quadraticCurveTo(9,-10,9,1);c.closePath();c.fill();
+  c.fillStyle='#c9952f';c.beginPath();c.arc(0,-11.5,2.2,0,Math.PI*2);c.fill();
+  ellipse(c,-3.5,-6,1.6,2.6,'rgba(255,255,255,.6)');c.restore();
+  if(starNew()){const bob=calm?0:Math.sin(time/320)*2;text(c,'★',x+13,y-14+bob,13,'#ffd84d');}
+  if(ding)text(c,'♪',x-14,y-14,10,'#fff3c4');
+  if(LABELS)plaque(c,'🌟 '+ST.bell,x-22,y-24);
+}
+const starExtras=world.options.extras;
+world.options.extras=()=>{const list=starExtras();if(state&&!festivalActive&&!titleVisible)list.push({id:'star',...STAR_SPOT,name:ST.name});return list;};
+const starDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{starDrawExtras(c,time,calm);drawStarBell(c,time,calm);};
+const starInteract=interact;interact=function(id){if(id==='star'){openStar();return;}return starInteract.apply(this,arguments);};
+addEventListener('keydown',e=>{
+  if(e.key.toLowerCase()!=='g'||e.ctrlKey||e.altKey||e.metaKey||modal.open||/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  e.preventDefault();openStar();
+});
+
+/* ---------- Sidebar, house ledger, title and pins ---------- */
+const starRenderGrowth=renderGrowth;
+renderGrowth=function(){
+  starRenderGrowth();const row=$('growth')?.querySelector('.joy-row');if(!row)return;
+  const b=document.createElement('button');b.id='joy-side-star';b.textContent=ST.side+(starNew()?' ★':'');b.onclick=()=>openStar();row.append(b);
+};
+const starOpenLedger=openLedger;
+openLedger=function(){const r=starOpenLedger.apply(this,arguments);const tabs=$('ledger-tabs');
+  if(tabs&&!$('ledger-star')){const b=document.createElement('button');b.id='ledger-star';b.textContent=ST.hub;b.onclick=openStar;tabs.append(b);}return r;};
+{const anchor=$('penny-title')||$('hms-title')||$('joy-title-gift')||document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg star';b.id='star-title';b.innerHTML=esc(ST.title)+' →';b.onclick=()=>openStar();anchor.after(b);}}
+PINS.push(
+  {id:'star-remember',icon:'📒',name:ST.pins.remember[0],hint:ST.pins.remember[1],test:()=>star.lt.back.length>=1},
+  {id:'star-keeper',icon:'📔',name:ST.pins.keeper[0],hint:ST.pins.keeper[1],test:()=>star.lt.back.length>=STAR_GUESTS.length},
+  {id:'star-coin',icon:'🪙',name:ST.pins.coin[0],hint:ST.pins.coin[1],test:()=>star.coin.solved.length>=1},
+  {id:'star-miracle',icon:'✨',name:ST.pins.miracle[0],hint:ST.pins.miracle[1],test:()=>star.coin.solved.length>=STAR_CASES.length},
+  {id:'star-ring',icon:'☎️',name:ST.pins.ring[0],hint:ST.pins.ring[1],test:()=>star.phone.rounds>=1},
+  {id:'star-smile',icon:'📞',name:ST.pins.smile[0],hint:ST.pins.smile[1],test:()=>star.phone.perfect>=1},
+  {id:'star-first',icon:'🔔',name:ST.pins.first[0],secret:true,hint:ST.pins.first[1],test:()=>star.phone.ring1>=10}
+);
+renderGrowth();checkPins();
+/* ==== end STAR SERVICE v1 ==== */
+
 
 })();
 </script>
