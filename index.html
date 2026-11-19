@@ -1782,7 +1782,7 @@ class ManorWorld {
         }
         let dx=(this.keys.has('d')||this.keys.has('arrowright')?1:0)-(this.keys.has('a')||this.keys.has('arrowleft')?1:0);
         let dy=(this.keys.has('s')||this.keys.has('arrowdown')?1:0)-(this.keys.has('w')||this.keys.has('arrowup')?1:0);
-        const manual=Math.hypot(dx,dy);let budget=176*dt;
+        const manual=Math.hypot(dx,dy);let budget=176*(this.options.speed?.()||1)*dt;
         while(budget>0&&(manual||this.path.length)){
           if(!manual){const target=this.path[0];dx=target.x-p.x;dy=target.y-p.y;}
           const distance=Math.hypot(dx,dy);
@@ -6603,12 +6603,20 @@ const COTTAGE_VISITORS=[{id:'delores',at:2},{id:'penny',at:6}];
 
 /* ---------- Save ---------- */
 const COTTAGE_KEY='mapachez_cottage_v1';
-function createCottage(){return {version:1,owned:[],spent:0,visits:0,lamp:true,met:[],plays:0};}
+function createCottage(){return {version:1,owned:[],spent:0,visits:0,lamp:true,met:[],plays:0,live:null,home:'toadstool',rides:[],ride:'',snail:0,grade:-1,house:{own:false,done:[]}};}
 function normaliseCottage(v){
   const s=createCottage();if(!v||typeof v!=='object'||v.version!==1)return s;
   if(Array.isArray(v.owned))s.owned=[...new Set(v.owned.filter(x=>COTTAGE_ITEMS.some(i=>i.id===x)))];
   if(Array.isArray(v.met))s.met=[...new Set(v.met.filter(x=>COTTAGE_VISITORS.some(i=>i.id===x)))];
   s.spent=Math.max(0,v.spent|0);s.visits=Math.max(0,v.visits|0);s.plays=Math.max(0,v.plays|0);s.lamp=v.lamp!==false;
+  /* v2 fields: older saves that already furnished the cottage simply live there. */
+  s.live=v.live===true||v.live===false?v.live:(s.owned.length||s.visits?true:null);
+  if(['toadstool','lighthouse','treehouse','seashell','dream'].includes(v.home))s.home=v.home;
+  if(Array.isArray(v.rides))s.rides=[...new Set(v.rides.filter(x=>['skate','scooter','bike','snail','cart','broom','carpet','teacup','car'].includes(x)))];
+  if(typeof v.ride==='string'&&s.rides.includes(v.ride))s.ride=v.ride;s.snail=v.snail?1:0;
+  s.grade=Number.isInteger(v.grade)&&v.grade>=0&&v.grade<=4?v.grade:-1;
+  if(v.house&&typeof v.house==='object'){s.house.own=v.house.own===true;if(s.house.own&&Array.isArray(v.house.done))s.house.done=[...new Set(v.house.done.filter(x=>['windows','door','fence','porch','roof','paint','garden','swing'].includes(x)))];}
+  if(s.home==='dream'&&s.house.done.length<8)s.home='toadstool';
   return s;
 }
 let cottage=createCottage();
@@ -6642,11 +6650,12 @@ function drawCottageRoom(c,t,calm){
   const tw=k=>calm?.9:.55+.45*Math.sin(t/420+k*1.7),stars=cotHas('wallpaper');
   /* wall */
   if(stars){rect(c,0,0,COT_W,172,'#33416f');for(let k=0;k<46;k++){const x=(k*97)%392+4,y=18+(k*53)%118;c.globalAlpha=.35+.5*tw(k);text(c,'✦',x,y,k%3?6:8,'#ecd283');}c.globalAlpha=1;}
-  else{rect(c,0,0,COT_W,172,'#f4e3c6');for(let x=0;x<COT_W;x+=22)rect(c,x,0,11,140,'#efdabb');}
-  rect(c,0,138,COT_W,34,stars?'#28345c':'#dcb78c');rect(c,0,138,COT_W,3,stars?'#1f2a4c':'#b08458');
+  const P=cotPalette();
+  if(!stars){rect(c,0,0,COT_W,172,P.wall);for(let x=0;x<COT_W;x+=22)rect(c,x,0,11,140,P.stripe);}
+  rect(c,0,138,COT_W,34,stars?'#28345c':P.wains);rect(c,0,138,COT_W,3,stars?'#1f2a4c':P.wainsTop);
   rect(c,0,0,COT_W,12,'#7a4f33');rect(c,0,12,COT_W,3,'#5e3b26');
   /* floor */
-  rect(c,0,172,COT_W,78,'#bb8758');for(let y=185,r=0;y<COT_H;y+=13,r++){rect(c,0,y,COT_W,1.4,'#a3714a');for(let x=(r%2)*40+20;x<COT_W;x+=80)rect(c,x,y-12,1.4,12,'#a3714a');}
+  rect(c,0,172,COT_W,78,P.floor);for(let y=185,r=0;y<COT_H;y+=13,r++){rect(c,0,y,COT_W,1.4,P.seam);for(let x=(r%2)*40+20;x<COT_W;x+=80)rect(c,x,y-12,1.4,12,P.seam);}
   rect(c,0,169,COT_W,5,'#7a4f33');
   /* window with the night sky and the manor across the lawn (no weather indoors) */
   rect(c,164,44,76,80,'#7a5236',4);
@@ -6787,13 +6796,16 @@ const COT_SPOT={lamp:[262,160],rug:[200,222],plant:[182,104],quilt:[334,176],cur
 function cotSparkle(id){const cv=$('cot-room');if(!cv)return;const r=cv.getBoundingClientRect(),s=r.width/COT_W,[x,y]=COT_SPOT[id]||[200,120];burst(r.left+x*s,r.top+y*s,1.3,{hearts:true});}
 
 /* ---------- The cottage screen ---------- */
-function openCottage(){
+function openCottage(tab){
   if(world)world.stop();
+  tab=typeof tab==='string'?tab:cot.tab||'inside';cot.tab=tab;cancelAnimationFrame(cot.raf);
+  if(tab==='rides')return openCottageRides();if(tab==='homes')return openCottageHomes();if(tab==='dream')return openCottageDream();
+  if(cottage.live!==true)return openCottageLane();
   const first=cottage.visits===0;cottage.visits++;storeCottage();
   const v=cot.visitor=cotPickVisitor(),fresh=v&&!cottage.met.includes(v);
-  openModal('<span class="overline">🏡 '+esc(CT.kicker)+'</span><h2 id="modal-heading">'+esc(CT.name)+'</h2>'+
+  openModal(cotHead('inside')+
     '<div class="cot-stage"><canvas id="cot-room" role="img" aria-label="'+esc(CT.name)+'"></canvas><p class="cot-say" id="cot-say" aria-live="polite"></p></div>'+
-    '<div class="cot-top"><span class="cot-wallet" id="cot-wallet"></span><span class="cot-level" id="cot-level"></span></div>'+
+    '<div class="cot-top"><span class="cot-wallet" id="cot-wallet"></span><span class="cot-level" id="cot-level"></span></div>'+payHTML()+
     '<div id="cot-next"></div><h3 class="pins-heading">'+esc(CT.shop)+'</h3><p class="joy-hint">'+esc(CT.shopIntro)+'</p><ul class="cot-shop" id="cot-shop"></ul>'+
     '<p class="joy-hint" id="cot-earn">'+esc(CT.earn)+(cottage.spent?' · '+esc(ctx_(CT.spent,{n:cottage.spent})):'')+'</p><div class="action-row" id="cot-actions"></div>',true);
   modal.classList.add('cot-modal');
@@ -6805,7 +6817,7 @@ function openCottage(){
   if(fresh){cottage.met.push(v);storeCottage();const V=CT.visitors[v];cotSay(V.name+': “'+V.lines[0]+'”');celebrate({icon:v==='penny'?'🐉':'🥧',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
   else cotSay(first?CT.intro:cotPick(CT.hello));
   requestAnimationFrame(cotLoop);
-  narrativeText=body.innerText;
+  cotWire();
 }
 const cotCloseModal=closeModal;closeModal=function(){modal.classList.remove('cot-modal');cancelAnimationFrame(cot.raf);return cotCloseModal.apply(this,arguments);};
 const cotOpenModal=openModal;openModal=function(){modal.classList.remove('cot-modal');return cotOpenModal.apply(this,arguments);};
@@ -6842,6 +6854,16 @@ function buyCottageThing(id,btn){
   checkPins();renderGrowth();narrativeText=body.innerText;
 }
 
+/* ---------- Raises: a best answer earns extra tips as your pay grade grows ---------- */
+const payShowMomentResult=showMomentResult;
+showMomentResult=function(i,k,mode,host){
+  payShowMomentResult.apply(this,arguments);
+  const box=body.querySelector('.gm-result');if(!box||!box.classList.contains('best'))return cotRaiseCheck();
+  const r=payGrade();if(r>0){joy.tips+=r;joy.jar+=r;if(joy.jar>=JOY_JAR){joy.jar-=JOY_JAR;joy.jars++;joy.gifts.push('jar');}
+    if(mode==='shift'&&shift)shift.joyTips=(shift.joyTips||0)+r;storeJoy();
+    box.querySelector('.joy-tips b')?.insertAdjacentHTML('beforeend',' <span class="cot-raise">'+esc(ctx_(CT2.raiseChip,{n:r}))+'</span>');}
+  cotRaiseCheck();renderGrowth();
+};
 /* ---------- A gentle nudge when tips are enough for something new ---------- */
 const cotShowMomentResult=showMomentResult;
 showMomentResult=function(i,k,mode,host){
@@ -6858,6 +6880,343 @@ const cotHmsTip=hmsTip;
 hmsTip=function(n){const before=cotWallet();cotHmsTip.apply(this,arguments);
   const target=COTTAGE_ITEMS.find(x=>!cotHas(x.id)&&before<x.price&&cotWallet()>=x.price);if(target)setTimeout(()=>toast(ctx_(CT.enough,{name:cL(target)[0]})),900);};
 
+/* ---------- COTTAGE v2: Staff Lane, rides and raises ----------
+   - Living on the grounds is a choice. Four cottages on Staff Lane, each with its own look inside.
+     Players can live in town instead and move in (or out) any time.
+   - Rides bought with tips: they follow you around the manor and the festival grounds, and most
+     are faster than walking. Four of them fly. One is a giant snail, which is not fast at all.
+   - Raises: as your Silver Key skills grow, every best answer earns extra tips. Better work, more
+     tips, bigger dreams (like the flying car). */
+const CT2_TEXT={
+en:{
+  lane:'STAFF LANE · {name}',townKick:'STAFF COTTAGES · OPTIONAL',townTitle:'Staff Lane',
+  tabs:{inside:'🏡 Inside',rides:'🛵 Rides',homes:'🗝️ Cottages'},
+  offerQ:'Would you like to live on the grounds?',
+  offer:'Staff can live in a little cottage on Staff Lane, a short walk from the manor. It is free, it is optional, and you can change your mind any time.',
+  offerYes:'Yes, pick a cottage →',offerNo:'Not now, I live in town',
+  town:'You live in town. The cottages on Staff Lane are always there if you want one, and tips still buy rides for the trip in.',
+  moveIn:'Move into a cottage →',seeRides:'See the rides →',
+  homesIntro:'Four cottages, all free for staff. Pick the one that feels like you. You can move any time, and your things come with you.',
+  moveHere:'Move in here',liveHere:'You live here ✓',moveTown:'Live in town instead',movedIn:'🗝️ Welcome home to {name}!',movedTown:'You live in town now. Your cottage things will wait for you.',
+  ridesIntro:'Rides go wherever you walk: the manor halls and the festival grounds. Most are faster than walking. Some fly.',
+  ride:'Ride it',riding:'Riding ✓',walk:'Walk instead',nowRiding:'Now riding: {name}',walking:'Back on your own two feet.',
+  speed:'Speed',flies:'Flies',
+  pay:'Your pay',payNow:'+{n} tips on every best answer',payNone:'Best answers earn the usual tips',
+  payNext:'Next raise: {name} in {n} skill points',payTop:'Top pay. The manor is lucky to have you.',
+  payHow:'Raises come from your Silver Key skills. Best answers grow them.',
+  raiseKick:'YOU GOT A RAISE!',raiseLine:'Delores slides an envelope across the desk. “The guests keep mentioning you. That deserves a raise.”',
+  raiseChip:'+{n} raise',
+  grades:['New night host','Trusted host','Senior host','Night lead','Silver Key host'],
+  pins:{ride:['Wheels','Buy your first ride.'],sky:['Sky High','Buy a ride that flies.'],garage:['Whole Garage','Own every ride.'],snail:['Slow and Steady','Ride the giant snail.'],raise:['First Raise','Earn your first raise.']}
+},
+es:{
+  lane:'CALLE DEL PERSONAL · {name}',townKick:'CASITAS DEL PERSONAL · OPCIONAL',townTitle:'Calle del Personal',
+  tabs:{inside:'🏡 Dentro',rides:'🛵 Vehículos',homes:'🗝️ Casitas'},
+  offerQ:'¿Te gustaría vivir en la finca?',
+  offer:'El personal puede vivir en una casita en la Calle del Personal, a un paseo de la mansión. Es gratis, es opcional y puedes cambiar de idea cuando quieras.',
+  offerYes:'Sí, elegir una casita →',offerNo:'Ahora no, vivo en el pueblo',
+  town:'Vives en el pueblo. Las casitas de la Calle del Personal siguen ahí si quieres una, y las propinas también compran vehículos para el viaje.',
+  moveIn:'Mudarme a una casita →',seeRides:'Ver los vehículos →',
+  homesIntro:'Cuatro casitas, todas gratis para el personal. Elige la que más se parezca a ti. Puedes mudarte cuando quieras y tus cosas van contigo.',
+  moveHere:'Mudarme aquí',liveHere:'Vives aquí ✓',moveTown:'Vivir en el pueblo',movedIn:'🗝️ ¡Bienvenida a casa, a {name}!',movedTown:'Ahora vives en el pueblo. Tus cosas te esperan en la casita.',
+  ridesIntro:'Los vehículos van contigo a todas partes: los pasillos de la mansión y el recinto del festival. Casi todos son más rápidos que caminar. Algunos vuelan.',
+  ride:'Usarlo',riding:'En uso ✓',walk:'Ir a pie',nowRiding:'Ahora vas en: {name}',walking:'De vuelta a tus propios pies.',
+  speed:'Velocidad',flies:'Vuela',
+  pay:'Tu sueldo',payNow:'+{n} propinas en cada mejor respuesta',payNone:'Las mejores respuestas dan las propinas de siempre',
+  payNext:'Próximo aumento: {name} en {n} puntos de habilidad',payTop:'Sueldo máximo. La mansión tiene suerte de tenerte.',
+  payHow:'Los aumentos vienen de tus habilidades Silver Key. Las mejores respuestas las hacen crecer.',
+  raiseKick:'¡TE SUBIERON EL SUELDO!',raiseLine:'Delores te pasa un sobre por el mostrador. “Los huéspedes no paran de hablar de ti. Eso merece un aumento.”',
+  raiseChip:'+{n} aumento',
+  grades:['Anfitrión de noche nuevo','Anfitrión de confianza','Anfitrión sénior','Líder de noche','Anfitrión Silver Key'],
+  pins:{ride:['Sobre ruedas','Compra tu primer vehículo.'],sky:['Por las nubes','Compra un vehículo que vuela.'],garage:['Garaje completo','Ten todos los vehículos.'],snail:['Despacito y con buena letra','Monta el caracol gigante.'],raise:['Primer aumento','Consigue tu primer aumento.']}
+}};
+const CT2=CT2_TEXT[profile.lang]||CT2_TEXT.en;
+/* fix the Spanish welcome so it stays gender-neutral */
+if(profile.lang==='es')CT2.movedIn='🗝️ ¡Ya estás en casa, en {name}!';
+
+/* ---------- The four cottages on Staff Lane ---------- */
+const COT_HOMES=[
+  {id:'toadstool',en:['The Toadstool','A round little house under a big red cap. It smells like rain and cinnamon.'],es:['La Seta','Una casita redonda bajo un gran sombrero rojo. Huele a canela.'],
+   pal:{wall:'#f4e3c6',stripe:'#efdabb',wains:'#dcb78c',wainsTop:'#b08458',floor:'#bb8758',seam:'#a3714a'}},
+  {id:'lighthouse',en:['The Little Lighthouse','A tiny striped tower. The lamp on top is a nightlight now.'],es:['El Farito','Una torre diminuta a rayas. La luz de arriba ahora es una lamparita de noche.'],
+   pal:{wall:'#f7f6f2',stripe:'#e2eef6',wains:'#9fc3d9',wainsTop:'#6f9ab7',floor:'#cdb38c',seam:'#b39770'}},
+  {id:'treehouse',en:['The Treehouse','Up a friendly old oak, with a rope ladder and a squirrel landlord.'],es:['La Casa del Árbol','En lo alto de un roble amable, con escalera de cuerda y una ardilla casera.'],
+   pal:{wall:'#d3a674',stripe:'#c79a68',wains:'#8f6a43',wainsTop:'#6f4f30',floor:'#9c6f45',seam:'#84593a'}},
+  {id:'seashell',en:['The Seashell','A spiral pink shell by the dunes. If you listen, it hums the sea.'],es:['La Caracola','Una caracola rosa en espiral junto a las dunas. Si escuchas, tararea el mar.'],
+   pal:{wall:'#f8e2e4',stripe:'#f3d2d8',wains:'#e7b7bf',wainsTop:'#cf8f9c',floor:'#dcb88e',seam:'#c49f75'}}
+];
+const cotHome=()=>COT_HOMES.find(h=>h.id===cottage.home)||COT_HOMES[0];
+function cotPalette(){return cotHome().pal;}
+/* An outside view of one cottage, centred on (x, ground y), about 70 wide. */
+function drawCotHome(c,id,x,y,t,calm,k=1){
+  c.save();c.translate(x,y);c.scale(k,k);
+  ellipse(c,0,1,30,4,'rgba(30,60,40,.18)');
+  const win=(wx,wy,r=5)=>{ellipse(c,wx,wy,r+1.5,r+1.5,'#7a5236');ellipse(c,wx,wy,r,r,'#ffd77a');cotGlow(c,wx,wy,r*3,'rgba(255,220,140,.35)');};
+  if(id==='toadstool'){rect(c,-20,-34,40,34,'#f6ead2',8);rect(c,-6,-18,12,18,'#8a5a3a',[6,6,0,0]);ellipse(c,3,-9,1,1,'#e0c080');win(-13,-22,4);win(13,-22,4);
+    c.fillStyle='#e2655f';c.beginPath();c.ellipse(0,-34,34,22,0,Math.PI,0);c.fill();rect(c,-34,-36,68,4,'#c94f4a',2);
+    for(const [a,b,r] of [[-18,-44,4],[0,-50,5],[17,-43,3.5],[-6,-40,2.5],[24,-37,2]])ellipse(c,a,b,r,r,'#fff3ea');}
+  else if(id==='lighthouse'){c.fillStyle='#fffaf2';c.beginPath();c.moveTo(-16,0);c.lineTo(-10,-62);c.lineTo(10,-62);c.lineTo(16,0);c.fill();
+    c.fillStyle='#e2655f';
+    for(const yy of [-12,-36]){const w0=16-(-yy)*6/62,w1=16-(-yy+12)*6/62;c.beginPath();c.moveTo(-w0,yy);c.lineTo(-w1,yy-12);c.lineTo(w1,yy-12);c.lineTo(w0,yy);c.fill();}
+    rect(c,-13,-70,26,8,'#3d5a45',2);const g=calm?1:.75+.25*Math.sin(t/500);c.globalAlpha=g;cotGlow(c,0,-76,26,'rgba(255,232,150,.6)');c.globalAlpha=1;rect(c,-8,-82,16,12,'#ffe08a',2);
+    c.fillStyle='#3d5a45';c.beginPath();c.moveTo(-11,-82);c.lineTo(0,-92);c.lineTo(11,-82);c.fill();rect(c,-5,-14,10,14,'#5e7fa3',[5,5,0,0]);win(0,-48,3.5);}
+  else if(id==='treehouse'){rect(c,-6,-46,12,46,'#7a5236',3);c.strokeStyle='#7a5236';c.lineWidth=4;c.beginPath();c.moveTo(0,-38);c.lineTo(-22,-52);c.moveTo(0,-34);c.lineTo(20,-48);c.stroke();
+    for(const [a,b,r,col] of [[-20,-70,20,'#4f8a5a'],[18,-72,22,'#4f8a5a'],[0,-84,22,'#5f9d63'],[-6,-66,16,'#6aa96b']])ellipse(c,a,b,r,r*.85,col);
+    rect(c,-18,-60,36,20,'#c99a62',3);c.fillStyle='#8a5a3a';c.beginPath();c.moveTo(-22,-60);c.lineTo(0,-74);c.lineTo(22,-60);c.fill();win(-8,-50,3.5);rect(c,4,-56,8,16,'#8a5a3a',2);
+    c.strokeStyle='#e0c58e';c.lineWidth=1.2;c.beginPath();c.moveTo(14,-40);c.lineTo(14,-2);c.moveTo(20,-40);c.lineTo(20,-2);for(let r=-36;r<-2;r+=6){c.moveTo(14,r);c.lineTo(20,r);}c.stroke();}
+  else{c.fillStyle='#f6c3cd';c.beginPath();c.moveTo(-30,0);c.quadraticCurveTo(-34,-40,0,-46);c.quadraticCurveTo(30,-44,30,-14);c.quadraticCurveTo(28,0,10,0);c.closePath();c.fill();
+    c.strokeStyle='#e79aab';c.lineWidth=2;c.beginPath();for(let a=0;a<9;a+=.25){const r=3+a*3.2,xx=6+Math.cos(a)*r,yy=-24+Math.sin(a)*r*.85;a?c.lineTo(xx,yy):c.moveTo(xx,yy);}c.stroke();
+    rect(c,-22,-16,12,16,'#c98a5a',[6,6,0,0]);win(-16,-30,3.5);ellipse(c,-40,0,4,2,'#f3e2c4');ellipse(c,34,-1,3,2,'#fff3ea');}
+  c.restore();
+}
+function paintCotHome(cv,id,{w=150,h=112,lane=false}={}){
+  if(!cv)return;cv.style.width=lane?'100%':w+'px';cv.style.aspectRatio=w+'/'+h;
+  const dpr=Math.min(2,devicePixelRatio||1)*(lane?Math.max(1,(cv.clientWidth||w)/w):1);cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  const sky=c.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#23305e');sky.addColorStop(1,'#6b5f9f');c.fillStyle=sky;c.fillRect(0,0,w,h);
+  for(let k=0;k<(lane?26:8);k++)ellipse(c,(k*53)%w+3,(k*29)%(h*.5)+4,.9,.9,'#fff');ellipse(c,w-18,16,7,7,'#fff4c9');
+  c.fillStyle='#3c6b52';c.beginPath();c.moveTo(0,h-18);c.quadraticCurveTo(w*.3,h-30,w*.6,h-22);c.quadraticCurveTo(w*.85,h-16,w,h-24);c.lineTo(w,h);c.lineTo(0,h);c.fill();
+  if(lane){rect(c,0,h-12,w,12,'#d9c49a');COT_HOMES.forEach((hm,i)=>drawCotHome(c,hm.id,w*(i+.5)/4,h-12,0,true,1));}
+  else drawCotHome(c,id,w/2,h-14,0,true,1.05);
+}
+
+/* ---------- Rides ---------- */
+/* speed: how much faster than walking. lift: how high you sit. fly: floats and bobs. */
+const COT_RIDES=[
+  {id:'skate',price:30,speed:1.3,lift:4,en:['Skateboard','Pink with yellow wheels. Goes “clackety-clack” over the floor tiles.'],es:['Monopatín','Rosa con ruedas amarillas. Hace “clac-clac” sobre las baldosas.']},
+  {id:'scooter',price:45,speed:1.4,lift:4,en:['Kick scooter','One kick and you are gliding. It has a tiny bell.'],es:['Patinete','Una patada y ya vas deslizándote. Tiene una campanita.']},
+  {id:'bike',price:60,speed:1.55,lift:10,en:['Bike with a basket','The basket holds one sandwich and one daisy, as is tradition.'],es:['Bici con cesta','En la cesta caben un bocadillo y una margarita, como manda la tradición.']},
+  {id:'snail',price:75,speed:.75,lift:16,en:['Giant snail','The slowest ride on the island. Everyone waves.'],es:['Caracol gigante','El vehículo más lento de la isla. Todo el mundo saluda.']},
+  {id:'cart',price:100,speed:1.6,lift:5,en:['Manor golf cart','Mint green, with a little crest on the side and a cup holder for tea.'],es:['Carrito de la mansión','Verde menta, con un escudito en el lado y un portavasos para el té.']},
+  {id:'broom',price:130,speed:1.75,lift:6,fly:true,en:['Flying broom','It sweeps the air as it goes. Very tidy.'],es:['Escoba voladora','Barre el aire mientras vuela. Muy ordenada.']},
+  {id:'carpet',price:160,speed:1.75,lift:2,fly:true,en:['Magic carpet','Woven from sunset colours. Ripples like a happy cat.'],es:['Alfombra mágica','Tejida con colores de atardecer. Ondula como un gato feliz.']},
+  {id:'teacup',price:200,speed:1.7,lift:9,fly:true,en:['Flying teacup','You ride inside it. It never spills.'],es:['Taza voladora','Vas dentro. Nunca se derrama.']},
+  {id:'car',price:280,speed:2,lift:10,fly:true,en:['Flying car','Bubble-shaped, mint and silver, with a soft “whirr”. The dream.'],es:['Coche volador','Con forma de burbuja, menta y plata, con un suave “zumm”. El sueño.']}
+];
+const cotRide=()=>COT_RIDES.find(r=>r.id===cottage.ride&&cottage.rides.includes(r.id))||null;
+/* Draws a ride at the ground point (0,0), facing right. pass 'back' is under you, 'front' over you. */
+function drawRide(c,id,t,calm,pass){
+  const bob=calm?0:Math.sin(t/380)*2.2,wheel=(x,y,r,col='#3a3040')=>{ellipse(c,x,y,r,r,col);ellipse(c,x,y,r*.45,r*.45,'#d8d2c6');};
+  if(id==='skate'&&pass==='back'){rect(c,-17,-6,34,4,'#f28aa8',2);rect(c,-15,-6,30,1.4,'#ffc2d4',1);wheel(-10,-1,2.4,'#ffd84d');wheel(10,-1,2.4,'#ffd84d');}
+  if(id==='scooter'){if(pass==='back'){rect(c,-15,-6,28,3.5,'#5f9fbf',2);wheel(-13,-2,3,'#333');wheel(13,-2,3,'#333');}
+    else{c.strokeStyle='#8fb4c9';c.lineWidth=2.4;c.beginPath();c.moveTo(11,-6);c.lineTo(15,-38);c.stroke();rect(c,9,-40,12,3,'#5f9fbf',1.5);ellipse(c,20,-41,1.8,1.8,'#ffd84d');}}
+  if(id==='bike'){if(pass==='back'){c.strokeStyle='#e2655f';c.lineWidth=2;c.beginPath();c.arc(-15,-9,9,0,Math.PI*2);c.arc(15,-9,9,0,Math.PI*2);c.stroke();
+      c.strokeStyle='#d9534f';c.lineWidth=2.4;c.beginPath();c.moveTo(-15,-9);c.lineTo(-3,-22);c.lineTo(11,-22);c.lineTo(15,-9);c.moveTo(-3,-22);c.lineTo(2,-9);c.lineTo(-15,-9);c.stroke();rect(c,-8,-26,10,3,'#5a3720',1.5);}
+    else{c.strokeStyle='#d9534f';c.lineWidth=2.2;c.beginPath();c.moveTo(11,-22);c.lineTo(13,-32);c.lineTo(8,-33);c.stroke();rect(c,14,-30,12,8,'#d8b07a',2);for(let k=0;k<3;k++)rect(c,15+k*4,-30,1,8,'#b08458');ellipse(c,22,-31,2.4,2.4,'#fff');ellipse(c,22,-31,1,1,'#ffd84d');}}
+  if(id==='snail'){if(pass==='back'){c.fillStyle='#b8d98f';c.beginPath();c.moveTo(-26,0);c.quadraticCurveTo(-28,-8,-10,-8);c.lineTo(22,-8);c.quadraticCurveTo(30,-8,30,-16);c.quadraticCurveTo(34,-22,28,-22);c.lineTo(20,-12);c.lineTo(20,0);c.closePath();c.fill();
+      ellipse(c,-4,-20,17,15,'#e9a84f');c.strokeStyle='#c4782f';c.lineWidth=2;c.beginPath();for(let a=0;a<10;a+=.3){const r=1+a*1.4,xx=-4+Math.cos(a)*r,yy=-20+Math.sin(a)*r;a?c.lineTo(xx,yy):c.moveTo(xx,yy);}c.stroke();}
+    else{c.strokeStyle='#9cc477';c.lineWidth=1.6;c.beginPath();c.moveTo(29,-20);c.lineTo(31,-30);c.moveTo(27,-20);c.lineTo(25,-29);c.stroke();ellipse(c,31,-31,2,2,'#2a2430');ellipse(c,25,-30,2,2,'#2a2430');ellipse(c,30.5,-31.5,.6,.6,'#fff');c.fillStyle='#f28aa8';c.globalAlpha=.6;ellipse(c,26,-17,2,1.2,'#f28aa8');c.globalAlpha=1;}}
+  if(id==='cart'){if(pass==='back'){rect(c,-22,-44,44,4,'#f6f1e4',2);rect(c,-20,-40,2.4,26,'#b8b0a0');rect(c,17,-40,2.4,26,'#b8b0a0');rect(c,-18,-26,12,14,'#7fb8a3',3);}
+    else{rect(c,-24,-16,48,12,'#8fd6c4',5);rect(c,-24,-16,48,3,'#bfeee0',2);ellipse(c,0,-10,4,4,'#d9b44a');wheel(-14,-3,4.4);wheel(14,-3,4.4);ellipse(c,22,-12,2,1.4,'#fff6c4');}}
+  if(id==='broom'&&pass==='back'){c.save();c.translate(0,bob);c.strokeStyle='#8a5a3a';c.lineWidth=3;c.beginPath();c.moveTo(-24,-4);c.lineTo(22,-8);c.stroke();
+    c.fillStyle='#e8c46a';c.beginPath();c.moveTo(-22,-4);c.lineTo(-36,-12);c.lineTo(-38,2);c.closePath();c.fill();c.strokeStyle='#c99a3e';c.lineWidth=.8;c.beginPath();for(let k=0;k<4;k++){c.moveTo(-23,-4);c.lineTo(-37,-10+k*4);}c.stroke();rect(c,-24,-7,4,6,'#d9534f',1);
+    if(!calm)for(let k=0;k<3;k++){const a=((t/500)+k/3)%1;c.globalAlpha=1-a;ellipse(c,-38-a*14,-4+Math.sin(k*2)*4,1.4,1.4,'#ffe9a6');}c.globalAlpha=1;c.restore();}
+  if(id==='carpet'&&pass==='back'){c.save();c.translate(0,bob);const wv=k=>calm?0:Math.sin(t/220+k)*1.6;
+    c.fillStyle='#c4506a';c.beginPath();c.moveTo(-26,-2+wv(0));for(let k=1;k<=4;k++)c.lineTo(-26+k*13,-2+wv(k));c.lineTo(26,4+wv(4));for(let k=3;k>=0;k--)c.lineTo(-26+k*13,4+wv(k));c.closePath();c.fill();
+    c.fillStyle='#ffd77a';for(let k=0;k<4;k++)rect(c,-22+k*13,0+wv(k+.5),6,2,'#ffd77a',1);c.fillStyle='#7d5bb8';for(let k=0;k<5;k++)rect(c,-25+k*12.5,1+wv(k),2,1.4,'#7d5bb8');
+    c.strokeStyle='#ffd77a';c.lineWidth=1;c.beginPath();for(const [x,s] of [[-26,-1],[26,1]])for(let k=0;k<3;k++){c.moveTo(x,-1+k*2+wv(s>0?4:0));c.lineTo(x+s*4,k*2+wv(s>0?4:0));}c.stroke();c.restore();}
+  if(id==='teacup'){c.save();c.translate(0,bob);if(pass==='back'){ellipse(c,0,-2,22,4,'#f1e6d6');ellipse(c,0,-20,17,4.4,'#f6c3cd');ellipse(c,0,-20,14.5,3,'#c48a5a');}
+    else{c.fillStyle='#fffaf2';c.beginPath();c.moveTo(-17,-20);c.quadraticCurveTo(-16,-2,0,-2);c.quadraticCurveTo(16,-2,17,-20);c.closePath();c.fill();rect(c,-16,-15,32,3,'#f2a7bb');
+      c.strokeStyle='#fffaf2';c.lineWidth=3;c.beginPath();c.arc(19,-13,5,-1.3,1.3);c.stroke();heartPath(c,0,-8,3.4,'#f28aa8');}c.restore();}
+  if(id==='car'){c.save();c.translate(0,bob);if(pass==='back'){c.fillStyle='rgba(200,240,255,.45)';c.beginPath();c.ellipse(0,-20,16,14,0,Math.PI,0);c.fill();}
+    else{rect(c,-28,-20,56,15,'#8fd6c4',8);rect(c,-28,-20,56,4,'#c8f2e6',4);rect(c,-26,-11,52,3,'#c9d3d6',1.5);ellipse(c,25,-14,2.6,2,'#fff6c4');ellipse(c,-26,-14,2,1.6,'#f28aa8');
+      c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=1.2;c.beginPath();c.ellipse(0,-20,16,14,0,Math.PI*1.1,Math.PI*1.45);c.stroke();
+      const g=calm?1:.7+.3*Math.sin(t/90);for(const x of [-16,16]){c.globalAlpha=g;cotGlow(c,x,-2,9,'rgba(140,220,255,.7)');ellipse(c,x,-4,4,2,'#bfeaff');}c.globalAlpha=1;}c.restore();}
+}
+function paintRide(cv,id){
+  if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),W=96,H=72;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);const r=COT_RIDES.find(x=>x.id===id);
+  ellipse(c,W/2,H-8,24,4,'rgba(60,40,30,.15)');c.save();c.translate(W/2,H-8-(r.fly?6:0));c.scale(1.4,1.4);drawRide(c,id,0,true,'back');drawRide(c,id,0,true,'front');c.restore();
+}
+/* In the world: the ride goes under you, you sit up on it, the front parts go over you. */
+const cotFace={dir:1};
+const rideDrawPerson=drawPerson;
+drawPerson=function(c,x,y,person={},step=0,dir='down',carrying=false,scale=1){
+  const r=person&&person.cast==='player'&&!titleVisible?cotRide():null;
+  if(!r)return rideDrawPerson.apply(this,arguments);
+  if(dir==='left')cotFace.dir=-1;else if(dir==='right')cotFace.dir=1;
+  const t=castNow(),calm=!!settings.motion,gy=y+12*scale,k=scale,hover=r.fly?10:0,bob=r.fly&&!calm?Math.sin(t/380)*2.2*k:0;
+  if(r.fly){ellipse(c,x,gy+1,18,4.5,'rgba(20,40,30,.22)');}
+  c.save();c.translate(x,gy-hover);c.scale(cotFace.dir*k,k);drawRide(c,r.id,t,calm,'back');c.restore();
+  c.save();c.translate(0,-(r.lift*k+hover)-bob);const out=rideDrawPerson.call(this,c,x,y,person,0,dir,carrying,scale);c.restore();
+  c.save();c.translate(x,gy-hover);c.scale(cotFace.dir*k,k);drawRide(c,r.id,t,calm,'front');c.restore();
+  return out;
+};
+world.options.speed=()=>{const r=cotRide();return r?r.speed:1;};
+
+/* ---------- Raises ---------- */
+const PAY_AT=[0,80,220,450,800];
+const skillPoints=()=>{const p=growth.pts||{};return (p.trust|0)+(p.care|0)+(p.team|0);};
+function payGrade(pts=skillPoints()){let g=0;PAY_AT.forEach((v,k)=>{if(pts>=v)g=k;});return g;}
+if(cottage.grade<0)cottage.grade=payGrade();storeCottage();
+function cotRaiseCheck(){const g=payGrade();if(g>cottage.grade){cottage.grade=g;storeCottage();joySound('open',2);
+  celebrate({icon:'💰',kicker:CT2.raiseKick,label:CT2.grades[g]+' · '+ctx_(CT2.payNow,{n:g}),confetti:true});toast(CT2.raiseLine);checkPins();}}
+function payHTML(){
+  const g=payGrade(),pts=skillPoints(),next=PAY_AT[g+1];
+  const pct=next==null?100:Math.round((pts-PAY_AT[g])/(next-PAY_AT[g])*100);
+  return '<div class="cot-pay"><span class="cot-ic" aria-hidden="true">💰</span><div class="cot-nx"><small>'+esc(CT2.pay)+' · '+esc(CT2.grades[g])+'</small><b>'+esc(g?ctx_(CT2.payNow,{n:g}):CT2.payNone)+'</b>'+
+    '<span class="bar" role="meter" aria-label="'+esc(CT2.pay)+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><i style="width:'+pct+'%"></i></span>'+
+    '<span class="cot-left">'+esc(next==null?CT2.payTop:ctx_(CT2.payNext,{name:CT2.grades[g+1],n:next-pts}))+' · '+esc(CT2.payHow)+'</span></div></div>';
+}
+
+/* ---------- Tabs, the lane, rides and cottages screens ---------- */
+function cotTabs(tab){return '<div class="cot-tabs" role="tablist">'+['inside','rides','homes','dream'].map(k=>'<button role="tab" class="cot-tab'+(k===tab?' on':'')+'" aria-selected="'+(k===tab)+'" data-tab="'+k+'">'+esc(k==='dream'?DT.tab:CT2.tabs[k])+'</button>').join('')+'</div>';}
+function cotHead(tab){
+  const live=cottage.live===true;
+  return '<span class="overline">'+(live?'🏡 '+esc(ctx_(CT2.lane,{name:cL(cotHome())[0].toUpperCase()})):'🗝️ '+esc(CT2.townKick))+'</span><h2 id="modal-heading">'+esc(live?CT.name:CT2.townTitle)+'</h2>'+cotTabs(tab);
+}
+function cotWire(){body.querySelectorAll('.cot-tab').forEach(b=>b.onclick=()=>openCottage(b.dataset.tab));
+  const acts=$('cot-actions');if(acts&&!acts.children.length){const d=document.createElement('button');d.className='primary-button';d.textContent=titleVisible?t('Done'):t('Back to the manor');d.onclick=closeModal;acts.append(d);}
+  modal.classList.add('cot-modal');narrativeText=body.innerText;}
+function cotWalletHTML(){const w=cotWallet();return '<div class="cot-top"><span class="cot-wallet"><span aria-hidden="true">🪙</span> <b>'+esc(w===1?CT.walletOne:ctx_(CT.wallet,{n:w}))+'</b></span></div>';}
+function openCottageLane(){
+  const ask=cottage.live==null;
+  openModal(cotHead('inside')+'<div class="cot-stage lane"><canvas id="cot-lane" aria-hidden="true"></canvas></div>'+
+    '<div class="cot-offer"><h3>'+esc(ask?CT2.offerQ:CT2.townTitle)+'</h3><p>'+esc(ask?CT2.offer:CT2.town)+'</p><div class="cot-offer-row" id="cot-offer-row"></div></div>'+payHTML()+'<div class="action-row" id="cot-actions"></div>',true);
+  paintCotHome($('cot-lane'),'',{w:400,h:130,lane:true});
+  const row=$('cot-offer-row'),add=(label,primary,fn)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=fn;row.append(b);};
+  add(ask?CT2.offerYes:CT2.moveIn,true,()=>openCottage('homes'));
+  if(ask)add(CT2.offerNo,false,()=>{cottage.live=false;storeCottage();openCottage('inside');});else add(CT2.seeRides,false,()=>openCottage('rides'));
+  cotWire();
+}
+function openCottageHomes(){
+  openModal(cotHead('homes')+'<p class="joy-hint">'+esc(CT2.homesIntro)+'</p><ul class="cot-homes" id="cot-homes"></ul><div class="action-row" id="cot-actions"></div>',true);
+  const ul=$('cot-homes');
+  COT_HOMES.filter(h=>!h.dream||dreamDone()).forEach((h,i)=>{const L=cL(h),here=cottage.live===true&&cottage.home===h.id,li=document.createElement('li');li.className=here?'on':'';
+    li.innerHTML='<canvas aria-hidden="true"></canvas><b>'+(i+1)+' · '+esc(L[0])+'</b><small>'+esc(L[1])+'</small>'+(here?'<span class="cot-tag">'+esc(CT2.liveHere)+'</span>':'<button class="secondary-button">'+esc(CT2.moveHere)+'</button>');
+    ul.append(li);paintCotHome(li.querySelector('canvas'),h.id);
+    li.querySelector('button')?.addEventListener('click',()=>{cottage.live=true;cottage.home=h.id;storeCottage();joySound('open',1);toast(ctx_(CT2.movedIn,{name:L[0]}));openCottage('inside');});});
+  if(cottage.live===true){const b=document.createElement('button');b.className='text-button cot-town';b.textContent=CT2.moveTown;b.onclick=()=>{cottage.live=false;storeCottage();toast(CT2.movedTown);openCottage('inside');};ul.after(b);}
+  cotWire();
+}
+function openCottageRides(){
+  openModal(cotHead('rides')+cotWalletHTML()+payHTML()+'<p class="joy-hint">'+esc(CT2.ridesIntro)+'</p><ul class="cot-rides" id="cot-rides"></ul><div class="action-row" id="cot-actions"></div>',true);
+  const ul=$('cot-rides'),w=cotWallet(),cur=cotRide();
+  for(const r of COT_RIDES){const L=cL(r),own=cottage.rides.includes(r.id),ok=!own&&w>=r.price,li=document.createElement('li');li.className=(own?'own':ok?'ok':'')+(cur&&cur.id===r.id?' on':'');
+    const stars=Math.max(1,Math.round((r.speed-.5)*2.4));
+    li.innerHTML='<canvas aria-hidden="true"></canvas><span class="cot-tx"><b>'+esc(L[0])+'</b><small>'+esc(L[1])+'</small><small class="cot-spd">'+esc(CT2.speed)+' '+'★'.repeat(stars)+'<i>'+'★'.repeat(Math.max(0,5-stars))+'</i>'+(r.fly?' · '+esc(CT2.flies)+' ☁️':'')+'</small></span>';
+    const b=document.createElement('button');
+    if(own){const on=cur&&cur.id===r.id;b.className=on?'secondary-button':'primary-button';b.textContent=on?CT2.walk:CT2.ride;
+      b.onclick=()=>{cottage.ride=on?'':r.id;storeCottage();if(!on){joySound('hop');toast(ctx_(CT2.nowRiding,{name:L[0]}));if(r.id==='snail'){cottage.snail=1;}}else toast(CT2.walking);checkPins();renderGrowth();openCottage('rides');};
+      if(on){const tag=document.createElement('span');tag.className='cot-tag';tag.textContent=CT2.riding;li.append(tag);}}
+    else{b.className=ok?'primary-button':'secondary-button';b.textContent=ctx_(CT.buyShort,{n:r.price});b.disabled=!ok;
+      b.onclick=()=>{if(cotWallet()<r.price||cottage.rides.includes(r.id))return;joy.tips-=r.price;cottage.spent+=r.price;cottage.rides.push(r.id);cottage.ride=r.id;if(r.id==='snail')cottage.snail=1;storeJoy();storeCottage();
+        const [x,y]=centerOf(b);burst(x,y,1.4,{hearts:true,rainbow:r.fly});floatText(x,y-20,'-'+r.price+' 🪙',{size:18,col:'#fff3c4'});joySound('open',r.price>=150?2:1);
+        celebrate({icon:'🛵',kicker:CT2.tabs.rides.replace(/^\S+ /,''),label:ctx_(CT2.nowRiding,{name:L[0]}),confetti:r.price>=150});checkPins();renderGrowth();openCottage('rides');};}
+    li.append(b);ul.append(li);paintRide(li.querySelector('canvas'),r.id);}
+  cotWire();
+}
+
+/* ---------- The dream house: a sleepy old fixer-upper at the end of Staff Lane ----------
+   A big goal to save for. Buy the deed, then fix it up one project at a time. Nothing ever
+   breaks again or costs upkeep: every project only makes it lovelier. */
+const DREAM_TEXT={
+en:{
+  tab:'🏚️ Dream house',name:'Willowbrook House',kick:'THE END OF STAFF LANE · A FIXER-UPPER',
+  intro:'An old house at the end of Staff Lane, a little sleepy and very loved. It is for sale to staff. Save up, make it yours, then fix it up one project at a time.',
+  deed:'Buy the house',deedLine:'The keys, the deed, and one very old doorbell that plays half a tune.',
+  bought:'🔑 Willowbrook House is yours!',saving:'Saving for your own house',left:'{n} more tips',
+  projects:'Fix-up projects',projIntro:'Pick any project you can afford. Tap Fix it and watch the house wake up.',
+  fix:'Fix it · {n} 🪙',fixed:'Done ✓',
+  doneAll:'Willowbrook House is finished, and it is beautiful. Everyone you know came to the housewarming.',
+  liveHere:'Live here',livingHere:'You live here ✓',
+  status:'{n} of {total} projects done',
+  pins:{deed:['Homeowner','Buy Willowbrook House.'],done:['Labour of Love','Finish every fix-up project.']}
+},
+es:{
+  tab:'🏚️ Casa soñada',name:'Casa Willowbrook',kick:'AL FINAL DE LA CALLE DEL PERSONAL · PARA REFORMAR',
+  intro:'Una casa antigua al final de la Calle del Personal, un poco dormida y muy querida. Está a la venta para el personal. Ahorra, hazla tuya y arréglala proyecto a proyecto.',
+  deed:'Comprar la casa',deedLine:'Las llaves, la escritura y un timbre muy viejo que toca media canción.',
+  bought:'🔑 ¡La Casa Willowbrook es tuya!',saving:'Ahorrando para tu propia casa',left:'Faltan {n} propinas',
+  projects:'Proyectos de reforma',projIntro:'Elige cualquier proyecto que puedas pagar. Toca Arreglar y mira cómo la casa despierta.',
+  fix:'Arreglar · {n} 🪙',fixed:'Hecho ✓',
+  doneAll:'La Casa Willowbrook está terminada, y es preciosa. Todo el mundo vino a la inauguración.',
+  liveHere:'Vivir aquí',livingHere:'Vives aquí ✓',
+  status:'{n} de {total} proyectos hechos',
+  pins:{deed:['Propietario','Compra la Casa Willowbrook.'],done:['Hecho con amor','Termina todos los proyectos de reforma.']}
+}};
+const DT=DREAM_TEXT[profile.lang]||DREAM_TEXT.en;
+const DREAM_PRICE=500;
+const DREAM_PROJECTS=[
+  {id:'windows',price:60,icon:'🪟',en:['Wash the windows','Years of dust off. Now they glow at night.'],es:['Limpiar las ventanas','Años de polvo fuera. Ahora brillan de noche.']},
+  {id:'door',price:80,icon:'🚪',en:['A new front door','Round at the top, sage green, with a wreath.'],es:['Una puerta nueva','Redonda arriba, verde salvia, con una corona de flores.']},
+  {id:'fence',price:90,icon:'🪵',en:['White picket fence','Every picket stands up straight and proud.'],es:['Valla blanca','Cada tabla está derecha y orgullosa.']},
+  {id:'porch',price:100,icon:'🪜',en:['Mend the porch','No more creaky step. (It still creaks a little, for charm.)'],es:['Arreglar el porche','Se acabó el escalón que cruje. (Cruje un poquito, por encanto.)']},
+  {id:'roof',price:120,icon:'🏠',en:['Fix the roof','Brand new shingles in a cheerful red.'],es:['Arreglar el tejado','Tejas nuevas de un rojo alegre.']},
+  {id:'paint',price:150,icon:'🎨',en:['Paint the house','Soft blue with white trim, like a summer morning.'],es:['Pintar la casa','Azul suave con bordes blancos, como una mañana de verano.']},
+  {id:'garden',price:170,icon:'🌷',en:['Plant a garden','Tulips, roses and one sunflower that is taller than you.'],es:['Plantar un jardín','Tulipanes, rosas y un girasol más alto que tú.']},
+  {id:'swing',price:200,icon:'🪑',en:['Porch swing','For slow evenings, cups of tea and waving at neighbours.'],es:['Columpio del porche','Para tardes lentas, tazas de té y saludar a los vecinos.']}
+];
+const dreamHas=id=>cottage.house.done.includes(id);
+const dreamDone=()=>cottage.house.own&&DREAM_PROJECTS.every(p=>dreamHas(p.id));
+COT_HOMES.push({id:'dream',dream:true,en:['Willowbrook House','Your very own house, fixed up with your own tips.'],es:['Casa Willowbrook','Tu propia casa, reformada con tus propias propinas.'],
+  pal:{wall:'#e6eef7',stripe:'#d8e4f1',wains:'#f6f1e4',wainsTop:'#c9bfa8',floor:'#b98a5e',seam:'#a2734a'}});
+function drawDreamHouse(c,W,H,t,calm){
+  const own=cottage.house.own,h=id=>own&&dreamHas(id);
+  const sky=c.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#23305e');sky.addColorStop(1,'#7a6aa8');c.fillStyle=sky;c.fillRect(0,0,W,H);
+  for(let k=0;k<30;k++){c.globalAlpha=calm?.8:.5+.5*Math.sin(t/500+k);ellipse(c,(k*137.5)%W+4,(k*53.7)%100+6,.9,.9,'#fff');}c.globalAlpha=1;ellipse(c,W-50,36,12,12,'#fff4c9');
+  c.fillStyle='#3c6b52';c.fillRect(0,H-48,W,48);c.fillStyle='#467a5d';c.beginPath();c.moveTo(0,H-48);c.quadraticCurveTo(W/2,H-62,W,H-48);c.lineTo(W,H-40);c.lineTo(0,H-40);c.fill();
+  rect(c,186,H-44,28,44,'#d9c49a');
+  const X=110,Y=H-48,Wd=180,Hh=92;
+  /* chimney and walls */
+  rect(c,X+130,Y-Hh-46,18,40,h('roof')?'#b9655a':'#8e8580');
+  rect(c,X,Y-Hh,Wd,Hh,h('paint')?'#9fc3e6':'#b9b0a2');
+  if(!h('paint')){for(const [a,b,w2] of [[X+18,Y-70,14],[X+120,Y-40,18],[X+70,Y-82,10],[X+150,Y-74,12]])rect(c,a,b,w2,6,'#cfc7b8',3);}
+  else{rect(c,X,Y-Hh,Wd,4,'#fffaf2');rect(c,X,Y-4,Wd,4,'#fffaf2');rect(c,X,Y-Hh,4,Hh,'#fffaf2');rect(c,X+Wd-4,Y-Hh,4,Hh,'#fffaf2');}
+  /* roof */
+  c.fillStyle=h('roof')?'#d9665f':'#7f7a80';c.beginPath();c.moveTo(X-14,Y-Hh+2);c.lineTo(X+Wd/2,Y-Hh-58);c.lineTo(X+Wd+14,Y-Hh+2);c.closePath();c.fill();
+  if(h('roof')){c.strokeStyle='#bf514c';c.lineWidth=1.4;for(let k=1;k<5;k++){const yy=Y-Hh+2-k*11.5,hw=(Wd/2+14)*(1-k*11.5/60);c.beginPath();c.moveTo(X+Wd/2-hw,yy);c.lineTo(X+Wd/2+hw,yy);c.stroke();}
+    if(!calm)for(let k=0;k<3;k++){const a=((t/2200)+k/3)%1;c.globalAlpha=(1-a)*.5;ellipse(c,X+139+Math.sin(a*5)*4,Y-Hh-52-a*34,4+a*5,3+a*4,'#e8e8f0');}c.globalAlpha=1;}
+  else{rect(c,X+40,Y-Hh-24,34,20,'#5f9fbf',2);for(const [a,b] of [[X+110,Y-Hh-18],[X+92,Y-Hh-34]])rect(c,a,b,10,6,'#4a4550',1);}
+  /* windows */
+  for(const wx of [X+22,X+122]){rect(c,wx,Y-70,36,30,'#7a5236',3);
+    if(h('windows')){c.fillStyle='#ffd77a';c.fillRect(wx+3,Y-67,30,24);cotGlow(c,wx+18,Y-55,40,'rgba(255,215,130,.35)');rect(c,wx+17,Y-67,2,24,'#7a5236');rect(c,wx+3,Y-56,30,2,'#7a5236');}
+    else{c.fillStyle='#6f7480';c.fillRect(wx+3,Y-67,30,24);c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=.8;c.beginPath();c.moveTo(wx+3,Y-67);c.lineTo(wx+12,Y-58);c.moveTo(wx+3,Y-61);c.lineTo(wx+8,Y-67);c.stroke();}}
+  /* door */
+  if(h('door')){c.fillStyle='#7fa38f';c.beginPath();c.roundRect(X+76,Y-58,28,54,[14,14,0,0]);c.fill();ellipse(c,X+98,Y-30,1.8,1.8,'#d9b44a');c.strokeStyle='#4f8a5a';c.lineWidth=3;c.beginPath();c.arc(X+90,Y-44,6,0,Math.PI*2);c.stroke();ellipse(c,X+90,Y-38,2,2,'#e2655f');}
+  else{rect(c,X+76,Y-58,28,54,'#8a7560');for(const yy of [-50,-30])rect(c,X+72,Y+yy,36,5,'#a3906f',1);}
+  /* porch */
+  if(h('porch')){rect(c,X-6,Y-6,Wd+12,8,'#c99a62',2);rect(c,X+70,Y+2,40,5,'#b08458',1);rect(c,X+66,Y+7,48,5,'#a8784e',1);for(const px of [X-4,X+Wd+0])rect(c,px,Y-48,4,44,'#fffaf2');rect(c,X-6,Y-50,Wd+12,4,'#fffaf2');}
+  else{c.save();c.translate(X+Wd/2,Y);c.rotate(.03);rect(c,-Wd/2-6,-6,Wd+12,8,'#9b8a72',2);c.restore();rect(c,X+40,Y-6,16,8,'#3c3640');}
+  if(h('swing')){const sw=calm?0:Math.sin(t/900)*.06;c.save();c.translate(X+150,Y-46);c.rotate(sw);c.strokeStyle='#8a6a4a';c.lineWidth=1;c.beginPath();c.moveTo(-14,0);c.lineTo(-14,30);c.moveTo(14,0);c.lineTo(14,30);c.stroke();rect(c,-17,30,34,6,'#c99a62',2);rect(c,-15,25,30,6,'#f2a7bb',3);c.restore();}
+  /* fence */
+  if(h('fence')){for(let x=8;x<W-4;x+=14){if(x>176&&x<224)continue;rect(c,x,H-40,8,24,'#fffaf2',[4,4,0,0]);}rect(c,0,H-34,176,3,'#fffaf2');rect(c,224,H-34,W-224,3,'#fffaf2');}
+  else for(const [x,a] of [[30,.2],[70,-.15],[330,.25],[372,-.1]]){c.save();c.translate(x,H-18);c.rotate(a);rect(c,-3,-22,6,22,'#8a7a66',1);c.restore();}
+  /* garden */
+  if(h('garden')){const cols=['#f28aa8','#ffd84d','#e2655f','#c7b3ef','#fff'];for(let k=0;k<22;k++){const x=k<11?20+k*14:226+(k-11)*15,y=H-14+(k%3)*3;rect(c,x,y-6,1.4,8,'#4f8a5a');ellipse(c,x+.7,y-7,3,3,cols[k%cols.length]);}
+    rect(c,X-30,Y-60,2,58,'#4f8a5a');ellipse(c,X-29,Y-64,8,8,'#ffd84d');ellipse(c,X-29,Y-64,3.4,3.4,'#8a5a3a');}
+  else for(let k=0;k<12;k++){const x=16+k*32,y=H-12;c.strokeStyle='#5f7a4a';c.lineWidth=1.2;c.beginPath();c.moveTo(x,y);c.lineTo(x-3,y-8);c.moveTo(x,y);c.lineTo(x+3,y-9);c.stroke();}
+  if(!own){rect(c,300,H-74,64,26,'#fbf3e0',3);stroke(c,300,H-74,64,26,'#8a5a3a',1.5,3);text(c,profile.lang==='es'?'SE VENDE':'FOR SALE',332,H-57,10,'#8a3a3a');rect(c,330,H-48,4,30,'#8a5a3a');}
+  if(dreamDone()&&!calm)for(let k=0;k<8;k++){const a=((t/3000)+k/8)%1;c.globalAlpha=Math.sin(a*Math.PI);ellipse(c,30+k*48,H-60-a*40,1.6,1.6,'#fff3a0');}c.globalAlpha=1;
+}
+function dreamPaint(){const cv=$('dream-cv');if(!cv)return;const w=cv.clientWidth||400,dpr=Math.min(2,devicePixelRatio||1),W=400,H=220;cv.width=Math.round(w*dpr);cv.height=Math.round(w*H/W*dpr);
+  const c=cv.getContext('2d');c.setTransform(w/W*dpr,0,0,w/W*dpr,0,0);drawDreamHouse(c,W,H,joyCalm()?0:performance.now(),joyCalm());}
+function dreamLoop(){cancelAnimationFrame(cot.raf);const step=()=>{if(!$('dream-cv')||!modal.open)return;if(!document.hidden)dreamPaint();if(!joyCalm())cot.raf=requestAnimationFrame(step);};step();}
+function openCottageDream(){
+  const own=cottage.house.own,w=cotWallet(),n=cottage.house.done.length;
+  let html=cotHead('dream')+'<div class="cot-stage"><canvas id="dream-cv" role="img" aria-label="'+esc(DT.name)+'" style="display:block;width:100%;aspect-ratio:400/220"></canvas><p class="cot-say" id="cot-say">'+esc(!own?DT.intro:dreamDone()?DT.doneAll:DT.projIntro)+'</p></div>'+cotWalletHTML();
+  if(!own){const ok=w>=DREAM_PRICE,pct=Math.min(100,Math.round(w/DREAM_PRICE*100));
+    html+='<div class="cot-next'+(ok?' ready':'')+'"><span class="cot-ic" aria-hidden="true">🔑</span><div class="cot-nx"><small>'+esc(DT.saving)+'</small><b>'+esc(DT.name)+' · '+DREAM_PRICE+' 🪙</b><span class="bar" role="meter" aria-label="'+esc(DT.saving)+'" aria-valuemin="0" aria-valuemax="'+DREAM_PRICE+'" aria-valuenow="'+Math.min(w,DREAM_PRICE)+'"><i style="width:'+pct+'%"></i></span><span class="cot-left">'+esc(ok?CT.ready:ctx_(DT.left,{n:DREAM_PRICE-w}))+' · '+esc(DT.deedLine)+'</span></div>'+
+      (ok?'<button class="primary-button" id="dream-buy">'+esc(DT.deed)+' · '+DREAM_PRICE+' 🪙</button>':'')+'</div>'+payHTML();}
+  else{html+='<h3 class="pins-heading">'+esc(DT.projects)+' · '+esc(ctx_(DT.status,{n,total:DREAM_PROJECTS.length}))+'</h3><ul class="cot-shop" id="dream-shop"></ul>';
+    if(dreamDone())html+=(cottage.live===true&&cottage.home==='dream'?'<p class="cot-tag">🏡 '+esc(DT.livingHere)+'</p>':'<button class="primary-button" id="dream-live">🏡 '+esc(DT.liveHere)+'</button>');}
+  html+='<div class="action-row" id="cot-actions"></div>';
+  openModal(html,true);
+  if($('dream-buy'))$('dream-buy').onclick=()=>{if(cotWallet()<DREAM_PRICE||cottage.house.own)return;joy.tips-=DREAM_PRICE;cottage.spent+=DREAM_PRICE;cottage.house.own=true;storeJoy();storeCottage();joySound('open',2);
+    celebrate({icon:'🔑',kicker:DT.kick,label:DT.bought,confetti:true});checkPins();renderGrowth();openCottage('dream');};
+  if($('dream-live'))$('dream-live').onclick=()=>{cottage.live=true;cottage.home='dream';storeCottage();toast(ctx_(CT2.movedIn,{name:DT.name}));openCottage('inside');};
+  const ul=$('dream-shop');
+  if(ul)for(const p of DREAM_PROJECTS){const L=cL(p),done=dreamHas(p.id),ok=!done&&cotWallet()>=p.price,li=document.createElement('li');li.className=done?'own':ok?'ok':'';
+    li.innerHTML='<span class="cot-ic" aria-hidden="true">'+p.icon+'</span><span class="cot-tx"><b>'+esc(L[0])+'</b><small>'+esc(L[1])+'</small></span>'+(done?'<span class="cot-tag">'+esc(DT.fixed)+'</span>':'<button class="'+(ok?'primary-button':'secondary-button')+' cot-buy"'+(ok?'':' disabled')+'>'+esc(ctx_(CT.buyShort,{n:p.price}))+'</button>');
+    li.querySelector('button')?.addEventListener('click',e=>{if(cotWallet()<p.price||dreamHas(p.id))return;joy.tips-=p.price;cottage.spent+=p.price;cottage.house.done.push(p.id);storeJoy();storeCottage();
+      const [x,y]=centerOf(e.currentTarget);floatText(x,y-20,'-'+p.price+' 🪙',{size:18,col:'#fff3c4'});joySound('open',1);
+      if(dreamDone())celebrate({icon:'🏡',kicker:DT.kick,label:DT.pins.done[0],confetti:true});
+      checkPins();renderGrowth();openCottage('dream');const cv=$('dream-cv');if(cv){const r=cv.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height*.55,1.6,{hearts:true,rainbow:dreamDone()});}
+      cotSay('✨ '+L[0]+': '+L[1]);});
+    ul.append(li);}
+  requestAnimationFrame(dreamLoop);
+  cotWire();
+}
 /* ---------- Styles ---------- */
 {const st=document.createElement('style');st.textContent=`
 .cot-stage{position:relative;margin:6px 0 10px;border-radius:16px;overflow:hidden;border:3px solid #8a5a3a;box-shadow:0 10px 26px #4a2e1a33,inset 0 0 0 2px #e8c99a}
@@ -6893,6 +7252,29 @@ hmsTip=function(n){const before=cotWallet();cotHmsTip.apply(this,arguments);
 .joy-row #joy-side-cottage.ready{background:linear-gradient(180deg,#fff3c4,#ffe08a);border-color:#e6bf55;animation:cotGlow 2.2s ease-in-out infinite}
 .joy-title-mg.cottage{border-color:rgba(255,214,140,.6);background:rgba(190,130,70,.24);color:#fff4dc}
 .joy-title-mg.cottage.ready{background:rgba(230,180,70,.34)}
+.cot-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px}
+.cot-tab{border:1px solid #e0cf9e;background:#fffaf0;color:var(--ink);border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;min-height:40px}
+.cot-tab.on{background:linear-gradient(180deg,#fff3c4,#ffe08a);border-color:#e6bf55;font-weight:600}
+.cot-stage.lane canvas{display:block;width:100%}
+.cot-offer{padding:14px 16px;border-radius:16px;background:linear-gradient(160deg,#fffaf0,#f8efe0);border:1px solid #e0cf9e;margin-bottom:10px}
+.cot-offer h3{font:normal 21px Georgia,serif;margin:0 0 6px}.cot-offer p{margin:0 0 10px;line-height:1.55}
+.cot-offer-row{display:flex;gap:8px;flex-wrap:wrap}
+.cot-pay{display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:16px;background:linear-gradient(160deg,#f3fbf6,#e6f6ee);border:1px solid #b9dfc9;margin:0 0 10px}
+.cot-pay .cot-ic{font-size:28px}.cot-pay .bar i{background:linear-gradient(90deg,#5fb79a,#9fe0c4)!important}.cot-pay b{font-size:16px!important}
+.cot-raise{font:600 12px Arial,sans-serif;color:#2f6b4f;background:#dff3e8;border:1px solid #9fd3b6;border-radius:999px;padding:1px 7px}
+.cot-homes{list-style:none;padding:0;margin:8px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:9px}
+.cot-homes li{display:flex;flex-direction:column;gap:5px;padding:10px;border-radius:16px;border:1px solid #e3d6bb;background:#fffdf8}
+.cot-homes li.on{border-color:#e6bf55;background:linear-gradient(160deg,#fffaf0,#fff2cc)}
+.cot-homes canvas{border-radius:12px;width:100%!important;height:auto!important}.cot-homes small{color:#6b604e;line-height:1.4}.cot-homes button{margin-top:auto}
+.cot-town{margin:2px 0 8px}
+.cot-rides{list-style:none;padding:0;margin:8px 0 10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.cot-rides li{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:8px 12px;padding:10px;border-radius:14px;border:1px solid #e3d6bb;background:#fffdf8}
+.cot-rides li>button,.cot-rides li>.cot-tag{grid-column:1/-1}.cot-rides .cot-tx{display:flex;flex-direction:column;gap:2px}.cot-rides .cot-tx small{font-size:12px;line-height:1.35;color:#6b604e}
+.cot-rides li.ok{border-color:#e6bf55;background:linear-gradient(160deg,#fffaf0,#fff2cc)}.cot-rides li.own{background:#f2f7ee;border-color:#cfe0c4}.cot-rides li.on{box-shadow:0 0 0 2px #5fb79a inset}
+.cot-rides canvas{flex:none;border-radius:10px;background:linear-gradient(180deg,#eef4fb,#f7f0e4)}
+.cot-rides button{min-height:40px;font-size:13px;padding:6px 12px}.cot-rides button:disabled{opacity:.55}
+.cot-spd{color:#8a6a2a!important}.cot-spd i{color:#e3d6bb;font-style:normal}
+@media(max-width:520px){.cot-tab{padding:7px 10px;font-size:13px}.cot-homes{grid-template-columns:1fr 1fr}.cot-rides{grid-template-columns:1fr}.cot-pay .cot-left{font-size:11px}}
 @media(max-width:520px){.cot-shop{grid-template-columns:1fr}.cot-next .cot-ic{font-size:28px}.cot-next{flex-wrap:wrap}.cot-next .cot-buy{width:100%}.cot-say{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.cot-next.ready,.joy-row #joy-side-cottage.ready{animation:none}}
 body.reduce-motion .cot-next.ready,body.reduce-motion .joy-row #joy-side-cottage.ready,body.reduce-motion .cot-say.pop{animation:none}
@@ -6916,7 +7298,14 @@ PINS.push(
   {id:'cottage-home',icon:'🏡',name:CT.pins.first[0],hint:CT.pins.first[1],test:()=>cottage.owned.length>=1},
   {id:'cottage-cozy',icon:'🛋️',name:CT.pins.cozy[0],hint:CT.pins.cozy[1],test:()=>cottage.owned.length>=9},
   {id:'cottage-all',icon:'🕯️',name:CT.pins.all[0],hint:CT.pins.all[1],test:()=>cottage.owned.length>=COTTAGE_ITEMS.length},
-  {id:'cottage-concert',icon:'🎶',name:CT.pins.concert[0],secret:true,hint:CT.pins.concert[1],test:()=>cottage.plays>=1}
+  {id:'cottage-concert',icon:'🎶',name:CT.pins.concert[0],secret:true,hint:CT.pins.concert[1],test:()=>cottage.plays>=1},
+  {id:'ride-first',icon:'🛹',name:CT2.pins.ride[0],hint:CT2.pins.ride[1],test:()=>cottage.rides.length>=1},
+  {id:'ride-sky',icon:'🧹',name:CT2.pins.sky[0],hint:CT2.pins.sky[1],test:()=>cottage.rides.some(id=>COT_RIDES.find(r=>r.id===id)?.fly)},
+  {id:'ride-garage',icon:'🚗',name:CT2.pins.garage[0],hint:CT2.pins.garage[1],test:()=>cottage.rides.length>=COT_RIDES.length},
+  {id:'ride-snail',icon:'🐌',name:CT2.pins.snail[0],secret:true,hint:CT2.pins.snail[1],test:()=>!!cottage.snail},
+  {id:'pay-raise',icon:'💰',name:CT2.pins.raise[0],hint:CT2.pins.raise[1],test:()=>payGrade()>=1},
+  {id:'dream-deed',icon:'🔑',name:DT.pins.deed[0],hint:DT.pins.deed[1],test:()=>cottage.house.own},
+  {id:'dream-done',icon:'🏡',name:DT.pins.done[0],hint:DT.pins.done[1],test:()=>dreamDone()}
 );
 renderGrowth();checkPins();
 /* ==== end COTTAGE v1 ==== */

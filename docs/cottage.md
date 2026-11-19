@@ -89,3 +89,77 @@ fresh; unknown things are dropped.
 ```sh
 python tests/test_cottage.py
 ```
+
+---
+
+# Cottage v2: Staff Lane, rides, raises and a dream house
+
+The cottage now gives every shift a purpose: good work earns tips and raises your pay, tips buy
+things, and the big dreams (the flying car, your own house) are always on screen to chase.
+The cottage screen has four tabs: **Inside**, **Rides**, **Cottages** and **Dream house**.
+
+## Living on the grounds is a choice
+
+The first visit shows Staff Lane and asks "Would you like to live on the grounds?" Players can
+pick a cottage or say "Not now, I live in town". Town players still get rides and the dream
+house, and can move in any time. Saves from v1 that already furnished a cottage simply live there.
+
+## Four cottages on Staff Lane (free, move any time)
+
+The Toadstool, The Little Lighthouse, The Treehouse and The Seashell. Each has its own outside
+drawing and its own colours inside (walls, panelling and floor). Your things move with you.
+
+## Rides (9)
+
+Bought with tips in the Rides tab. The ride you choose is drawn under you as you walk the manor
+and the festival grounds, and changes how fast you move (`world.options.speed`, a one-line hook in
+the walking code).
+
+| Ride | Tips | Speed |
+| --- | --- | --- |
+| Skateboard | 30 | 1.3x |
+| Kick scooter | 45 | 1.4x |
+| Bike with a basket | 60 | 1.55x |
+| Giant snail | 75 | 0.75x (the slowest ride on the island; everyone waves) |
+| Manor golf cart | 100 | 1.6x |
+| Flying broom | 130 | 1.75x, flies |
+| Magic carpet | 160 | 1.75x, flies |
+| Flying teacup | 200 | 1.7x, flies |
+| Flying car | 280 | 2x, flies |
+
+"Walk instead" puts the ride away.
+
+## Raises
+
+Your pay grade comes from your Silver Key skill points (the three growth bars). Every best
+answer earns the usual tips plus a raise bonus, shown as a green "+2 raise" chip.
+
+| Grade | Skill points | Extra tips per best answer |
+| --- | --- | --- |
+| New night host | 0 | 0 |
+| Trusted host | 80 | +1 |
+| Senior host | 220 | +2 |
+| Night lead | 450 | +3 |
+| Silver Key host | 800 | +4 |
+
+A new grade pops a "You got a raise!" celebration with a note from Delores. The pay card on the
+Inside, Rides and Dream house tabs shows the current grade and how far the next raise is.
+
+## The dream house: Willowbrook House
+
+A sleepy old fixer-upper at the end of Staff Lane, for sale to staff for 500 tips. After buying
+it, eight projects wake it up one at a time, each drawn on the house: wash the windows (60), a new
+front door (80), a white picket fence (90), mend the porch (100), fix the roof (120), paint the
+house (150), plant a garden (170) and a porch swing (200). When all eight are done, players can
+live there; it becomes a fifth home with soft blue walls inside.
+
+Nothing ever breaks again and there is no upkeep: every project only makes the house lovelier.
+
+## New pins
+
+Wheels, Sky High, Whole Garage, Slow and Steady (secret), First Raise, Homeowner, Labour of Love.
+
+## Saves
+
+Still `mapachez_cottage_v1`, with new fields `live`, `home`, `rides`, `ride`, `snail`, `grade` and
+`house`. Unknown values are dropped.
