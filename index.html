@@ -5384,9 +5384,9 @@ en:{
   back:'← Back',room:'Room',arrives:'Arrives',leaves:'Leaves',nights:'Nights',checkout:'Checkout',bookNote:'Booking note',
   nightsN:n=>n===1?'1 night':n+' nights',inHouse:'In house',arriving:'Arriving tonight',checkedIn:'Checked in ✓',
   profile:'🙂 Profile',bill:'🧾 Bill',checkIn:'✅ Check in',notes:'Notes',features:'Room',total:'Total',paid:'Paid',
-  status:{ready:['✨','Clean & ready'],guest:['🛌','Guest inside'],tidy:['🧹','Needs a tidy'],fix:['🔧','Needs fixing']},
-  roomTip:{ready:'Ready for a guest.',guest:'Someone is staying here.',tidy:'Housekeeping is on the way. Not ready yet.',fix:'Engineering is fixing something. Not ready yet.'},
-  pickRoom:'Pick a room for {name}. Look for ✨.',pickTidy:'Room {r} still needs a tidy. Pick one with ✨.',pickGuest:'Someone is already staying in {r} 🙂',pickFix:'Room {r} needs fixing first.',
+  status:{ready:['✨','Clean, inspected & ready'],guest:['🛌','Guest inside'],tidy:['🧹','Needs a tidy'],clean:['🔍','Cleaned, not inspected'],fix:['🔧','Needs fixing']},
+  roomTip:{ready:'Cleaned, inspected by a supervisor, and ready for a guest.',guest:'Someone is staying here.',tidy:'Housekeeping is on the way. Not ready yet.',clean:'Housekeeping finished cleaning. A housekeeping supervisor still has to inspect it. Not ready yet.',fix:'Engineering is fixing something. Not ready yet.'},
+  pickRoom:'Pick a room for {name}. Look for ✨.',pickTidy:'Room {r} still needs a tidy. Pick one with ✨.',pickGuest:'Someone is already staying in {r} 🙂',pickFix:'Room {r} needs fixing first.',pickClean:'Room {r} is cleaned, but a housekeeping supervisor hasn’t inspected it yet. Pick one with ✨.',
   checkedInMsg:'{name} is checked in to Room {r} ✨',
   lessonsH:'Lessons · about a minute each',gamesH:'Desk games',lesson:'Lesson {n}',lessonOf:'HMS LESSON {n} OF {total}',done:'Done ✓',start:'Start',play:'Play',
   explore:'🔎 Explore on my own',bigLab:'Big practice lab →',bigLabHint:'For later: the full practice HMS at the training desk.',
@@ -5402,7 +5402,7 @@ en:{
     {t:'Check a room',d:'Is it ready? The little picture tells you.',steps:[
       {say:'Tap 🛏️ Rooms. Each square is a room, and the picture shows how it is.',want:'tab:rooms'},
       {say:'Captain Fuzz arrives soon, in Room 205. Tap 205.',want:'room:205'},
-      {say:'✨ means ready. 🧹 means housekeeping isn’t done yet.',quiz:{q:'Can Captain Fuzz go up to 205 right now?',opts:[['Not yet. It needs a tidy first.',1],['Yes, hand over the key!',0],['No, that room is gone.',0]],hint:'What does the 🧹 mean?'}}]},
+      {say:'✨ means cleaned AND inspected by a housekeeping supervisor, so a guest can go in. 🔍 means cleaned, but not inspected yet. 🧹 means housekeeping isn’t done yet.',quiz:{q:'Can Captain Fuzz go up to 205 right now?',opts:[['Not yet. It needs a tidy first.',1],['Yes, hand over the key!',0],['No, that room is gone.',0]],hint:'What does the 🧹 mean?'}}]},
     {t:'Read guest notes',d:'Allergies and wishes, so nobody has to repeat them.',steps:[
       {say:'Tap 🙂 Guests. That’s where the notes live.',want:'tab:guests'},
       {say:'The kitchen is making Lady Vesper’s supper. Tap her name.',want:'guest:vesper'},
@@ -5415,7 +5415,7 @@ en:{
       {say:'Juniper Glow just walked in! Tap 📅 Bookings.',want:'tab:bookings'},
       {say:'Tap Juniper Glow. See “Arriving tonight”?',want:'booking:juniper'},
       {say:'Tap ✅ Check in.',want:'checkin:juniper'},
-      {say:'Now pick a room with ✨. Those are clean and ready.',want:'pick:201'}]}
+      {say:'Now pick a room with ✨. Cleaned isn’t enough on its own: only a room a supervisor has inspected is ready.',want:'pick:201'}]}
   ],
   coachEnd:'You did it! That’s exactly how it’s done at the desk.',
   /* Look-it-up questions */
@@ -5429,8 +5429,8 @@ en:{
   /* Mini-games */
   games:{rush:['🧹','Room Rush','Housekeeping radios in. Keep the room board right.'],build:['📝','Booking Builder','Listen to the guest and fill in the booking. Watch for typos!'],bill:['🔍','Bill Detective','One charge on each bill is wrong. Find it!']},
   best:'Best: {v}',bestTime:'Best: {v}s',noBest:'New!',
-  rushTapRoom:'Tap the room.',rushPick:'Room {r} is now…',rushWrongRoom:'That’s Room {r}. Listen again 📻',rushWrongStatus:'Hmm, not that one. Listen again 📻',
-  calls:{ready:'📻 Housekeeping: “Room {r} is sparkling clean!”',tidy:'📻 Front desk: “The guest in {r} just checked out.”',guest:'📻 Bell team: “We just walked a guest up to {r}.”',fix:'📻 Engineering: “The tap in {r} is dripping. We’re on it.”',fixed:'📻 Engineering: “All fixed in {r}! It just needs a tidy now.”'},
+  rushTapRoom:'Tap the room.',rushPick:'Room {r} is now…',rushWrongRoom:'That’s Room {r}. Listen again 📻',rushWrongStatus:'Hmm, not that one. Listen again 📻',rushNotInspected:'🔍 Cleaned isn’t ready yet. A housekeeping supervisor inspects it first.',
+  calls:{clean:'📻 Housekeeping: “Room {r} is sparkling clean! Ready for inspection.”',ready:'📻 Housekeeping supervisor: “I just inspected {r}. Every corner is perfect!”',tidy:'📻 Front desk: “The guest in {r} just checked out.”',guest:'📻 Bell team: “We just walked a guest up to {r}.”',fix:'📻 Engineering: “The tap in {r} is dripping. We’re on it.”',fixed:'📻 Engineering: “All fixed in {r}! It just needs a tidy now.”'},
   call:'CALL {n} OF {total}',time:'⏱️ {s}s',
   buildFields:{name:'Name',nights:'Nights',note:'Note',room:'Room'},buildPick:'Tap the right {f}.',buildRoom:'Pick a ✨ room.',buildWrong:'Hmm, listen again 👂',buildSaved:'Booking saved! ✨',guestOf:'GUEST {n} OF {total}',
   billFind:'Tap the charge that’s wrong.',billOk:'That one looks right 🙂',billFixed:'FIXED',billCase:'BILL {n} OF {total}',
@@ -5447,9 +5447,9 @@ es:{
   back:'← Volver',room:'Habitación',arrives:'Llega',leaves:'Sale',nights:'Noches',checkout:'Salida',bookNote:'Nota de reserva',
   nightsN:n=>n===1?'1 noche':n+' noches',inHouse:'Alojado',arriving:'Llega esta noche',checkedIn:'Registrado ✓',
   profile:'🙂 Ficha',bill:'🧾 Cuenta',checkIn:'✅ Registrar entrada',notes:'Notas',features:'Habitación',total:'Total',paid:'Pagado',
-  status:{ready:['✨','Limpia y lista'],guest:['🛌','Huésped dentro'],tidy:['🧹','Falta ordenar'],fix:['🔧','Hay que arreglarla']},
-  roomTip:{ready:'Lista para un huésped.',guest:'Alguien se aloja aquí.',tidy:'Limpieza va de camino. Aún no está lista.',fix:'Mantenimiento está arreglando algo. Aún no está lista.'},
-  pickRoom:'Elige una habitación para {name}. Busca ✨.',pickTidy:'La {r} aún falta ordenarla. Elige una con ✨.',pickGuest:'Alguien ya se aloja en la {r} 🙂',pickFix:'Primero hay que arreglar la {r}.',
+  status:{ready:['✨','Limpia, inspeccionada y lista'],guest:['🛌','Huésped dentro'],tidy:['🧹','Falta ordenar'],clean:['🔍','Limpia, sin inspeccionar'],fix:['🔧','Hay que arreglarla']},
+  roomTip:{ready:'Limpia, inspeccionada por un supervisor y lista para un huésped.',guest:'Alguien se aloja aquí.',tidy:'Limpieza va de camino. Aún no está lista.',clean:'Limpieza terminó. Falta que una supervisora de limpieza la inspeccione. Aún no está lista.',fix:'Mantenimiento está arreglando algo. Aún no está lista.'},
+  pickRoom:'Elige una habitación para {name}. Busca ✨.',pickTidy:'La {r} aún falta ordenarla. Elige una con ✨.',pickGuest:'Alguien ya se aloja en la {r} 🙂',pickFix:'Primero hay que arreglar la {r}.',pickClean:'La {r} está limpia, pero una supervisora de limpieza aún no la inspeccionó. Elige una con ✨.',
   checkedInMsg:'{name} ya está en la habitación {r} ✨',
   lessonsH:'Lecciones · un minuto cada una',gamesH:'Juegos de recepción',lesson:'Lección {n}',lessonOf:'LECCIÓN HMS {n} DE {total}',done:'Hecha ✓',start:'Empezar',play:'Jugar',
   explore:'🔎 Explorar por mi cuenta',bigLab:'Laboratorio grande →',bigLabHint:'Para más adelante: el HMS completo de práctica en el escritorio de formación.',
@@ -5465,7 +5465,7 @@ es:{
     {t:'Revisar una habitación',d:'¿Está lista? El dibujito te lo dice.',steps:[
       {say:'Toca 🛏️ Habitaciones. Cada cuadro es una habitación, y el dibujo dice cómo está.',want:'tab:rooms'},
       {say:'El capitán Fuzz llega pronto, a la 205. Toca la 205.',want:'room:205'},
-      {say:'✨ es lista. 🧹 es que limpieza aún no terminó.',quiz:{q:'¿Puede el capitán Fuzz subir a la 205 ahora?',opts:[['Aún no. Falta ordenarla.',1],['¡Sí, dale la llave!',0],['No, esa habitación ya no existe.',0]],hint:'¿Qué significa 🧹?'}}]},
+      {say:'✨ es limpia E inspeccionada por una supervisora de limpieza: ya puede entrar un huésped. 🔍 es limpia, pero aún sin inspeccionar. 🧹 es que limpieza aún no terminó.',quiz:{q:'¿Puede el capitán Fuzz subir a la 205 ahora?',opts:[['Aún no. Falta ordenarla.',1],['¡Sí, dale la llave!',0],['No, esa habitación ya no existe.',0]],hint:'¿Qué significa 🧹?'}}]},
     {t:'Leer las notas',d:'Alergias y deseos, para que nadie tenga que repetirlos.',steps:[
       {say:'Toca 🙂 Huéspedes. Ahí viven las notas.',want:'tab:guests'},
       {say:'La cocina prepara la cena de Lady Vesper. Toca su nombre.',want:'guest:vesper'},
@@ -5478,7 +5478,7 @@ es:{
       {say:'¡Acaba de llegar Juniper Glow! Toca 📅 Reservas.',want:'tab:bookings'},
       {say:'Toca Juniper Glow. ¿Ves “Llega esta noche”?',want:'booking:juniper'},
       {say:'Toca ✅ Registrar entrada.',want:'checkin:juniper'},
-      {say:'Ahora elige una habitación con ✨. Están limpias y listas.',want:'pick:201'}]}
+      {say:'Ahora elige una habitación con ✨. Limpia no basta: solo está lista si una supervisora la inspeccionó.',want:'pick:201'}]}
   ],
   coachEnd:'¡Lo lograste! Así se hace en recepción.',
   qKicker:'UN HUÉSPED TIENE UNA PREGUNTA',qShift:'TURNO RÁPIDO · HUÉSPED {n} DE {total} · HMS',
@@ -5490,8 +5490,8 @@ es:{
   peekBonus:'🖥️ +1 propina por mirar primero el HMS',peekNext:'💡 La próxima vez, mira el HMS antes de responder.',
   games:{rush:['🧹','Carrera de habitaciones','Limpieza llama por radio. Mantén el tablero al día.'],build:['📝','Crea la reserva','Escucha al huésped y completa la reserva. ¡Ojo con las erratas!'],bill:['🔍','Detective de cuentas','Un cargo de cada cuenta está mal. ¡Encuéntralo!']},
   best:'Mejor: {v}',bestTime:'Mejor: {v}s',noBest:'¡Nuevo!',
-  rushTapRoom:'Toca la habitación.',rushPick:'La {r} ahora está…',rushWrongRoom:'Esa es la {r}. Escucha otra vez 📻',rushWrongStatus:'Mmm, esa no. Escucha otra vez 📻',
-  calls:{ready:'📻 Limpieza: “¡La {r} está reluciente!”',tidy:'📻 Recepción: “El huésped de la {r} acaba de salir.”',guest:'📻 Botones: “Acabamos de subir a un huésped a la {r}.”',fix:'📻 Mantenimiento: “El grifo de la {r} gotea. Vamos para allá.”',fixed:'📻 Mantenimiento: “¡Arreglado en la {r}! Ahora solo falta ordenarla.”'},
+  rushTapRoom:'Toca la habitación.',rushPick:'La {r} ahora está…',rushWrongRoom:'Esa es la {r}. Escucha otra vez 📻',rushWrongStatus:'Mmm, esa no. Escucha otra vez 📻',rushNotInspected:'🔍 Limpia aún no es lista. Primero la inspecciona una supervisora de limpieza.',
+  calls:{clean:'📻 Limpieza: “¡La {r} está reluciente! Lista para inspección.”',ready:'📻 Supervisora de limpieza: “Acabo de inspeccionar la {r}. ¡Todo perfecto!”',tidy:'📻 Recepción: “El huésped de la {r} acaba de salir.”',guest:'📻 Botones: “Acabamos de subir a un huésped a la {r}.”',fix:'📻 Mantenimiento: “El grifo de la {r} gotea. Vamos para allá.”',fixed:'📻 Mantenimiento: “¡Arreglado en la {r}! Ahora solo falta ordenarla.”'},
   call:'LLAMADA {n} DE {total}',time:'⏱️ {s}s',
   buildFields:{name:'Nombre',nights:'Noches',note:'Nota',room:'Habitación'},buildPick:'Toca: {f}.',buildRoom:'Elige una habitación ✨.',buildWrong:'Mmm, escucha otra vez 👂',buildSaved:'¡Reserva guardada! ✨',guestOf:'HUÉSPED {n} DE {total}',
   billFind:'Toca el cargo que está mal.',billOk:'Ese parece correcto 🙂',billFixed:'CORREGIDO',billCase:'CUENTA {n} DE {total}',
@@ -5614,7 +5614,7 @@ function hmsScreen(host,opt={}){
     if(kind==='checkin')return act(a,()=>{S.picking=arg;S.msg='';});
     if(kind==='pick'){
       const st=S.rooms[arg],g=hmsGuest(S.picking);
-      if(st!=='ready'){S.msg=ht(st==='tidy'?HT.pickTidy:st==='fix'?HT.pickFix:HT.pickGuest,{r:arg});render();pc.querySelector('[data-act="pick:'+arg+'"]')?.classList.add('hms-no');joySound('boop');return;}
+      if(st!=='ready'){S.msg=ht(st==='clean'?HT.pickClean:st==='tidy'?HT.pickTidy:st==='fix'?HT.pickFix:HT.pickGuest,{r:arg});render();pc.querySelector('[data-act="pick:'+arg+'"]')?.classList.add('hms-no');joySound('boop');return;}
       return act(a,()=>{S.checked[g.id]=arg;S.rooms[arg]='guest';S.picking='';S.msg=ht(HT.checkedInMsg,{name:hL(g).name,r:arg});const [x,y]=centerOf(el);burst(x,y,1,{hearts:true});joySound('hop');});
     }
   }
@@ -5714,7 +5714,7 @@ const HMS_QS=[
   {id:'deposit',g:'fuzz',tab:'bills',en:['Did my deposit go through?',[['Yes, your $50 deposit is paid. It’s right here on your bill.',1],['I can’t see bills, sorry.',0],['Better pay it again, just in case.',0]],'Captain Fuzz’s bill: Deposit paid, −$50.'],es:['¿Se cobró mi depósito?',[['Sí, su depósito de $50 está pagado. Aquí está en su cuenta.',1],['No puedo ver las cuentas, lo siento.',0],['Mejor páguelo otra vez, por si acaso.',0]],'Cuenta del capitán Fuzz: depósito pagado, −$50.']},
   {id:'access',g:'vale',tab:'guests',en:['Is my room the accessible one?',[['Yes. Room 204 is accessible, and it’s noted on your record.',1],['All our rooms are the same.',0],['You’d have to ask housekeeping.',0]],'Ms. Vale’s record: ⚠️ Accessible room needed. Room: Accessible.'],es:['¿Mi habitación es la accesible?',[['Sí. La 204 es accesible, y está anotado en su ficha.',1],['Todas las habitaciones son iguales.',0],['Eso tendría que preguntarlo a limpieza.',0]],'Ficha de la señora Vale: ⚠️ necesita habitación accesible.']},
   {id:'wake',g:'nine',tab:'guests',en:['Is my 6:30 wake-up call booked?',[['It is. 6:30 AM exactly, right on your record.',1],['Wake-up calls are only for weddings.',0],['Set your own alarm, just in case?',0]],'M. Nine’s record: ⚠️ Wake-up call at 6:30 AM.'],es:['¿Está programado mi despertador de las 6:30?',[['Sí. A las 6:30 AM exactas, está en su ficha.',1],['Los despertadores son solo para bodas.',0],['¿Ponga su propia alarma, por si acaso?',0]],'Ficha de M. Nine: ⚠️ despertador a las 6:30 AM.']},
-  {id:'whichroom',g:'juniper',tab:'rooms',en:['Which room will I be in?',[['Room 201. It’s clean and ready for you, with the window seat.',1],['Room 205, top of the stairs.',0],['Any room you like, just pick one.',0]],'Room 201 shows ✨ Clean & ready. 205 still needs a tidy.'],es:['¿En qué habitación estaré?',[['En la 201. Está limpia y lista, con el asiento de la ventana.',1],['En la 205, subiendo la escalera.',0],['La que quiera, elija una.',0]],'La 201 muestra ✨ Limpia y lista. La 205 aún falta ordenarla.']},
+  {id:'whichroom',g:'juniper',tab:'rooms',en:['Which room will I be in?',[['Room 201. It’s clean, inspected and ready for you, with the window seat.',1],['Room 205, top of the stairs.',0],['Any room you like, just pick one.',0]],'Room 201 shows ✨ Clean, inspected & ready. 205 still needs a tidy.'],es:['¿En qué habitación estaré?',[['En la 201. Está limpia, inspeccionada y lista, con el asiento de la ventana.',1],['En la 205, subiendo la escalera.',0],['La que quiera, elija una.',0]],'La 201 muestra ✨ Limpia, inspeccionada y lista. La 205 aún falta ordenarla.']},
   {id:'privacy',g:'finch',who:{en:'A friend of Mr. Finch',es:'Una amistad del señor Finch'},tab:'guests',en:['What room is Mr. Finch in? I want to surprise him!',[['I can’t share room numbers, but I’d be glad to call him for you.',1],['Room 202! Go on up.',0],['He’s on the second floor, third door.',0]],'Mr. Finch’s record: ⚠️ Please don’t say his room number out loud.'],es:['¿En qué habitación está el señor Finch? ¡Quiero darle una sorpresa!',[['No puedo dar números de habitación, pero con gusto le llamo.',1],['¡En la 202! Suba.',0],['Segundo piso, tercera puerta.',0]],'Ficha del señor Finch: ⚠️ no digas en voz alta su número de habitación.']}
 ];
 function nextHmsQ(){
@@ -5831,7 +5831,7 @@ function gameOver(id,{score,max,slips,extra=''}){
   narrativeText=body.innerText;
 }
 /* Room Rush: housekeeping radios in, you keep the room board true. */
-const RUSH_MOVES={ready:['tidy'],tidy:['guest','fix'],guest:['ready'],fix:['tidy','guest','ready']};
+const RUSH_MOVES={clean:['tidy'],ready:['clean'],tidy:['guest','fix'],guest:['ready'],fix:['tidy','guest','ready','clean']};
 function rushCalls(n=6){
   const rooms={...HMS_ROOMS,'202':'guest','204':'guest'},calls=[];let last='';
   while(calls.length<n){const r=hmsShuffle(Object.keys(rooms)).find(x=>x!==last);const from=rooms[r];
@@ -5855,7 +5855,7 @@ function playRush(){
     const nope=(el,text)=>{slips++;run=0;clean=false;msg.hidden=false;msg.textContent=text;el.classList.remove('hms-no');void el.offsetWidth;el.classList.add('hms-no');joySound('boop');};
     g.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>{if(b.dataset.room!==c.r)return nope(b,ht(HT.rushWrongRoom,{r:b.dataset.room}));picked=c.r;joySound('tick',1);draw();});
     g.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{
-      if(b.dataset.st!==c.to)return nope(b,HT.rushWrongStatus);
+      if(b.dataset.st!==c.to)return nope(b,c.to==='clean'&&b.dataset.st==='ready'?HT.rushNotInspected:HT.rushWrongStatus);
       rooms[c.r]=c.to;if(clean){score++;run++;}picked='';clean=true;k++;
       const tile=g.querySelector('[data-room="'+c.r+'"]');const [x,y]=tile?centerOf(tile):centerOf(b);
       burst(x,y,.6+run*.15,{rainbow:run>=4});floatText(x,y-20,'+1 ⭐',{size:18});joySound('coin',run);gameCombo(tile,run);
@@ -5884,7 +5884,7 @@ function playBuild(){
   const g=$('hms-game');
   function guest(){
     const G=list[gi],[line,notes]=hL(G),nightsOpts=hmsShuffle([1,2,3]);
-    const roomPlan=hmsShuffle(['ready','tidy','guest','fix','guest','ready']).slice(0,6);if(!roomPlan.includes('ready'))roomPlan[0]='ready';
+    const roomPlan=hmsShuffle(['ready','tidy','guest','fix','clean','ready']).slice(0,6);if(!roomPlan.includes('ready'))roomPlan[0]='ready';
     const rooms=Object.fromEntries(['201','202','203','204','205','206'].map((r,k)=>[r,roomPlan[k]]));
     const fields=['name','nights','note','room'],val={};let f=0,clean=true;
     function draw(){
@@ -5902,7 +5902,7 @@ function playBuild(){
       const msg=g.querySelector('.hms-msg');
       g.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{
         const v=b.dataset.v,right=key==='name'?v===G.name[0]:key==='nights'?+v===G.n:key==='note'?v===notes[0]:rooms[v]==='ready';
-        if(!right){slips++;run=0;clean=false;msg.hidden=false;msg.textContent=key==='room'?ht(rooms[v]==='tidy'?HT.pickTidy:rooms[v]==='fix'?HT.pickFix:HT.pickGuest,{r:v}):HT.buildWrong;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');return;}
+        if(!right){slips++;run=0;clean=false;msg.hidden=false;msg.textContent=key==='room'?ht(rooms[v]==='clean'?HT.pickClean:rooms[v]==='tidy'?HT.pickTidy:rooms[v]==='fix'?HT.pickFix:HT.pickGuest,{r:v}):HT.buildWrong;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');return;}
         val[key]=key==='nights'?HT.nightsN(+v):key==='room'?HT.room+' '+v:v;f++;
         const [x,y]=centerOf(b);burst(x,y,.4);joySound('tick',f);
         if(f>=fields.length){if(clean){score++;run++;}draw();const form=g.querySelector('.hms-form');form.classList.add('saved');
@@ -5995,12 +5995,12 @@ const HMS_GAMES={rush:playRush,build:playBuild,bill:playBill};
 .hms-rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .hms-room{display:grid;justify-items:center;gap:0;padding:6px 2px;border-radius:12px;border:2px solid #d5e5d9;background:#fff;cursor:pointer;color:var(--ink);min-height:74px;perspective:400px}
 .hms-room b{font:bold 16px Georgia,serif}.hms-room-ic{font-size:22px;line-height:1.1}.hms-room small{font:10px Arial,sans-serif;color:#5b6b60}
-.hms-room.ready{background:#effbe9;border-color:#a6dc94}.hms-room.tidy{background:#fff6dc;border-color:#f0cf74}.hms-room.fix{background:#fdecec;border-color:#e6a2a2}.hms-room.guest{background:#eef3fb;border-color:#b5c7e6}
+.hms-room.ready{background:#effbe9;border-color:#a6dc94}.hms-room.tidy{background:#fff6dc;border-color:#f0cf74}.hms-room.clean{background:#eef8fb;border-color:#93cfe0}.hms-room.fix{background:#fdecec;border-color:#e6a2a2}.hms-room.guest{background:#eef3fb;border-color:#b5c7e6}
 .hms-room.on{box-shadow:0 0 0 3px #2c6152}
 .hms-room-note{margin-top:8px}
 .hms-legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
 .hms-st{display:inline-block;padding:2px 8px;border-radius:999px;font:bold 11px Arial,sans-serif;background:#eef3fb}
-.hms-st.ready{background:#effbe9}.hms-st.tidy{background:#fff6dc}.hms-st.fix{background:#fdecec}
+.hms-st.ready{background:#effbe9}.hms-st.tidy{background:#fff6dc}.hms-st.clean{background:#eef8fb}.hms-st.fix{background:#fdecec}
 .hms-say{margin:8px 0 6px;font:bold 14px Georgia,serif;color:#23493f}
 .hms-msg{margin:6px 0 0;padding:6px 10px;border-radius:10px;background:#fff6dc;font:13px Arial,sans-serif;color:#6b4a12}
 .hms-msg.ok{background:#e4f8dc;color:#1f5a26}
@@ -6039,7 +6039,7 @@ const HMS_GAMES={rush:playRush,build:playBuild,bill:playBill};
 .hms-radio small{font:bold 11px Arial,sans-serif;letter-spacing:.06em;opacity:.85}.hms-radio p{margin:4px 0 0;font:bold 16px/1.4 Georgia,serif;color:#fff}
 .hms-status-pick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .hms-st-btn{min-height:46px;border-radius:12px;border:2px solid #d5e5d9;background:#fff;cursor:pointer;font:bold 13px Arial,sans-serif;color:var(--ink)}
-.hms-st-btn.ready{border-color:#a6dc94}.hms-st-btn.tidy{border-color:#f0cf74}.hms-st-btn.fix{border-color:#e6a2a2}.hms-st-btn.guest{border-color:#b5c7e6}
+.hms-st-btn.ready{border-color:#a6dc94}.hms-st-btn.tidy{border-color:#f0cf74}.hms-st-btn.clean{border-color:#93cfe0}.hms-st-btn.fix{border-color:#e6a2a2}.hms-st-btn.guest{border-color:#b5c7e6}
 .hms-speech{display:flex;gap:10px;align-items:center;margin:8px 0;padding:10px 12px;border-radius:14px;background:#fffaf0;border:1px solid #ecd39a}
 .hms-speech small{font:bold 10px Arial,sans-serif;letter-spacing:.08em;color:#8f6a2b}.hms-speech p{margin:2px 0 0;font:15px/1.45 Georgia,serif}
 .hms-form{display:grid;grid-template-columns:1fr 1fr;gap:6px}

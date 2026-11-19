@@ -18,12 +18,14 @@ Object.defineProperty(window,'hmsTest',{get:()=>({
  lessonsDone:()=>{hms.lessons=[1,2,3,4,5];storeHms();},firstLesson:()=>{hms.lessons=[1];storeHms();},
  rushCall:()=>document.querySelector('.hms-radio p').textContent,
  rushAnswer:()=>{const t=document.querySelector('.hms-radio p').textContent,r=t.match(/\\d{3}/)[0];
-   const to=/sparkling/.test(t)?'ready':/checked out|fixed/.test(t)?'tidy':/walked/.test(t)?'guest':'fix';return {r,to};},
+   const to=/supervisor/i.test(t)?'ready':/sparkling/.test(t)?'clean':/checked out|fixed/.test(t)?'tidy':/walked/.test(t)?'guest':'fix';return {r,to};},
  billBad:()=>{const n=document.querySelector('.hms-who b').textContent,c=BILL_CASES.find(c=>hL(hmsGuest(c.g)).name===n&&[...document.querySelectorAll('.hms-line span')].map(s=>s.textContent).join('|')===hL(c)[1].map(l=>l[0]).join('|'));return hL(c)[2];},
  buildRight:()=>{const line=document.querySelector('.hms-speech p').textContent,G=BUILD_GUESTS.find(g=>line.includes(hL(g)[0]));const f=document.querySelector('.hms-field.now').dataset.field;
    return f==='name'?G.name[0]:f==='nights'?String(G.n):f==='note'?hL(G)[1][0]:[...document.querySelectorAll('.hms-chips .hms-room.ready')][0].dataset.v;},
  enterPlay:()=>{state.flags.briefed=true;state.phase='playing';return world.options.extras().map(e=>e.id);},
- motion:(on)=>{settings.motion=on;applySettings();}
+ motion:(on)=>{settings.motion=on;applySettings();},
+ rushCalls:()=>rushCalls(),rushStart:()=>({...HMS_ROOMS,'202':'guest','204':'guest'}),
+ status:()=>HT.status,pickClean:()=>HT.pickClean
 })});
 """
 base.TEST_HTML = base.TEST_HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
@@ -235,6 +237,19 @@ class Hms(base.Growth):
             self.page.wait_for_timeout(150)
             w = self.page.evaluate('document.querySelector("#modal").scrollWidth - document.querySelector("#modal").clientWidth')
             self.assertLessEqual(w, 1, open_js)
+        self.assertEqual(self.errors, [])
+
+    def test_16_a_cleaned_room_is_not_ready_until_a_supervisor_inspects_it(self):
+        st = self.page.evaluate('hmsTest.status()')
+        self.assertEqual(st['ready'][1], 'Clean, inspected & ready')
+        self.assertIn('not inspected', st['clean'][1])
+        for _ in range(40):
+            rooms = self.page.evaluate('hmsTest.rushStart()')
+            for c in self.page.evaluate('hmsTest.rushCalls()'):
+                if c['to'] == 'ready':
+                    self.assertEqual(rooms[c['r']], 'clean', 'a room went to ready without an inspection')
+                rooms[c['r']] = c['to']
+        self.assertIn('inspected', self.page.evaluate('hmsTest.pickClean()'))
         self.assertEqual(self.errors, [])
 
 
