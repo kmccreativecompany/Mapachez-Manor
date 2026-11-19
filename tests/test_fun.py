@@ -42,6 +42,8 @@ class Fun(base.Growth):
         self.context.add_init_script('try{if(!sessionStorage.getItem("seeded")){sessionStorage.setItem("seeded","1");'
                                      + ''.join(f'localStorage.setItem({json.dumps(k)},{json.dumps(v if isinstance(v, str) else json.dumps(v))});' for k, v in seed.items())
                                      + '}}catch(e){}')
+        # The whole manor is open here; night-by-night unlocks are covered in test_nights.py.
+        self.context.add_init_script("try{if(!localStorage.getItem('mapachez_nights_v1'))localStorage.setItem('mapachez_nights_v1',JSON.stringify({all:true,seen:10,fresh:[]}))}catch(e){}")
         self.page = self.context.new_page()
         self.page.clock.set_fixed_time(self.day)
         self.errors, self.requests = [], []

@@ -8482,6 +8482,88 @@ renderGrowth();checkPins();
 /* ==== end STAR SERVICE v1 ==== */
 
 
+/* ==== NEW NIGHTS v1: night one is one simple loop (a shift, tips, your cottage).
+   Each finished shift opens one more part of the manor, so nothing arrives all at once.
+   Returning players with progress, and the "Show everything now" setting, see it all. ==== */
+const NN_SAVE='mapachez_nights_v1';
+const NN_STEPS=[
+  {id:'book',icon:'📖',en:'Your Memory Book of pins and keepsakes',es:'Tu Libro de recuerdos, con insignias y tesoros',sel:['#title-memories','#memory-button','#growth-pins','#keepsakes-button']},
+  {id:'closet',icon:'🎀',en:'The closet, for gifts from thankful guests',es:'El armario, para los regalos de huéspedes agradecidos',sel:['#joy-side-closet']},
+  {id:'hms',icon:'🖥️',en:'The desk computer (HMS)',es:'La computadora de recepción (HMS)',sel:['#hms-title','#joy-side-hms']},
+  {id:'festival',icon:'🎪',en:'The festival grounds',es:'El festival en los jardines',sel:['#explore-festival','#festival-button','#places-button']},
+  {id:'mystery',icon:'🕯️',en:'Mystery guests',es:'Huéspedes misteriosos',sel:['#joy-title-mg','#joy-side-mg']},
+  {id:'lilies',icon:'🔍',en:'The lily mystery',es:'El misterio de los lirios',sel:['#growth-notebook']},
+  {id:'penny',icon:'🐉',en:'Penny and her shiny money facts',es:'Penny y sus datos brillantes de dinero',sel:['#penny-title','#joy-side-penny']},
+  {id:'star',icon:'🌟',en:'Star service',es:'Servicio estrella',sel:['#star-title','#joy-side-star']},
+  {id:'desk',icon:'🗝️',en:'The practice desk, ledger and journal',es:'El escritorio de práctica, el libro y el diario',sel:['#title-training','#training-button','#ledger-button','#journal-button']},
+  {id:'report',icon:'🏅',en:'Your progress report and certificate',es:'Tu informe de progreso y certificado',sel:['#title-report','#growth-report']}
+];
+const NN_TEXT={
+  en:{fresh:'New tonight',tease:'🌙 Finish a shift to open something new in the manor.',left:'🌙 Next shift opens something new · {n} still waiting',all:'Show everything now',allHint:'Open every part of the manor at once, instead of one new thing each night.'},
+  es:{fresh:'Nuevo esta noche',tease:'🌙 Termina un turno para abrir algo nuevo en la mansión.',left:'🌙 El próximo turno abre algo nuevo · faltan {n}',all:'Mostrar todo ahora',allHint:'Abre toda la mansión de una vez, en lugar de una cosa nueva cada noche.'}
+};
+const nnT=k=>(NN_TEXT[profile.lang==='es'?'es':'en'][k]);
+function nnLoad(){
+  let v=null;try{v=JSON.parse(localStorage.getItem(NN_SAVE)||'null');}catch{}
+  if(v&&typeof v==='object')return {all:!!v.all,seen:Math.max(0,v.seen|0),fresh:Array.isArray(v.fresh)?v.fresh.filter(id=>NN_STEPS.some(s=>s.id===id)):[]};
+  /* Players who already played before this update keep everything they had. */
+  return {all:(growth.answers|0)>0||(growth.shifts|0)>0,seen:0,fresh:[]};
+}
+let nn=nnLoad();
+function nnStore(){try{localStorage.setItem(NN_SAVE,JSON.stringify(nn));}catch{}}
+nnStore();
+function nnNightsDone(){return Math.max(growth.shifts|0,Math.floor((growth.answers|0)/5));}
+function nnOpenCount(){return nn.all?NN_STEPS.length:Math.min(NN_STEPS.length,nnNightsDone());}
+function nnLocked(step,open){
+  if(step.id==='report'&&profile.mode==='hotel')return false; /* hotel trainees always see their report */
+  return NN_STEPS.indexOf(step)>=open;
+}
+{const css=document.createElement('style');css.id='nn-style';
+ css.textContent=NN_STEPS.map(s=>s.sel.map(q=>'html.nn-lock-'+s.id+' '+q).join(',')+'{display:none!important}').join('\n')+'\n'+
+  NN_STEPS.map(s=>s.sel.map(q=>'html.nn-new-'+s.id+' '+q).join(',')+'{animation:nnGlow 1.6s ease-in-out infinite;box-shadow:0 0 0 2px #e8c872,0 0 16px rgba(232,200,114,.75)!important;border-radius:999px}').join('\n')+
+  '\n@keyframes nnGlow{50%{box-shadow:0 0 0 3px #f3d98a,0 0 26px rgba(243,217,138,.95)}}'+
+  '\n@media (prefers-reduced-motion:reduce){[class*="nn-new-"] *{animation:none!important}}'+
+  '\n.nn-next{margin:10px 0 0;font-size:12px;line-height:1.45;color:#7a6331;text-align:center}';
+ document.head.append(css);}
+function nnApply(announce){
+  const open=nnOpenCount(),root=document.documentElement;
+  if(open>nn.seen){
+    const fresh=NN_STEPS.slice(nn.seen,open);nn.seen=open;
+    if(!nn.all){nn.fresh=fresh.map(s=>s.id);
+      if(announce){const s=fresh[fresh.length-1],name=profile.lang==='es'?s.es:s.en;toast('✨ '+nnT('fresh')+': '+s.icon+' '+name);}}
+    nnStore();
+  }
+  for(const s of NN_STEPS){root.classList.toggle('nn-lock-'+s.id,nnLocked(s,open));root.classList.toggle('nn-new-'+s.id,nn.fresh.includes(s.id)&&!nnLocked(s,open));}
+  const g=$('growth');if(!g)return;
+  let line=$('nn-next');const left=NN_STEPS.length-open;
+  if(nn.all||left<=0){if(line)line.remove();return;}
+  if(!line){line=document.createElement('p');line.id='nn-next';line.className='nn-next';}
+  line.textContent=open===0?nnT('tease'):nnT('left').replace('{n}',left);
+  if(line.parentElement!==g||line!==g.lastElementChild)g.append(line);
+}
+/* Tapping something new stops its glow. */
+document.addEventListener('click',e=>{
+  if(!nn.fresh.length||!(e.target instanceof Element))return;
+  const s=NN_STEPS.find(x=>nn.fresh.includes(x.id)&&x.sel.some(q=>e.target.closest(q)));
+  if(s){nn.fresh=nn.fresh.filter(id=>id!==s.id);nnStore();document.documentElement.classList.remove('nn-new-'+s.id);}
+},true);
+const nnRenderGrowth=renderGrowth;renderGrowth=function(){const r=nnRenderGrowth.apply(this,arguments);nnApply(true);return r;};
+const nnOpenSettings=openSettings;openSettings=function(){
+  const r=nnOpenSettings.apply(this,arguments);const list=$('settings-list');
+  if(list&&!$('nn-all')){
+    const label=document.createElement('label');label.className='setting';
+    label.innerHTML='<span><b></b><small></small></span><input type="checkbox" id="nn-all">';
+    label.querySelector('b').textContent=nnT('all');label.querySelector('small').textContent=nnT('allHint');
+    const input=label.querySelector('input');input.checked=nn.all;input.setAttribute('aria-label',nnT('all'));
+    input.onchange=()=>{nn.all=input.checked;if(nn.all)nn.fresh=[];else nn.seen=Math.min(nn.seen,nnNightsDone());nnStore();nnApply(false);};
+    list.append(label);
+  }
+  return r;
+};
+$('settings-button').onclick=openSettings;$('title-settings').onclick=openSettings;
+nnApply(false);
+/* ==== end NEW NIGHTS v1 ==== */
+
 })();
 </script>
 </body>
