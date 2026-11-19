@@ -6500,6 +6500,452 @@ PINS.push(
 checkPins();
 /* ==== end TALKING TREES v1 ==== */
 
+/* ==== KNOCK v1: door knocks, closed rooms, Do Not Disturb signs and texting the guest ====
+   Guest rooms stay closed from the hallway. Walk to a door and you knock and say who you are
+   ("Housekeeping!", "In-Room Dining!", from your role). The door swings open and the guest is caught
+   mid-something: reading, napping, yoga, a midnight snack, knitting. One door each shift wears a
+   Do Not Disturb sign. Then you text the guest's phone first: knocking or calling the room wakes them.
+   Texting needs a phone number, which is why the desk computer now asks for one at check-in.
+   No number on file? A gentle lesson and a note slid under the door.
+   Everything is drawn with code and written here (English and Spanish). Save key mapachez_knock_v1. */
+const KNOCK_TEXT={
+en:{
+  knock:'Knock, knock.',
+  role:{desk:'Front desk!',house:'Housekeeping!',dining:'In-Room Dining!',night:'Night manager!',all:'Guest services!'},
+  bubbleTop:'knock knock',shh:'shh…',
+  open:'The door opens.',noAnswer:'No answer. The room is quiet and tidy, waiting for someone.',
+  acts:{
+    read:'{name} is reading a very thick book, and quickly turns it the right way up.',
+    nap:'{name} was having a little nap and waves sleepily from under the blanket.',
+    yoga:'{name} is mid-yoga, holding a very confident tree pose. It wobbles politely.',
+    snack:'{name} is having a midnight snack and offers you a cookie. It is mostly crumbs.',
+    knit:'{name} is knitting something long and stripy. “It’s a scarf. Or a very long sock. We’ll see.”',
+    plant:'{name} is watering the little plant and telling it all about the day.',
+    dance:'{name} is dancing to music nobody else can hear, and finishes with one small spin.',
+    paint:'{name} is painting the view from the window, mostly in purple.',
+    puzzle:'{name} is doing a jigsaw puzzle on the rug. One piece is missing. It is in a pocket.',
+    tea:'{name} is blowing on a cup of tea, very carefully, like it’s a birthday candle.'
+  },
+  arrivals:{
+    juniper:['“Oh! Hello. The window seat is perfect. I’ve been watching the moths do a little dance.”','“Could I have one more blanket? Or two. I’m always a little cold.”','Two extra blankets, coming right up. Juniper hugs a pillow in advance.'],
+    fuzz:['“Ahoy! The extra-long bed fits. My feet have never been so happy.”','“Is there any chance of a cup of cocoa?”','Cocoa it is. Captain Fuzz salutes you with a very fluffy hand.']
+  },
+  askNeed:'Ask if they need anything',wishNight:'Wish them a cozy night',welcomeTitle:'All settled in',
+  dndKicker:'ROOM {r} · DO NOT DISTURB',dndTitle:'A sign on the door',
+  dndText:'A little sign hangs on the handle: “Please do not disturb.” {name} might be napping.',
+  dndVacant:'A little sign hangs on the handle: “Please do not disturb.”',
+  dndAsk:'How will you reach {name}?',
+  how:{text:['📱 Text their phone','A text waits quietly until they’re ready.'],call:['☎️ Call the room phone','It rings right by the bed.'],knock:['✊ Knock anyway, softly','The sign is probably just decoration.']},
+  callMiss:'Rrring! A very sleepy voice: “H-hello? Is it breakfast?” The room phone rings right by the bed. A text waits quietly until they’re ready. Let’s text instead.',
+  knockMiss:'Knock, knock… a muffled “Mmmf. The sign… the sign says…” Even a soft knock wakes a napper. Let’s text instead.',
+  phoneTo:'To',noNumber:'No number on file',pickText:'Pick your text:',
+  texts:{
+    good:{desk:'Hi {name}! It’s the front desk. A little package came for you. Shall I bring it up? Reply whenever suits you 🙂',house:'Hi {name}! It’s Housekeeping. Would you like fresh towels today? No rush, reply whenever suits you 🙂',dining:'Hi {name}! It’s In-Room Dining. Your order is ready whenever you’d like it. Reply anytime 🙂',night:'Hi {name}! It’s the night manager. Just checking you have everything you need tonight. Reply anytime 🙂',all:'Hi {name}! It’s Guest Services. Just checking you have everything you need tonight. Reply anytime 🙂'},
+    loud:'ARE YOU AWAKE?? 🚪🚪🚪',vague:'hi'
+  },
+  replyLoud:'I am now 😴',replyVague:'…hi? Who is this?',
+  hintLoud:'🌱 Gentle and calm works best. They might be asleep.',hintVague:'🌱 Say who you are and why you’re texting.',
+  replies:['Thank you for texting instead of knocking 💛 I’m awake now. Come on by!','Oh, how thoughtful. One minute to find my slippers… okay, come by!','Perfect timing, I was just waking up. The sign is off!'],
+  typing:'typing…',signOff:'They flipped the sign off 💛',headIn:'Head in',backManor:'Back to the manor',
+  lessonH:'No phone number for {name}',
+  lessonDelores:'Delores: “No number on file, so we can’t text. That’s why we ask for a phone number at check-in. For tonight, slide a little note under the door. They’ll see it when they wake.”',
+  slideNote:'✉️ Slide a note under the door',
+  noteSlid:'You slide a note under the door: “{role} stopped by. Call the desk anytime. Sweet dreams 🌙” Next check-in, ask for a number!',
+  openHms:'🖥️ Open the desk computer',
+  phoneLabel:'📱 Phone',phoneNone:'Not on file yet. Ask at check-in!',
+  phoneCoach:'Delores: “One more thing! Ask for a phone number. If their door ever says Do Not Disturb, you can text instead of knocking.”',
+  askPhone:'📱 Ask for a phone number',skipPhone:'Skip it',
+  gavePhone:'“Of course! It’s {phone}.”',savedPhone:'Saved to {name}’s profile ✓',skipped:'Okay. No phone number on file for {name}.',
+  pins:{knock:['Knock Knock','Knock on all six guest room doors.'],quiet:['Quiet Hands','Text a guest with a Do Not Disturb sign, kindly.'],number:['Number, Please','Save a guest’s phone number at check-in.']}
+},
+es:{
+  knock:'Toc, toc.',
+  role:{desk:'¡Recepción!',house:'¡Limpieza!',dining:'¡Servicio de habitaciones!',night:'¡Gerencia de noche!',all:'¡Atención al huésped!'},
+  bubbleTop:'toc toc',shh:'shh…',
+  open:'Se abre la puerta.',noAnswer:'Nadie contesta. La habitación está tranquila y ordenada, esperando a alguien.',
+  acts:{
+    read:'{name} lee un libro gordísimo y lo pone rápidamente del derecho.',
+    nap:'{name} estaba echando una siesta y saluda medio dormido desde la manta.',
+    yoga:'{name} está en mitad de una clase de yoga, en una postura del árbol muy segura. Se tambalea con educación.',
+    snack:'{name} está tomando un tentempié de medianoche y te ofrece una galleta. Son casi todo migas.',
+    knit:'{name} teje algo largo y de rayas. “Es una bufanda. O un calcetín muy largo. Ya veremos.”',
+    plant:'{name} riega la plantita y le cuenta todo su día.',
+    dance:'{name} baila una música que nadie más oye y termina con un giro pequeñito.',
+    paint:'{name} pinta la vista de la ventana, casi toda en morado.',
+    puzzle:'{name} hace un rompecabezas en la alfombra. Falta una pieza. Está en un bolsillo.',
+    tea:'{name} sopla una taza de té con muchísimo cuidado, como si fuera una vela de cumpleaños.'
+  },
+  arrivals:{
+    juniper:['“¡Oh! Hola. El asiento de la ventana es perfecto. Estaba viendo bailar a las polillas.”','“¿Me traería otra manta? O dos. Siempre tengo un poquito de frío.”','Dos mantas extra, enseguida. Juniper ya abraza una almohada por adelantado.'],
+    fuzz:['“¡Ahoy! La cama extralarga me queda perfecta. Mis pies nunca han sido tan felices.”','“¿Habría una tacita de chocolate caliente?”','Chocolate, entonces. El capitán Fuzz te saluda con una mano muy peluda.']
+  },
+  askNeed:'Preguntar si necesita algo',wishNight:'Desearle una noche acogedora',welcomeTitle:'Bien instalado',
+  dndKicker:'HABITACIÓN {r} · NO MOLESTAR',dndTitle:'Un cartel en la puerta',
+  dndText:'Del picaporte cuelga un cartelito: “Por favor, no molestar.” Puede que {name} esté durmiendo la siesta.',
+  dndVacant:'Del picaporte cuelga un cartelito: “Por favor, no molestar.”',
+  dndAsk:'¿Cómo contactarás con {name}?',
+  how:{text:['📱 Mandar un mensaje a su móvil','Un mensaje espera en silencio hasta que esté listo.'],call:['☎️ Llamar al teléfono de la habitación','Suena justo al lado de la cama.'],knock:['✊ Llamar a la puerta, flojito','El cartel seguro que es decoración.']},
+  callMiss:'¡Riiing! Una voz muy dormida: “¿S-sí? ¿Ya es el desayuno?” El teléfono de la habitación suena junto a la cama. Un mensaje espera en silencio. Mejor manda un mensaje.',
+  knockMiss:'Toc, toc… un “Mmmf. El cartel… el cartel dice…” amortiguado. Hasta un toque suave despierta a quien duerme. Mejor manda un mensaje.',
+  phoneTo:'Para',noNumber:'Sin número en la ficha',pickText:'Elige tu mensaje:',
+  texts:{
+    good:{desk:'¡Hola, {name}! Le escribe recepción. Ha llegado un paquetito para usted. ¿Se lo subo? Conteste cuando le venga bien 🙂',house:'¡Hola, {name}! Le escribe Limpieza. ¿Quiere toallas limpias hoy? Sin prisa, conteste cuando le venga bien 🙂',dining:'¡Hola, {name}! Le escribe el servicio de habitaciones. Su pedido está listo cuando quiera. Conteste cuando quiera 🙂',night:'¡Hola, {name}! Le escribe la gerencia de noche. Solo quería saber si tiene todo lo que necesita. Conteste cuando quiera 🙂',all:'¡Hola, {name}! Le escribe Atención al huésped. Solo quería saber si tiene todo lo que necesita. Conteste cuando quiera 🙂'},
+    loud:'¿¿ESTÁ DESPIERTO?? 🚪🚪🚪',vague:'hola'
+  },
+  replyLoud:'Ahora sí 😴',replyVague:'…¿hola? ¿Quién es?',
+  hintLoud:'🌱 Mejor con calma y suavidad. Puede que esté durmiendo.',hintVague:'🌱 Di quién eres y por qué escribes.',
+  replies:['Gracias por escribir en vez de llamar a la puerta 💛 Ya estoy despierto. ¡Pase!','Qué detalle. Un minuto, que busco las zapatillas… ¡listo, pase!','Justo a tiempo, me estaba despertando. ¡Ya quité el cartel!'],
+  typing:'escribiendo…',signOff:'Ha quitado el cartel 💛',headIn:'Entrar',backManor:'Volver a la mansión',
+  lessonH:'No hay teléfono de {name}',
+  lessonDelores:'Delores: “No hay número en la ficha, así que no podemos escribir. Por eso pedimos un teléfono al registrar la entrada. Por esta noche, desliza una notita bajo la puerta. La verá al despertar.”',
+  slideNote:'✉️ Deslizar una nota bajo la puerta',
+  noteSlid:'Deslizas una nota bajo la puerta: “Ha pasado {role}. Llame a recepción cuando quiera. Dulces sueños 🌙” ¡En el próximo registro, pide un número!',
+  openHms:'🖥️ Abrir el ordenador de recepción',
+  phoneLabel:'📱 Teléfono',phoneNone:'Aún no está. ¡Pídelo al registrar la entrada!',
+  phoneCoach:'Delores: “¡Una cosa más! Pide un número de teléfono. Si algún día su puerta dice No molestar, podrás escribirle en vez de llamar a la puerta.”',
+  askPhone:'📱 Pedir un teléfono',skipPhone:'Saltar',
+  gavePhone:'“¡Claro! Es el {phone}.”',savedPhone:'Guardado en la ficha de {name} ✓',skipped:'Vale. No hay teléfono en la ficha de {name}.',
+  pins:{knock:['Toc toc','Llama a las seis puertas de las habitaciones.'],quiet:['Manos silenciosas','Escribe con amabilidad a un huésped con el cartel de No molestar.'],number:['Número, por favor','Guarda el teléfono de un huésped al registrar su entrada.']}
+}};
+const KT=KNOCK_TEXT[profile.lang]||KNOCK_TEXT.en;
+const KNOCK_ACTS=['read','nap','yoga','snack','knit','plant','dance','paint','puzzle','tea'];
+/* Fictional numbers only (the 555-01xx range is reserved for make-believe). */
+const STORY_PHONES={finch:'555-0186',vesper:'555-0123',vale:'555-0164',nine:'555-0199'};
+const ARRIVAL_PHONES={juniper:'555-0117',fuzz:'555-0152'};
+
+/* ---------- Save ---------- */
+const KNOCK_KEY='mapachez_knock_v1';
+function createKnock(){return {version:1,doors:[],knocks:0,phones:{},checked:{},kind:0,calls:0,notes:0,saved:0,cleared:{seed:0,rooms:[]}};}
+function normaliseKnock(v){
+  const k=createKnock();if(!v||typeof v!=='object'||v.version!==1)return k;
+  for(const f of ['knocks','kind','calls','notes','saved'])k[f]=Math.max(0,v[f]|0);
+  if(Array.isArray(v.doors))k.doors=[...new Set(v.doors.map(Number).filter(n=>n>=201&&n<=206))];
+  for(const id of Object.keys(ARRIVAL_PHONES)){
+    if(typeof v.phones?.[id]==='string')k.phones[id]=v.phones[id]===ARRIVAL_PHONES[id]?ARRIVAL_PHONES[id]:'';
+    if(/^20[1-6]$/.test(v.checked?.[id]||''))k.checked[id]=v.checked[id];
+  }
+  if(v.cleared&&typeof v.cleared==='object')k.cleared={seed:+v.cleared.seed||0,rooms:Array.isArray(v.cleared.rooms)?v.cleared.rooms.map(Number).filter(n=>n>=201&&n<=206):[]};
+  return k;
+}
+let knock=createKnock();
+try{knock=normaliseKnock(JSON.parse(localStorage.getItem(KNOCK_KEY)||'null'));}catch{}
+function storeKnock(){try{localStorage.setItem(KNOCK_KEY,JSON.stringify(knock));}catch{}}
+const kt=(s,vars)=>ht(s,vars);
+const knockHash=s=>{let n=0;for(const ch of String(s))n=(n*31+ch.charCodeAt(0))>>>0;return n;};
+
+/* ---------- Who is behind each door ---------- */
+function doorGuest(n){
+  const story=GUESTS.find(g=>g.room===String(n));
+  if(story)return {id:story.id,name:story.name,person:story,phone:STORY_PHONES[story.id]||'',story:true};
+  const id=Object.keys(knock.checked).find(k=>knock.checked[k]===String(n));
+  if(!id)return null;const g=hmsGuest(id);
+  return {id,name:hL(g).name,person:hmsPerson(g),phone:knock.phones[id]||'',story:false};
+}
+const roleKey=()=>['desk','house','dining','night'].includes(profile.role)?profile.role:'all';
+const rolePhrase=()=>KT.role[roleKey()];
+function doorAct(n){return KNOCK_ACTS[knockHash((state?.seed||1)+':'+n+':'+knock.knocks)%KNOCK_ACTS.length];}
+/* One door each shift wears a sign, after your first two knocks. A guest checked in without a
+   phone number gets it more often, so the check-in lesson shows up naturally. */
+function dndRooms(){
+  if(!state||festivalActive||knock.knocks<2)return [];
+  const occ=[201,202,203,204,205,206].filter(n=>doorGuest(n)&&!(n===206&&state.flags.hazard==='reported'));
+  if(!occ.length)return [];
+  const h=knockHash(state.seed+'dnd'),noPhone=occ.filter(n=>{const g=doorGuest(n);return g&&!g.story&&!g.phone;});
+  const pick=noPhone.length&&h%2===0?noPhone[0]:occ[h%occ.length];
+  const cleared=knock.cleared.seed===state.seed?knock.cleared.rooms:[];
+  return cleared.includes(pick)?[]:[pick];
+}
+function clearDnd(n){if(knock.cleared.seed!==state.seed)knock.cleared={seed:state.seed,rooms:[]};if(!knock.cleared.rooms.includes(n))knock.cleared.rooms.push(n);storeKnock();}
+
+/* ---------- Sounds: two soft wooden taps ---------- */
+function knockSound(){const a=joyAudio();if(!a)return;try{joyNote(a,196,0,{type:'triangle',vol:.05,dur:.07,slide:.7});joyNote(a,185,.16,{type:'triangle',vol:.05,dur:.07,slide:.7});}catch{}}
+
+/* ---------- Drawing: closed doors, signs, and guests caught mid-activity ---------- */
+function drawDoorSign(c,x,y,time,calm){
+  c.save();c.translate(x,y);c.rotate(calm?0:Math.sin(time/700)*.08);
+  c.strokeStyle='#8a6a3a';c.lineWidth=1;c.beginPath();c.moveTo(0,0);c.lineTo(-5,7);c.moveTo(0,0);c.lineTo(5,7);c.stroke();
+  rect(c,-12,6,24,30,'#fdf6e3',4);stroke(c,-12,6,24,30,'#c76f8f',1.4,4);
+  ellipse(c,-2,17,6,6,'#f2c14e');ellipse(c,1,15,5.5,5.5,'#fdf6e3');
+  text(c,'z',6,15,6,'#7a5aa0','Georgia');text(c,'z',9,11,5,'#7a5aa0','Georgia');
+  text(c,'SHH',0,32,6.5,'#7a3b55');
+  c.restore();
+}
+function drawClosedRoom(c,x,n,dnd,occupied,time,calm){
+  const hue=ROOM_HUES[n];
+  c.save();c.beginPath();c.rect(x-70,134,140,176);c.clip();
+  rect(c,x-70,134,140,176,hue[3]);
+  c.globalAlpha=.35;for(let k=0;k<7;k++)rect(c,x-70+k*20+9,134,2,118,hue[2]);c.globalAlpha=1;
+  rect(c,x-70,252,140,58,hue[2]+'66');rect(c,x-70,250,140,3,AN.gold);
+  for(const k of [-1,1]){rect(c,x+k*48-7,216,14,10,AN.walnut,3);ellipse(c,x+k*48,214,5,6,'#ffe7a3');if(!calm)ellipse(c,x+k*48,214,10+Math.sin(time/600+k)*1.5,11,'#ffe7a322');}
+  c.beginPath();c.moveTo(x-30,310);c.lineTo(x-30,198);c.quadraticCurveTo(x-30,170,x,168);c.quadraticCurveTo(x+30,170,x+30,198);c.lineTo(x+30,310);c.closePath();c.fillStyle=AN.walnut;c.fill();
+  c.beginPath();c.moveTo(x-24,310);c.lineTo(x-24,200);c.quadraticCurveTo(x-24,177,x,175);c.quadraticCurveTo(x+24,177,x+24,200);c.lineTo(x+24,310);c.closePath();c.fillStyle=hue[1];c.fill();c.strokeStyle=AN.gold;c.lineWidth=1;c.stroke();
+  stroke(c,x-17,206,34,38,hue[3]+'aa',1.2,4);stroke(c,x-17,252,34,46,hue[3]+'aa',1.2,4);
+  rect(c,x-10,186,20,11,AN.cream,3);text(c,String(n),x,195,8,AN.walnutDk,'Georgia');
+  ellipse(c,x+16,256,3.2,3.2,AN.goldHi);ellipse(c,x+16,256,1.6,1.6,AN.walnut);
+  if(occupied)rect(c,x-22,307,44,3,'#ffe7a3cc');
+  c.restore();
+  if(dnd)drawDoorSign(c,x+16,257,time,calm);
+}
+function drawActivity(c,x,n,g,act,time,calm){
+  const hue=ROOM_HUES[n],p=g.person,T=calm?0:time;
+  const bob=calm?0:Math.abs(Math.sin(T/260))*3;
+  if(act==='nap'){
+    drawPerson(c,x-12,238,p,0,'down',false,.9);
+    rect(c,x-46,234,67,31,hue[0],5);c.strokeStyle=AN.goldHi;c.lineWidth=1;c.beginPath();c.moveTo(x-44,240);c.lineTo(x+19,240);c.stroke();
+    for(let k=0;k<3;k++){const f=calm?k/3:((T/1400+k/3)%1);c.globalAlpha=calm?.9:Math.sin(f*Math.PI);text(c,'z',x+8+f*18,196-f*26,8+k*2,'#6c5a9a','Georgia');}c.globalAlpha=1;return;
+  }
+  if(act==='yoga'){rect(c,x-12,284,50,10,'#9cc9a8',4);c.save();c.translate(x+13,290);c.rotate(calm?0:Math.sin(T/500)*.05);drawPerson(c,0,0,p,0,'down',false,.92);c.restore();
+    ellipse(c,x+13,240,6,2,'#ffffff88');return;}
+  if(act==='dance'){drawPerson(c,x+13,286-bob,p,calm?0:T/180,'down',false,.92);
+    for(let k=0;k<2;k++){const f=calm?.5:((T/1600+k/2)%1);c.globalAlpha=calm?.9:Math.sin(f*Math.PI);text(c,'♪',x+34+k*8,252-f*24,11,'#7a5aa0','Georgia');}c.globalAlpha=1;return;}
+  if(act==='plant'){rect(c,x+46,276,14,12,'#b8794f',3);leaf(c,x+53,276,13,-2.2,'#5f9a6a');leaf(c,x+53,276,13,-.9,'#7fb487');leaf(c,x+53,276,10,-1.6,'#4f8a5c');
+    drawPerson(c,x+24,292,p,0,'right',false,.92);rect(c,x+33,262,9,6,'#7fa6c9',2);
+    for(let k=0;k<3;k++){const f=calm?k/3:((T/700+k/3)%1);ellipse(c,x+44+f*3,268+f*10,1.2,1.8,'#7fb0e0');}return;}
+  if(act==='paint'){c.strokeStyle=AN.walnut;c.lineWidth=2;c.beginPath();c.moveTo(x+44,290);c.lineTo(x+50,240);c.lineTo(x+56,290);c.stroke();
+    rect(c,x+38,238,24,20,'#fffdf5',2);ellipse(c,x+46,246,4,3,'#9b7fd0');ellipse(c,x+53,250,3,3,'#7a5aa0');rect(c,x+40,252,20,3,'#8fb08a');
+    drawPerson(c,x+22,292,p,0,'right',false,.92);return;}
+  if(act==='puzzle'){for(let k=0;k<6;k++)rect(c,x-8+(k%3)*9,284+((k/3)|0)*8,7,6,['#d995a9','#86b2d4','#dfbd62','#7fbf9f','#a596cf','#e4a07e'][k],1.5);
+    drawPerson(c,x+40,292,p,0,'left',false,.92);return;}
+  drawPerson(c,x+43,272,p,0,'left',false,.92);
+  if(act==='read'){rect(c,x+28,248,13,10,'#8a5d38',2);rect(c,x+29,249,11,8,'#fff8e6',1);c.strokeStyle='#8a5d38';c.beginPath();c.moveTo(x+34.5,249);c.lineTo(x+34.5,257);c.stroke();}
+  else if(act==='snack'){ellipse(c,x+28,258,8,3,'#ffffff');ellipse(c,x+28,256,4,3,'#c08a4e');for(let k=0;k<3;k++)ellipse(c,x+20+k*6,268+(k%2)*3,1,1,'#c08a4e');}
+  else if(act==='knit'){ellipse(c,x+6,290,6,6,'#d27c9a');c.strokeStyle='#d27c9a';c.lineWidth=1;c.beginPath();c.moveTo(x+9,286);c.quadraticCurveTo(x+22,268,x+31,256);c.stroke();
+    c.strokeStyle='#c9a45c';c.lineWidth=1.4;c.beginPath();c.moveTo(x+26,250);c.lineTo(x+36,262);c.moveTo(x+36,250);c.lineTo(x+26,262);c.stroke();rect(c,x+27,258,9,8,'#7fbf9f',2);}
+  else if(act==='tea'){rect(c,x+24,252,9,7,'#fdf6e3',2);c.strokeStyle='#fdf6e3';c.lineWidth=1.2;c.beginPath();c.arc(x+34,255,2.5,-1.4,1.4);c.stroke();
+    if(!calm){c.globalAlpha=.6;c.strokeStyle='#ffffff';c.beginPath();const w=Math.sin(T/400)*2;c.moveTo(x+27,250);c.quadraticCurveTo(x+25+w,244,x+28,238);c.stroke();c.globalAlpha=1;}}
+}
+/* On the map: every room is a closed door until you knock. The door you knocked on stays open
+   while you are nearby, then quietly closes again. */
+const knockOpen={},knockShown={room:0,act:'read',until:0};
+function drawDoors(c,time,calm){
+  if(festivalActive||!state)return;
+  const dnd=dndRooms(),p=state.player;
+  rooms.forEach((x,i)=>{
+    const n=201+i,g=doorGuest(n),st=STATIONS['r'+n];
+    const want=knockShown.room===n&&(modal.open||Math.hypot(p.x-st.x,p.y-st.y)<130||performance.now()<knockShown.until)?1:0;
+    const cur=knockOpen[n]||0,next=calm?want:cur+(want-cur)*.12;knockOpen[n]=Math.abs(next-want)<.01?want:next;
+    const o=knockOpen[n];
+    if(o>0&&g){c.save();c.beginPath();c.rect(x-70,134,140,189);c.clip();drawActivity(c,x,n,g,knockShown.act,time,calm);c.restore();}
+    if(o<1){c.save();c.globalAlpha=1-o;drawClosedRoom(c,x,n,dnd.includes(n),!!g,time,calm);c.restore();}
+  });
+}
+
+/* In a modal: a little hallway strip. You knock with a speech bubble; the door swings open. */
+function knockStrip(n,g,act,mode){
+  const cv=document.createElement('canvas');cv.className='knock-strip';cv.setAttribute('aria-hidden','true');
+  const W2=340,H2=128,dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W2*dpr;cv.height=H2*dpr;
+  const c=cv.getContext('2d'),x=rooms[n-201],hue=ROOM_HUES[n],calm=joyCalm(),t0=performance.now(),phrase=mode==='dnd'?KT.shh:(mode||rolePhrase());
+  function frame(now){
+    const e=calm?2000:now-t0,open=mode==='dnd'?0:Math.max(0,Math.min(1,(e-650)/550));
+    c.setTransform(dpr,0,0,dpr,0,0);rect(c,0,0,W2,H2,'#ece0c2');
+    c.globalAlpha=.35;for(let k=0;k<17;k++)rect(c,k*20+6,0,2,96,'#c9a45c');c.globalAlpha=1;
+    rect(c,0,96,W2,32,'#2a5a46');c.strokeStyle='#d9bd7cb0';c.lineWidth=1.2;c.beginPath();c.moveTo(0,112);for(let k=0;k<W2;k+=40)c.bezierCurveTo(k+10,104,k+30,120,k+40,112);c.stroke();
+    /* the doorway */
+    const dx=206,dy=22,dw=96,dh=74;
+    rect(c,dx-8,dy-8,dw+16,dh+8,AN.walnut,6);
+    c.save();c.beginPath();c.rect(dx,dy,dw,dh);c.clip();
+    const s=.92,fx=act==='nap'?x-8:x+10,fy=act==='nap'?226:252;c.translate(dx+dw/2-fx*s,dy+dh/2-fy*s);c.scale(s,s);room(c,x,n,null);if(g&&mode!=='dnd')drawActivity(c,x,n,g,act,calm?0:now,calm);c.restore();
+    const pw=dw*(1-open*.84);
+    rect(c,dx,dy,pw,dh,hue[1]);c.strokeStyle=AN.gold;c.lineWidth=1;c.strokeRect(dx+.5,dy+.5,pw-1,dh-1);
+    if(pw>30){stroke(c,dx+8,dy+8,pw-16,24,hue[3]+'aa',1.2,3);stroke(c,dx+8,dy+38,pw-16,30,hue[3]+'aa',1.2,3);ellipse(c,dx+pw-10,dy+40,3,3,AN.goldHi);}
+    rect(c,dx+dw/2-14,dy-17,28,12,AN.cream,3);text(c,String(n),dx+dw/2,dy-8,9,AN.walnutDk,'Georgia');
+    if(mode==='dnd')drawDoorSign(c,dx+dw-10,dy+40,now,calm);
+    /* you, with a bubble */
+    const knockT=calm?0:Math.max(0,1-Math.abs(e-300)/300);
+    drawPerson(c,124,104,playerLook(),0,'right',false,1.55);
+    if(knockT>0&&mode!=='dnd'){c.globalAlpha=knockT;text(c,'✊',176,60+Math.sin(e/40)*2,14,'#4b2f1c');c.globalAlpha=1;}
+    const pop=calm?1:Math.min(1,e/220),bw=Math.max(118,c.measureText?0:0);
+    c.save();c.translate(70,30);c.scale(pop,pop);
+    c.font='700 13px Georgia';const w=Math.max(96,c.measureText(phrase).width+22);
+    rect(c,-w/2,-22,w,40,'#fffaf0',12);stroke(c,-w/2,-22,w,40,'#c9a45c',1.2,12);
+    c.fillStyle='#fffaf0';c.beginPath();c.moveTo(18,16);c.lineTo(34,30);c.lineTo(28,15);c.fill();
+    if(mode!=='dnd')text(c,KT.bubbleTop,0,-8,9,'#8a6a3a','Arial');
+    text(c,phrase,0,mode==='dnd'?3:9,13,'#4b2f1c','Georgia');
+    c.restore();void bw;
+    if(!calm&&e<1400&&cv.isConnected)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);frame(t0);
+  return cv;
+}
+
+/* ---------- Knocking: wraps every guest room visit in the manor ---------- */
+const knockInteract=interact;
+interact=function(id){
+  const m=/^r(20[1-6])$/.exec(String(id));
+  if(!m||festivalActive||!state||state.phase==='ended'||!state.flags.briefed)return knockInteract.apply(this,arguments);
+  const n=+m[1],g=doorGuest(n);
+  if(dndRooms().includes(n))return openDnd(n,g);
+  knock.knocks++;if(!knock.doors.includes(n))knock.doors.push(n);storeKnock();
+  const act=doorAct(n);knockShown.room=n;knockShown.act=act;knockShown.until=performance.now()+2500;knockSound();
+  if(g&&!g.story)return arrivalScene(n,g,act);
+  const before=body.firstElementChild;
+  const r=knockInteract.apply(this,arguments);
+  if(modal.open&&body.firstElementChild!==before)decorateKnock(n,g,act);
+  checkPins();
+  return r;
+};
+function knockLine(n,g,act){return KT.knock+' “'+rolePhrase()+'” '+(g?KT.open+' '+kt(KT.acts[act],{name:g.name}):KT.noAnswer);}
+function decorateKnock(n,g,act){
+  if(body.querySelector('.knock-strip'))return;
+  const copy=body.querySelector('.scene-copy'),said=(copy?.innerText||'');
+  const dining=/In-Room Dining|servicio de habitaciones/i.test(said);
+  const strip=knockStrip(n,g,act,dining?KT.role.dining:null);
+  const head=body.querySelector('.scene-head')||body.querySelector('h2');
+  if(head)head.after(strip);else body.prepend(strip);
+  if(copy&&!/knock|toc/i.test(said)){const p=document.createElement('p');p.className='knock-line';p.textContent=knockLine(n,g,act);copy.prepend(p);}
+  narrativeText=body.innerText;
+}
+function arrivalScene(n,g,act){
+  const [hi,ask,ans]=KT.arrivals[g.id];
+  scene({speaker:g.person.cast,title:g.name,kicker:'ROOM '+n,text:[knockLine(n,g,act),hi],options:[
+    {text:KT.askNeed,run:()=>{scene({speaker:g.person.cast,title:KT.welcomeTitle,kicker:'ROOM '+n,text:[ask,ans],options:[{text:KT.backManor,run:closeModal}]});hmsTip(1);}},
+    {text:KT.wishNight,run:closeModal}
+  ]});
+  decorateKnock(n,g,act);checkPins();
+}
+
+/* ---------- Do Not Disturb: text first ---------- */
+function openDnd(n,g){
+  const name=g?g.name:'';
+  openModal(titleHTML(KT.dndTitle,kt(KT.dndKicker,{r:n}))+'<div id="knock-strip-host"></div><div class="scene-copy"><p>'+esc(g?kt(KT.dndText,{name}):KT.dndVacant)+'</p></div>'+
+    '<p class="gm-ask">'+esc(kt(KT.dndAsk,{name}))+'</p><div class="choices" id="knock-how"></div><p class="hms-msg knock-msg" hidden></p>');
+  $('knock-strip-host').append(knockStrip(n,g,doorAct(n),'dnd'));
+  const host=$('knock-how');
+  hmsShuffle(['text','call','knock']).forEach((k,i)=>{
+    const [label,detail]=KT.how[k],b=document.createElement('button');b.className='choice';b.dataset.choice=String(i+1);b.dataset.how=k;
+    b.innerHTML='<span>'+(i+1)+'</span><span><b>'+esc(label)+'</b><small>'+esc(detail)+'</small></span>'+icon('arrow');
+    b.onclick=()=>{
+      if(k==='text')return phoneStep(n,g);
+      if(k==='call')knock.calls++;else knockSound();storeKnock();
+      const msg=body.querySelector('.knock-msg');msg.hidden=false;msg.textContent=k==='call'?KT.callMiss:KT.knockMiss;
+      b.disabled=true;b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');joySound('boop');
+      host.querySelector('[data-how="text"]')?.classList.add('hms-glow');narrativeText=body.innerText;
+    };
+    host.append(b);
+  });
+  narrativeText=body.innerText;
+}
+function bubble(chat,text,mine){const b=document.createElement('div');b.className='kp-b '+(mine?'me':'them');b.textContent=text;chat.append(b);chat.scrollTop=chat.scrollHeight;return b;}
+function phoneStep(n,g){
+  const has=!!g?.phone;
+  openModal(titleHTML(KT.dndTitle,kt(KT.dndKicker,{r:n}))+
+    '<div class="kp"><div class="kp-top"><span class="kp-dot" aria-hidden="true"></span><span>'+esc(KT.phoneTo)+': <b>'+esc(g?.name||'')+'</b></span><small>'+esc(has?g.phone:'❔ '+KT.noNumber)+'</small></div><div class="kp-chat" id="kp-chat" aria-live="polite"></div></div>'+
+    '<div id="kp-pick"></div><div class="action-row" id="kp-actions"></div>');
+  const pick=$('kp-pick'),row=$('kp-actions'),chat=$('kp-chat');
+  const add=(label,primary,run)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=run;row.append(b);return b;};
+  if(!has){
+    bubble(chat,'📵 '+KT.noNumber,false).classList.add('sys');
+    pick.innerHTML='<div class="joy-panel knock-lesson"><small>📵 '+esc(kt(KT.lessonH,{name:g?.name||''}))+'</small><div class="hms-coach"><canvas id="knock-delores" aria-hidden="true"></canvas><p>'+esc(KT.lessonDelores)+'</p></div></div>';
+    paintBust($('knock-delores'),{cast:'delores'},26,2);
+    const note=add(KT.slideNote,true,()=>{
+      knock.notes++;clearDnd(n);storeKnock();
+      pick.insertAdjacentHTML('beforeend','<p class="hms-msg ok">'+esc(kt(KT.noteSlid,{role:rolePhrase().replace(/[!¡]/g,'')}))+'</p>');
+      hmsReward(note,1,0,{word:'✉️'});row.innerHTML='';
+      add(KT.openHms,false,()=>{closeModal();openHms();});add(KT.backManor,true,closeModal).focus();narrativeText=body.innerText;
+    });
+    requestAnimationFrame(()=>note.focus());narrativeText=body.innerText;return;
+  }
+  pick.innerHTML='<p class="gm-ask">'+esc(KT.pickText)+'</p><div class="choices"></div><p class="hms-msg" hidden></p>';
+  const list=pick.querySelector('.choices'),msg=pick.querySelector('.hms-msg');
+  const good=kt(KT.texts.good[roleKey()],{name:g.name});
+  hmsShuffle([['good',good],['loud',KT.texts.loud],['vague',KT.texts.vague]]).forEach(([k,txt],i)=>{
+    const b=document.createElement('button');b.className='choice kp-choice';b.dataset.choice=String(i+1);b.dataset.text=k;
+    b.innerHTML='<span>'+(i+1)+'</span><span><b>'+esc(txt)+'</b></span>';
+    b.onclick=()=>{
+      bubble(chat,txt,true);joySound('hop');
+      if(k!=='good'){bubble(chat,k==='loud'?KT.replyLoud:KT.replyVague,false);msg.hidden=false;msg.textContent=k==='loud'?KT.hintLoud:KT.hintVague;b.disabled=true;b.classList.add('hms-no');joySound('boop');narrativeText=body.innerText;return;}
+      list.querySelectorAll('button').forEach(x=>x.disabled=true);msg.hidden=true;
+      const dots=bubble(chat,KT.typing,false);dots.classList.add('typing');
+      setTimeout(()=>{
+        if(!dots.isConnected)return;
+        dots.classList.remove('typing');dots.textContent=KT.replies[knockHash(state.seed+':'+n)%KT.replies.length];
+        knock.kind++;clearDnd(n);storeKnock();
+        pick.querySelector('.gm-ask')?.remove();list.remove();
+        pick.insertAdjacentHTML('beforeend','<p class="hms-msg ok">'+esc(KT.signOff)+'</p>');
+        hmsReward(chat,3,0,{big:true,word:'💛'});
+        add(KT.backManor,false,closeModal);
+        add(KT.headIn,true,()=>{closeModal();interact('r'+n);}).focus();
+        narrativeText=body.innerText;
+      },joyCalm()?250:900);
+    };
+    list.append(b);
+  });
+  narrativeText=body.innerText;
+}
+
+/* ---------- The desk computer: ask for a phone number at check-in, and show it on profiles ---------- */
+function phoneLine(id){
+  if(STORY_PHONES[id])return STORY_PHONES[id];
+  return knock.checked[id]&&knock.phones[id]?knock.phones[id]:'';
+}
+function decoratePhone(host,S){
+  if(S.tab!=='guests'||!S.sel)return;
+  const card=host.querySelector('.hms-body .hms-card');if(!card||card.querySelector('.knock-num'))return;
+  const num=phoneLine(S.sel);
+  card.insertAdjacentHTML('beforeend','<span class="hms-label">'+esc(KT.phoneLabel)+'</span><p class="knock-num'+(num?'':' none')+'">'+esc(num||KT.phoneNone)+'</p>');
+}
+function phoneCard(host,id,room){
+  host.querySelector('.knock-phone')?.remove();
+  const g=hmsGuest(id),name=hL(g).name;
+  const card=document.createElement('div');card.className='joy-panel knock-phone';
+  card.innerHTML='<div class="hms-coach"><canvas aria-hidden="true"></canvas><p>'+esc(KT.phoneCoach)+'</p></div><div class="action-row"></div><p class="hms-msg ok" hidden></p>';
+  host.append(card);paintBust(card.querySelector('canvas'),{cast:'delores'},26,2);
+  const row=card.querySelector('.action-row'),msg=card.querySelector('.hms-msg');
+  const ask=document.createElement('button');ask.className='primary-button';ask.textContent=KT.askPhone;
+  const skip=document.createElement('button');skip.className='secondary-button';skip.textContent=KT.skipPhone;
+  ask.onclick=()=>{knock.phones[id]=ARRIVAL_PHONES[id];knock.saved++;storeKnock();row.remove();msg.hidden=false;msg.textContent=kt(KT.gavePhone,{phone:ARRIVAL_PHONES[id]})+' '+kt(KT.savedPhone,{name});hmsReward(msg,1,2,{word:'📱'});narrativeText=body.innerText;};
+  skip.onclick=()=>{knock.phones[id]='';storeKnock();row.remove();msg.hidden=false;msg.classList.remove('ok');msg.textContent=kt(KT.skipped,{name});narrativeText=body.innerText;};
+  row.append(ask,skip);
+  void room;narrativeText=body.innerText;
+}
+const knockHmsScreen=hmsScreen;
+hmsScreen=function(host,opt={}){
+  const userAct=opt.onAct;let S=null;
+  const S0=knockHmsScreen.call(this,host,{...opt,onAct:(a,s)=>{
+    userAct?.(a,s);
+    const [kind,arg]=String(a).split(':');
+    if(kind==='pick'){
+      const id=Object.keys(s.checked).find(k=>s.checked[k]===arg);
+      if(id){for(const k of Object.keys(knock.checked))if(knock.checked[k]===arg&&k!==id)delete knock.checked[k];knock.checked[id]=arg;knock.phones[id]=knock.phones[id]||'';storeKnock();phoneCard(host,id,arg);}
+    }
+    decoratePhone(host,s);
+  }});
+  S=S0;const set=S.set;S.set=o=>{set(o);decoratePhone(host,S);};
+  decoratePhone(host,S);return S;
+};
+
+/* ---------- Wiring: guests leave the painted rooms (they're behind doors now) ---------- */
+const knockRoomPaint=room;
+room=function(c,x,n){return knockRoomPaint(c,x,n,null);};
+world.layer=null;
+const knockDrawExtras=world.options.drawExtras;
+world.options.drawExtras=function(c,time,calm){const r=knockDrawExtras?.apply(this,arguments);drawDoors(c,time,calm);return r;};
+
+PINS.push(
+  {id:'knock-knock',icon:'🚪',name:KT.pins.knock[0],hint:KT.pins.knock[1],test:()=>knock.doors.length>=6},
+  {id:'knock-quiet',icon:'🤫',name:KT.pins.quiet[0],hint:KT.pins.quiet[1],test:()=>knock.kind>=1},
+  {id:'knock-number',icon:'📱',name:KT.pins.number[0],hint:KT.pins.number[1],test:()=>knock.saved>=1}
+);
+{const st=document.createElement('style');st.textContent=`
+.knock-strip{display:block;width:100%;max-width:420px;aspect-ratio:340/128;margin:4px auto 14px;border-radius:14px;border:1px solid #c9a45c88;box-shadow:0 2px 10px #4b2f1c22}
+.knock-line{font-style:italic}
+.kp{max-width:360px;margin:6px auto 14px;border-radius:26px;background:#1f2b28;padding:12px 10px 14px;box-shadow:0 6px 18px #1d463633}
+.kp-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:#f3ead2;font-size:14px;padding:4px 8px 10px;border-bottom:1px solid #ffffff22}
+.kp-top small{width:100%;opacity:.8;font-size:12px}
+.kp-dot{width:8px;height:8px;border-radius:50%;background:#7fd08f}
+.kp-chat{display:flex;flex-direction:column;gap:8px;min-height:84px;max-height:320px;overflow:auto;padding:10px 4px 0}
+.kp-b{max-width:82%;padding:8px 12px;border-radius:16px;font-size:14px;line-height:1.35}
+.kp-b.me{align-self:flex-end;background:#5aa3e0;color:#fff;border-bottom-right-radius:4px}
+.kp-b.them{align-self:flex-start;background:#f3ead2;color:#2c2a26;border-bottom-left-radius:4px}
+.kp-b.typing{opacity:.7;font-style:italic}
+.kp-b.sys{align-self:center;background:#ffffff1a;color:#f3ead2;font-size:13px}
+.kp-choice b{font-weight:600}
+.knock-num{font-size:16px;font-weight:700;margin:2px 0 0}.knock-num.none{font-weight:400;opacity:.8}
+.knock-phone,.knock-lesson{margin-top:12px}
+`;document.head.append(st);}
+checkPins();
+/* ==== end KNOCK v1 ==== */
+
 
 })();
 </script>
