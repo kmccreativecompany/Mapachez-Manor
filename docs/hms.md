@@ -25,8 +25,10 @@ nothing is downloaded and nothing costs money to run. Progress is saved on the d
 Four big tabs: 📅 Bookings, 🛏️ Rooms, 🙂 Guests, 🧾 Bills. The data is the manor's own six
 rooms (201 to 206) and the story's guests (Mr. Finch, Lady Vesper, Ms. Vale, M. Nine) plus two
 arrivals (Juniper Glow in 201, Captain Barnaby Fuzz in 205). Room status uses four pictures:
-✨ Clean & ready, 🛌 Guest inside, 🧹 Needs a tidy, 🔧 Needs fixing. Important notes carry ⚠️.
-Arriving guests have a ✅ Check in button that only accepts a ✨ room.
+✨ Clean, inspected & ready (a supervisor has checked the room after cleaning), 🛌 Guest inside, 🧹 Needs a tidy, 🔍 Cleaned, not inspected, 🔧 Needs fixing. Important notes carry ⚠️.
+Arriving guests have a ✅ Check in button that only accepts a ✨ room. A 🔍 room is cleaned but not
+yet inspected by a housekeeping supervisor, so a guest cannot go in; picking one gets a gentle correction.
+In Room Rush, housekeeping's "sparkling clean" call makes a room 🔍, and only the supervisor's inspection call makes it ✨.
 
 ## Lessons (about a minute each)
 
