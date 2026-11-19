@@ -78,7 +78,7 @@ class Chats(base.Growth):
         self.page.wait_for_function('window.chatTest.phase !== "here"')
         self.assertNotIn('lobby-conversation', self.c()['extras'], 'Nobody to listen to while the chairs are empty')
         toast = self.page.locator('#toast').inner_text()
-        self.assertIn('Overheard: 1 of 13', toast)
+        self.assertIn('Overheard: 1 of 15', toast)
         self.assertIn('Zinnia Starling, getting up: “Sorry, I have a video meeting that really could have been an email.”', toast)
         saved = json.loads(self.page.evaluate("localStorage.getItem('mapachez_chats_v1')"))
         self.assertEqual((saved['next'], saved['heard'], saved['bye']), (1, ['letter'], 1))
@@ -91,7 +91,7 @@ class Chats(base.Growth):
 
     def test_03_every_pair_takes_a_turn_and_earns_all_ears(self):
         self.enter_manor()
-        for n in range(13):
+        for n in range(15):
             self.page.evaluate('window.chatTest.listen()')
             self.choose('Keep listening')
             self.choose('Return to your evening')
@@ -99,8 +99,8 @@ class Chats(base.Growth):
             self.page.evaluate('window.chatTest.skip(40000)')
             self.page.wait_for_function('window.chatTest.phase === "here"', timeout=8000)
         c = self.c()
-        self.assertEqual(len(c['chats']['heard']), 13)
-        self.assertEqual(c['chats']['bye'], 13, 'Every pair says a tired little goodbye')
+        self.assertEqual(len(c['chats']['heard']), 15)
+        self.assertEqual(c['chats']['bye'], 15, 'Every pair says a tired little goodbye')
         self.assertEqual(c['chats']['next'], 0, 'The chairs start over with the first pair')
         self.assertIn('all-ears', c['pins'])
 
@@ -127,7 +127,7 @@ class ChatsSpanish(Chats):
         self.assertIn('La misma, dos veces.', self.page.locator('#modal-body').inner_text())
         self.choose('Volver a tu noche')
         self.page.wait_for_function('window.chatTest.phase !== "here"')
-        self.assertIn('Escuchadas: 1 de 13', self.page.locator('#toast').inner_text())
+        self.assertIn('Escuchadas: 1 de 15', self.page.locator('#toast').inner_text())
         self.assertIn('podría haber sido un correo', self.page.locator('#toast').inner_text())
 
 
