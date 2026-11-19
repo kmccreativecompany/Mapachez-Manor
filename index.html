@@ -1984,6 +1984,90 @@ modal.addEventListener('close',()=>{if('speechSynthesis'in window)speechSynthesi
 modal.addEventListener('cancel',()=>{if('speechSynthesis'in window)speechSynthesis.cancel();});
 function speak(){if(!('speechSynthesis'in window)){toast('Read-aloud is unavailable in this browser. All story text remains visible.');return;}speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(narrativeText);utterance.rate=.94;speechSynthesis.speak(utterance);}
 $('narrate').onclick=speak;$('narrate').disabled=!('speechSynthesis'in window);
+/* ==== READ ALOUD v1: select any text to hear it, one tap to stop. Uses the browser's own free voice. ==== */
+const READ_KEY='mapachez_readaloud_v1',canSpeak=!!(window.speechSynthesis&&window.SpeechSynthesisUtterance);
+const readAloud={on:true,talking:false,token:0,picked:'',pill:null};
+try{const r=JSON.parse(localStorage.getItem(READ_KEY)||'null');if(r&&typeof r.on==='boolean')readAloud.on=r.on;}catch{}
+function readSave(){try{localStorage.setItem(READ_KEY,JSON.stringify({on:readAloud.on}));}catch{}}
+function readWord(s){return typeof t==='function'?t(s):s;}
+function readChunks(text){
+  const out=[];let cur='';
+  for(const part of String(text).replace(/\s+/g,' ').trim().match(/[^.!?…;:]+[.!?…;:]*["”’)]*\s*/g)||[]){
+    if((cur+part).length>220&&cur){out.push(cur.trim());cur='';}
+    if(part.length>220){for(let i=0;i<part.length;i+=200)out.push(part.slice(i,i+200));}else cur+=part;
+  }
+  if(cur.trim())out.push(cur.trim());return out;
+}
+function readVoice(lang){
+  const voices=speechSynthesis.getVoices(),base=(lang||'en').slice(0,2).toLowerCase();
+  const fits=voices.filter(v=>(v.lang||'').toLowerCase().startsWith(base));
+  return fits.find(v=>v.localService&&v.default)||fits.find(v=>v.localService)||fits[0]||null;
+}
+function readStop(){readAloud.token++;if(canSpeak)speechSynthesis.cancel();readSetTalking(false);}
+function readText(text){
+  if(!canSpeak){toast(readWord('Read-aloud is unavailable in this browser. All story text remains visible.'));return;}
+  const chunks=readChunks(text);readStop();if(!chunks.length)return;
+  const token=readAloud.token,lang=document.documentElement.lang||'en',voice=readVoice(lang);
+  readSetTalking(true);
+  chunks.forEach((chunk,i)=>{const u=new SpeechSynthesisUtterance(chunk);u.lang=lang;if(voice)u.voice=voice;u.rate=.94;
+    if(i===chunks.length-1){u.onend=u.onerror=()=>{if(token===readAloud.token)readSetTalking(false);};}
+    speechSynthesis.speak(u);});
+}
+function readSetTalking(on){
+  readAloud.talking=on;
+  const n=$('narrate');if(n&&n.lastChild){n.lastChild.nodeValue=' '+readWord(on?'Stop reading':'Read this aloud');n.setAttribute('aria-pressed',on?'true':'false');}
+  readPill();
+}
+/* The modal's own "Read this aloud" button now doubles as a stop button. */
+speak=function(){if(!canSpeak){toast(readWord('Read-aloud is unavailable in this browser. All story text remains visible.'));return;}readText(narrativeText);};
+$('narrate').onclick=()=>readAloud.talking?readStop():speak();
+modal.addEventListener('close',readStop);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&readAloud.talking)readStop();});
+/* Floating pill: shows "Read this" when text is selected and "Stop" while talking. */
+(()=>{const s=document.createElement('style');s.textContent=
+'.read-pill{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483000;display:none;align-items:center;gap:8px;min-height:48px;padding:0 22px;border:2px solid #fff8e6;border-radius:999px;background:#2f6b4f;color:#fff8e6;font:600 17px/1 system-ui,sans-serif;box-shadow:0 8px 26px #092c2855;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}'+
+'.read-pill.show{display:inline-flex}.read-pill.stop{background:#9a3b2f}.read-pill:focus-visible{outline:3px solid #f4c95d;outline-offset:3px}'+
+'.read-pill .read-bars{display:none;gap:3px;align-items:flex-end;height:16px}.read-pill.stop .read-bars{display:inline-flex}'+
+'.read-pill .read-bars i{width:3px;height:6px;background:currentColor;border-radius:2px;animation:readBar .9s ease-in-out infinite}.read-pill .read-bars i:nth-child(2){animation-delay:.15s}.read-pill .read-bars i:nth-child(3){animation-delay:.3s}'+
+'@keyframes readBar{50%{height:16px}}body.reduce-motion .read-pill .read-bars i{animation:none;height:10px}';
+document.head.append(s);})();
+function readPill(){
+  if(!canSpeak)return;
+  let p=readAloud.pill;
+  if(!p){p=readAloud.pill=document.createElement('button');p.type='button';p.className='read-pill';p.id='read-pill';
+    p.addEventListener('pointerdown',e=>e.preventDefault());/* keep the selection while tapping */
+    p.onclick=()=>{if(readAloud.talking)return readStop();if(readAloud.picked)readText(readAloud.picked);};}
+  const show=readAloud.talking||(readAloud.on&&readAloud.picked.length>1);
+  /* A modal dialog makes the rest of the page untappable, so the pill lives inside it while it is open. */
+  const home=modal.open?modal:document.body;if(p.parentNode!==home)home.append(p);
+  p.classList.toggle('show',show);p.classList.toggle('stop',readAloud.talking);
+  p.innerHTML=readAloud.talking?'<span class="read-bars" aria-hidden="true"><i></i><i></i><i></i></span>■ '+esc(readWord('Stop')):'🔊 '+esc(readWord('Read this'));
+  p.setAttribute('aria-label',readAloud.talking?readWord('Stop reading aloud'):readWord('Read the selected text aloud'));
+}
+let readTimer;
+function readWatch(doc){
+  doc.addEventListener('selectionchange',()=>{clearTimeout(readTimer);readTimer=setTimeout(()=>{
+    const sel=doc.getSelection&&doc.getSelection(),text=sel&&!sel.isCollapsed?String(sel).trim():'';
+    if(text||doc===document||!document.getSelection()||document.getSelection().isCollapsed)readAloud.picked=text.slice(0,4000);
+    readPill();},180);});
+}
+if(canSpeak){
+  readWatch(document);
+  /* The practice desk lives in a same-origin frame; listen for selections inside it too. */
+  document.addEventListener('load',e=>{const f=e.target;if(f&&f.tagName==='IFRAME'){try{if(f.contentDocument)readWatch(f.contentDocument);}catch{}}},true);
+  modal.addEventListener('close',()=>{readAloud.picked='';readPill();});
+  speechSynthesis.getVoices();
+}
+/* Settings: one switch to turn the "Read this" bubble on or off, remembered on this device. */
+const readOpenSettings=openSettings;
+openSettings=function(){readOpenSettings.apply(this,arguments);const list=$('settings-list');if(!list||list.querySelector('[data-read-setting]'))return;
+  const label=document.createElement('label');label.className='setting';label.dataset.readSetting='1';
+  label.innerHTML='<span><b>'+esc(readWord('Read selected text'))+'</b><small>'+esc(readWord(canSpeak?'Select any words and tap “Read this” to hear them. Free, uses your device’s own voice.':'Read-aloud is unavailable in this browser. All text stays visible.'))+'</small></span><input type="checkbox" '+(readAloud.on&&canSpeak?'checked':'')+(canSpeak?'':' disabled')+' aria-label="'+esc(readWord('Read selected text'))+'">';
+  const input=label.querySelector('input');input.onchange=()=>{readAloud.on=input.checked;readSave();if(!input.checked&&!readAloud.talking){readAloud.picked='';}readPill();};
+  const auto=[...list.children].findIndex(el=>/narration|Read story text/i.test(el.textContent));
+  if(auto>=0&&list.children[auto+1])list.insertBefore(label,list.children[auto+1]);else list.append(label);
+};
+/* ==== end READ ALOUD v1 ==== */
 function openModal(html,wide=false){
   if('speechSynthesis'in window)speechSynthesis.cancel();
   $('lobby-chatter').hidden=true;
