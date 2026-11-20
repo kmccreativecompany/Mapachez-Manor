@@ -119,7 +119,7 @@ class Course(base.Growth):
         self.page.evaluate('courseTest.cert()')
         code = self.page.evaluate("courseTest.code('Rosa Quill')")
         self.assertRegex(code, r'^SKC-CHK-[0-9A-Z]{4}-[0-9A-Z]{4}$')
-        href = self.page.locator('.co-li').get_attribute('href')
+        href = self.page.locator('.cs-add').get_attribute('href')
         u = urlparse(href)
         self.assertEqual(u.netloc, 'www.linkedin.com')
         q = parse_qs(u.query)

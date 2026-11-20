@@ -8990,6 +8990,168 @@ $('settings-button').onclick=openSettings;$('title-settings').onclick=openSettin
 nnApply(false);
 /* ==== end NEW NIGHTS v1 ==== */
 
+/* ==== CERT SHARE v1: credential links, a code-drawn QR code, a share post and skills ====
+   Reusable for every course certificate. A course registers itself once:
+     certRegister('chk',{course:()=>'Course name',liName:()=>'LinkedIn name',skills:()=>['Skill',...],draw:(canvas,data)=>{...}});
+   Certificate IDs look like SKC-CHK-1A2B-3C4D; the middle part names the course.
+   The credential link carries the details in the address itself (no server, nothing to pay for):
+     https://kmccreativecompany.github.io/Mapachez-Manor/?cert=ID&n=Name&d=YYYY-MM-DD&k=check
+   k is a short check code, so an edited or broken link shows a gentle "doesn't match" note. */
+const CERT_HOME='https://kmccreativecompany.github.io/Mapachez-Manor/';
+const CERT_TEXT={
+ en:{viewKick:'CREDENTIAL · SILVER KEY CERTIFICATE',viewT:'Certificate of completion',
+  viewP:'{name} completed {course} on {date}.',intact:'✓ The details in this credential link are complete and unchanged.',
+  viewFine:'Issued by KMC Creative Company, LLC for a gamified e-course at Mapáchez Manor. A certificate of completion, not an accreditation or license. Certificates are made on the learner’s own device; this page shows the details carried in the link.',
+  skillsH:'Skills practiced',earn:'🎓 Earn yours free',earnD:'A cozy hotel game that teaches the front desk, one tiny lesson at a time. Free, no sign-up.',
+  bad:'This credential link doesn’t match a certificate. It may have been cut short when it was copied.',badT:'Hmm, that link looks incomplete',
+  qr:['Earn yours at','Mapáchez Manor'],
+  li:'Add to LinkedIn',stepsH:'Show it off on LinkedIn',s1:'Add it to your profile',s1d:'LinkedIn opens with the course, issuer, date, ID and credential link filled in.',
+  s2:'Add the skills',s2d:'In the same LinkedIn form, type these into the Skills box.',copySkills:'📋 Copy skills',
+  s3:'Share a post',s3d:'Tell your network. Friends who tap your link see your certificate and can earn their own.',share:'Share on LinkedIn',copyPost:'📋 Copy the post',copyLink:'🔗 Copy credential link',
+  copied:'Copied! Paste it wherever you like.',
+  post:'I just earned my Silver Key Certificate in {course} 🎓🔑 It’s a cozy gamified e-course from Mapáchez Manor that teaches the why behind every step at the front desk. Try it free: {link}\n\n#Hospitality #FrontDesk #HotelCareers'},
+ es:{viewKick:'CREDENCIAL · SILVER KEY CERTIFICATE',viewT:'Certificado de finalización',
+  viewP:'{name} completó {course} el {date}.',intact:'✓ Los datos de este enlace de credencial están completos y sin cambios.',
+  viewFine:'Emitido por KMC Creative Company, LLC por un curso en línea gamificado de Mapáchez Manor. Es un certificado de finalización, no una acreditación ni una licencia. Los certificados se crean en el dispositivo de quien estudia; esta página muestra los datos que lleva el enlace.',
+  skillsH:'Habilidades practicadas',earn:'🎓 Gana el tuyo gratis',earnD:'Un juego de hotel acogedor que enseña la recepción, una lección pequeñita a la vez. Gratis, sin registro.',
+  bad:'Este enlace de credencial no coincide con un certificado. Puede que se haya cortado al copiarlo.',badT:'Mmm, ese enlace parece incompleto',
+  qr:['Gana el tuyo en','Mapáchez Manor'],
+  li:'Añadir a LinkedIn',stepsH:'Muéstralo en LinkedIn',s1:'Añádelo a tu perfil',s1d:'LinkedIn se abre con el curso, el emisor, la fecha, el ID y el enlace de credencial ya escritos.',
+  s2:'Añade las habilidades',s2d:'En el mismo formulario de LinkedIn, escríbelas en la casilla de habilidades.',copySkills:'📋 Copiar habilidades',
+  s3:'Comparte una publicación',s3d:'Cuéntaselo a tu red. Quien toque tu enlace verá tu certificado y podrá ganar el suyo.',share:'Compartir en LinkedIn',copyPost:'📋 Copiar la publicación',copyLink:'🔗 Copiar enlace de credencial',
+  copied:'¡Copiado! Pégalo donde quieras.',
+  post:'¡Acabo de ganar mi Silver Key Certificate en {course}! 🎓🔑 Es un curso en línea gamificado y acogedor de Mapáchez Manor que enseña el porqué de cada paso en la recepción. Pruébalo gratis: {link}\n\n#Hospitalidad #Recepción #Hotelería'}
+};
+const CS=CERT_TEXT[profile.lang]||CERT_TEXT.en;
+const CERT_TYPES={};
+function certRegister(code,def){CERT_TYPES[String(code).toLowerCase()]=def;}
+const CERT_ID=/^SKC-([A-Z]{3})-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+const certKind=id=>(CERT_ID.exec(id||'')||[])[1]?.toLowerCase()||'';
+const certCheck=d=>sum4([d.id,d.name,d.date].join('|')).toUpperCase();
+/* data: {id, name, date:'YYYY-MM-DD'} */
+function certLink(d){const q=new URLSearchParams({cert:d.id,n:d.name,d:d.date,k:certCheck(d)});return CERT_HOME+'?'+q.toString();}
+/* Reads a credential link. Returns null (no cert in the link), {bad:true}, or the data. */
+function certParse(search){
+  const q=new URLSearchParams(search||'');if(!q.has('cert'))return null;
+  const d={id:String(q.get('cert')||'').toUpperCase(),name:cleanText(q.get('n')||'',40),date:String(q.get('d')||'')};
+  if(!CERT_ID.test(d.id)||!CERT_TYPES[certKind(d.id)]||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||!d.name||String(q.get('k')||'').toUpperCase()!==certCheck(d))return {bad:true};
+  return d;
+}
+function certLinkedInAdd(d){
+  const T=CERT_TYPES[certKind(d.id)],[y,m]=d.date.split('-').map(Number);
+  const q=new URLSearchParams({startTask:'CERTIFICATION_NAME',name:T.liName(),organizationName:'KMC Creative Company, LLC',issueYear:String(y),issueMonth:String(m),certUrl:certLink(d),certId:d.id});
+  return 'https://www.linkedin.com/profile/add?'+q.toString();
+}
+const certPost=d=>ht(CS.post,{course:CERT_TYPES[certKind(d.id)].course(),link:certLink(d)});
+const certLinkedInShare=d=>'https://www.linkedin.com/feed/?'+new URLSearchParams({shareActive:'true',text:certPost(d)}).toString();
+function certCopy(text){
+  const done=()=>toast(CS.copied);
+  const old=()=>{const t=document.createElement('textarea');t.value=text;t.setAttribute('readonly','');t.style.cssText='position:fixed;opacity:0';document.body.append(t);t.select();try{document.execCommand('copy');}catch{}t.remove();done();};
+  try{navigator.clipboard.writeText(text).then(done,old);}catch{old();}
+}
+const certSkillsHTML=d=>'<ul class="cs-skills">'+CERT_TYPES[certKind(d.id)].skills().map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul>';
+/* The "Show it off on LinkedIn" card: three numbered steps, one tap each. */
+function certShareMount(host,d){
+  host.innerHTML='<div class="cs-card"><h3>'+esc(CS.stepsH)+'</h3><ol class="cs-steps">'+
+    '<li><b>'+esc(CS.s1)+'</b><small>'+esc(CS.s1d)+'</small><span class="cs-row" data-s="1"></span></li>'+
+    '<li><b>'+esc(CS.s2)+'</b><small>'+esc(CS.s2d)+'</small>'+certSkillsHTML(d)+'<span class="cs-row" data-s="2"></span></li>'+
+    '<li><b>'+esc(CS.s3)+'</b><small>'+esc(CS.s3d)+'</small><span class="cs-row" data-s="3"></span></li></ol></div>';
+  const row=n=>host.querySelector('.cs-row[data-s="'+n+'"]');
+  const link=(label,href,cls)=>{const a=document.createElement('a');a.className=cls;a.textContent=label;a.href=href;a.target='_blank';a.rel='noopener noreferrer';
+    a.onclick=e=>{if(DEMO_BUILD){e.preventDefault();openFullEdition();}};return a;};
+  const btn=(label,run)=>{const b=document.createElement('button');b.className='secondary-button';b.textContent=label;b.onclick=()=>DEMO_BUILD?openFullEdition():run();return b;};
+  const add=link(CS.li,certLinkedInAdd(d),'primary-button cs-li cs-add');
+  row(1).append(add);
+  row(2).append(btn(CS.copySkills,()=>certCopy(CERT_TYPES[certKind(d.id)].skills().join(', '))));
+  row(3).append(link(CS.share,certLinkedInShare(d),'primary-button cs-li cs-share'),btn(CS.copyPost,()=>certCopy(certPost(d))),btn(CS.copyLink,()=>certCopy(certLink(d))));
+}
+/* What a visitor sees when they open someone's credential link. */
+function certView(d){
+  if(world)world.stop();
+  const clean=()=>{try{history.replaceState(null,'',location.pathname+location.hash);}catch{}};
+  const earn='<div class="cs-earn"><p>'+esc(CS.earnD)+'</p></div><div class="action-row" id="cs-actions"></div>';
+  if(d.bad){openModal(titleHTML(CS.badT,CS.viewKick)+'<p class="modal-description">'+esc(CS.bad)+'</p>'+earn,true);}
+  else{const T=CERT_TYPES[certKind(d.id)];
+    openModal(titleHTML(CS.viewT,CS.viewKick)+'<p class="modal-description cs-who">'+esc(ht(CS.viewP,{name:d.name,course:T.course(),date:coursePretty(d.date)}))+'</p>'+
+      '<canvas id="cs-cert" class="co-cert" width="1200" height="850" role="img" aria-label="'+esc(CS.viewT+' · '+d.name+' · '+T.course())+'"></canvas>'+
+      '<p class="cs-intact">'+esc(CS.intact)+' <span>'+esc(d.id)+'</span></p>'+
+      '<h3 class="pins-heading">'+esc(CS.skillsH)+'</h3>'+certSkillsHTML(d)+earn+'<p class="joy-hint co-fine">'+esc(CS.viewFine)+'</p>',true);
+    T.draw($('cs-cert'),d);}
+  const go=document.createElement('button');go.className='primary-button';go.textContent=CS.earn;
+  go.onclick=()=>{clean();location.reload();};$('cs-actions').append(go);
+  modal.addEventListener('close',clean,{once:true});
+  narrativeText=body.innerText;
+}
+
+/* ---------- A QR code, drawn with code (byte mode, error correction M, versions 1-10) ---------- */
+function qrMatrix(text){
+  const bytes=[...new TextEncoder().encode(text)];
+  const ECC=[0,10,16,26,18,24,16,18,22,22,26],BLK=[0,1,1,1,2,2,4,4,4,5,5];
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36;}return r;};
+  let ver=1;for(;ver<=10;ver++){const cap=Math.floor(raw(ver)/8)-ECC[ver]*BLK[ver];if(4+(ver<10?8:16)+bytes.length*8<=cap*8)break;}
+  if(ver>10)return null;
+  const size=ver*4+17,dataCap=Math.floor(raw(ver)/8)-ECC[ver]*BLK[ver];
+  /* bits */
+  const bits=[],put=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>>i)&1);};
+  put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+  put(0,Math.min(4,dataCap*8-bits.length));put(0,(8-bits.length%8)%8);
+  for(let p=0xEC;bits.length<dataCap*8;p^=0xEC^0x11)put(p,8);
+  const data=[];for(let i=0;i<bits.length;i+=8)data.push(bits.slice(i,i+8).reduce((a,b)=>a<<1|b,0));
+  /* Reed-Solomon over GF(256) */
+  const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x;}return z;};
+  const deg=ECC[ver],div=new Array(deg).fill(0);div[deg-1]=1;
+  for(let i=0,root=1;i<deg;i++){for(let j=0;j<deg;j++){div[j]=mul(div[j],root);if(j+1<deg)div[j]^=div[j+1];}root=mul(root,2);}
+  const rem=d=>{const r=new Array(deg).fill(0);for(const b of d){const f=b^r.shift();r.push(0);div.forEach((c,i)=>{r[i]^=mul(c,f);});}return r;};
+  const nb=BLK[ver],rawCw=Math.floor(raw(ver)/8),nShort=nb-rawCw%nb,shortLen=Math.floor(rawCw/nb),blocks=[];
+  for(let i=0,k=0;i<nb;i++){const d=data.slice(k,k+shortLen-deg+(i<nShort?0:1));k+=d.length;const e=rem(d);if(i<nShort)d.push(0);blocks.push(d.concat(e));}
+  const cw=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==shortLen-deg||j>=nShort)cw.push(b[i]);});
+  /* function patterns */
+  const M=[...Array(size)].map(()=>new Array(size).fill(false)),F=[...Array(size)].map(()=>new Array(size).fill(false));
+  const set=(x,y,d)=>{M[y][x]=d;F[y][x]=true;};
+  for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0);}
+  for(const [cx,cy] of [[3,3],[size-4,3],[3,size-4]])for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const x=cx+dx,y=cy+dy,dist=Math.max(Math.abs(dx),Math.abs(dy));if(x>=0&&x<size&&y>=0&&y<size)set(x,y,dist!==2&&dist!==4);}
+  if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2,pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p);
+    pos.forEach((a,i)=>pos.forEach((b,j)=>{if((i===0&&j===0)||(i===0&&j===n-1)||(i===n-1&&j===0))return;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(a+dx,b+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1);}));}
+  const format=mask=>{const d=mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=(d<<10|r)^0x5412,g=i=>((b>>>i)&1)===1; /* level M = 00 */
+    for(let i=0;i<=5;i++)set(8,i,g(i));set(8,7,g(6));set(8,8,g(7));set(7,8,g(8));for(let i=9;i<15;i++)set(14-i,8,g(i));
+    for(let i=0;i<8;i++)set(size-1-i,8,g(i));for(let i=8;i<15;i++)set(8,size-15+i,g(i));set(8,size-8,true);};
+  format(0);
+  if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=ver<<12|r;for(let i=0;i<18;i++){const d=((b>>>i)&1)===1,a=size-11+i%3,c=Math.floor(i/3);set(a,c,d);set(c,a,d);}}
+  /* data */
+  for(let right=size-1,i=0;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;
+    if(!F[y][x]&&i<cw.length*8){M[y][x]=((cw[i>>>3]>>>(7-(i&7)))&1)===1;i++;}}}
+  /* masks: try all eight, keep the calmest */
+  const MASKS=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,x=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+  const flip=m=>{for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!F[y][x]&&MASKS[m](x,y))M[y][x]=!M[y][x];};
+  const penalty=()=>{let p=0,dark=0;
+    for(let a=0;a<size;a++)for(const row of [0,1]){let run=1;for(let b=1;b<=size;b++){const cur=b<size?(row?M[a][b]:M[b][a]):null,prev=row?M[a][b-1]:M[b-1][a];if(cur===prev)run++;else{if(run>=5)p+=run-2;run=1;}}}
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++){if(M[y][x])dark++;if(x<size-1&&y<size-1&&M[y][x]===M[y][x+1]&&M[y][x]===M[y+1][x]&&M[y][x]===M[y+1][x+1])p+=3;}
+    return p+Math.floor(Math.abs(dark*20-size*size*10)/(size*size))*10;};
+  let best=0,low=Infinity;for(let m=0;m<8;m++){flip(m);format(m);const p=penalty();if(p<low){low=p;best=m;}flip(m);}
+  flip(best);format(best);
+  return M;
+}
+/* Draws a QR code at x,y in a box of the given size, with a white quiet zone. */
+function drawQR(c,text,x,y,box){
+  const M=qrMatrix(text);if(!M)return false;
+  const n=M.length+4,u=box/n;
+  c.fillStyle='#ffffff';c.fillRect(x,y,box,box);c.fillStyle='#2b2418';
+  for(let r=0;r<M.length;r++)for(let k=0;k<M.length;k++)if(M[r][k]){const x0=Math.round(x+(k+2)*u),y0=Math.round(y+(r+2)*u);c.fillRect(x0,y0,Math.round(x+(k+3)*u)-x0,Math.round(y+(r+3)*u)-y0);}
+  return true;
+}
+{const st=document.createElement('style');st.textContent=`
+.cs-card{margin:12px 0 0;padding:12px 16px;border-radius:16px;background:#f2f7fb;border:1px solid #b9d3e6}
+.cs-card h3{margin:0 0 6px;font:bold 16px Arial,sans-serif;color:#1d4e6e}
+.cs-steps{margin:0;padding-left:22px;display:grid;gap:12px}.cs-steps li{line-height:1.4}.cs-steps li>b{display:block}.cs-steps li>small{display:block;color:#5c5a4e}
+.cs-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.cs-li{display:inline-flex;align-items:center;text-decoration:none}
+.cs-skills{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:8px 0 0}.cs-skills li{padding:5px 10px;border-radius:99px;background:#fffaf0;border:1px solid #e0cf9e;font-size:13px}
+.cs-intact{margin:2px 0 0;font:13px Arial,sans-serif;color:#2f5d50}.cs-intact span{color:#6b6450;white-space:nowrap}
+.cs-earn{margin:14px 0 0;padding:10px 14px;border-radius:14px;background:#fff8e1;border:1px solid #e0cf9e}.cs-earn p{margin:0;line-height:1.45}
+.cs-who{font-size:16px}
+`;document.head.append(st);}
+/* ==== end CERT SHARE v1 (the course registers below; the link is opened at the very end) ==== */
+
 /* ==== COURSE v1: the Front Desk Check-In e-course, taught by Delores, with a certificate ====
    Six tiny lessons (each one says HOW and WHY), a friendly final check (5 of 6 to pass, retry
    anytime), then a certificate drawn on the device: name, date and a certificate ID. It saves as
@@ -9049,10 +9211,11 @@ const COURSE_TEXT={
   save:'⬇️ Save the picture',li:'Add to LinkedIn',needName:'Type your name first, so it can go on the certificate.',saved:'Saved! Look in your downloads.',
   liHow:'LinkedIn opens with the course filled in. You can also post the picture you saved.',
   fine:'This Silver Key Certificate is issued by KMC Creative Company, LLC for completing a gamified e-course. It is a certificate of completion, not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
-  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the gamified e-course',course:'Front Desk Check-In & Guest Registration Fundamentals',
+  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the Mapáchez Manor gamified e-course',course:'Front Desk Check-In & Guest Registration Fundamentals',
      steps:'Booking · ID · Phone with area code · Email · Card on file · Keys last',date:'Date',sign:'KMC Creative Company, LLC',signRole:'Issued by',id:'Certificate ID',
      fine:'Certificate of completion for a gamified e-course. Not an accreditation or license.',placeholder:'Your name here',seal:'COMPLETED'},
-  liName:'Silver Key Certificate: Front Desk Check-In & Guest Registration Fundamentals',liOrg:'KMC Creative Company, LLC',
+  liName:'Silver Key Certificate: Front Desk Check-In & Guest Registration Fundamentals (Mapáchez Manor e-course)',liOrg:'KMC Creative Company, LLC',
+  skills:['Guest Check-In','Front Desk Operations','Guest Service','Hotel Management Systems','Hospitality'],
   titleBtn:'🎓 Check-in e-course · certificate',hmsBtn:'🎓 E-course: Front Desk Check-In',hmsBtnD:'Learn the why behind every step, and earn a certificate.',
   pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']},
   nameKick:'BEFORE WE START',nameT:'Your name, for your certificates',
@@ -9119,10 +9282,11 @@ const COURSE_TEXT={
   save:'⬇️ Guardar la imagen',li:'Añadir a LinkedIn',needName:'Escribe tu nombre primero, para ponerlo en el certificado.',saved:'¡Guardado! Míralo en tus descargas.',
   liHow:'LinkedIn se abre con el curso ya escrito. También puedes publicar la imagen que guardaste.',
   fine:'Este Silver Key Certificate lo emite KMC Creative Company, LLC por completar un curso en línea gamificado. Es un certificado de finalización, no una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
-  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea gamificado',course:'Fundamentos de registro de entrada y recepción de huéspedes',
+  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea gamificado de Mapáchez Manor',course:'Fundamentos de registro de entrada y recepción de huéspedes',
      steps:'Reserva · Identificación · Teléfono con código · Correo · Tarjeta · Llaves al final',date:'Fecha',sign:'KMC Creative Company, LLC',signRole:'Emitido por',id:'ID del certificado',
      fine:'Certificado de finalización de un curso en línea gamificado. No es una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'COMPLETADO'},
-  liName:'Silver Key Certificate: Fundamentos de registro de entrada y recepción de huéspedes',liOrg:'KMC Creative Company, LLC',
+  liName:'Silver Key Certificate: Fundamentos de registro de entrada y recepción de huéspedes (curso de Mapáchez Manor)',liOrg:'KMC Creative Company, LLC',
+  skills:['Registro de huéspedes','Operaciones de recepción','Atención al huésped','Sistemas de gestión hotelera','Hospitalidad'],
   titleBtn:'🎓 Curso de registro de entrada · certificado',hmsBtn:'🎓 Curso: Registro de entrada',hmsBtnD:'Aprende el porqué de cada paso y gana un certificado.',
   pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']},
   nameKick:'ANTES DE EMPEZAR',nameT:'Tu nombre, para tus certificados',
@@ -9305,7 +9469,8 @@ function openCourseFinal(skipName){
 }
 
 /* ---------- The certificate: drawn with code on the device ---------- */
-function drawCertificate(cv,name){
+function drawCertificate(cv,name,info){
+  const passed=info?info.passed:course.passed,certId=info?info.id:courseCode(name);
   const c=cv.getContext('2d'),W=cv.width,H=cv.height,C=CO.c,serif='Georgia,"Times New Roman",serif';
   const gold='#b8892f',deep='#2f5d50',ink='#3b3223';
   c.clearRect(0,0,W,H);
@@ -9348,23 +9513,24 @@ function drawCertificate(cv,name){
   c.font='bold 12px Arial,sans-serif';c.fillStyle='#7a5a1c';c.fillText(C.seal,sx,sy+30);
   c.fillStyle='#8c3b3b';for(const d of [-1,1]){c.beginPath();c.moveTo(sx+d*20,sy+60);c.lineTo(sx+d*40,sy+100);c.lineTo(sx+d*29,sy+92);c.lineTo(sx+d*20,sy+104);c.lineTo(sx+d*6,sy+64);c.closePath();c.fill();}
   /* date and signature */
-  const line=(x,label,value,font)=>{c.font=font;c.fillStyle=ink;c.fillText(value,x,650);c.strokeStyle='#8a7652';c.lineWidth=1.5;c.beginPath();c.moveTo(x-150,664);c.lineTo(x+150,664);c.stroke();c.font='16px '+serif;c.fillStyle='#6b5d44';c.fillText(label,x,690);};
-  line(250,C.date,course.passed?coursePretty(course.passed):'',  '24px '+serif);
+  const line=(x,label,value,font)=>{c.font=font;c.fillStyle=ink;c.fillText(value,x,628);c.strokeStyle='#8a7652';c.lineWidth=1.5;c.beginPath();c.moveTo(x-150,642);c.lineTo(x+150,642);c.stroke();c.font='16px '+serif;c.fillStyle='#6b5d44';c.fillText(label,x,666);};
+  line(250,C.date,passed?coursePretty(passed):'',  '24px '+serif);
   line(W-250,C.signRole,C.sign,'italic 24px '+serif);
-  c.font='15px Arial,sans-serif';c.fillStyle='#6b5d44';c.fillText(C.id+': '+courseCode(name),W/2,H-76);
+  c.font='15px Arial,sans-serif';c.fillStyle='#6b5d44';c.fillText(C.id+': '+certId,W/2,H-76);
+  /* a small QR code: earn yours at Mapáchez Manor */
+  const qx=W-252,qy=680,qb=112;
+  if(drawQR(c,CERT_HOME,qx,qy,qb)){c.strokeStyle='#d8c79c';c.lineWidth=1;c.strokeRect(qx-.5,qy-.5,qb+1,qb+1);
+    c.textAlign='right';c.font='italic 15px '+serif;c.fillStyle='#5c4e36';c.fillText(CS.qr[0],qx-12,qy+50);c.font='bold 16px '+serif;c.fillStyle=deep;c.fillText(CS.qr[1],qx-12,qy+72);c.textAlign='center';}
   c.font='13px Arial,sans-serif';c.fillStyle='#8a7c62';c.fillText(C.fine,W/2,H-54);
 }
-function courseLinkedIn(name){
-  const [y,m]=(course.passed||isoDay()).split('-').map(Number);
-  const q=new URLSearchParams({startTask:'CERTIFICATION_NAME',name:CO.liName,organizationName:CO.liOrg,issueYear:String(y),issueMonth:String(m),certId:courseCode(name)});
-  return 'https://www.linkedin.com/profile/add?'+q.toString();
-}
+const courseCertData=name=>({id:courseCode(name),name:cleanText(name,40),date:course.passed||isoDay()});
+function courseLinkedIn(name){return certLinkedInAdd(courseCertData(name));}
 function openCourseCert(){
   if(!course.passed)return openCourse();
   const locked=!!course.name;
   openModal(titleHTML(CO.certT,CO.kicker)+(locked?'<p class="joy-hint co-locked">'+esc(CO.lockedNote)+'</p>':'<p class="modal-description">'+esc(CO.addOnce)+'</p><div id="co-name-host"></div>')+
     '<canvas id="co-cert" class="co-cert" width="1200" height="850" role="img" aria-label="'+esc(CO.c.title+' · '+CO.c.course)+'"></canvas>'+
-    '<div class="action-row" id="co-actions"></div><p class="joy-hint">'+esc(CO.liHow)+'</p><p class="joy-hint co-fine">'+esc(CO.fine)+'</p>',true);
+    '<div class="action-row" id="co-actions"></div><div id="co-share"></div><p class="joy-hint co-fine">'+esc(CO.fine)+'</p>',true);
   const cv=$('co-cert'),row=$('co-actions');
   drawCertificate(cv,course.name);
   if(!locked){
@@ -9375,10 +9541,8 @@ function openCourseCert(){
   const save=document.createElement('button');save.className='primary-button';save.textContent=CO.save;
   save.onclick=()=>{if(DEMO_BUILD)return openFullEdition();if(need())return;drawCertificate(cv,course.name);
     const a=document.createElement('a');a.download='silver-key-check-in-certificate.png';a.href=cv.toDataURL('image/png');document.body.append(a);a.click();a.remove();toast(CO.saved);};
-  const li=document.createElement('a');li.className='secondary-button co-li';li.textContent=CO.li;li.target='_blank';li.rel='noopener noreferrer';li.href=courseLinkedIn(course.name);
-  li.onclick=e=>{if(DEMO_BUILD){e.preventDefault();return openFullEdition();}if(need())e.preventDefault();};
   const back=document.createElement('button');back.className='secondary-button';back.textContent=CO.backCourse;back.onclick=openCourse;
-  if(locked)row.append(save,li,back);else row.append(back);
+  if(locked){row.append(save,back);certShareMount($('co-share'),courseCertData(course.name));}else row.append(back);
   narrativeText=body.innerText;
 }
 
@@ -9423,7 +9587,10 @@ PINS.push(
 body.reduce-motion .co-path li{animation:none}
 `;document.head.append(st);}
 checkPins();
+certRegister('chk',{course:()=>CO.c.course,liName:()=>CO.liName,skills:()=>CO.skills,draw:(cv,d)=>drawCertificate(cv,d.name,{passed:d.date,id:d.id})});
 /* ==== end COURSE v1 ==== */
+/* Opening a credential link (?cert=...) shows that certificate. Kept last, after every course registers. */
+{const d=certParse(location.search);if(d)setTimeout(()=>certView(d),0);}
 
 
 })();
