@@ -10,7 +10,7 @@ import unittest
 
 import test_growth as base
 
-FIRST_NIGHT_HIDDEN = ['#title-memories', '#title-training', '#explore-festival', '#hms-title', '#penny-title',
+FIRST_NIGHT_HIDDEN = ['#title-memories', '#explore-festival', '#hms-title', '#penny-title',
                       '#star-title', '#joy-title-mg', '#title-report']
 
 

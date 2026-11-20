@@ -15,7 +15,7 @@ this order:
 6. The lily mystery
 7. Penny
 8. Star service
-9. Practice desk, house ledger and shift journal
+9. Training shortcut, house ledger and shift journal
 10. Progress report and certificate (always shown for **Training with my hotel**)
 
 Something new glows gold and a "New tonight" note appears until the player taps it.

@@ -28,6 +28,8 @@ class Phone(base.Growth):
             return super().setUp()
         self.context = self.browser.new_context(reduced_motion='reduce', **PHONE)
         self.context.add_init_script("try{if(!localStorage.getItem('mapachez_profile_v1'))localStorage.setItem('mapachez_profile_v1',JSON.stringify({version:1,mode:'solo',lang:'en',hooked:true}))}catch(e){}")
+        # Returning-player fixture: the whole manor is open (night-by-night unlocks are covered in test_nights.py).
+        self.context.add_init_script("try{if(!localStorage.getItem('mapachez_nights_v1'))localStorage.setItem('mapachez_nights_v1',JSON.stringify({all:true,seen:10,fresh:[]}))}catch(e){}")
         self.page = self.context.new_page()
         self.errors, self.requests = [], []
         self.page.on('pageerror', lambda error: self.errors.append(str(error)))
