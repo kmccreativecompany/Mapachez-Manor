@@ -5583,11 +5583,15 @@ function openHms(){
   if(world)world.stop();
   const first=!hms.opened;hms.opened++;storeHms();
   const next=[1,2,3,4,5].find(n=>!hms.lessons.includes(n));
+  /* One glowing next step up top, two big tiles, and everything else (still all here) under "More". */
   openModal(titleHTML(HT.title,HT.kicker)+
     '<div class="hms-coach"><canvas id="hms-delores" aria-hidden="true"></canvas><p>'+esc(first?HT.firstHi:HT.hi)+'</p></div>'+
+    '<div id="hms-next-step"></div><div class="hms-tiles" id="hms-tiles"></div>'+
+    '<details class="hms-more" id="hms-more"><summary>'+esc(HF.more)+'</summary>'+
     '<p class="modal-description">'+esc(HT.intro)+'</p>'+hmsSkillHTML()+
     '<h3 class="pins-heading">'+esc(HT.lessonsH)+'</h3><div class="hms-cards" id="hms-lessons"></div>'+
     '<h3 class="pins-heading">'+esc(HT.gamesH)+'</h3><div class="hms-cards" id="hms-games"></div>'+
+    '<div class="action-row" id="hms-more-actions"></div></details>'+
     '<div class="action-row" id="hms-home-actions"></div>',true);
   paintBust($('hms-delores'),{cast:'delores'},26,2);
   HT.lessons.forEach((L,k)=>{const n=k+1,got=hms.lessons.includes(n),b=document.createElement('button');b.className='hms-lesson'+(got?' got':'')+(n===next?' next':'');b.dataset.lesson=n;
@@ -5595,13 +5599,14 @@ function openHms(){
   for(const id of ['rush','build','bill']){const [i,name,d]=HT.games[id],b=document.createElement('button');b.className='hms-lesson game';b.dataset.game=id;
     const best=id==='rush'?(hms.time?ht(HT.bestTime,{v:hms.time}):HT.noBest):(hms.best[id]?ht(HT.best,{v:hms.best[id]+' ⭐'}):HT.noBest);
     b.innerHTML='<span class="hms-num" aria-hidden="true">'+i+'</span><span><b>'+esc(name)+'</b><small>'+esc(d)+'</small></span><span class="hms-go">'+esc(best)+'</span>';b.onclick=()=>HMS_GAMES[id]();$('hms-games').append(b);}
-  const row=$('hms-home-actions');
-  const add=(label,cls,run)=>{const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=run;row.append(b);return b;};
-  add(HT.explore,'secondary-button',exploreHms);
-  add(titleVisible?t('Done'):t('Back to the manor'),'primary-button',closeModal);
+  const add=(row,label,cls,run)=>{const b=document.createElement('button');b.className=cls;b.textContent=label;b.onclick=run;$(row).append(b);return b;};
+  add('hms-more-actions',HT.explore,'secondary-button',exploreHms);
+  add('hms-home-actions',titleVisible?t('Done'):t('Back to the manor'),'secondary-button',closeModal);
+  hmsHomeTop();
+  const more=$('hms-more');more.ontoggle=()=>{if(more.isConnected)narrativeText=body.innerText;};
   if(first)celebrate({icon:'🖥️',kicker:HT.name,label:HT.pins.login[0]});
   checkPins();renderGrowth();narrativeText=body.innerText;
-  requestAnimationFrame(()=>body.querySelector('.hms-lesson.next')?.focus());
+  requestAnimationFrame(()=>$('hms-next-go')?.focus());
 }
 function exploreHms(){
   openModal(titleHTML(HT.title,HT.kicker)+'<div id="hms-host"></div><div class="action-row" id="hms-x-actions"></div>',true);
@@ -9592,8 +9597,6 @@ body.reduce-motion .co-path li{animation:none}
 checkPins();
 certRegister('chk',{course:()=>CO.c.course,liName:()=>CO.liName,skills:()=>CO.skills,draw:(cv,d)=>drawCertificate(cv,d.name,{passed:d.date,id:d.id})});
 /* ==== end COURSE v1 ==== */
-/* Opening a credential link (?cert=...) shows that certificate. Kept last, after every course registers. */
-{const d=certParse(location.search);if(d)setTimeout(()=>certView(d),0);}
 
 /* ==== MORE COURSES v1: three more Silver Key e-courses and a Master certificate ====
    Luxury guest language, telephone skills and housekeeping standards, built exactly like the
@@ -9614,6 +9617,7 @@ const MC_TEXT={
   masterPin:['Master of the Manor','Earn all four Silver Key Certificates.'],
   mc:{title:'Master Certificate',completed:'has completed all four gamified e-courses in',course:'Hotel Front Office & Guest Services',seal:'MASTER',fine:'Certificate of completion for four gamified e-courses. Not an accreditation or license.',steps:'Check-In & Registration · Guest Service Language · Telephone Etiquette · Housekeeping Standards'},
   masterLi:'Silver Key Master Certificate: Hotel Front Office & Guest Services',
+  masterSkills:['Front Office Operations','Guest Service','Telephone Etiquette','Housekeeping','Hospitality Management'],
   courses:[
    {id:'lux',code:'LUX',icon:'💬',title:'Luxury Guest Service Language & Communication',short:'Warm words, names, and never a flat “no”.',
     hi:'Delores: “Five-star service isn’t fancy words. It’s kind ones, said at the right moment. Six tiny lessons, then your certificate.”',
@@ -9654,7 +9658,7 @@ const MC_TEXT={
      {q:'Why does the goodbye matter so much?',opts:[['Guests remember endings most',1],['It doesn’t, the stay is over by then',0],['It’s a last chance to sell them a mug',0]],why:'The last moment colors the memory of the whole stay.'}
     ],
     c:{course:'Luxury Guest Service Language & Communication',steps:'Warm names · Gracious words · Options, not “no” · Anticipation · Escorting · Goodbyes'},
-    liName:'Silver Key Certificate: Luxury Guest Service Language & Communication',file:'silver-key-guest-language-certificate.png'},
+    skills:['Guest Service','Hospitality','Customer Experience','Communication','Luxury Service'],liName:'Silver Key Certificate: Luxury Guest Service Language & Communication',file:'silver-key-guest-language-certificate.png'},
    {id:'phn',code:'PHN',icon:'📞',title:'Front Desk Telephone Etiquette & Call Handling',short:'Answer, hold, transfer, take messages, keep guests private.',
     hi:'Delores: “On the phone, your voice is the whole welcome. Let’s make it a lovely one. Six tiny lessons, then your certificate.”',
     hiBack:'Delores: “Ring ring! Welcome back to phone class.”',hiDone:'Delores: “You handle calls like a dream. Your certificate is ready.”',
@@ -9694,7 +9698,7 @@ const MC_TEXT={
      {q:'How do you end a call?',opts:[['Recap, thank them, let them hang up first',1],['Hang up quickly so the line is free for the next caller',0],['Say “bye”',0]],why:'A recap prevents mix-ups, and nobody feels cut off.'}
     ],
     c:{course:'Front Desk Telephone Etiquette & Call Handling',steps:'Three rings · Hold with permission · Warm transfers · Complete messages · Privacy · Gracious close'},
-    liName:'Silver Key Certificate: Front Desk Telephone Etiquette & Call Handling',file:'silver-key-telephone-certificate.png'},
+    skills:['Telephone Etiquette','Call Handling','Front Desk Operations','Guest Privacy','Hospitality'],liName:'Silver Key Certificate: Front Desk Telephone Etiquette & Call Handling',file:'silver-key-telephone-certificate.png'},
    {id:'hsk',code:'HSK',icon:'🧹',title:'Housekeeping Standards & Guest Room Inspection',short:'Knock right, clean in order, inspect, lost and found.',
     hi:'Delores: “Every perfect stay starts with a perfect room. Let’s learn how the magic happens. Six tiny lessons, then your certificate.”',
     hiBack:'Delores: “Welcome back. Fresh towels and fresh lessons, coming up.”',hiDone:'Delores: “Spotless! Your certificate is ready.”',
@@ -9734,7 +9738,7 @@ const MC_TEXT={
      {q:'Why log lost and found items?',opts:[['To return them and protect you',1],['For fun',0],['So staff can share them',0]],why:'A log returns treasures and shows exactly what happened.'}
     ],
     c:{course:'Housekeeping Standards & Guest Room Inspection',steps:'Knock & announce · Do Not Disturb · Room priority · Top to bottom · Inspection · Lost & found'},
-    liName:'Silver Key Certificate: Housekeeping Standards & Guest Room Inspection',file:'silver-key-housekeeping-certificate.png'}
+    skills:['Housekeeping','Room Inspection','Quality Standards','Guest Privacy','Hospitality'],liName:'Silver Key Certificate: Housekeeping Standards & Guest Room Inspection',file:'silver-key-housekeeping-certificate.png'}
   ],
   swap:[['No problem','My pleasure'],['Hi guys','Good evening, everyone'],['I don’t know','Let me find out for you'],['You need to…','May I ask you to…']],
   greet:['Good evening,','Mapáchez Manor,','this is Sam.','How may I help you?'],
@@ -9756,6 +9760,7 @@ const MC_TEXT={
   masterPin:['Maestra de la mansión','Gana los cuatro Silver Key Certificates.'],
   mc:{title:'Certificado Maestro',completed:'ha completado los cuatro cursos en línea gamificados de',course:'Recepción hotelera y servicio al huésped',seal:'MAESTRO',fine:'Certificado de finalización de cuatro cursos en línea gamificados. No es una acreditación ni una licencia.',steps:'Registro de entrada · Lenguaje de servicio · Etiqueta telefónica · Limpieza e inspección'},
   masterLi:'Silver Key Master Certificate: Recepción hotelera y servicio al huésped',
+  masterSkills:['Operaciones de recepción','Atención al huésped','Etiqueta telefónica','Limpieza de habitaciones','Gestión hotelera'],
   courses:[
    {id:'lux',code:'LUX',icon:'💬',title:'Lenguaje y comunicación en el servicio de lujo',short:'Palabras cálidas, nombres y nunca un “no” seco.',
     hi:'Delores: “El servicio de cinco estrellas no son palabras elegantes. Son palabras amables, dichas en el momento justo. Seis lecciones chiquitas y luego tu certificado.”',
@@ -9796,7 +9801,7 @@ const MC_TEXT={
      {q:'¿Por qué importa tanto la despedida?',opts:[['El final es lo que más se recuerda',1],['No importa, la estancia ya acabó',0],['Es la última ocasión de venderle una taza',0]],why:'El último momento tiñe el recuerdo de toda la estancia.'}
     ],
     c:{course:'Lenguaje y comunicación en el servicio de lujo',steps:'Nombres · Palabras amables · Opciones, no “no” · Anticipación · Acompañar · Despedidas'},
-    liName:'Silver Key Certificate: Lenguaje y comunicación en el servicio de lujo',file:'silver-key-guest-language-certificate.png'},
+    skills:['Atención al huésped','Hospitalidad','Experiencia del cliente','Comunicación','Servicio de lujo'],liName:'Silver Key Certificate: Lenguaje y comunicación en el servicio de lujo',file:'silver-key-guest-language-certificate.png'},
    {id:'phn',code:'PHN',icon:'📞',title:'Etiqueta telefónica y gestión de llamadas en recepción',short:'Contestar, esperar, transferir, tomar recados, cuidar la privacidad.',
     hi:'Delores: “Por teléfono, tu voz es toda la bienvenida. Hagamos que sea preciosa. Seis lecciones chiquitas y luego tu certificado.”',
     hiBack:'Delores: “¡Ring ring! Bienvenida de nuevo a la clase de teléfono.”',hiDone:'Delores: “Atiendes llamadas de maravilla. Tu certificado está listo.”',
@@ -9836,7 +9841,7 @@ const MC_TEXT={
      {q:'¿Cómo terminas una llamada?',opts:[['Resumes, agradeces y dejas que cuelguen primero',1],['Cuelgas rápido para dejar la línea libre al siguiente que llame',0],['Dices “chao”',0]],why:'Un resumen evita confusiones y nadie se siente cortado.'}
     ],
     c:{course:'Etiqueta telefónica y gestión de llamadas en recepción',steps:'Tres tonos · Espera con permiso · Transferencias cálidas · Recados completos · Privacidad · Buen cierre'},
-    liName:'Silver Key Certificate: Etiqueta telefónica y gestión de llamadas en recepción',file:'silver-key-telephone-certificate.png'},
+    skills:['Etiqueta telefónica','Gestión de llamadas','Operaciones de recepción','Privacidad del huésped','Hospitalidad'],liName:'Silver Key Certificate: Etiqueta telefónica y gestión de llamadas en recepción',file:'silver-key-telephone-certificate.png'},
    {id:'hsk',code:'HSK',icon:'🧹',title:'Estándares de limpieza e inspección de habitaciones',short:'Llamar bien, limpiar en orden, inspeccionar, objetos perdidos.',
     hi:'Delores: “Cada estancia perfecta empieza con una habitación perfecta. Veamos cómo se hace la magia. Seis lecciones chiquitas y luego tu certificado.”',
     hiBack:'Delores: “Bienvenida de nuevo. Toallas limpias y lecciones nuevas.”',hiDone:'Delores: “¡Impecable! Tu certificado está listo.”',
@@ -9876,7 +9881,7 @@ const MC_TEXT={
      {q:'¿Por qué anotar los objetos perdidos?',opts:[['Para devolverlos y protegerte',1],['Por diversión',0],['Para repartirlos',0]],why:'El registro devuelve tesoros y muestra lo que pasó.'}
     ],
     c:{course:'Estándares de limpieza e inspección de habitaciones',steps:'Llamar y anunciarse · No molestar · Prioridad · De arriba abajo · Inspección · Objetos perdidos'},
-    liName:'Silver Key Certificate: Estándares de limpieza e inspección de habitaciones',file:'silver-key-housekeeping-certificate.png'}
+    skills:['Limpieza de habitaciones','Inspección de habitaciones','Estándares de calidad','Privacidad del huésped','Hospitalidad'],liName:'Silver Key Certificate: Estándares de limpieza e inspección de habitaciones',file:'silver-key-housekeeping-certificate.png'}
   ],
   swap:[['No hay problema','Es un placer'],['Hola, chicos','Buenas noches a todos'],['No sé','Lo averiguo para usted'],['Tiene que…','¿Me permite pedirle que…?']],
   greet:['Buenas noches,','Mapáchez Manor,','le atiende Sam.','¿En qué puedo ayudarle?'],
@@ -9909,10 +9914,8 @@ function mcLockedName(){return course.name||MC_IDS.map(id=>mc.courses[id].name).
 const mcPassedCount=()=>(course.passed?1:0)+MC_IDS.filter(id=>mc.courses[id].passed).length;
 const mcSalt=()=>Math.random().toString(36).slice(2,10)||'mapachez';
 function mcCode(code,rec,name){return 'SKC-'+code+'-'+sum4(cleanText(name,40).toLowerCase()+'|'+rec.passed+'|'+rec.salt).toUpperCase()+'-'+sum4(rec.salt+'|'+rec.passed).toUpperCase();}
-function mcLinkedIn(liName,code,rec,name){
-  const [y,m]=(rec.passed||isoDay()).split('-').map(Number);
-  return 'https://www.linkedin.com/profile/add?'+new URLSearchParams({startTask:'CERTIFICATION_NAME',name:liName,organizationName:CO.liOrg,issueYear:String(y),issueMonth:String(m),certId:mcCode(code,rec,name)}).toString();
-}
+/* Kept for anything that still asks for a plain LinkedIn link; it now carries the credential link too. */
+function mcLinkedIn(liName,code,rec,name){return certLinkedInAdd({id:mcCode(code,rec,name||''),name:cleanText(name||'',40),date:rec.passed||isoDay()});}
 /* The Master Certificate arrives on its own the moment the fourth course is passed. */
 function mcCheckMaster(){
   if(mc.master.passed||mcPassedCount()<4)return false;
@@ -10106,6 +10109,10 @@ function mcDrawCert(cv,{name,course:courseName,steps,date,code,master}){
   line(250,C.date,date?coursePretty(date):'','24px '+serif);
   line(W-250,C.signRole,C.sign,'italic 24px '+serif);
   c.font='15px Arial,sans-serif';c.fillStyle='#6b5d44';c.fillText(C.id+': '+code,W/2,H-76);
+  /* a small QR code: earn yours at Mapáchez Manor (same as the check-in certificate) */
+  {const qx=W-246,qy=694,qb=100;
+   if(drawQR(c,CERT_HOME,qx,qy,qb)){c.strokeStyle='#d8c79c';c.lineWidth=1;c.strokeRect(qx-.5,qy-.5,qb+1,qb+1);
+    c.textAlign='right';c.font='italic 15px '+serif;c.fillStyle='#5c4e36';c.fillText(CS.qr[0],qx-12,qy+44);c.font='bold 16px '+serif;c.fillStyle=deep;c.fillText(CS.qr[1],qx-12,qy+66);c.textAlign='center';}}
   c.font='13px Arial,sans-serif';c.fillStyle='#8a7c62';c.fillText(master?MC.mc.fine:C.fine,W/2,H-54);
 }
 /* A certificate screen for one record: a course, or the Master Certificate. */
@@ -10115,7 +10122,7 @@ function mcCertScreen(o){
   const draw=n=>mcDrawCert($('co-cert'),{name:n,course:courseName,steps,date:rec.passed,code:mcCode(code,rec,n||''),master});
   openModal(titleHTML(title,kick)+(locked?'<p class="joy-hint co-locked">'+esc(CO.lockedNote)+'</p>':'<p class="modal-description">'+esc(CO.addOnce)+'</p><div id="co-name-host"></div>')+
     '<canvas id="co-cert" class="co-cert" width="1200" height="850" role="img" aria-label="'+esc((master?MC.mc.title:CO.c.title)+' · '+courseName)+'"></canvas>'+
-    '<div class="action-row" id="co-actions"></div><p class="joy-hint">'+esc(CO.liHow)+'</p><p class="joy-hint co-fine">'+esc(fine)+'</p>',true);
+    '<div class="action-row" id="co-actions"></div><div id="co-share"></div><p class="joy-hint co-fine">'+esc(fine)+'</p>',true);
   const cv=$('co-cert'),row=$('co-actions');
   draw(rec.name);
   if(!locked){
@@ -10125,12 +10132,17 @@ function mcCertScreen(o){
   const save=document.createElement('button');save.className='primary-button';save.textContent=CO.save;
   save.onclick=()=>{if(DEMO_BUILD)return openFullEdition();draw(rec.name);
     const a=document.createElement('a');a.download=file;a.href=cv.toDataURL('image/png');document.body.append(a);a.click();a.remove();toast(CO.saved);};
-  const li=document.createElement('a');li.className='secondary-button co-li';li.textContent=CO.li;li.target='_blank';li.rel='noopener noreferrer';li.href=mcLinkedIn(liName,code,rec,rec.name);
-  li.onclick=e=>{if(DEMO_BUILD){e.preventDefault();return openFullEdition();}};
   const bk=document.createElement('button');bk.className='secondary-button';bk.textContent=CO.backCourse;bk.onclick=back;
-  if(locked)row.append(save,li,bk);else row.append(bk);
+  if(locked){row.append(save,bk);certShareMount($('co-share'),mcCertData(code,rec));}else row.append(bk);
   narrativeText=body.innerText;
 }
+/* Credential data for the share card and link: {id, name, date}, same shape as the check-in course. */
+const mcCertData=(code,rec)=>({id:mcCode(code,rec,rec.name||''),name:cleanText(rec.name||'',40),date:rec.passed||isoDay()});
+/* Each new course, and the Master, registers with CERT SHARE so its credential link opens a real certificate. */
+for(const S of MC.courses)certRegister(S.code,{course:()=>S.c.course,liName:()=>S.liName,skills:()=>S.skills,
+  draw:(cv,d)=>mcDrawCert(cv,{name:d.name,course:S.c.course,steps:S.c.steps,date:d.date,code:d.id,master:false})});
+certRegister('MST',{course:()=>MC.mc.course,liName:()=>MC.masterLi,skills:()=>MC.masterSkills,
+  draw:(cv,d)=>mcDrawCert(cv,{name:d.name,course:MC.mc.course,steps:MC.mc.steps,date:d.date,code:d.id,master:true})});
 function openMcCert(id){
   const S=mcSpec(id),r=mc.courses[id];if(!r.passed)return openMcCourse(id);
   const args={rec:r,kick:CO.kicker,title:CO.certT,courseName:S.c.course,steps:S.c.steps,code:S.code,liName:S.liName,file:S.file,
@@ -10212,6 +10224,286 @@ function openDramas(){
 .drama-actions{margin-top:12px}
 `;document.head.append(st);}
 /* ==== end DRAMAS v1 ==== */
+/* ==== HMS FRIENDLY v1: one next step, a practice hotel with Undo, and a colorful room board ====
+   - The desk computer home shows Delores's greeting, ONE glowing "next step" card and two big tiles
+     (Practice hotel, Browse records). Every lesson, desk game, the HMS skill bar and the e-course
+     are all still there, tucked under "More".
+   - The practice hotel is a pretend HMS where nothing counts: no tips, no points, no saves. Book,
+     check in, move, check out and cancel freely. A big Undo takes back any tap.
+   - Its room board is six big colorful tiles (201 to 206): 🧹 dirty, 🔍 cleaned (not inspected),
+     ✨ inspected & ready, 🛌 occupied. Tap a tile to act on it.
+   - Check-in keeps the real rules: a ✨ room, then phone WITH area code, email and a card on file,
+     and only then the keys. Delores says why. Every name, number, email and card is make-believe. */
+const HF_TEXT={
+ en:{
+  more:'More: all lessons, desk games, your HMS skill',
+  nextKick:'✨ YOUR NEXT STEP',
+  nextLesson:'Lesson {n} of 5',nextCourse:'Check-in e-course',nextCourseD:'Learn the why behind every check-in step, and earn a certificate.',
+  nextGame:'Desk game',nextGuest:'A guest is waiting at the practice hotel',nextGuestD:'Check them in your way. Nothing counts, and Undo fixes anything.',
+  go:'Let’s go →',goGuest:'Help the guest →',
+  tiles:{hotel:['🏨','Practice hotel','Nothing counts. Try anything.'],browse:['🔎','Browse records','The manor’s real bookings, rooms, guests and bills.']},
+  title:'Practice hotel',kicker:'HMS · PRACTICE HOTEL',
+  hello:'Delores: “This is our pretend hotel. Book, move, cancel, click everything! Nothing here counts, and Undo takes back any tap. Every HMS looks a little different, but they all do these same jobs.”',
+  board:'Room board · tap a room',waitingH:'Waiting at the desk',noneWaiting:'Nobody is waiting. Make a new booking!',
+  newBooking:'＋ New booking',undo:'↩️ Undo',undoN:'↩️ Undo ({n})',fresh:'🔄 Start fresh',back:'← Back to the desk computer',
+  st:{tidy:['🧹','Dirty'],clean:['🔍','Cleaned, not inspected'],ready:['✨','Inspected & ready'],guest:['🛌','Occupied']},
+  nights:n=>n===1?'1 night':n+' nights',
+  checkIn:'✅ Check in',cancel:'❌ Cancel',
+  doClean:'🧽 Housekeeping cleans it',doInspect:'🔍 Supervisor inspects it',doDirty:'🧹 Mark it dirty',doCheckHere:'🛎️ Check a guest in here',
+  doOut:'🧳 Check out',doMove:'↔️ Move to another room',doFile:'🙂 Their file',
+  roomOf:'Room {r}',whoIn:'{name} · {nights}',
+  pickFor:'Pick a ✨ room for {name}. The ready rooms are glowing.',pickWho:'Who is checking in to {r}?',moveFor:'Pick a ✨ room to move {name} into.',
+  no:{tidy:'Room {r} is dirty. Housekeeping cleans it first, then a supervisor inspects it.',clean:'Room {r} is cleaned but not inspected yet. A supervisor checks every corner first.',guest:'Someone is already in Room {r} 🙂'},
+  infoHead:'🔑 Before the keys, three things go on file',
+  info:{phone:['📱','Phone, with area code'],email:['✉️','Email, read back'],card:['💳','Card on file']},
+  askIt:'Tap to ask',
+  why:{phone:'Delores: “Always get the area code. Seven digits exist in hundreds of towns. We text guests when the room is ready or their door says Do Not Disturb.”',
+       email:'Delores: “Read the email back, letter by letter. The confirmation and receipt go there, and one typo sends them to a stranger.”',
+       card:'Delores: “The card is a hold, not a charge. It covers the room and extras, and the HMS only ever shows the last 4 digits.”'},
+  keysLocked:'🔒 Keys · fill in all three first',keys:'🔑 Make the keys',
+  said:{
+   clean:'Delores: “Clean! But not ready yet. A supervisor inspects it first, so no guest ever finds a surprise sock.”',
+   ready:'Delores: “Inspected and ready ✨. Only now can a guest go in.”',
+   dirty:'Delores: “Marked dirty 🧹. Housekeeping sees it on their board right away.”',
+   keys:'Delores: “Keys last, always. Now {name} can be reached, and the room is truly ready. Welcome to Room {r}!”',
+   out:'Delores: “{name} checked out. The room turns 🧹 dirty, so housekeeping knows to clean it.”',
+   moved:'Delores: “{name} moved to {r}. The old room needs a fresh clean before anyone else goes in.”',
+   cancel:'Delores: “Booking cancelled. A real HMS also asks why, and checks the hotel’s cancellation policy. Every hotel’s is a little different.”',
+   booked:'Delores: “New booking for {name}! They’re waiting at the desk.”',
+   undone:'Delores: “Undone! See? Nothing breaks here.”',
+   fresh:'Delores: “A fresh practice hotel. Off you go!”',
+   file:'{name} · 📱 {phone} · ✉️ {email} · 💳 •••• {last4}',
+   fileNone:'{name}: nothing on file yet.'}
+ },
+ es:{
+  more:'Más: todas las lecciones, juegos de recepción y tu nivel HMS',
+  nextKick:'✨ TU SIGUIENTE PASO',
+  nextLesson:'Lección {n} de 5',nextCourse:'Curso de registro de entrada',nextCourseD:'Aprende el porqué de cada paso del registro y gana un certificado.',
+  nextGame:'Juego de recepción',nextGuest:'Un huésped espera en el hotel de práctica',nextGuestD:'Regístralo a tu manera. Nada cuenta, y Deshacer lo arregla todo.',
+  go:'¡Vamos! →',goGuest:'Atender al huésped →',
+  tiles:{hotel:['🏨','Hotel de práctica','Nada cuenta. Prueba lo que quieras.'],browse:['🔎','Consultar registros','Las reservas, habitaciones, huéspedes y cuentas reales de la mansión.']},
+  title:'Hotel de práctica',kicker:'HMS · HOTEL DE PRÁCTICA',
+  hello:'Delores: “Este es nuestro hotel de mentira. ¡Reserva, mueve, cancela, toca todo! Aquí nada cuenta, y Deshacer borra cualquier toque. Cada HMS se ve un poco distinto, pero todos hacen estas mismas tareas.”',
+  board:'Tablero de habitaciones · toca una',waitingH:'Esperando en recepción',noneWaiting:'No espera nadie. ¡Haz una reserva nueva!',
+  newBooking:'＋ Reserva nueva',undo:'↩️ Deshacer',undoN:'↩️ Deshacer ({n})',fresh:'🔄 Empezar de nuevo',back:'← Volver al ordenador',
+  st:{tidy:['🧹','Sucia'],clean:['🔍','Limpia, sin inspeccionar'],ready:['✨','Inspeccionada y lista'],guest:['🛌','Ocupada']},
+  nights:n=>n===1?'1 noche':n+' noches',
+  checkIn:'✅ Registrar',cancel:'❌ Cancelar',
+  doClean:'🧽 Limpieza la limpia',doInspect:'🔍 La supervisora la inspecciona',doDirty:'🧹 Marcarla sucia',doCheckHere:'🛎️ Registrar a alguien aquí',
+  doOut:'🧳 Registrar salida',doMove:'↔️ Cambiar de habitación',doFile:'🙂 Su ficha',
+  roomOf:'Habitación {r}',whoIn:'{name} · {nights}',
+  pickFor:'Elige una habitación ✨ para {name}. Las listas brillan.',pickWho:'¿Quién entra en la {r}?',moveFor:'Elige una habitación ✨ para {name}.',
+  no:{tidy:'La {r} está sucia. Primero la limpian y luego una supervisora la inspecciona.',clean:'La {r} está limpia pero sin inspeccionar. Una supervisora revisa cada rincón primero.',guest:'Ya hay alguien en la {r} 🙂'},
+  infoHead:'🔑 Antes de las llaves, tres cosas a la ficha',
+  info:{phone:['📱','Teléfono, con código de área'],email:['✉️','Correo, leído en voz alta'],card:['💳','Tarjeta en ficha']},
+  askIt:'Toca para preguntar',
+  why:{phone:'Delores: “Pide siempre el código de área. Siete dígitos existen en cientos de ciudades. Escribimos al huésped cuando la habitación está lista o su puerta dice No molestar.”',
+       email:'Delores: “Lee el correo letra por letra. Allí van la confirmación y el recibo, y un error los manda a un desconocido.”',
+       card:'Delores: “La tarjeta es una retención, no un cobro. Cubre la habitación y los extras, y el HMS solo muestra los 4 últimos dígitos.”'},
+  keysLocked:'🔒 Llaves · completa las tres primero',keys:'🔑 Preparar las llaves',
+  said:{
+   clean:'Delores: “¡Limpia! Pero aún no lista. Una supervisora la inspecciona, para que nadie encuentre un calcetín sorpresa.”',
+   ready:'Delores: “Inspeccionada y lista ✨. Solo ahora puede entrar un huésped.”',
+   dirty:'Delores: “Marcada sucia 🧹. Limpieza lo ve en su tablero al instante.”',
+   keys:'Delores: “Las llaves, siempre al final. Ya podemos contactar a {name} y la habitación está de verdad lista. ¡Bienvenida a la {r}!”',
+   out:'Delores: “{name} se fue. La habitación pasa a 🧹 sucia, para que limpieza sepa que toca limpiarla.”',
+   moved:'Delores: “{name} se cambió a la {r}. La habitación anterior necesita limpieza antes de que entre nadie.”',
+   cancel:'Delores: “Reserva cancelada. Un HMS real también pregunta el motivo y revisa la política de cancelación. Cada hotel tiene la suya.”',
+   booked:'Delores: “¡Reserva nueva para {name}! Espera en recepción.”',
+   undone:'Delores: “¡Deshecho! ¿Ves? Aquí nada se rompe.”',
+   fresh:'Delores: “Un hotel de práctica nuevecito. ¡Adelante!”',
+   file:'{name} · 📱 {phone} · ✉️ {email} · 💳 •••• {last4}',
+   fileNone:'{name}: aún no hay nada en su ficha.'}
+ }
+};
+const HF=HF_TEXT[profile.lang]||HF_TEXT.en;
+
+/* ---------- The home: one glowing next step ---------- */
+function hmsNextStep(){
+  const n=[1,2,3,4,5].find(k=>!hms.lessons.includes(k));
+  if(n){const L=HT.lessons[n-1];return {icon:'🎓',kick:ht(HF.nextLesson,{n}),t:L.t,d:L.d,go:HF.go,run:()=>startLesson(n)};}
+  if(typeof course==='object'&&course&&!course.passed&&typeof openCourse==='function')return {icon:'📚',kick:HF.nextCourse,t:HF.nextCourse,d:HF.nextCourseD,go:HF.go,run:openCourse};
+  const g=['rush','build','bill'].find(id=>id==='rush'?!hms.time:!hms.best[id]);
+  if(g){const [i,name,d]=HT.games[g];return {icon:i,kick:HF.nextGame,t:name,d,go:HF.go,run:()=>HMS_GAMES[g]()};}
+  return {icon:'🛎️',kick:HF.nextGuest,t:HF.nextGuest,d:HF.nextGuestD,go:HF.goGuest,run:()=>openPracticeHotel({guest:true})};
+}
+function hmsHomeTop(){
+  const N=hmsNextStep(),host=$('hms-next-step');if(!host)return;
+  host.innerHTML='<div class="hms-next"><span class="hms-next-ic" aria-hidden="true">'+N.icon+'</span><div><small>'+esc(HF.nextKick)+' · '+esc(N.kick)+'</small><b>'+esc(N.t)+'</b><p>'+esc(N.d)+'</p></div>'+
+    '<button class="primary-button hms-next-go" id="hms-next-go" type="button">'+esc(N.go)+'</button></div>';
+  $('hms-next-go').onclick=N.run;
+  const tiles=$('hms-tiles');
+  for(const [id,run] of [['hotel',()=>openPracticeHotel()],['browse',exploreHms]]){
+    const [i,name,d]=HF.tiles[id],b=document.createElement('button');b.type='button';b.className='hms-tile '+id;b.id='hms-tile-'+id;
+    b.innerHTML='<span aria-hidden="true">'+i+'</span><b>'+esc(name)+'</b><small>'+esc(d)+'</small>';b.onclick=run;tiles.append(b);}
+}
+
+/* ---------- The practice hotel: pretend guests, a room board and a big Undo ---------- */
+/* Make-believe guests from all over. 555-01xx numbers are kept for fiction; example.com is a
+   domain kept for examples; card endings are well-known test numbers, only ever shown masked. */
+const PH_GUESTS=[['Amara','Okonkwo','404'],['Kenji','Morimoto','206'],['Lucía','Fernández','305'],['Priya','Raman','469'],['Mateus','Silva','617'],
+  ['Freya','Lindqvist','612'],['Tane','Walker','808'],['Nadia','Haddad','313'],['Oksana','Petrenko','215'],['Diego','Quispe','720'],['Mei','Chow','415'],
+  ['Kofi','Mensah','202'],['Isla','McKenzie','503'],['Arjun','Mehta','713'],['Zainab','Yusuf','901'],['Sione','Taufa','801'],['Elif','Yilmaz','312'],
+  ['Camille','Dubois','504'],['Luca','Bianchi','718'],['Ingrid','Solberg','907']];
+const PH_CARDS=['4242','4444','1881','0005','1117','8431'];
+const phPlain=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+function phGuest(k){
+  const [f,l,a]=PH_GUESTS[k%PH_GUESTS.length];
+  return {id:'p'+k+'-'+Math.random().toString(36).slice(2,6),name:f+' '+l,nights:1+k%3,phone:'('+a+') 555-01'+String(10+k*3%90).padStart(2,'0'),
+    email:phPlain(f)+'.'+phPlain(l)+'@example.com',last4:PH_CARDS[k%PH_CARDS.length],got:{phone:0,email:0,card:0}};
+}
+let ph=null,phDeal=0;
+function phFresh(){
+  const deck=hmsShuffle([...PH_GUESTS.keys()]);phDeal=0;const take=()=>deck[phDeal++%deck.length];
+  const sit=()=>{const g=phGuest(take());g.got={phone:1,email:1,card:1};return g;};
+  ph={deck,rooms:{'201':{st:'ready'},'202':{st:'guest',g:sit()},'203':{st:'tidy'},'204':{st:'clean'},'205':{st:'ready'},'206':{st:'guest',g:sit()}},
+    waiting:[phGuest(take()),phGuest(take())],sel:'',mode:null,say:HF.hello,undo:[]};
+}
+function phSnap(){ph.undo.push(JSON.stringify({rooms:ph.rooms,waiting:ph.waiting,deal:phDeal}));if(ph.undo.length>60)ph.undo.shift();}
+function openPracticeHotel(opt={}){
+  if(world)world.stop();
+  if(!ph)phFresh();
+  if(opt.guest&&!ph.waiting.length){ph.waiting.push(phGuest(ph.deck[phDeal++%ph.deck.length]));}
+  ph.sel='';ph.mode=null;if(opt.guest)ph.say=HF.hello;
+  openModal(titleHTML(HF.title,HF.kicker)+
+    '<div class="hms-coach" aria-live="polite"><canvas id="hms-delores" aria-hidden="true"></canvas><p id="ph-say"></p></div>'+
+    '<h3 class="pins-heading">'+esc(HF.board)+'</h3><div class="ph-board" id="ph-board"></div>'+
+    '<p class="ph-legend">'+Object.keys(HF.st).map(k=>'<span class="ph-chip '+k+'"><span aria-hidden="true">'+HF.st[k][0]+'</span> '+esc(HF.st[k][1])+'</span>').join('')+'</p>'+
+    '<div id="ph-panel"></div>'+
+    '<h3 class="pins-heading">'+esc(HF.waitingH)+'</h3><div class="ph-wait" id="ph-wait"></div>'+
+    '<div class="ph-bar"><button class="primary-button ph-undo" id="ph-undo" type="button"></button><button class="secondary-button" id="ph-fresh" type="button">'+esc(HF.fresh)+'</button></div>'+
+    '<div class="action-row"><button class="secondary-button" id="ph-back" type="button">'+esc(HF.back)+'</button></div>',true);
+  paintBust($('hms-delores'),{cast:'delores'},26,2);
+  $('ph-undo').onclick=()=>{const s=ph.undo.pop();if(!s)return;const o=JSON.parse(s);ph.rooms=o.rooms;ph.waiting=o.waiting;phDeal=o.deal;ph.sel='';ph.mode=null;ph.say=HF.said.undone;joySound('boop');phRender();};
+  $('ph-fresh').onclick=()=>{phSnap();const u=ph.undo;phFresh();ph.undo=u;ph.say=HF.said.fresh;joySound('pop');phRender();};
+  $('ph-back').onclick=openHms;
+  phRender();
+  if(opt.guest&&ph.waiting[0]){ph.mode={pick:ph.waiting[0].id};ph.say=ht(HF.pickFor,{name:ph.waiting[0].name});phRender();}
+}
+function phFind(id){return ph.waiting.find(g=>g.id===id);}
+function phPop(el,word){if(!el||!el.isConnected)return;const [x,y]=centerOf(el);burst(x,y,.6,{});if(word)floatText(x,y-30,word,{size:20});}
+function phRender(){
+  if(!$('ph-board'))return;
+  $('ph-say').textContent=ph.say;
+  const glowReady=ph.mode&&(ph.mode.pick||ph.mode.move);
+  $('ph-board').innerHTML=Object.keys(ph.rooms).map(r=>{const R=ph.rooms[r],[i,l]=HF.st[R.st];
+    return '<button type="button" class="ph-tile '+R.st+(ph.sel===r?' on':'')+(glowReady&&R.st==='ready'?' hms-glow':'')+'" data-r="'+r+'"><b>'+r+'</b><span class="ph-ic" aria-hidden="true">'+i+'</span><small>'+esc(l)+'</small>'+
+      (R.g?'<canvas class="ph-face" aria-hidden="true"></canvas><em>'+esc(R.g.name.split(' ')[0])+'</em>':'')+'</button>';}).join('');
+  $('ph-board').querySelectorAll('.ph-tile').forEach(b=>{const R=ph.rooms[b.dataset.r];if(R.g)paintBust(b.querySelector('canvas'),{cast:R.g.name},24,1);b.onclick=()=>phTile(b.dataset.r,b);});
+  const w=$('ph-wait');
+  w.innerHTML=ph.waiting.length?'':'<p class="joy-hint">'+esc(HF.noneWaiting)+'</p>';
+  ph.waiting.forEach(g=>{const d=document.createElement('div');d.className='ph-guest'+(ph.mode?.pick===g.id?' on':'');
+    d.innerHTML='<canvas aria-hidden="true"></canvas><span><b>'+esc(g.name)+'</b><small>'+esc(HF.nights(g.nights))+'</small></span><button type="button" class="primary-button ph-in">'+esc(HF.checkIn)+'</button><button type="button" class="secondary-button ph-x">'+esc(HF.cancel)+'</button>';
+    paintBust(d.querySelector('canvas'),{cast:g.name},24,1);
+    d.querySelector('.ph-in').onclick=()=>{ph.mode={pick:g.id};ph.sel='';ph.say=ht(HF.pickFor,{name:g.name});joySound('pop');phRender();};
+    d.querySelector('.ph-x').onclick=()=>{phSnap();ph.waiting=ph.waiting.filter(x=>x!==g);if(ph.mode?.pick===g.id)ph.mode=null;ph.say=HF.said.cancel;joySound('boop');phRender();};
+    w.append(d);});
+  const nb=document.createElement('button');nb.type='button';nb.className='secondary-button ph-new';nb.textContent=HF.newBooking;
+  nb.onclick=()=>{phSnap();const g=phGuest(ph.deck[phDeal++%ph.deck.length]);ph.waiting.push(g);ph.say=ht(HF.said.booked,{name:g.name});joySound('pop');phRender();phPop($('ph-wait').lastElementChild?.previousElementSibling,'📝');};
+  w.append(nb);
+  const u=$('ph-undo');u.disabled=!ph.undo.length;u.textContent=ph.undo.length?ht(HF.undoN,{n:ph.undo.length}):HF.undo;
+  phPanel();
+  narrativeText=body.innerText;
+}
+function phTile(r,el){
+  const R=ph.rooms[r];
+  if(ph.mode&&(ph.mode.pick||ph.mode.move)){
+    if(R.st!=='ready'){ph.say='🌱 '+ht(HF.no[R.st],{r});el.classList.remove('hms-no');void el.offsetWidth;el.classList.add('hms-no');joySound('boop');$('ph-say').textContent=ph.say;narrativeText=body.innerText;return;}
+    if(ph.mode.pick){const g=phFind(ph.mode.pick);ph.mode={info:g.id,room:r};ph.sel=r;ph.say=HF.infoHead;joySound('pop');return phRender();}
+    const from=ph.mode.move,g=ph.rooms[from].g;phSnap();
+    ph.rooms[r]={st:'guest',g};ph.rooms[from]={st:'tidy'};ph.mode=null;ph.sel=r;ph.say=ht(HF.said.moved,{name:g.name,r});joySound('hop');phRender();
+    return phPop($('ph-board').querySelector('[data-r="'+r+'"]'),'↔️');
+  }
+  ph.sel=ph.sel===r?'':r;ph.mode=null;joySound('pop');phRender();
+}
+function phPanel(){
+  const p=$('ph-panel');p.innerHTML='';
+  const btn=(label,cls,run)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.textContent=label;b.onclick=run;return b;};
+  if(ph.mode?.info){
+    const g=phFind(ph.mode.info),r=ph.mode.room;if(!g){ph.mode=null;return;}
+    const card=document.createElement('div');card.className='joy-panel ph-info';
+    card.innerHTML='<b>'+esc(g.name)+' → '+esc(ht(HF.roomOf,{r}))+'</b><p class="ci-every">'+esc(HF.infoHead)+'</p><div class="ph-asks"></div>'+
+      (Object.values(HF.why).includes(ph.say)?'<p class="ph-why">'+esc(ph.say)+'</p>':'');
+    const asks=card.querySelector('.ph-asks');
+    for(const k of ['phone','email','card']){
+      const [i,l]=HF.info[k],b=document.createElement('button');b.type='button';b.className='ph-ask'+(g.got[k]?' got':'');
+      b.innerHTML='<span aria-hidden="true">'+i+'</span><span><b>'+esc(l)+'</b><small>'+esc(g.got[k]?(k==='phone'?g.phone:k==='email'?g.email:'•••• •••• •••• '+g.last4):HF.askIt)+'</small></span><span aria-hidden="true">'+(g.got[k]?'✓':'')+'</span>';
+      b.onclick=()=>{if(g.got[k])return;phSnap();g.got[k]=1;ph.say=HF.why[k];joySound('coin',1);phRender();phPop($('ph-panel').querySelectorAll('.ph-ask')[['phone','email','card'].indexOf(k)],i);};
+      asks.append(b);}
+    const all=g.got.phone&&g.got.email&&g.got.card;
+    const keys=btn(all?HF.keys:HF.keysLocked,'primary-button ph-keys'+(all?' hms-glow':''),()=>{
+      if(!all)return;phSnap();ph.waiting=ph.waiting.filter(x=>x!==g);ph.rooms[r]={st:'guest',g};ph.mode=null;ph.sel=r;ph.say=ht(HF.said.keys,{name:g.name.split(' ')[0],r});
+      joySound('open',1);phRender();const t=$('ph-board').querySelector('[data-r="'+r+'"]');if(t&&t.isConnected){const [x,y]=centerOf(t);burst(x,y,1,{hearts:true});floatText(x,y-30,'🔑',{size:24});}});
+    keys.disabled=!all;card.append(keys);p.append(card);return;
+  }
+  if(ph.mode?.pick){const g=phFind(ph.mode.pick);if(g)p.innerHTML='<p class="hms-say">'+esc(ht(HF.pickFor,{name:g.name}))+'</p>';return;}
+  if(ph.mode?.move){p.innerHTML='<p class="hms-say">'+esc(ht(HF.moveFor,{name:ph.rooms[ph.mode.move].g.name}))+'</p>';return;}
+  if(ph.mode?.who){
+    const r=ph.mode.who,card=document.createElement('div');card.className='joy-panel ph-act';card.innerHTML='<b>'+esc(ht(HF.pickWho,{r}))+'</b><div class="ph-acts"></div>';
+    ph.waiting.forEach(g=>card.querySelector('.ph-acts').append(btn(g.name,'secondary-button',()=>{ph.mode={info:g.id,room:r};ph.say=HF.infoHead;joySound('pop');phRender();})));
+    p.append(card);return;
+  }
+  const r=ph.sel;if(!r)return;const R=ph.rooms[r];
+  const card=document.createElement('div');card.className='joy-panel ph-act';
+  card.innerHTML='<b>'+esc(ht(HF.roomOf,{r}))+' · '+HF.st[R.st][0]+' '+esc(HF.st[R.st][1])+'</b>'+(R.g?'<p>'+esc(ht(HF.whoIn,{name:R.g.name,nights:HF.nights(R.g.nights)}))+'</p>':'')+'<div class="ph-acts"></div>';
+  const acts=card.querySelector('.ph-acts');
+  const set=(st,said,word)=>()=>{phSnap();ph.rooms[r]={st};ph.say=said;joySound('pop');phRender();phPop($('ph-board').querySelector('[data-r="'+r+'"]'),word);};
+  if(R.st==='tidy')acts.append(btn(HF.doClean,'primary-button',set('clean',HF.said.clean,'🧽')));
+  if(R.st==='clean'){acts.append(btn(HF.doInspect,'primary-button',set('ready',HF.said.ready,'✨')));acts.append(btn(HF.doDirty,'secondary-button',set('tidy',HF.said.dirty,'🧹')));}
+  if(R.st==='ready'){
+    if(ph.waiting.length)acts.append(btn(HF.doCheckHere,'primary-button',()=>{if(ph.waiting.length===1){ph.mode={info:ph.waiting[0].id,room:r};ph.say=HF.infoHead;}else ph.mode={who:r};joySound('pop');phRender();}));
+    acts.append(btn(HF.doDirty,'secondary-button',set('tidy',HF.said.dirty,'🧹')));
+  }
+  if(R.st==='guest'){
+    const g=R.g;
+    acts.append(btn(HF.doOut,'primary-button',()=>{phSnap();ph.rooms[r]={st:'tidy'};ph.say=ht(HF.said.out,{name:g.name});joySound('hop');phRender();phPop($('ph-board').querySelector('[data-r="'+r+'"]'),'🧳');}));
+    acts.append(btn(HF.doMove,'secondary-button',()=>{ph.mode={move:r};ph.say=ht(HF.moveFor,{name:g.name});joySound('pop');phRender();}));
+    acts.append(btn(HF.doFile,'secondary-button',()=>{ph.say=g.got.phone?ht(HF.said.file,{name:g.name,phone:g.phone,email:g.email,last4:g.last4}):ht(HF.said.fileNone,{name:g.name});phRender();}));
+  }
+  p.append(card);
+}
+{const st=document.createElement('style');st.textContent=`
+.hms-next{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;margin:10px 0;padding:14px;border-radius:18px;border:2px solid #c9952f;
+ background:linear-gradient(135deg,#fff7d6,#fff0c2);box-shadow:0 0 0 3px #ffd84d66,0 6px 22px #c9952f44;animation:hmsNextGlow 2.4s ease-in-out infinite}
+.hms-next-ic{font-size:40px;line-height:1}.hms-next small{display:block;font:bold 11px Arial,sans-serif;letter-spacing:.06em;color:#8a6420}
+.hms-next b{display:block;font:bold 20px Georgia,serif;color:var(--ink)}.hms-next p{margin:2px 0 0;color:#5b5444}
+.hms-next-go{grid-column:1/-1;width:100%;min-height:52px;font-size:18px}
+@keyframes hmsNextGlow{50%{box-shadow:0 0 0 5px #ffd84d99,0 6px 28px #c9952f66}}
+.hms-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}
+.hms-tile{display:grid;justify-items:center;gap:2px;padding:12px 8px;border-radius:16px;border:2px solid #b5d8c4;background:#effbf3;cursor:pointer;color:var(--ink);text-align:center;min-height:96px}
+.hms-tile.browse{background:#eef3fb;border-color:#b5c7e6}.hms-tile>span{font-size:30px}.hms-tile b{font:bold 16px Georgia,serif}.hms-tile small{font:12px/1.3 Arial,sans-serif;color:#5b6b60}
+.hms-tile:hover{filter:brightness(1.03);transform:translateY(-1px)}
+.hms-more{margin:4px 0 8px;padding:0 12px;border:1px solid #dfd3b3;border-radius:14px;background:#fffaf0}
+.hms-more[open]{padding-bottom:10px}.hms-more summary{min-height:48px;padding:13px 0;color:#23493f;font-weight:bold;cursor:pointer}
+.ph-board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ph-tile{position:relative;display:grid;justify-items:center;align-content:start;gap:1px;padding:8px 4px;min-height:118px;border-radius:16px;border:3px solid;cursor:pointer;color:var(--ink)}
+.ph-tile b{font:bold 20px Georgia,serif}.ph-ic{font-size:30px;line-height:1.15}.ph-tile small{font:bold 11px/1.2 Arial,sans-serif}
+.ph-tile em{font:12px Arial,sans-serif;font-style:normal}.ph-face{width:30px;height:24px;image-rendering:pixelated}
+.ph-tile.tidy{background:#ffe3d6;border-color:#f09a74}.ph-tile.clean{background:#fff5c9;border-color:#e8c34a}.ph-tile.ready{background:#dcf7d4;border-color:#6cc25a}.ph-tile.guest{background:#e3e9fd;border-color:#8ea3e6}
+.ph-tile.on{box-shadow:0 0 0 3px #2c6152}
+.ph-legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.ph-chip{padding:3px 9px;border-radius:99px;font:12px Arial,sans-serif;border:1px solid}
+.ph-chip.tidy{background:#ffe3d6;border-color:#f09a74}.ph-chip.clean{background:#fff5c9;border-color:#e8c34a}.ph-chip.ready{background:#dcf7d4;border-color:#6cc25a}.ph-chip.guest{background:#e3e9fd;border-color:#8ea3e6}
+.ph-act,.ph-info{display:grid;gap:8px;margin:8px 0}.ph-act p,.ph-info p{margin:0}.ph-acts{display:flex;flex-wrap:wrap;gap:8px}
+.ph-asks{display:grid;gap:6px}.ph-ask{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:2px dashed #c9952f;background:#fffaf0;cursor:pointer;text-align:left;color:var(--ink);min-height:56px}
+.ph-ask>span:first-child{font-size:24px}.ph-ask small{display:block;font:13px Arial,sans-serif;color:#6b6450}
+.ph-ask.got{border-style:solid;border-color:#6cc25a;background:#effbe9;cursor:default}.ph-ask.got small{font-family:'Courier New',monospace;color:#2f5d50}
+.ph-keys{min-height:50px}
+.ph-why{padding:8px 12px;border-radius:12px;background:#effbe9;border:1px solid #9fd38c;line-height:1.45}
+.ph-tile.hms-glow::after,.ph-keys.hms-glow::after{content:none}
+.ph-wait{display:grid;gap:6px}.ph-guest{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;border-radius:14px;border:1px solid #e0cf9e;background:#fffaf0}
+.ph-guest.on{border-color:#c9952f;box-shadow:0 0 0 2px #ffd84d88}.ph-guest canvas{width:36px;height:29px;image-rendering:pixelated}
+.ph-guest>span{flex:1;min-width:120px}.ph-guest small{display:block;font:12px Arial,sans-serif;color:#6b6450}
+.ph-new{justify-self:start}
+.ph-bar{position:sticky;bottom:0;z-index:2;display:flex;gap:8px;margin:12px -6px 0;padding:8px 6px;border-top:1px solid #e0cf9e;border-radius:12px;background:#fffdf7;box-shadow:0 -4px 12px #4b2f1c14}
+.ph-undo{min-height:50px;font-size:18px;flex:2 1 0}.ph-bar #ph-fresh{flex:1 1 0;min-height:50px}.ph-undo:disabled{opacity:.5;cursor:not-allowed}
+body.reduce-motion .hms-next{animation:none}
+@media(max-width:520px){.ph-tile{min-height:104px}.ph-ic{font-size:26px}.hms-tile{min-height:88px}}
+`;document.head.append(st);}
+/* ==== end HMS FRIENDLY v1 ==== */
+
+
+/* Opening a credential link (?cert=...) shows that certificate. Kept last, after every course registers. */
+{const d=certParse(location.search);if(d)setTimeout(()=>certView(d),0);}
 
 })();
 </script>

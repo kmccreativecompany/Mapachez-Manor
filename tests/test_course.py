@@ -49,6 +49,7 @@ class Course(base.Growth):
         self.assertEqual(self.page.locator('#co-mods .hms-lesson').count(), 6)
         self.assertTrue(self.page.locator('.co-final').is_disabled())
         self.page.evaluate('courseTest.hms()')
+        self.page.locator('#hms-more summary').click()
         self.page.locator('#co-hms').click()
         self.assertIn('LESSONS', self.page.locator('#modal-body').inner_text().upper())
 

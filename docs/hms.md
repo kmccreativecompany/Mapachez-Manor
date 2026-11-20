@@ -20,6 +20,40 @@ nothing is downloaded and nothing costs money to run. Progress is saved on the d
 | Every third guest in the manor | A guest asks something only the HMS knows ("Is my room ready yet?"). The hint names the tab, and the tab glows once the HMS opens. |
 | Quick shifts | After the first lesson, guest 2 of every quick shift is an HMS question (skipped when rush hour starts that early). |
 
+## The desk computer home (HMS FRIENDLY v1)
+
+The home is sorted so there is always one obvious thing to do. Nothing was removed.
+
+1. Delores's greeting (her first-visit hello, then "Back at the keys?").
+2. **✨ Your next step**: one glowing card with one big button. It walks the player through the
+   five lessons, then the Check-in e-course, then any desk game not tried yet, and after that it
+   always offers "A guest is waiting at the practice hotel".
+3. Two big tiles: **🏨 Practice hotel** and **🔎 Browse records** (the real manor HMS screen).
+4. **More**: the HMS skill bar, the e-course button, all five lessons, all three desk games and
+   "Explore on my own", exactly as before.
+
+## The practice hotel (nothing counts)
+
+A pretend HMS for poking around freely. No tips, no HMS points and nothing saved, so mistakes
+cost nothing. A big **↩️ Undo** sits at the bottom and takes back any tap (up to 60), and
+**🔄 Start fresh** deals a new hotel (also undoable).
+
+- **Room board**: six big tiles, 201 to 206, colored by status: 🧹 Dirty (peach),
+  🔍 Cleaned, not inspected (yellow), ✨ Inspected & ready (green), 🛌 Occupied (blue, with the
+  guest's face and first name). Tap a tile to act: housekeeping cleans it, a supervisor inspects
+  it, mark it dirty, check a guest in, check out (the room turns dirty), move rooms (the old room
+  turns dirty), or peek at their file.
+- **Waiting at the desk**: bookings with ✅ Check in and ❌ Cancel, plus **＋ New booking**.
+- **Check-in** keeps the real rules: only a ✨ room (a gentle "not inspected yet" on 🔍, "dirty"
+  on 🧹), then 📱 phone with area code, ✉️ email read back and 💳 a card on file, and only then
+  🔑 the keys. Delores says why after each one, and reminds players every HMS looks a little
+  different but does these same jobs.
+- Guests are make-believe, with names from all over the world and a random look (monster, alien,
+  fae, construct and so on). Phone numbers use 555-01xx, emails use example.com and cards use
+  well-known test endings, only ever shown masked.
+
+Tests: `tests/test_hms_friendly.py`.
+
 ## The HMS screen
 
 Four big tabs: 📅 Bookings, 🛏️ Rooms, 🙂 Guests, 🧾 Bills. The data is the manor's own six
