@@ -39,7 +39,7 @@ class Hms(base.Growth):
 
     def finish_checkin(self):
         self.page.wait_for_selector('.ci-card')
-        for right in ('And the area code', 'juniper.glow@example.com', 'Name matches'):
+        for right in ('And the area code', 'juniper.glow@example.com', 'Check name and date'):
             self.page.locator('.ci-step .choice', has_text=right).click()
         self.page.click('.ci-keys')
 

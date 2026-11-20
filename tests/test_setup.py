@@ -72,6 +72,8 @@ class Setup(unittest.TestCase):
     def open(self, init='', viewport=None, demo=False):
         context = self.browser.new_context(viewport=viewport or {'width': 1440, 'height': 1000}, reduced_motion='reduce')
         context.add_init_script("window.print=()=>{window.__printed=(window.__printed||0)+1;};" + init)
+        # The whole manor is open here; night-by-night unlocks are covered in test_nights.py.
+        context.add_init_script("try{if(!localStorage.getItem('mapachez_nights_v1'))localStorage.setItem('mapachez_nights_v1',JSON.stringify({all:true,seen:10,fresh:[]}))}catch(e){}")
         self.contexts.append(context)
         page = context.new_page()
         page.on('pageerror', lambda error: self.errors.append(str(error)))

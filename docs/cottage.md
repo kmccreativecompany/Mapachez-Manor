@@ -109,7 +109,7 @@ house, and can move in any time. Saves from v1 that already furnished a cottage 
 The Toadstool, The Little Lighthouse, The Treehouse and The Seashell. Each has its own outside
 drawing and its own colours inside (walls, panelling and floor). Your things move with you.
 
-## Rides (9)
+## Rides (9, now 11: see the update below)
 
 Bought with tips in the Rides tab. The ride you choose is drawn under you as you walk the manor
 and the festival grounds, and changes how fast you move (`world.options.speed`, a one-line hook in
@@ -163,3 +163,15 @@ Wheels, Sky High, Whole Garage, Slow and Steady (secret), First Raise, Homeowner
 
 Still `mapachez_cottage_v1`, with new fields `live`, `home`, `rides`, `ride`, `snail`, `grade` and
 `house`. Unknown values are dropped.
+
+## Rides are for getting around outside (update)
+
+- **Two new rides:** Hoverboard (120 tips, 1.7x, floats a hand above the path) and Pocket
+  teleporter (350 tips, 3x: a brass wristband with a glowing ring and sparkles).
+- **No vehicles inside the hotel, except the teleporter.** Inside the manor everyone walks: the
+  ride isn't drawn and walking speed is normal. Rides show and change speed only outdoors, on the
+  festival grounds. The pocket teleporter is the one exception and works indoors too.
+- **The trip in.** When a player with a ride starts their night, a short scene shows them
+  travelling from home (their cottage, Willowbrook House, or town) to the manor's front door.
+  The teleporter fades out at home and sparkles back in at the manor. Tap to skip; it closes on
+  its own. "Watch the trip in" on the Rides tab replays it.

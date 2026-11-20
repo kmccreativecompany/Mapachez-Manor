@@ -118,7 +118,7 @@ class Knock(base.Growth):
         self.assertIn('•••• •••• •••• 4242', self.page.locator('.ci-cc').inner_text())
         self.page.locator('.ci-step .choice', has_text='sticky note').click()
         self.assertIn('Never write a card number down', self.page.locator('.ci-step .hms-msg').inner_text())
-        self.page.locator('.ci-step .choice', has_text='Name matches').click()
+        self.page.locator('.ci-step .choice', has_text='Check name and date').click()
         self.assertFalse(self.page.locator('.ci-keys').is_disabled())
         self.page.click('.ci-keys')
         self.page.wait_for_selector('.hms-done')
