@@ -35,7 +35,10 @@ on the certificate screen.
 
 Each one uses the same Silver Key design as the check-in certificate (issued and signed by KMC
 Creative Company, LLC, "gamified e-course", "not an accreditation or license", locked name,
-certificate ID, PNG download and LinkedIn "Add to profile" link). The Master Certificate has a
+certificate ID, PNG download, a small "Earn yours at Mapáchez Manor" QR code, and the full
+"Show it off on LinkedIn" card from CERT SHARE v1: credential link, skills, share post). Each course
+registers with `certRegister` (codes LUX, PHN, HSK and MST for the Master), so its credential link
+opens a real certificate for whoever taps it. The Master Certificate has a
 double gold frame, a crown seal marked MASTER and green ribbons, and lists all four courses.
 The drawing lives in `mcDrawCert` inside the new block, so the check-in certificate code is untouched.
 

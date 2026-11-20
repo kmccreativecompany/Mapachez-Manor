@@ -21,7 +21,7 @@ Object.defineProperty(window,'mcTest',{get:()=>({
  allMods:id=>{mc.courses[id].mods=[1,2,3,4,5,6];mcStore();},
  pass:id=>{const r=mc.courses[id];r.mods=[1,2,3,4,5,6];r.passed='2026-11-20';r.salt='abc123';r.name=fullName(mcLockedName())||fullName(profile.name)||'';mcStore();},
  passCheckIn:()=>{course.mods=[1,2,3,4,5,6];course.passed='2026-11-19';course.salt='zz9';course.name=fullName(profile.name)||'';storeCourse();},
- normalise:v=>mcNormalise(v),code:(c,id,n)=>mcCode(c,mc.courses[id],n)
+ normalise:v=>mcNormalise(v),parse:u=>certParse(new URL(u).search),code:(c,id,n)=>mcCode(c,mc.courses[id],n)
 })});
 """
 base.TEST_HTML = base.TEST_HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
@@ -93,8 +93,13 @@ class Courses(base.Growth):
         self.assertIn('not an accreditation', body)
         self.assertIn('locked', body)
         self.assertEqual(self.page.locator('#co-name').count(), 0)
-        href = self.page.locator('.co-li').get_attribute('href')
+        href = self.page.locator('#co-share .cs-add').get_attribute('href')
         q = parse_qs(urlparse(href).query)
+        # The share card carries a credential link that opens this same certificate.
+        self.assertRegex(q['certUrl'][0], r'^https://kmccreativecompany\.github\.io/Mapachez-Manor/\?cert=SKC-HSK-')
+        self.assertEqual(self.page.evaluate("u=>mcTest.parse(u).name", q['certUrl'][0]), 'Rosa Quill')
+        self.assertIn('Room Inspection', self.page.locator('#co-share .cs-skills').inner_text())
+        self.assertEqual(self.page.locator('#co-share .cs-share').count(), 1)
         self.assertEqual(q['organizationName'], ['KMC Creative Company, LLC'])
         self.assertEqual(q['name'], ['Silver Key Certificate: Housekeeping Standards & Guest Room Inspection'])
         self.assertRegex(q['certId'][0], r'^SKC-HSK-[0-9A-Z]{4}-[0-9A-Z]{4}$')
@@ -133,7 +138,8 @@ class Courses(base.Growth):
         self.page.locator('#mc-master').click()
         self.page.wait_for_selector('#co-cert')
         self.assertIn('all four', self.page.locator('#modal-body').inner_text())
-        q = parse_qs(urlparse(self.page.locator('.co-li').get_attribute('href')).query)
+        q = parse_qs(urlparse(self.page.locator('#co-share .cs-add').get_attribute('href')).query)
+        self.assertFalse(self.page.evaluate("u=>mcTest.parse(u).bad||false", q['certUrl'][0]))
         self.assertEqual(q['name'], ['Silver Key Master Certificate: Hotel Front Office & Guest Services'])
         self.assertRegex(q['certId'][0], r'^SKC-MST-[0-9A-Z]{4}-[0-9A-Z]{4}$')
 

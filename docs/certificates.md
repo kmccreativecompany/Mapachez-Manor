@@ -56,3 +56,8 @@ automatically.
 
 `tests/test_cert_share.py` (run with `CHROMIUM_PATH=/opt/pw-browsers/chromium python tests/test_cert_share.py`).
 If OpenCV is installed, the test also scans the QR code.
+
+## Every certificate shares the same way
+
+The three later courses (LUX, PHN, HSK) and the Master Certificate (MST) register too, so all five
+certificates get the QR code, the credential link and the "Show it off on LinkedIn" card.
