@@ -19,7 +19,7 @@ bubble, spot and Memory Book page (a chat with `memory:true` fills that page).
 | --- | --- | --- |
 | letter | Zinnia Starling, Sunny Marrow | A secret letter for Lady Vesper, signed with one note drawn twice. Callback to Mr. Finch's one-note triangle. |
 | bells | Gwendolyn Butterfield, Mr. Finch | Spoons, bells, one triangle. Her next obsession is set up last. |
-| time | Ms. Chen, Dr. Merriweather | One has nine minutes, one has "centuries. I mean weeks." |
+| time | Ms. Chen, Dr. Merriweather | At the bar: one has nine minutes, one has "centuries. I mean weeks." Her very red usual is "synthetic, wonderful for the complexion." |
 | muffin | Cece Wrenwood, Basil Thorne | Muffin and Admiral both play asleep. "Two professionals." |
 | blankets | Mrs. and Mr. Calder | Forty years: patience, kindness, separate blankets. |
 | tuesday | Mr. Alvarez, M. Nine | A delayed flight vs. a trip "through Tuesday. Twice." |

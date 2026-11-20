@@ -81,6 +81,10 @@ On every other night, Cece walks the garden asking "Have you seen my cat?". Talk
 
 Nobody says what Muffin is, and the game doesn't either. A test checks that the kit never names her species.
 
+## Dr. Merriweather
+
+Dr. Evangeline Merriweather is a vampire, but the game never says the word. Her look is pinned in `CAST_PINS`: moon-pale skin, long dark hair with a widow's peak, pointed ears, two tiny fangs and a high-collared cape over a wine-red coat. She is allergic to garlic, avoids silver, and only drinks her usual: the Velvet Nightcap, a synthetic blood cocktail from a standing chef arrangement. Her training moments, regular card and lobby chat show this through her record and her own lines, never a label.
+
 ## Checks
 
 `python tests/test_cast.py` (set `CHROMIUM_PATH`). It checks that the kit stays small, that the family are raccoons, that named looks never change, that 300 random beings and every creator choice draw cleanly in all four directions, that Muffin and Cece work, and that the picker and pronouns (English and Spanish) save and read correctly.
