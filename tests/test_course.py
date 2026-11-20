@@ -103,7 +103,7 @@ class Course(base.Growth):
         self.assertIn('not an accreditation', self.page.locator('#modal-body').inner_text())
         self.page.fill('#co-name', 'Rosa Quill')
         code = self.page.evaluate("courseTest.code('Rosa Quill')")
-        self.assertRegex(code, r'^SKA-CHK-[0-9A-Z]{4}-[0-9A-Z]{4}$')
+        self.assertRegex(code, r'^SKC-CHK-[0-9A-Z]{4}-[0-9A-Z]{4}$')
         self.assertEqual(code, self.page.evaluate("courseTest.code('rosa quill')"))
         href = self.page.locator('.co-li').get_attribute('href')
         u = urlparse(href)
@@ -112,6 +112,8 @@ class Course(base.Growth):
         self.assertEqual(q['startTask'], ['CERTIFICATION_NAME'])
         self.assertEqual(q['certId'], [code])
         self.assertIn('Front Desk Check-In', q['name'][0])
+        self.assertIn('Silver Key Certificate', q['name'][0])
+        self.assertEqual(q['organizationName'], ['KMC Creative Company, LLC'])
         with self.page.expect_download() as d:
             self.page.locator('#co-actions .primary-button', has_text='Save the picture').click()
         self.assertTrue(d.value.suggested_filename.endswith('.png'))

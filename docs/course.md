@@ -41,11 +41,11 @@ limit on tries and nothing is taken away for a miss. Passing gives +5 tips, conf
 
 Drawn on a canvas on the device (1200 × 850): the player's name, the date they passed, the
 course name, Delores's signature and a gold seal. Each certificate has an ID like
-`SKA-CHK-1A2B-3C4D`, made from the name, date and a random salt saved on the device.
+`SKC-CHK-1A2B-3C4D`, made from the name, date and a random salt saved on the device.
 
 - **⬇️ Save the picture** downloads a PNG.
 - **Add to LinkedIn** opens LinkedIn's free "Add to profile" form with the course name, the
-  organization (Silver Key Games), the month and year, and the certificate ID filled in.
+  organization (KMC Creative Company, LLC, the issuer) and the name "Silver Key Certificate: Front Desk Check-In", the month and year, and the certificate ID filled in.
 
 The certificate and the screen both say it is a certificate of completion from a training game,
 not an accreditation or license.

@@ -8997,7 +8997,7 @@ nnApply(false);
    It is a certificate of completion from a training game, never an accreditation. */
 const COURSE_TEXT={
  en:{
-  kicker:'SILVER KEY ACADEMY · E-COURSE',title:'Front Desk Check-In',
+  kicker:'SILVER KEY CERTIFICATE · E-COURSE',title:'Front Desk Check-In',
   hi:'Delores: “Welcome to class! I’ll teach you how to check a guest in, and why we do every step. Six tiny lessons, one friendly final check, then a certificate with your name on it.”',
   hiBack:'Delores: “Welcome back, star pupil. Pick up right where you left off.”',
   hiDone:'Delores: “You’ve mastered check-in! Your certificate is ready whenever you are.”',
@@ -9048,16 +9048,16 @@ const COURSE_TEXT={
   certIntro:'Type your name the way you want it on your certificate.',nameL:'Your name',namePh:'First and last name',
   save:'⬇️ Save the picture',li:'Add to LinkedIn',needName:'Type your name first, so it can go on the certificate.',saved:'Saved! Look in your downloads.',
   liHow:'LinkedIn opens with the course filled in. You can also post the picture you saved.',
-  fine:'This is a certificate of completion from a training game. It is not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
-  c:{org:'SILVER KEY ACADEMY  ·  MAPÁCHEZ MANOR',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the e-course',course:'Front Desk Check-In',
+  fine:'This Silver Key Certificate is issued by KMC Creative Company, LLC. It is a certificate of completion from a training game. It is not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
+  c:{org:'SILVER KEY CERTIFICATE  ·  MAPÁCHEZ MANOR',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the e-course',course:'Front Desk Check-In',
      steps:'Booking · ID · Phone with area code · Email · Card on file · Keys last',date:'Date',sign:'Delores',signRole:'Head of the Front Desk',id:'Certificate ID',
-     fine:'Certificate of completion from a training game. Not an accreditation or license.',placeholder:'Your name here',seal:'MASTERED'},
-  liName:'Front Desk Check-In (Silver Key Academy e-course)',liOrg:'Silver Key Games',
+     fine:'Issued by KMC Creative Company, LLC. A certificate of completion from a training game, not an accreditation or license.',placeholder:'Your name here',seal:'MASTERED'},
+  liName:'Silver Key Certificate: Front Desk Check-In',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Check-in e-course · certificate',hmsBtn:'🎓 E-course: Front Desk Check-In',hmsBtnD:'Learn the why behind every step, and earn a certificate.',
   pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']}
  },
  es:{
-  kicker:'SILVER KEY ACADEMY · CURSO EN LÍNEA',title:'Registro de entrada en recepción',
+  kicker:'SILVER KEY CERTIFICATE · CURSO EN LÍNEA',title:'Registro de entrada en recepción',
   hi:'Delores: “¡Bienvenida a clase! Te enseño a registrar la entrada de un huésped, y por qué hacemos cada paso. Seis lecciones chiquitas, un repaso final amable y luego un certificado con tu nombre.”',
   hiBack:'Delores: “Bienvenida de nuevo, alumna estrella. Sigue donde lo dejaste.”',
   hiDone:'Delores: “¡Dominas el registro de entrada! Tu certificado está listo cuando quieras.”',
@@ -9108,11 +9108,11 @@ const COURSE_TEXT={
   certIntro:'Escribe tu nombre tal como lo quieres en tu certificado.',nameL:'Tu nombre',namePh:'Nombre y apellido',
   save:'⬇️ Guardar la imagen',li:'Añadir a LinkedIn',needName:'Escribe tu nombre primero, para ponerlo en el certificado.',saved:'¡Guardado! Míralo en tus descargas.',
   liHow:'LinkedIn se abre con el curso ya escrito. También puedes publicar la imagen que guardaste.',
-  fine:'Es un certificado de finalización de un juego de formación. No es una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
-  c:{org:'SILVER KEY ACADEMY  ·  MAPÁCHEZ MANOR',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea',course:'Registro de entrada en recepción',
+  fine:'Este Silver Key Certificate lo emite KMC Creative Company, LLC. Es un certificado de finalización de un juego de formación. No es una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
+  c:{org:'SILVER KEY CERTIFICATE  ·  MAPÁCHEZ MANOR',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea',course:'Registro de entrada en recepción',
      steps:'Reserva · Identificación · Teléfono con código · Correo · Tarjeta · Llaves al final',date:'Fecha',sign:'Delores',signRole:'Jefa de recepción',id:'ID del certificado',
-     fine:'Certificado de finalización de un juego de formación. No es una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'DOMINADO'},
-  liName:'Registro de entrada en recepción (curso de Silver Key Academy)',liOrg:'Silver Key Games',
+     fine:'Emitido por KMC Creative Company, LLC. Certificado de finalización de un juego de formación, no una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'DOMINADO'},
+  liName:'Silver Key Certificate: Registro de entrada en recepción',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Curso de registro de entrada · certificado',hmsBtn:'🎓 Curso: Registro de entrada',hmsBtnD:'Aprende el porqué de cada paso y gana un certificado.',
   pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']}
  }
@@ -9134,7 +9134,7 @@ function storeCourse(){try{localStorage.setItem(COURSE_KEY,JSON.stringify(course
 const cf=(s,v)=>ht(s,v);
 const isoDay=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function coursePretty(iso){const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(profile.lang==='es'?'es':'en',{year:'numeric',month:'long',day:'numeric'});}
-function courseCode(name){return 'SKA-CHK-'+sum4(cleanText(name,40).toLowerCase()+'|'+course.passed+'|'+course.salt).toUpperCase()+'-'+sum4(course.salt+'|'+course.passed).toUpperCase();}
+function courseCode(name){return 'SKC-CHK-'+sum4(cleanText(name,40).toLowerCase()+'|'+course.passed+'|'+course.salt).toUpperCase()+'-'+sum4(course.salt+'|'+course.passed).toUpperCase();}
 function coachHTML(id,text){return '<div class="hms-coach"><canvas id="'+id+'" aria-hidden="true"></canvas><p>'+esc(text)+'</p></div>';}
 function courseVisual(kind){
   if(kind==='path')return '<ol class="co-path">'+CO.path.map((p,k)=>'<li style="--k:'+k+'">'+esc(p)+'</li>').join('')+'</ol>';
