@@ -118,6 +118,10 @@ class Setup(unittest.TestCase):
         self.assertIn('first-hello', s['growth']['pins'])
         self.assertGreater(s['profile']['week']['pts'], 0)
         page.click('#modal-body .gm-result .primary-button')
+        # Right after the first guest, Delores offers to put the player's name on certificates (optional).
+        page.wait_for_selector('#co-name')
+        self.assertIn('gamified e-course', page.inner_text('#modal-body'))
+        page.click('#co-name-row .secondary-button')
         page.wait_for_selector('#modal-body .gm-dots i')
         self.assertIsNotNone(self.state(page)['shift'])
         page.reload()

@@ -37,6 +37,19 @@ Six questions in a shuffled order. Every answer shows a one-line reason. 5 of 6 
 limit on tries and nothing is taken away for a miss. Passing gives +5 tips, confetti and the
 **Certified!** pin.
 
+## Whose certificate: the name
+
+- Right after a new player's very first guest (so the first guest is still one tap away), Delores
+  explains that the game is also a gamified e-course and offers to put their first and last name on
+  certificates for their resume. It's optional ("Skip for now"), and asked once.
+- The course home shows a gentle reminder until a name is saved, and the final check asks once more
+  ("Whose certificate is this?"), with "Take the check without a name" as the way past.
+- A name must have at least two words (first and last).
+- When the final check is passed, the name is **locked** onto the certificate (saved as `name` in
+  `mapachez_course_v1`). The certificate screen has no name box, and changing the profile name later
+  doesn't change it. Someone who passed without a name can add one, once; then it locks too.
+- Once locked, the progress report's name box is locked to the same name.
+
 ## The certificate
 
 Drawn on a canvas on the device (1200 × 850): the player's name, the date they passed, the
