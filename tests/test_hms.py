@@ -37,6 +37,12 @@ class Hms(base.Growth):
     def h(self):
         return self.page.evaluate('window.hmsTest')
 
+    def finish_checkin(self):
+        self.page.wait_for_selector('.ci-card')
+        for right in ('And the area code', 'juniper.glow@example.com', 'Name matches'):
+            self.page.locator('.ci-step .choice', has_text=right).click()
+        self.page.click('.ci-keys')
+
     def tap(self, act):
         self.page.locator(f'#modal-body [data-act="{act}"]').first.click()
 
@@ -84,6 +90,8 @@ class Hms(base.Growth):
         self.tap('pick:205')
         self.assertIn('still needs a tidy', self.page.locator('#hms-host .hms-msg').inner_text())
         self.tap('pick:201')
+        self.assertEqual(self.page.locator('.hms-done').count(), 0)
+        self.finish_checkin()
         self.page.wait_for_selector('.hms-done')
         self.assertIn('checked in', self.page.locator('#hms-host').inner_text().lower())
 
@@ -100,6 +108,7 @@ class Hms(base.Growth):
         self.page.evaluate('hmsTest.lesson(5)')
         for act in ('tab:bookings', 'booking:juniper', 'checkin:juniper', 'pick:201'):
             self.tap(act)
+        self.finish_checkin()
         self.page.wait_for_selector('.hms-done .joy-open-gift')
         h = self.h()
         self.assertEqual(sorted(h['hms']['lessons']), [1, 2, 3, 4, 5])

@@ -42,12 +42,25 @@ and "hi" gets "…hi? Who is this?", each with a gentle hint. Then **Head in** k
 
 ## Phone numbers and check-in
 
-Story guests (202, 203, 204, 206) have fictional numbers on file (555-01xx). On the desk
-computer, the Guests tab now shows **📱 Phone** for everyone.
+Story guests (202, 203, 204, 206) have fictional numbers on file, always with an area code
+(for example (312) 555-0186). On the desk computer, the Guests tab shows **📱 Phone** for everyone,
+and **✉️ Email** and **💳 Card on file** (masked, `•••• •••• •••• 4242`) for arrivals.
 
-When you check a guest in on the desk computer (lesson 5 or exploring), Delores adds one more
-step: "Ask for a phone number." Asking saves it (+1 tip, pin). Skipping is allowed.
-Checked-in arrivals (Juniper Glow, Captain Barnaby Fuzz) then live behind their door in the manor.
+When you check a guest in on the desk computer (lesson 5 or exploring), the room is held and a
+**🔑 Before the keys** card appears. Delores notes that every HMS looks a little different, but
+most hotels check guests in this same way. Three things go on file, one tap each, with Delores
+saying why after every right answer:
+
+| Step | Right tap | Gentle misses |
+| --- | --- | --- |
+| 📱 Phone | “And the area code?” | Save the 7 digits as they are; skip it |
+| ✉️ Email | The address typed exactly | Two near-miss typos (read it back!) |
+| 💳 Card | Check name and date, let the HMS hold it, hand it back | Copy it on a sticky note; skip it |
+
+Only then does **🔑 Make the room keys** unlock. Keys come in a sleeve with the room number
+written inside (never said out loud). Checked-in arrivals (Juniper Glow, Captain Barnaby Fuzz)
+then live behind their door in the manor. Older saves that kept a number without an area code
+are upgraded.
 
 If that guest's door later says Do Not Disturb and there's **no number on file**, the phone
 shows "No number on file" and Delores explains why we ask at check-in. You slide a kind note
