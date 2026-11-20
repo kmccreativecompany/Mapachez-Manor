@@ -34,6 +34,8 @@ class CertShare(base.Growth):
 
     def open_cert(self):
         self.page.locator('#co-title').click()
+        # The title button opens the course catalog (MORE COURSES v1); the check-in course is first.
+        self.page.locator('#mc-open-chk').click()
         self.page.locator('.co-cert-open').click()
         self.page.wait_for_selector('#co-share .cs-card')
 
