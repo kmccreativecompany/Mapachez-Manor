@@ -8997,7 +8997,7 @@ nnApply(false);
    It is a Silver Key Certificate of completion from KMC Creative Company, LLC for a gamified e-course, never an accreditation. */
 const COURSE_TEXT={
  en:{
-  kicker:'SILVER KEY CERTIFICATE · E-COURSE',title:'Front Desk Check-In',
+  kicker:'SILVER KEY CERTIFICATE · E-COURSE',title:'Front Desk Check-In & Guest Registration Fundamentals',
   hi:'Delores: “Welcome to class! I’ll teach you how to check a guest in, and why we do every step. Six tiny lessons, one friendly final check, then a certificate with your name on it.”',
   hiBack:'Delores: “Welcome back, star pupil. Pick up right where you left off.”',
   hiDone:'Delores: “You’ve mastered check-in! Your certificate is ready whenever you are.”',
@@ -9049,15 +9049,15 @@ const COURSE_TEXT={
   save:'⬇️ Save the picture',li:'Add to LinkedIn',needName:'Type your name first, so it can go on the certificate.',saved:'Saved! Look in your downloads.',
   liHow:'LinkedIn opens with the course filled in. You can also post the picture you saved.',
   fine:'This Silver Key Certificate is issued by KMC Creative Company, LLC for completing a gamified e-course. It is a certificate of completion, not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
-  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the gamified e-course',course:'Front Desk Check-In',
+  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the gamified e-course',course:'Front Desk Check-In & Guest Registration Fundamentals',
      steps:'Booking · ID · Phone with area code · Email · Card on file · Keys last',date:'Date',sign:'KMC Creative Company, LLC',signRole:'Issued by',id:'Certificate ID',
      fine:'Certificate of completion for a gamified e-course. Not an accreditation or license.',placeholder:'Your name here',seal:'COMPLETED'},
-  liName:'Silver Key Certificate: Front Desk Check-In',liOrg:'KMC Creative Company, LLC',
+  liName:'Silver Key Certificate: Front Desk Check-In & Guest Registration Fundamentals',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Check-in e-course · certificate',hmsBtn:'🎓 E-course: Front Desk Check-In',hmsBtnD:'Learn the why behind every step, and earn a certificate.',
   pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']}
  },
  es:{
-  kicker:'SILVER KEY CERTIFICATE · CURSO EN LÍNEA',title:'Registro de entrada en recepción',
+  kicker:'SILVER KEY CERTIFICATE · CURSO EN LÍNEA',title:'Fundamentos de registro de entrada y recepción de huéspedes',
   hi:'Delores: “¡Bienvenida a clase! Te enseño a registrar la entrada de un huésped, y por qué hacemos cada paso. Seis lecciones chiquitas, un repaso final amable y luego un certificado con tu nombre.”',
   hiBack:'Delores: “Bienvenida de nuevo, alumna estrella. Sigue donde lo dejaste.”',
   hiDone:'Delores: “¡Dominas el registro de entrada! Tu certificado está listo cuando quieras.”',
@@ -9109,10 +9109,10 @@ const COURSE_TEXT={
   save:'⬇️ Guardar la imagen',li:'Añadir a LinkedIn',needName:'Escribe tu nombre primero, para ponerlo en el certificado.',saved:'¡Guardado! Míralo en tus descargas.',
   liHow:'LinkedIn se abre con el curso ya escrito. También puedes publicar la imagen que guardaste.',
   fine:'Este Silver Key Certificate lo emite KMC Creative Company, LLC por completar un curso en línea gamificado. Es un certificado de finalización, no una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
-  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea gamificado',course:'Registro de entrada en recepción',
+  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea gamificado',course:'Fundamentos de registro de entrada y recepción de huéspedes',
      steps:'Reserva · Identificación · Teléfono con código · Correo · Tarjeta · Llaves al final',date:'Fecha',sign:'KMC Creative Company, LLC',signRole:'Emitido por',id:'ID del certificado',
      fine:'Certificado de finalización de un curso en línea gamificado. No es una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'COMPLETADO'},
-  liName:'Silver Key Certificate: Registro de entrada en recepción',liOrg:'KMC Creative Company, LLC',
+  liName:'Silver Key Certificate: Fundamentos de registro de entrada y recepción de huéspedes',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Curso de registro de entrada · certificado',hmsBtn:'🎓 Curso: Registro de entrada',hmsBtnD:'Aprende el porqué de cada paso y gana un certificado.',
   pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']}
  }
@@ -9265,7 +9265,7 @@ function drawCertificate(cv,name){
   c.fillStyle=cleanText(name,40)?deep:'#b9ab8c';c.fillText(nm,W/2,348);
   c.strokeStyle=gold;c.lineWidth=2;c.beginPath();c.moveTo(W/2-330,370);c.lineTo(W/2+330,370);c.stroke();
   c.font='italic 26px '+serif;c.fillStyle='#5c4e36';c.fillText(C.completed,W/2,418);
-  c.font='bold 46px '+serif;c.fillStyle=ink;c.fillText(C.course,W/2,476);
+  {let cs=46;c.font='bold '+cs+'px '+serif;while(c.measureText(C.course).width>W-220&&cs>26){cs-=2;c.font='bold '+cs+'px '+serif;}}c.fillStyle=ink;c.fillText(C.course,W/2,476);
   c.font='19px '+serif;c.fillStyle='#5c4e36';c.fillText(C.steps,W/2,516);
   /* seal: a gold rosette with a little key */
   const sx=W/2,sy=636;

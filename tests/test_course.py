@@ -111,7 +111,7 @@ class Course(base.Growth):
         q = parse_qs(u.query)
         self.assertEqual(q['startTask'], ['CERTIFICATION_NAME'])
         self.assertEqual(q['certId'], [code])
-        self.assertIn('Front Desk Check-In', q['name'][0])
+        self.assertIn('Front Desk Check-In & Guest Registration Fundamentals', q['name'][0])
         self.assertIn('Silver Key Certificate', q['name'][0])
         self.assertEqual(q['organizationName'], ['KMC Creative Company, LLC'])
         with self.page.expect_download() as d:
