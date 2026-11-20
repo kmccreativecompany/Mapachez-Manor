@@ -8994,7 +8994,7 @@ nnApply(false);
    Six tiny lessons (each one says HOW and WHY), a friendly final check (5 of 6 to pass, retry
    anytime), then a certificate drawn on the device: name, date and a certificate ID. It saves as
    a picture and opens LinkedIn's free "Add to profile" form. No servers, nothing to pay for.
-   It is a certificate of completion from a training game, never an accreditation. */
+   It is a Silver Key Certificate of completion from KMC Creative Company, LLC for a gamified e-course, never an accreditation. */
 const COURSE_TEXT={
  en:{
   kicker:'SILVER KEY CERTIFICATE · E-COURSE',title:'Front Desk Check-In',
@@ -9048,10 +9048,10 @@ const COURSE_TEXT={
   certIntro:'Type your name the way you want it on your certificate.',nameL:'Your name',namePh:'First and last name',
   save:'⬇️ Save the picture',li:'Add to LinkedIn',needName:'Type your name first, so it can go on the certificate.',saved:'Saved! Look in your downloads.',
   liHow:'LinkedIn opens with the course filled in. You can also post the picture you saved.',
-  fine:'This Silver Key Certificate is issued by KMC Creative Company, LLC. It is a certificate of completion from a training game. It is not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
-  c:{org:'SILVER KEY CERTIFICATE  ·  MAPÁCHEZ MANOR',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the e-course',course:'Front Desk Check-In',
-     steps:'Booking · ID · Phone with area code · Email · Card on file · Keys last',date:'Date',sign:'Delores',signRole:'Head of the Front Desk',id:'Certificate ID',
-     fine:'Issued by KMC Creative Company, LLC. A certificate of completion from a training game, not an accreditation or license.',placeholder:'Your name here',seal:'MASTERED'},
+  fine:'This Silver Key Certificate is issued by KMC Creative Company, LLC for completing a gamified e-course. It is a certificate of completion, not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
+  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the gamified e-course',course:'Front Desk Check-In',
+     steps:'Booking · ID · Phone with area code · Email · Card on file · Keys last',date:'Date',sign:'KMC Creative Company, LLC',signRole:'Issued by',id:'Certificate ID',
+     fine:'Certificate of completion for a gamified e-course. Not an accreditation or license.',placeholder:'Your name here',seal:'COMPLETED'},
   liName:'Silver Key Certificate: Front Desk Check-In',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Check-in e-course · certificate',hmsBtn:'🎓 E-course: Front Desk Check-In',hmsBtnD:'Learn the why behind every step, and earn a certificate.',
   pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']}
@@ -9108,10 +9108,10 @@ const COURSE_TEXT={
   certIntro:'Escribe tu nombre tal como lo quieres en tu certificado.',nameL:'Tu nombre',namePh:'Nombre y apellido',
   save:'⬇️ Guardar la imagen',li:'Añadir a LinkedIn',needName:'Escribe tu nombre primero, para ponerlo en el certificado.',saved:'¡Guardado! Míralo en tus descargas.',
   liHow:'LinkedIn se abre con el curso ya escrito. También puedes publicar la imagen que guardaste.',
-  fine:'Este Silver Key Certificate lo emite KMC Creative Company, LLC. Es un certificado de finalización de un juego de formación. No es una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
-  c:{org:'SILVER KEY CERTIFICATE  ·  MAPÁCHEZ MANOR',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea',course:'Registro de entrada en recepción',
-     steps:'Reserva · Identificación · Teléfono con código · Correo · Tarjeta · Llaves al final',date:'Fecha',sign:'Delores',signRole:'Jefa de recepción',id:'ID del certificado',
-     fine:'Emitido por KMC Creative Company, LLC. Certificado de finalización de un juego de formación, no una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'DOMINADO'},
+  fine:'Este Silver Key Certificate lo emite KMC Creative Company, LLC por completar un curso en línea gamificado. Es un certificado de finalización, no una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
+  c:{org:'SILVER KEY CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea gamificado',course:'Registro de entrada en recepción',
+     steps:'Reserva · Identificación · Teléfono con código · Correo · Tarjeta · Llaves al final',date:'Fecha',sign:'KMC Creative Company, LLC',signRole:'Emitido por',id:'ID del certificado',
+     fine:'Certificado de finalización de un curso en línea gamificado. No es una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'COMPLETADO'},
   liName:'Silver Key Certificate: Registro de entrada en recepción',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Curso de registro de entrada · certificado',hmsBtn:'🎓 Curso: Registro de entrada',hmsBtnD:'Aprende el porqué de cada paso y gana un certificado.',
   pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']}
@@ -9279,7 +9279,7 @@ function drawCertificate(cv,name){
   /* date and signature */
   const line=(x,label,value,font)=>{c.font=font;c.fillStyle=ink;c.fillText(value,x,650);c.strokeStyle='#8a7652';c.lineWidth=1.5;c.beginPath();c.moveTo(x-150,664);c.lineTo(x+150,664);c.stroke();c.font='16px '+serif;c.fillStyle='#6b5d44';c.fillText(label,x,690);};
   line(250,C.date,course.passed?coursePretty(course.passed):'',  '24px '+serif);
-  line(W-250,C.signRole,C.sign,'italic 40px "Brush Script MT","Segoe Script",cursive,'+serif);
+  line(W-250,C.signRole,C.sign,'italic 24px '+serif);
   c.font='15px Arial,sans-serif';c.fillStyle='#6b5d44';c.fillText(C.id+': '+courseCode(name),W/2,H-76);
   c.font='13px Arial,sans-serif';c.fillStyle='#8a7c62';c.fillText(C.fine,W/2,H-54);
 }
