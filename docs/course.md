@@ -16,7 +16,7 @@ buttons and names change, but almost every one follows the same path:
 
 | Where | What |
 | --- | --- |
-| Title screen | "🎓 Check-in e-course · certificate · n / 6 →" |
+| Title screen | "🎓 E-courses · certificates · n / 4 →" opens the catalog of all four courses (see `docs/courses.md`) |
 | Desk computer home (H) | "🎓 E-course: Front Desk Check-In", right under the HMS skill bar |
 
 ## Lessons (six, about 30 seconds each)

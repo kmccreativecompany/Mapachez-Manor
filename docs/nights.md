@@ -17,6 +17,9 @@ this order:
 8. Star service
 9. Training shortcut, house ledger and shift journal
 10. Progress report and certificate (always shown for **Training with my hotel**)
+11. Luxury Guest Service Language e-course
+12. Telephone Etiquette e-course
+13. Housekeeping Standards e-course (see `docs/courses.md`)
 
 Something new glows gold and a "New tonight" note appears until the player taps it.
 A small line under Quick shift says something new opens next shift.

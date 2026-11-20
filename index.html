@@ -8922,7 +8922,10 @@ const NN_STEPS=[
   {id:'penny',icon:'🐉',en:'Penny and her shiny money facts',es:'Penny y sus datos brillantes de dinero',sel:['#penny-title','#joy-side-penny']},
   {id:'star',icon:'🌟',en:'Star service',es:'Servicio estrella',sel:['#star-title','#joy-side-star']},
   {id:'desk',icon:'🗝️',en:'Your ledger, journal and training shortcut',es:'Tu libro, tu diario y el atajo de formación',sel:['#training-button','#ledger-button','#journal-button']},
-  {id:'report',icon:'🏅',en:'Your progress report and certificate',es:'Tu informe de progreso y certificado',sel:['#title-report','#growth-report']}
+  {id:'report',icon:'🏅',en:'Your progress report and certificate',es:'Tu informe de progreso y certificado',sel:['#title-report','#growth-report']},
+  {id:'course-lux',icon:'💬',en:'A new e-course: Luxury Guest Service Language',es:'Un curso nuevo: Lenguaje en el servicio de lujo',sel:['#mc-open-lux']},
+  {id:'course-phn',icon:'📞',en:'A new e-course: Telephone Etiquette',es:'Un curso nuevo: Etiqueta telefónica',sel:['#mc-open-phn']},
+  {id:'course-hsk',icon:'🧹',en:'A new e-course: Housekeeping Standards',es:'Un curso nuevo: Estándares de limpieza',sel:['#mc-open-hsk']}
 ];
 const NN_TEXT={
   en:{fresh:'New tonight',tease:'🌙 Finish a shift to open something new in the manor.',left:'🌙 Next shift opens something new · {n} still waiting',all:'Show everything now',allHint:'Open every part of the manor at once, instead of one new thing each night.'},
@@ -9424,6 +9427,588 @@ body.reduce-motion .co-path li{animation:none}
 `;document.head.append(st);}
 checkPins();
 /* ==== end COURSE v1 ==== */
+
+/* ==== MORE COURSES v1: three more Silver Key e-courses and a Master certificate ====
+   Luxury guest language, telephone skills and housekeeping standards, built exactly like the
+   check-in course: six tiny lessons (how + why), a final check (5 of 6, retry anytime) and a
+   certificate drawn on the device. Pass all four (check-in included) for the Master Certificate.
+   The check-in course (COURSE v1) is left as it is; this block only reads from it. */
+const MC_TEXT={
+ en:{
+  catKick:'SILVER KEY CERTIFICATES',catT:'E-courses & certificates',
+  catHi:'Delores: “Four short courses, each with its own certificate. Finish all four and you earn the Master Certificate. Take them in any order, at your own pace.”',
+  earned:'{n} of 4 certificates earned',open:'Open',passed:'✓ Certified',
+  waitOne:'🌙 Opens after your next shift',waitMany:'🌙 Opens in {n} more shifts',
+  titleBtn:'🎓 E-courses · certificates',allBtn:'🎓 All e-courses',
+  masterT:'Master Certificate',masterD:'Pass all four courses to earn it',masterGot:'Earned! Save it, print it, add it to LinkedIn',
+  masterKick:'SILVER KEY MASTER CERTIFICATE',masterHi:'Delores: “All four courses. I’m so proud I could knit you a scarf. This one is the big one.”',
+  masterPop:'Master Certificate',
+  masterFine:'This Silver Key Master Certificate is issued by KMC Creative Company, LLC for completing all four gamified e-courses. It is a certificate of completion, not an accreditation or license.',
+  masterPin:['Master of the Manor','Earn all four Silver Key Certificates.'],
+  mc:{title:'Master Certificate',completed:'has completed all four gamified e-courses in',course:'Hotel Front Office & Guest Services',seal:'MASTER',fine:'Certificate of completion for four gamified e-courses. Not an accreditation or license.',steps:'Check-In & Registration · Guest Service Language · Telephone Etiquette · Housekeeping Standards'},
+  masterLi:'Silver Key Master Certificate: Hotel Front Office & Guest Services',
+  courses:[
+   {id:'lux',code:'LUX',icon:'💬',title:'Luxury Guest Service Language & Communication',short:'Warm words, names, and never a flat “no”.',
+    hi:'Delores: “Five-star service isn’t fancy words. It’s kind ones, said at the right moment. Six tiny lessons, then your certificate.”',
+    hiBack:'Delores: “Welcome back. Your words are getting warmer already.”',hiDone:'Delores: “You speak fluent Gracious now. Your certificate is ready.”',
+    passT:'Your words sparkle! 🎓',pin:['Silver Tongue','Pass the Luxury Guest Service Language e-course.'],
+    mods:[
+     {t:'Names and warm welcomes',d:'Use their name, gently.',
+      how:'Greet every guest within a few steps of the door, with eye contact and a smile. Once you know their name, use it, but not in every sentence.',
+      why:'A name tells a guest they are known, not processed. Two or three times feels warm. Ten times feels like a sales pitch.',
+      q:'Ms. Okafor walks up for the third night in a row. Best greeting?',opts:[['Welcome back, Ms. Okafor!',1],['Hello, welcome to the manor, may I have your last name please?',0],['Next, please.',0]],yes:'She feels remembered. That’s the whole trick.',hint:'She has been here before.'},
+     {t:'Words that sound like velvet',d:'Small swaps, big warmth.',vis:'swap',
+      how:'Luxury service sounds calm and kind. Swap casual or negative words for warm, positive ones. You aren’t being fancy, you’re being gracious.',
+      why:'“No problem” quietly hints it might have been a problem. “My pleasure” says helping them was a joy. Guests remember how you made them feel.',
+      q:'A guest thanks you for a spare phone charger. You say:',opts:[['My pleasure.',1],['No problem, honestly it’s not a big deal at all.',0],['Yep.',0]],yes:'Velvet. Pure velvet.',hint:'Look at the swaps above.'},
+     {t:'Never a flat “no”',d:'Lead with what you can do.',
+      how:'When you can’t give a guest what they asked for, skip the “no” and lead with what you can do. Offer two choices when you can, so they feel in control.',
+      why:'A flat no ends the conversation and the guest walks away disappointed. Two good options turn a letdown into a choice they get to make.',
+      q:'The spa is fully booked tonight. Best reply?',opts:[['Tonight is full, but I can book you at 9 tomorrow, or send warm towels and tea up now.',1],['Sorry, no.',0],['It’s full. Maybe try calling them tomorrow yourself?',0]],yes:'Two lovely options. Nobody even noticed the “no”.',hint:'Offer something they can say yes to.'},
+     {t:'Notice before they ask',d:'Anticipate small needs.',
+      how:'Watch and listen. A sniffle means tissues and tea. A heavy suitcase means a bellhop. An early flight means a wake-up call and a breakfast box.',
+      why:'Meeting a need before it is spoken is the heart of five-star service. It tells guests someone is looking out for them.',
+      q:'A guest mentions their 6 a.m. flight. What do you offer?',opts:[['A wake-up call and a breakfast box',1],['Nothing. They didn’t ask for anything, so it’s best not to bother them',0],['A late checkout',0]],yes:'They didn’t even have to ask. Magic.',hint:'Think about what an early morning needs.'},
+     {t:'Walk them there',d:'Escort, don’t point.',
+      how:'When a guest asks where something is, walk them there if you can. If you can’t leave the desk, give clear directions with an open hand, never a pointing finger.',
+      why:'Walking a guest to the dining room takes thirty seconds and feels like being welcomed into a home. A pointed finger feels like being sent away.',
+      q:'A guest asks where the library is. You’re free. You:',opts:[['Walk them there',1],['Point down the hall and say “that way”',0],['Hand them a map of the whole manor and wish them luck',0]],yes:'Thirty seconds, and they feel like family.',hint:'You’re free, so go along.'},
+     {t:'A graceful goodbye',d:'The last moment is remembered most.',
+      how:'At checkout, thank them by name, ask how their stay was, and really listen. If something went wrong, say sorry sincerely and say what you will do about it. Then invite them back.',
+      why:'People remember the end of a stay most. A warm, unhurried goodbye can turn a good stay into a story they tell their friends.',
+      q:'A guest says the radiator clanked all night. Best reply?',opts:[['I’m so sorry, Mr. Haddad. I’ll tell maintenance today. Thank you for letting me know.',1],['Old house, ha!',0],['That’s odd. Nobody else has ever said that.',0]],yes:'Sorry, a plan, and a thank-you. Perfect.',hint:'Say sorry, and say what you’ll do.'}
+    ],
+    final:[
+     {q:'A guest thanks you. Which reply sounds most gracious?',opts:[['My pleasure',1],['No worries at all, happens all the time',0],['Sure',0]],why:'“My pleasure” says helping was a joy, not a bother.'},
+     {q:'The restaurant is full. What do you lead with?',opts:[['What you can do instead',1],['A sorry and nothing more',0],['The word “no”',0]],why:'Lead with options so the guest still has a yes.'},
+     {q:'How often should you use a guest’s name?',opts:[['Two or three warm times',1],['In every sentence, so they never forget you know it',0],['Never, it’s too personal',0]],why:'A few times feels warm. Every sentence feels like a sales pitch.'},
+     {q:'Why offer two choices instead of one?',opts:[['So the guest feels in control of what happens next',1],['To confuse them',0],['One is never enough',0]],why:'Choices turn a letdown into a decision the guest gets to make.'},
+     {q:'A guest asks for directions and you’re free. You:',opts:[['Walk with them',1],['Point the way',0],['Draw a map on a napkin and hope for the best',0]],why:'Escorting feels like a welcome. Pointing feels like being sent off.'},
+     {q:'Why does the goodbye matter so much?',opts:[['Guests remember endings most',1],['It doesn’t, the stay is over by then',0],['It’s a last chance to sell them a mug',0]],why:'The last moment colors the memory of the whole stay.'}
+    ],
+    c:{course:'Luxury Guest Service Language & Communication',steps:'Warm names · Gracious words · Options, not “no” · Anticipation · Escorting · Goodbyes'},
+    liName:'Silver Key Certificate: Luxury Guest Service Language & Communication',file:'silver-key-guest-language-certificate.png'},
+   {id:'phn',code:'PHN',icon:'📞',title:'Front Desk Telephone Etiquette & Call Handling',short:'Answer, hold, transfer, take messages, keep guests private.',
+    hi:'Delores: “On the phone, your voice is the whole welcome. Let’s make it a lovely one. Six tiny lessons, then your certificate.”',
+    hiBack:'Delores: “Ring ring! Welcome back to phone class.”',hiDone:'Delores: “You handle calls like a dream. Your certificate is ready.”',
+    passT:'You aced phone class! 🎓',pin:['Golden Voice','Pass the Telephone Etiquette e-course.'],
+    mods:[
+     {t:'Answer with a smile',d:'Three rings, one warm greeting.',vis:'greet',
+      how:'Pick up within three rings. Say a greeting, the hotel’s name, your name and an offer to help. Smile while you speak.',
+      why:'Callers can’t see you, so your voice is the whole welcome. A smile really changes how you sound, and a quick answer tells them they matter.',
+      q:'Which greeting is best?',opts:[['Good evening, Mapáchez Manor, this is Sam. How may I help you?',1],['Hello?',0],['Manor. What do you need?',0]],yes:'Warm, clear and helpful. Lovely.',hint:'Greeting, hotel, your name, an offer to help.'},
+     {t:'May I place you on hold?',d:'Ask first, check back often.',
+      how:'Ask before you put anyone on hold, and wait for a yes. Check back every 30 to 60 seconds. When you return, thank them for waiting.',
+      why:'Silence on a phone feels endless. Asking first shows respect, and checking back proves they haven’t been forgotten.',
+      q:'You need to look something up. You say:',opts:[['May I place you on a brief hold?',1],['Hang on.',0],['I’m going to put you on hold now while I go and find out, okay, bye',0]],yes:'Polite, and they know what’s happening.',hint:'Ask, don’t announce.'},
+     {t:'Warm transfers',d:'Introduce the caller first.',
+      how:'Before you transfer, tell the caller who you’re connecting them to. Then tell your colleague who is calling and why, so the guest never has to repeat their story.',
+      why:'Repeating a problem three times turns a small annoyance into a big one. A warm transfer feels like being handed from friend to friend.',
+      q:'A guest wants room service. Best transfer?',opts:[['Brief the kitchen first, then connect them',1],['Give them the kitchen’s number to call and hang up',0],['Transfer without a word',0]],yes:'Friend to friend. Nobody repeats a thing.',hint:'Someone should hear the story before the guest arrives.'},
+     {t:'Taking a message',d:'Name, number, time, read it back.',vis:'msg',
+      how:'Write the caller’s full name, phone number with the area code, the date and time, and the message. Then read it all back to them.',
+      why:'A message with a missing area code or a misspelled name can’t be returned. Reading it back catches mistakes while the caller is still on the line.',
+      q:'Which message is complete?',opts:[['Rosa Quill, (207) 555-0142, 3:15 p.m.: please call about Saturday',1],['Someone called',0],['Rosa called, 555-0142',0]],yes:'Every detail, ready to return.',hint:'Look for the area code and the time.'},
+     {t:'Guest privacy on the phone',d:'Never share a room number.',
+      how:'If a caller asks for a guest’s room number, or whether someone is staying here, don’t say. Offer to connect the call or take a message instead.',
+      why:'Where a guest sleeps is private. Sharing it, even with a “friend”, could put someone at risk. Connecting the call lets the guest decide whether to answer.',
+      q:'A caller asks, “What room is Juniper Ashby in?” You say:',opts:[['I’m happy to connect your call or take a message.',1],['Room 204!',0],['Let me check… 204, but you didn’t hear it from me',0]],yes:'Kind, helpful, and the guest stays safe.',hint:'Room numbers stay private.'},
+     {t:'Closing the call',d:'Recap, thank, let them hang up first.',
+      how:'Repeat what will happen next, like “Your table for two is booked for 7.” Thank them for calling, and let the caller hang up first.',
+      why:'A recap prevents mix-ups. Letting them hang up first means they never feel cut off mid-sentence.',
+      q:'Who hangs up first?',opts:[['The caller',1],['You, as soon as you can, to keep the line free for the next guest',0],['Whoever sneezes first',0]],yes:'Nobody gets cut off. Perfect.',hint:'Nobody likes being cut off.'}
+    ],
+    final:[
+     {q:'How fast should you answer the phone?',opts:[['Within three rings',1],['After ten rings, so you seem busy',0],['Whenever',0]],why:'A quick answer tells the caller they matter.'},
+     {q:'Before placing someone on hold, you:',opts:[['Ask, and wait for a yes',1],['Just press the button',0],['Hum a little song so they know',0]],why:'Asking first shows respect.'},
+     {q:'A message needs a phone number with…',opts:[['The area code',1],['A smiley face drawn next to it',0],['Only the last four digits',0]],why:'Without the area code, the call can’t be returned.'},
+     {q:'A caller asks which room a guest is in. You:',opts:[['Offer to connect the call or take a message',1],['Tell them',0],['Spell it out slowly',0]],why:'Room numbers stay private, always.'},
+     {q:'Why brief a colleague before a transfer?',opts:[['So the guest never repeats their story',1],['To gossip',0],['Because transferring is against every rule in the whole hotel',0]],why:'A warm transfer saves the guest from saying it all again.'},
+     {q:'How do you end a call?',opts:[['Recap, thank them, let them hang up first',1],['Hang up quickly so the line is free for the next caller',0],['Say “bye”',0]],why:'A recap prevents mix-ups, and nobody feels cut off.'}
+    ],
+    c:{course:'Front Desk Telephone Etiquette & Call Handling',steps:'Three rings · Hold with permission · Warm transfers · Complete messages · Privacy · Gracious close'},
+    liName:'Silver Key Certificate: Front Desk Telephone Etiquette & Call Handling',file:'silver-key-telephone-certificate.png'},
+   {id:'hsk',code:'HSK',icon:'🧹',title:'Housekeeping Standards & Guest Room Inspection',short:'Knock right, clean in order, inspect, lost and found.',
+    hi:'Delores: “Every perfect stay starts with a perfect room. Let’s learn how the magic happens. Six tiny lessons, then your certificate.”',
+    hiBack:'Delores: “Welcome back. Fresh towels and fresh lessons, coming up.”',hiDone:'Delores: “Spotless! Your certificate is ready.”',
+    passT:'Spotless work! 🎓',pin:['White Glove','Pass the Housekeeping Standards e-course.'],
+    mods:[
+     {t:'Knock, announce, wait',d:'Three knocks. “Housekeeping.”',
+      how:'Knock three times and say “Housekeeping” clearly. Wait, then knock and announce once more. Open the door slowly, announcing again as you enter, and keep it propped open while you work.',
+      why:'Guests should never be surprised in their own room. Announcing gives them time to answer, and an open door keeps everyone comfortable and safe.',
+      q:'No answer after the first knock. Next?',opts:[['Knock and announce again, then enter slowly',1],['Walk straight in',0],['Shout “ROOM SERVICE!” through the keyhole and leave',0]],yes:'Polite and patient. Just right.',hint:'Give them one more chance to answer.'},
+     {t:'Do Not Disturb',d:'Text first. Calling disturbs.',vis:'dnd',
+      how:'If the door shows Do Not Disturb, don’t knock. Skip the room for now, and later text the guest to ask when they’d like service. Calling the room would disturb them, the very thing the sign asks you not to do.',
+      why:'The sign is a request for privacy. A gentle text respects it, and still makes sure the guest isn’t left without fresh towels for days.',
+      q:'Room 203 has Do Not Disturb up at 2 p.m. You:',opts:[['Text the guest to offer service later',1],['Knock anyway, very softly',0],['Call the room phone',0]],yes:'Quiet, kind and still helpful.',hint:'Which one doesn’t disturb them?'},
+     {t:'Which room first?',d:'A waiting guest comes first.',vis:'order',
+      how:'Start with rooms a guest is waiting for, like an early arrival in the lobby. Next, check-out rooms, so new guests can check in. Stay-over rooms fit around their guests’ plans.',
+      why:'A guest waiting in the lobby is the most urgent need in the building. Cleaning in the right order means more rooms are ✨ ready when check-in time comes.',
+      q:'Which room gets cleaned first?',opts:[['The check-out room a guest in the lobby is waiting for',1],['A stay-over room whose guest is out hiking until dinner',0],['Whichever is closest',0]],yes:'The lobby guest thanks you already.',hint:'Who is waiting right now?'},
+     {t:'Top to bottom, clean to dirty',d:'Dust falls down.',
+      how:'Dust high places first and finish with the floor, because dust falls. Clean the cleanest areas first and the bathroom last, with fresh cloths for each area.',
+      why:'Working top to bottom means you never re-dirty what you just cleaned. Separate cloths keep bathroom germs far away from the drinking glasses.',
+      q:'What do you clean last?',opts:[['The floor',1],['The ceiling fan',0],['The lampshades, then the mirror',0]],yes:'Gravity is on your side now.',hint:'Where does the dust land?'},
+     {t:'Cleaned is not inspected',d:'Only ✨ rooms are ready.',vis:'status',
+      how:'When a room is cleaned, it shows 🔍 Cleaned. Then a supervisor inspects it: lights, linens, amenities, a spotless bathroom and the little touches. Only then is it ✨ clean, inspected & ready.',
+      why:'Inspection catches the stray sock under the bed before a guest finds it. A second pair of eyes is how a good room becomes a perfect one.',
+      q:'Room 205 shows 🔍 Cleaned. Can a guest check in?',opts:[['Not yet. It needs inspecting',1],['Yes, cleaned is ready',0],['Only if they promise not to look under the bed',0]],yes:'Patience makes perfect rooms.',hint:'Only ✨ rooms are ready.'},
+     {t:'Lost and found',d:'Log it, bag it, lock it.',
+      how:'Anything left behind gets logged: what it is, where and when you found it, and your name. Bag it, label it, and hand it to lost and found to be locked away. Never keep it, not even a single sock.',
+      why:'A careful log lets us return guests’ treasures, and it protects you too, because everyone can see exactly what happened.',
+      q:'You find a silver locket under the bed. You:',opts:[['Log it and turn it in',1],['Keep it, finders keepers',0],['Leave it there in case they come back for it',0]],yes:'Somebody’s treasure is safe, thanks to you.',hint:'Every found thing gets logged.'}
+    ],
+    final:[
+     {q:'How do you enter a guest room?',opts:[['Knock, announce, wait, repeat',1],['Quietly, so you don’t bother anyone',0],['Fast',0]],why:'Announcing gives the guest time to answer.'},
+     {q:'The door says Do Not Disturb. First step?',opts:[['Text the guest later',1],['Knock louder',0],['Call the room phone to ask if they meant it',0]],why:'A text respects the sign. Calling disturbs.'},
+     {q:'Which room do you clean first?',opts:[['One a guest is waiting for',1],['The easiest one',0],['The one with the nicest view of the garden',0]],why:'A waiting guest is the most urgent need.'},
+     {q:'Why clean from top to bottom?',opts:[['Dust falls, so the floor goes last',1],['It looks fancier',0],['It doesn’t matter',0]],why:'You never re-dirty what you just cleaned.'},
+     {q:'A room shows 🔍 Cleaned. It is…',opts:[['Not ready until inspected',1],['Ready',0],['Ready, as long as the bed is made neatly',0]],why:'Only ✨ inspected rooms are ready.'},
+     {q:'Why log lost and found items?',opts:[['To return them and protect you',1],['For fun',0],['So staff can share them',0]],why:'A log returns treasures and shows exactly what happened.'}
+    ],
+    c:{course:'Housekeeping Standards & Guest Room Inspection',steps:'Knock & announce · Do Not Disturb · Room priority · Top to bottom · Inspection · Lost & found'},
+    liName:'Silver Key Certificate: Housekeeping Standards & Guest Room Inspection',file:'silver-key-housekeeping-certificate.png'}
+  ],
+  swap:[['No problem','My pleasure'],['Hi guys','Good evening, everyone'],['I don’t know','Let me find out for you'],['You need to…','May I ask you to…']],
+  greet:['Good evening,','Mapáchez Manor,','this is Sam.','How may I help you?'],
+  msg:{h:'While you were out',rows:[['Name','Rosa Quill'],['Phone','(207) 555-0142'],['When','Fri · 3:15 p.m.'],['Message','Please call about Saturday']],read:'✓ Read back'},
+  order:['⭐ A guest is waiting','🧳 Check-outs','🛏️ Stay-overs'],
+  dnd:['Do Not Disturb','💬 Text later'],
+  status:['🔍 Cleaned','✨ Inspected & ready']
+ },
+ es:{
+  catKick:'SILVER KEY CERTIFICATES',catT:'Cursos y certificados',
+  catHi:'Delores: “Cuatro cursos cortitos, cada uno con su certificado. Termina los cuatro y ganas el Certificado Maestro. Hazlos en el orden que quieras, a tu ritmo.”',
+  earned:'{n} de 4 certificados ganados',open:'Abrir',passed:'✓ Certificada',
+  waitOne:'🌙 Se abre después de tu próximo turno',waitMany:'🌙 Se abre en {n} turnos más',
+  titleBtn:'🎓 Cursos · certificados',allBtn:'🎓 Todos los cursos',
+  masterT:'Certificado Maestro',masterD:'Aprueba los cuatro cursos para ganarlo',masterGot:'¡Ganado! Guárdalo, imprímelo, añádelo a LinkedIn',
+  masterKick:'SILVER KEY MASTER CERTIFICATE',masterHi:'Delores: “Los cuatro cursos. Estoy tan orgullosa que te tejería una bufanda. Este es el grande.”',
+  masterPop:'Certificado Maestro',
+  masterFine:'Este Silver Key Master Certificate lo emite KMC Creative Company, LLC por completar los cuatro cursos en línea gamificados. Es un certificado de finalización, no una acreditación ni una licencia.',
+  masterPin:['Maestra de la mansión','Gana los cuatro Silver Key Certificates.'],
+  mc:{title:'Certificado Maestro',completed:'ha completado los cuatro cursos en línea gamificados de',course:'Recepción hotelera y servicio al huésped',seal:'MAESTRO',fine:'Certificado de finalización de cuatro cursos en línea gamificados. No es una acreditación ni una licencia.',steps:'Registro de entrada · Lenguaje de servicio · Etiqueta telefónica · Limpieza e inspección'},
+  masterLi:'Silver Key Master Certificate: Recepción hotelera y servicio al huésped',
+  courses:[
+   {id:'lux',code:'LUX',icon:'💬',title:'Lenguaje y comunicación en el servicio de lujo',short:'Palabras cálidas, nombres y nunca un “no” seco.',
+    hi:'Delores: “El servicio de cinco estrellas no son palabras elegantes. Son palabras amables, dichas en el momento justo. Seis lecciones chiquitas y luego tu certificado.”',
+    hiBack:'Delores: “Bienvenida de nuevo. Tus palabras ya suenan más cálidas.”',hiDone:'Delores: “Ya hablas Amabilidad con fluidez. Tu certificado está listo.”',
+    passT:'¡Tus palabras brillan! 🎓',pin:['Pico de plata','Aprueba el curso de lenguaje en el servicio de lujo.'],
+    mods:[
+     {t:'Nombres y bienvenidas cálidas',d:'Usa su nombre, con suavidad.',
+      how:'Saluda a cada huésped a pocos pasos de la puerta, mirándole a los ojos y con una sonrisa. Cuando sepas su nombre, úsalo, pero no en cada frase.',
+      why:'Un nombre le dice al huésped que lo conocemos, no que lo procesamos. Dos o tres veces suena cálido. Diez veces suena a venta.',
+      q:'La Sra. Okafor llega por tercera noche seguida. ¿El mejor saludo?',opts:[['¡Bienvenida de nuevo, Sra. Okafor!',1],['Hola, bienvenida a la mansión, ¿me dice su apellido, por favor?',0],['Siguiente, por favor.',0]],yes:'Se siente recordada. Ese es todo el truco.',hint:'Ya ha estado aquí antes.'},
+     {t:'Palabras que suenan a terciopelo',d:'Cambios pequeños, mucha calidez.',vis:'swap',
+      how:'El servicio de lujo suena tranquilo y amable. Cambia las palabras informales o negativas por otras cálidas y positivas. No es ser elegante, es ser amable.',
+      why:'“No hay problema” insinúa que pudo haberlo. “Es un placer” dice que ayudar fue una alegría. Los huéspedes recuerdan cómo les hiciste sentir.',
+      q:'Un huésped te agradece un cargador. Dices:',opts:[['Es un placer.',1],['No hay problema, de verdad que no es nada del otro mundo.',0],['Ajá.',0]],yes:'Terciopelo. Puro terciopelo.',hint:'Mira los cambios de arriba.'},
+     {t:'Nunca un “no” seco',d:'Empieza por lo que sí puedes hacer.',
+      how:'Cuando no puedas dar lo que piden, evita el “no” y empieza por lo que sí puedes hacer. Ofrece dos opciones cuando puedas, para que sientan que deciden.',
+      why:'Un “no” seco cierra la conversación y el huésped se va decepcionado. Dos buenas opciones convierten un chasco en una elección suya.',
+      q:'El spa está lleno esta noche. ¿La mejor respuesta?',opts:[['Hoy está lleno, pero puedo reservarle mañana a las 9, o subirle ahora toallas tibias y té.',1],['Lo siento, no.',0],['Está lleno. ¿Por qué no los llama usted mañana?',0]],yes:'Dos opciones preciosas. Nadie notó el “no”.',hint:'Ofrece algo a lo que puedan decir que sí.'},
+     {t:'Adelántate a lo que necesitan',d:'Anticipa los detalles.',
+      how:'Mira y escucha. Un estornudo pide pañuelos y té. Una maleta pesada pide un botones. Un vuelo temprano pide una llamada despertador y un desayuno para llevar.',
+      why:'Atender una necesidad antes de que la digan es el corazón del servicio de cinco estrellas. Les dice que alguien los cuida.',
+      q:'Un huésped menciona su vuelo de las 6. ¿Qué ofreces?',opts:[['Llamada despertador y desayuno para llevar',1],['Nada. No pidieron nada, así que mejor no molestarlos',0],['Salida tardía',0]],yes:'Ni tuvieron que pedirlo. Magia.',hint:'Piensa en lo que necesita una mañana temprana.'},
+     {t:'Acompáñalos',d:'Acompaña, no señales.',
+      how:'Cuando un huésped pregunte dónde está algo, acompáñalo si puedes. Si no puedes dejar la recepción, indica el camino con la mano abierta, nunca con el dedo.',
+      why:'Acompañar a alguien al comedor lleva treinta segundos y se siente como entrar en un hogar. Un dedo señalando se siente como que te despachan.',
+      q:'Un huésped pregunta por la biblioteca. Estás libre. Tú:',opts:[['Lo acompañas',1],['Señalas el pasillo y dices “por allá”',0],['Le das un mapa de toda la mansión y le deseas suerte',0]],yes:'Treinta segundos y se siente en familia.',hint:'Estás libre, así que ve con él.'},
+     {t:'Una despedida elegante',d:'El final es lo que más se recuerda.',
+      how:'En la salida, da las gracias por su nombre, pregunta qué tal la estancia y escucha de verdad. Si algo salió mal, pide perdón con sinceridad y di qué vas a hacer. Luego invítalos a volver.',
+      why:'Lo que más se recuerda de una estancia es el final. Una despedida cálida y sin prisas convierte una buena estancia en una historia que contar.',
+      q:'Un huésped dice que el radiador sonó toda la noche. ¿La mejor respuesta?',opts:[['Lo siento mucho, Sr. Haddad. Hoy mismo aviso a mantenimiento. Gracias por decírmelo.',1],['¡Casa vieja, ja!',0],['Qué raro. Nadie se había quejado nunca.',0]],yes:'Perdón, un plan y un gracias. Perfecto.',hint:'Pide perdón y di qué harás.'}
+    ],
+    final:[
+     {q:'Un huésped te da las gracias. ¿Qué suena más amable?',opts:[['Es un placer',1],['Nada, no te preocupes, pasa todo el tiempo',0],['Vale',0]],why:'“Es un placer” dice que ayudar fue una alegría.'},
+     {q:'El restaurante está lleno. ¿Con qué empiezas?',opts:[['Con lo que sí puedes hacer',1],['Con un perdón y nada más',0],['Con un “no”',0]],why:'Empieza con opciones para que el huésped tenga un sí.'},
+     {q:'¿Cuántas veces usas el nombre de un huésped?',opts:[['Dos o tres veces, con calidez',1],['En cada frase, para que no olvide que lo sabes',0],['Nunca, es muy personal',0]],why:'Unas pocas veces es cálido. En cada frase suena a venta.'},
+     {q:'¿Por qué ofrecer dos opciones en vez de una?',opts:[['Para que el huésped sienta que decide lo que pasa',1],['Para confundirlo',0],['Una nunca basta',0]],why:'Elegir convierte un chasco en una decisión del huésped.'},
+     {q:'Te piden indicaciones y estás libre. Tú:',opts:[['Lo acompañas',1],['Señalas',0],['Dibujas un mapa en una servilleta y que tenga suerte',0]],why:'Acompañar es una bienvenida. Señalar es despachar.'},
+     {q:'¿Por qué importa tanto la despedida?',opts:[['El final es lo que más se recuerda',1],['No importa, la estancia ya acabó',0],['Es la última ocasión de venderle una taza',0]],why:'El último momento tiñe el recuerdo de toda la estancia.'}
+    ],
+    c:{course:'Lenguaje y comunicación en el servicio de lujo',steps:'Nombres · Palabras amables · Opciones, no “no” · Anticipación · Acompañar · Despedidas'},
+    liName:'Silver Key Certificate: Lenguaje y comunicación en el servicio de lujo',file:'silver-key-guest-language-certificate.png'},
+   {id:'phn',code:'PHN',icon:'📞',title:'Etiqueta telefónica y gestión de llamadas en recepción',short:'Contestar, esperar, transferir, tomar recados, cuidar la privacidad.',
+    hi:'Delores: “Por teléfono, tu voz es toda la bienvenida. Hagamos que sea preciosa. Seis lecciones chiquitas y luego tu certificado.”',
+    hiBack:'Delores: “¡Ring ring! Bienvenida de nuevo a la clase de teléfono.”',hiDone:'Delores: “Atiendes llamadas de maravilla. Tu certificado está listo.”',
+    passT:'¡Aprobaste la clase de teléfono! 🎓',pin:['Voz de oro','Aprueba el curso de etiqueta telefónica.'],
+    mods:[
+     {t:'Contesta con una sonrisa',d:'Tres tonos, un saludo cálido.',vis:'greet',
+      how:'Contesta antes del tercer tono. Di un saludo, el nombre del hotel, tu nombre y una oferta de ayuda. Sonríe mientras hablas.',
+      why:'Quien llama no te ve, así que tu voz es toda la bienvenida. Una sonrisa cambia de verdad cómo suenas, y contestar rápido les dice que importan.',
+      q:'¿Cuál es el mejor saludo?',opts:[['Buenas noches, Mapáchez Manor, le atiende Sam. ¿En qué puedo ayudarle?',1],['¿Diga?',0],['Mansión. ¿Qué necesita?',0]],yes:'Cálido, claro y servicial. Precioso.',hint:'Saludo, hotel, tu nombre, una oferta de ayuda.'},
+     {t:'¿Puedo ponerle en espera?',d:'Pregunta antes, vuelve a menudo.',
+      how:'Pregunta antes de poner a alguien en espera y espera un sí. Vuelve cada 30 a 60 segundos. Al volver, agradece la espera.',
+      why:'El silencio al teléfono se hace eterno. Preguntar antes es respeto, y volver demuestra que no los olvidaste.',
+      q:'Necesitas buscar algo. Dices:',opts:[['¿Puedo ponerle en espera un momento?',1],['Espere.',0],['Le pongo en espera ahora mientras voy a averiguarlo, vale, adiós',0]],yes:'Educado, y saben lo que pasa.',hint:'Pregunta, no anuncies.'},
+     {t:'Transferencias cálidas',d:'Presenta antes a quien llama.',
+      how:'Antes de transferir, dile a quien llama con quién le pasas. Luego cuéntale a tu compañero quién llama y por qué, para que el huésped no tenga que repetir su historia.',
+      why:'Repetir un problema tres veces convierte una molestia pequeña en una grande. Una transferencia cálida se siente como pasar de amigo en amigo.',
+      q:'Un huésped quiere servicio a la habitación. ¿La mejor transferencia?',opts:[['Avisar a cocina primero y luego conectar',1],['Darle el número de la cocina para que llame y colgar',0],['Transferir sin decir nada',0]],yes:'De amigo en amigo. Nadie repite nada.',hint:'Alguien debería oír la historia antes.'},
+     {t:'Tomar un recado',d:'Nombre, número, hora, léelo en voz alta.',vis:'msg',
+      how:'Escribe el nombre completo, el teléfono con código de área, la fecha y la hora, y el recado. Luego léeselo todo en voz alta.',
+      why:'Un recado sin código de área o con el nombre mal escrito no se puede devolver. Leerlo en voz alta atrapa errores mientras siguen al teléfono.',
+      q:'¿Qué recado está completo?',opts:[['Rosa Quill, (207) 555-0142, 3:15 p. m.: llamar por lo del sábado',1],['Llamó alguien',0],['Llamó Rosa, 555-0142',0]],yes:'Todos los detalles, listo para devolver.',hint:'Busca el código de área y la hora.'},
+     {t:'Privacidad al teléfono',d:'Nunca des un número de habitación.',
+      how:'Si alguien pregunta el número de habitación de un huésped, o si alguien se aloja aquí, no lo digas. Ofrece pasar la llamada o tomar un recado.',
+      why:'Dónde duerme un huésped es privado. Decirlo, incluso a un “amigo”, podría poner a alguien en peligro. Pasar la llamada deja que el huésped decida si contesta.',
+      q:'Alguien pregunta: “¿En qué habitación está Juniper Ashby?” Dices:',opts:[['Con gusto le paso la llamada o tomo un recado.',1],['¡En la 204!',0],['A ver… en la 204, pero no se lo dije yo',0]],yes:'Amable, servicial, y el huésped está a salvo.',hint:'Los números de habitación son privados.'},
+     {t:'Cerrar la llamada',d:'Resume, agradece, deja que cuelguen primero.',
+      how:'Repite lo que va a pasar, como “Su mesa para dos está reservada a las 7”. Agradece la llamada y deja que cuelguen primero.',
+      why:'Un resumen evita confusiones. Dejar que cuelguen primero hace que nunca se sientan cortados a mitad de frase.',
+      q:'¿Quién cuelga primero?',opts:[['Quien llama',1],['Tú, lo antes posible, para dejar la línea libre para el siguiente',0],['Quien estornude primero',0]],yes:'Nadie se queda cortado. Perfecto.',hint:'A nadie le gusta que le corten.'}
+    ],
+    final:[
+     {q:'¿Qué tan rápido debes contestar?',opts:[['Antes del tercer tono',1],['Tras diez tonos, para parecer ocupada',0],['Cuando sea',0]],why:'Contestar rápido les dice que importan.'},
+     {q:'Antes de poner a alguien en espera:',opts:[['Pregunta y espera un sí',1],['Solo pulsa el botón',0],['Tararea una cancioncita para que lo sepan',0]],why:'Preguntar antes es respeto.'},
+     {q:'Un recado necesita un teléfono con…',opts:[['El código de área',1],['Una carita sonriente dibujada al lado',0],['Solo los cuatro últimos dígitos',0]],why:'Sin el código de área, no se puede devolver la llamada.'},
+     {q:'Preguntan en qué habitación está un huésped. Tú:',opts:[['Ofreces pasar la llamada o tomar un recado',1],['Lo dices',0],['Lo deletreas despacio',0]],why:'Los números de habitación son privados, siempre.'},
+     {q:'¿Por qué avisar a un compañero antes de transferir?',opts:[['Para que el huésped no repita su historia',1],['Para cotillear',0],['Porque transferir va contra todas las normas del hotel entero',0]],why:'Una transferencia cálida le ahorra repetirlo todo.'},
+     {q:'¿Cómo terminas una llamada?',opts:[['Resumes, agradeces y dejas que cuelguen primero',1],['Cuelgas rápido para dejar la línea libre al siguiente que llame',0],['Dices “chao”',0]],why:'Un resumen evita confusiones y nadie se siente cortado.'}
+    ],
+    c:{course:'Etiqueta telefónica y gestión de llamadas en recepción',steps:'Tres tonos · Espera con permiso · Transferencias cálidas · Recados completos · Privacidad · Buen cierre'},
+    liName:'Silver Key Certificate: Etiqueta telefónica y gestión de llamadas en recepción',file:'silver-key-telephone-certificate.png'},
+   {id:'hsk',code:'HSK',icon:'🧹',title:'Estándares de limpieza e inspección de habitaciones',short:'Llamar bien, limpiar en orden, inspeccionar, objetos perdidos.',
+    hi:'Delores: “Cada estancia perfecta empieza con una habitación perfecta. Veamos cómo se hace la magia. Seis lecciones chiquitas y luego tu certificado.”',
+    hiBack:'Delores: “Bienvenida de nuevo. Toallas limpias y lecciones nuevas.”',hiDone:'Delores: “¡Impecable! Tu certificado está listo.”',
+    passT:'¡Trabajo impecable! 🎓',pin:['Guante blanco','Aprueba el curso de estándares de limpieza.'],
+    mods:[
+     {t:'Llama, anúnciate, espera',d:'Tres golpes. “Limpieza.”',
+      how:'Llama tres veces y di “Limpieza” con claridad. Espera, y vuelve a llamar y anunciarte. Abre despacio, anunciándote otra vez al entrar, y deja la puerta abierta mientras trabajas.',
+      why:'Un huésped nunca debería llevarse un susto en su propia habitación. Anunciarte le da tiempo a contestar, y la puerta abierta da tranquilidad a todos.',
+      q:'Nadie contesta al primer golpe. ¿Y ahora?',opts:[['Llamar y anunciarte otra vez, y entrar despacio',1],['Entrar directamente',0],['Gritar “¡SERVICIO DE HABITACIONES!” por la cerradura y marcharte',0]],yes:'Educada y paciente. Justo así.',hint:'Dales una oportunidad más de contestar.'},
+     {t:'No molestar',d:'Primero un mensaje. Llamar molesta.',vis:'dnd',
+      how:'Si la puerta dice No molestar, no llames. Sáltala por ahora y luego escribe un mensaje al huésped para preguntar cuándo quiere el servicio. Llamar a la habitación le molestaría, justo lo que el cartel pide evitar.',
+      why:'El cartel pide privacidad. Un mensaje amable lo respeta y asegura que el huésped no se quede sin toallas limpias durante días.',
+      q:'La 203 tiene No molestar a las 2 p. m. Tú:',opts:[['Escribes al huésped para ofrecer el servicio más tarde',1],['Llamas igual, muy suavecito',0],['Llamas al teléfono de la habitación',0]],yes:'Silenciosa, amable y servicial.',hint:'¿Cuál no le molesta?'},
+     {t:'¿Qué habitación primero?',d:'Primero, quien está esperando.',vis:'order',
+      how:'Empieza por las habitaciones que alguien espera, como una llegada temprana en el vestíbulo. Luego las de salida, para que entren huéspedes nuevos. Las de huéspedes que siguen alojados se adaptan a sus planes.',
+      why:'Un huésped esperando en el vestíbulo es lo más urgente de todo el edificio. Limpiar en el orden correcto deja más habitaciones ✨ listas a la hora de entrada.',
+      q:'¿Qué habitación se limpia primero?',opts:[['La de salida que espera un huésped en el vestíbulo',1],['Una de huésped alojado que está de excursión hasta la cena',0],['La más cercana',0]],yes:'El huésped del vestíbulo ya te lo agradece.',hint:'¿Quién está esperando ahora mismo?'},
+     {t:'De arriba abajo, de limpio a sucio',d:'El polvo cae.',
+      how:'Quita el polvo de lo alto primero y termina con el suelo, porque el polvo cae. Limpia primero las zonas más limpias y el baño al final, con paños limpios para cada zona.',
+      why:'De arriba abajo nunca vuelves a ensuciar lo que acabas de limpiar. Paños distintos mantienen los gérmenes del baño lejos de los vasos.',
+      q:'¿Qué limpias al final?',opts:[['El suelo',1],['El ventilador del techo',0],['Las pantallas de las lámparas y luego el espejo',0]],yes:'Ahora la gravedad está de tu lado.',hint:'¿Dónde cae el polvo?'},
+     {t:'Limpia no es inspeccionada',d:'Solo las habitaciones ✨ están listas.',vis:'status',
+      how:'Cuando una habitación está limpia, muestra 🔍 Limpia. Luego una supervisora la inspecciona: luces, ropa de cama, amenidades, un baño impecable y los detalles. Solo entonces está ✨ limpia, inspeccionada y lista.',
+      why:'La inspección encuentra el calcetín perdido bajo la cama antes que el huésped. Un segundo par de ojos convierte una buena habitación en una perfecta.',
+      q:'La 205 muestra 🔍 Limpia. ¿Puede entrar un huésped?',opts:[['Aún no. Falta inspeccionarla',1],['Sí, limpia es lista',0],['Solo si promete no mirar debajo de la cama',0]],yes:'La paciencia hace habitaciones perfectas.',hint:'Solo las habitaciones ✨ están listas.'},
+     {t:'Objetos perdidos',d:'Anótalo, embólsalo, guárdalo.',
+      how:'Todo lo que se olvida se anota: qué es, dónde y cuándo lo encontraste, y tu nombre. Embólsalo, etiquétalo y entrégalo a objetos perdidos para guardarlo bajo llave. Nunca te lo quedes, ni un calcetín.',
+      why:'Un registro cuidadoso nos deja devolver los tesoros de los huéspedes, y también te protege, porque todos ven exactamente lo que pasó.',
+      q:'Encuentras un relicario de plata bajo la cama. Tú:',opts:[['Lo anotas y lo entregas',1],['Te lo quedas, quien lo encuentra se lo queda',0],['Lo dejas ahí por si vuelven a buscarlo',0]],yes:'El tesoro de alguien está a salvo gracias a ti.',hint:'Todo lo encontrado se anota.'}
+    ],
+    final:[
+     {q:'¿Cómo entras en una habitación?',opts:[['Llamas, te anuncias, esperas, repites',1],['En silencio, para no molestar a nadie',0],['Rápido',0]],why:'Anunciarte le da tiempo a contestar.'},
+     {q:'La puerta dice No molestar. ¿Primer paso?',opts:[['Escribir al huésped luego',1],['Llamar más fuerte',0],['Llamar al teléfono para ver si lo decía en serio',0]],why:'Un mensaje respeta el cartel. Llamar molesta.'},
+     {q:'¿Qué habitación limpias primero?',opts:[['Una que espera un huésped',1],['La más fácil',0],['La que tiene la vista más bonita del jardín',0]],why:'Un huésped esperando es lo más urgente.'},
+     {q:'¿Por qué limpiar de arriba abajo?',opts:[['El polvo cae, así que el suelo va al final',1],['Queda más elegante',0],['Da igual',0]],why:'Nunca vuelves a ensuciar lo que acabas de limpiar.'},
+     {q:'Una habitación muestra 🔍 Limpia. Está…',opts:[['Sin lista hasta inspeccionarla',1],['Lista',0],['Lista, siempre que la cama esté bien hecha',0]],why:'Solo las habitaciones ✨ inspeccionadas están listas.'},
+     {q:'¿Por qué anotar los objetos perdidos?',opts:[['Para devolverlos y protegerte',1],['Por diversión',0],['Para repartirlos',0]],why:'El registro devuelve tesoros y muestra lo que pasó.'}
+    ],
+    c:{course:'Estándares de limpieza e inspección de habitaciones',steps:'Llamar y anunciarse · No molestar · Prioridad · De arriba abajo · Inspección · Objetos perdidos'},
+    liName:'Silver Key Certificate: Estándares de limpieza e inspección de habitaciones',file:'silver-key-housekeeping-certificate.png'}
+  ],
+  swap:[['No hay problema','Es un placer'],['Hola, chicos','Buenas noches a todos'],['No sé','Lo averiguo para usted'],['Tiene que…','¿Me permite pedirle que…?']],
+  greet:['Buenas noches,','Mapáchez Manor,','le atiende Sam.','¿En qué puedo ayudarle?'],
+  msg:{h:'Mientras no estaba',rows:[['Nombre','Rosa Quill'],['Teléfono','(207) 555-0142'],['Cuándo','Vie · 3:15 p. m.'],['Recado','Llamar por lo del sábado']],read:'✓ Leído en voz alta'},
+  order:['⭐ Un huésped espera','🧳 Salidas','🛏️ Huéspedes alojados'],
+  dnd:['No molestar','💬 Mensaje luego'],
+  status:['🔍 Limpia','✨ Inspeccionada y lista']
+ }
+};
+const MC=MC_TEXT[profile.lang]||MC_TEXT.en;
+const MC_KEY='mapachez_courses_v1',MC_IDS=MC.courses.map(x=>x.id);
+const mcSpec=id=>MC.courses.find(x=>x.id===id);
+function mcBlank(){return {mods:[],tries:0,best:0,passed:'',salt:'',name:''};}
+function mcCreate(){const c={version:1,courses:{},master:{passed:'',salt:'',name:''}};for(const id of MC_IDS)c.courses[id]=mcBlank();return c;}
+function mcNormalise(v){
+  const c=mcCreate();if(!v||typeof v!=='object'||v.version!==1||!v.courses||typeof v.courses!=='object')return c;
+  const day=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'')?s:'',salt=s=>/^[a-z0-9]{1,12}$/.test(s||'')?s:'';
+  for(const id of MC_IDS){const r=v.courses[id];if(!r||typeof r!=='object')continue;const o=c.courses[id],n=mcSpec(id).mods.length;
+    if(Array.isArray(r.mods))o.mods=[...new Set(r.mods.filter(k=>Number.isInteger(k)&&k>=1&&k<=n))];
+    o.tries=Math.max(0,r.tries|0);o.best=Math.min(mcSpec(id).final.length,Math.max(0,r.best|0));
+    o.passed=day(r.passed);o.salt=salt(r.salt);if(o.passed&&typeof r.name==='string')o.name=cleanText(r.name,40);}
+  const m=v.master;if(m&&typeof m==='object'){c.master.passed=day(m.passed);c.master.salt=salt(m.salt);if(c.master.passed&&typeof m.name==='string')c.master.name=cleanText(m.name,40);}
+  return c;
+}
+let mc=mcCreate();
+try{mc=mcNormalise(JSON.parse(localStorage.getItem(MC_KEY)||'null'));}catch{}
+function mcStore(){try{localStorage.setItem(MC_KEY,JSON.stringify(mc));}catch{}}
+/* One person, one name: once any certificate carries a name, every later one uses it too. */
+function mcLockedName(){return course.name||MC_IDS.map(id=>mc.courses[id].name).find(Boolean)||mc.master.name||'';}
+const mcPassedCount=()=>(course.passed?1:0)+MC_IDS.filter(id=>mc.courses[id].passed).length;
+const mcSalt=()=>Math.random().toString(36).slice(2,10)||'mapachez';
+function mcCode(code,rec,name){return 'SKC-'+code+'-'+sum4(cleanText(name,40).toLowerCase()+'|'+rec.passed+'|'+rec.salt).toUpperCase()+'-'+sum4(rec.salt+'|'+rec.passed).toUpperCase();}
+function mcLinkedIn(liName,code,rec,name){
+  const [y,m]=(rec.passed||isoDay()).split('-').map(Number);
+  return 'https://www.linkedin.com/profile/add?'+new URLSearchParams({startTask:'CERTIFICATION_NAME',name:liName,organizationName:CO.liOrg,issueYear:String(y),issueMonth:String(m),certId:mcCode(code,rec,name)}).toString();
+}
+/* The Master Certificate arrives on its own the moment the fourth course is passed. */
+function mcCheckMaster(){
+  if(mc.master.passed||mcPassedCount()<4)return false;
+  mc.master.passed=isoDay();mc.master.salt=mcSalt();mc.master.name=fullName(mcLockedName())||fullName(profile.name)||'';mcStore();
+  hmsTip(10);
+  celebrate({icon:'👑',kicker:MC.masterKick,label:MC.masterPop,confetti:true});checkPins();
+  return true;
+}
+const mcStoreCourse=storeCourse;storeCourse=function(){const r=mcStoreCourse.apply(this,arguments);mcCheckMaster();return r;};
+
+/* Small pictures for a few lessons, all drawn with HTML and CSS. */
+function mcVisual(kind){
+  const chips=(list,cls)=>'<ol class="mc-chips '+cls+'" aria-hidden="true">'+list.map((p,k)=>'<li style="--k:'+k+'">'+esc(p)+'</li>').join('')+'</ol>';
+  if(kind==='swap')return '<div class="mc-swap" aria-hidden="true">'+MC.swap.map(([a,b])=>'<p><s>'+esc(a)+'</s><span>→</span><b>'+esc(b)+'</b></p>').join('')+'</div>';
+  if(kind==='greet')return '<div class="mc-greet" aria-hidden="true"><span>📞</span><p>'+MC.greet.map(esc).join(' ')+'</p></div>';
+  if(kind==='msg')return '<div class="mc-msg" aria-hidden="true"><b>'+esc(MC.msg.h)+'</b>'+MC.msg.rows.map(([k,v])=>'<p><small>'+esc(k)+'</small><span>'+esc(v)+'</span></p>').join('')+'<em>'+esc(MC.msg.read)+'</em></div>';
+  if(kind==='order')return chips(MC.order,'mc-order');
+  if(kind==='status')return chips(MC.status,'mc-status');
+  if(kind==='dnd')return '<div class="mc-dnd" aria-hidden="true"><span class="mc-hanger">🌙<b>'+esc(MC.dnd[0])+'</b></span><span class="mc-text">'+esc(MC.dnd[1])+'</span></div>';
+  return '';
+}
+
+/* ---------- The catalog: four courses and the Master Certificate ---------- */
+function mcStep(id){return typeof NN_STEPS!=='undefined'?NN_STEPS.find(s=>s.id==='course-'+id):null;}
+function mcWait(id){
+  const s=mcStep(id);if(!s||typeof nnLocked!=='function')return 0;
+  const open=nnOpenCount();return nnLocked(s,open)?NN_STEPS.indexOf(s)-open+1:0;
+}
+function openCourses(){
+  if(world)world.stop();
+  const n=mcPassedCount();
+  openModal(titleHTML(MC.catT,MC.catKick)+coachHTML('co-delores',mc.master.passed?MC.masterHi:MC.catHi)+
+    '<div class="co-progress"><span class="bar" role="meter" aria-label="'+esc(MC.catT)+'" aria-valuemin="0" aria-valuemax="4" aria-valuenow="'+n+'"><i style="width:'+n*25+'%"></i></span><small>'+esc(cf(MC.earned,{n}))+'</small></div>'+
+    '<div class="hms-cards mc-list" id="mc-list"></div><div class="action-row" id="mc-actions"></div>',true);
+  paintBust($('co-delores'),{cast:'delores'},26,2);
+  const list=$('mc-list');
+  const card=(id,icon,title,small,go,{got=false,next=false,lock=false}={},run)=>{const b=document.createElement('button');
+    b.className='hms-lesson game mc-card'+(got?' got':'')+(next?' next':'')+(lock?' mc-wait':'');if(id)b.id=id;b.disabled=lock;
+    b.innerHTML='<span class="hms-num" aria-hidden="true">'+(lock?'🔒':icon)+'</span><span><b>'+esc(title)+'</b><small>'+esc(small)+'</small></span><span class="hms-go">'+esc(go)+'</span>';
+    if(run)b.onclick=run;list.append(b);return b;};
+  card('mc-open-chk','🛎️',CO.title,CO.hmsBtnD,course.passed?MC.passed:course.mods.length+' / '+CO.mods.length,{got:!!course.passed},openCourse);
+  for(const S of MC.courses){const r=mc.courses[S.id],wait=mcWait(S.id);
+    if(wait)card('mc-wait-'+S.id,S.icon,S.title,wait===1?MC.waitOne:cf(MC.waitMany,{n:wait}),'',{lock:true});
+    else card('mc-open-'+S.id,S.icon,S.title,S.short,r.passed?MC.passed:r.mods.length+' / '+S.mods.length,{got:!!r.passed},()=>openMcCourse(S.id));}
+  const m=card('mc-master','👑',MC.masterT,mc.master.passed?MC.masterGot:MC.masterD,mc.master.passed?'→':n+' / 4',{got:!!mc.master.passed,next:!!mc.master.passed},mc.master.passed?openMcMaster:null);
+  m.classList.add('mc-master');if(!mc.master.passed)m.disabled=true;
+  const back=document.createElement('button');back.className='primary-button';back.textContent=titleVisible?t('Done'):t('Back to the manor');back.onclick=closeModal;$('mc-actions').append(back);
+  narrativeText=body.innerText;
+}
+
+/* ---------- One course home, lesson, final check and certificate ---------- */
+function openMcCourse(id){
+  if(world)world.stop();
+  const S=mcSpec(id),r=mc.courses[id],total=S.mods.length,n=r.mods.length,next=S.mods.findIndex((_,k)=>!r.mods.includes(k+1))+1,name=mcLockedName()||profile.name;
+  openModal(titleHTML(S.title,CO.kicker)+coachHTML('co-delores',r.passed?S.hiDone:n?S.hiBack:S.hi)+
+    '<div class="co-progress"><span class="bar" role="meter" aria-label="'+esc(CO.modsH)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+n+'"><i style="width:'+Math.round(n/total*100)+'%"></i></span><small>'+esc(cf(CO.progress,{n,total}))+'</small></div>'+
+    (r.passed?'':name?'<p class="co-name-on">'+esc(cf(CO.nameOn,{name}))+'</p>':'<div class="co-remind"><p>'+esc(CO.nameRemind)+'</p><button class="secondary-button" id="co-add-name">'+esc(CO.nameAdd)+'</button></div>')+
+    '<h3 class="pins-heading">'+esc(CO.modsH)+'</h3><div class="hms-cards" id="mc-mods"></div>'+
+    '<div class="hms-cards co-end" id="mc-end"></div><div class="action-row" id="mc-actions"></div>',true);
+  paintBust($('co-delores'),{cast:'delores'},26,2);
+  $('co-add-name')?.addEventListener('click',()=>openNameWelcome(()=>openMcCourse(id)));
+  S.mods.forEach((M,k)=>{const i=k+1,got=r.mods.includes(i),b=document.createElement('button');
+    b.className='hms-lesson'+(got?' got':'')+(i===next?' next':'');b.dataset.mod=i;
+    b.innerHTML='<span class="hms-num">'+(got?'✓':i)+'</span><span><b>'+esc(M.t)+'</b><small>'+esc(M.d)+'</small></span><span class="hms-go">'+esc(got?CO.done:CO.start)+'</span>';
+    b.onclick=()=>openMcModule(id,i);$('mc-mods').append(b);});
+  const ready=n>=total,end=$('mc-end');
+  const fin=document.createElement('button');fin.className='hms-lesson game co-final mc-final'+(ready&&!r.passed?' next':'');fin.disabled=!ready;
+  fin.innerHTML='<span class="hms-num" aria-hidden="true">'+(ready?'📝':'🔒')+'</span><span><b>'+esc(CO.finalT)+'</b><small>'+esc(ready?CO.finalD:CO.finalLocked)+'</small></span><span class="hms-go">'+esc(r.best?r.best+' / '+S.final.length:'')+'</span>';
+  fin.onclick=()=>openMcFinal(id);end.append(fin);
+  if(r.passed){const c=document.createElement('button');c.className='hms-lesson game got next mc-cert-open';
+    c.innerHTML='<span class="hms-num" aria-hidden="true">🎓</span><span><b>'+esc(CO.certT)+'</b><small>'+esc(CO.certD)+'</small></span><span class="hms-go">→</span>';c.onclick=()=>openMcCert(id);end.append(c);}
+  const all=document.createElement('button');all.className='secondary-button';all.textContent=MC.allBtn;all.onclick=openCourses;
+  const back=document.createElement('button');back.className='primary-button';back.textContent=titleVisible?t('Done'):t('Back to the manor');back.onclick=closeModal;$('mc-actions').append(all,back);
+  narrativeText=body.innerText;
+  requestAnimationFrame(()=>body.querySelector('#mc-end .next,#mc-mods .next')?.focus());
+}
+function openMcModule(id,i){
+  const S=mcSpec(id),r=mc.courses[id],M=S.mods[i-1],total=S.mods.length;
+  openModal('<span class="overline">'+esc(cf(CO.modOf,{n:i,total}))+'</span><h2 id="modal-heading">'+esc(M.t)+'</h2>'+
+    coachHTML('co-delores',M.how)+mcVisual(M.vis)+
+    '<div class="co-why"><b>💡 '+esc(CO.whyH)+'</b><p>'+esc(M.why)+'</p></div>'+
+    '<p class="gm-ask">'+esc(M.q)+'</p><div class="choices" id="co-choices"></div><p class="hms-msg" id="co-msg" hidden></p><div class="action-row" id="co-actions"></div>',true);
+  paintBust($('co-delores'),{cast:'delores'},26,2);
+  const msg=$('co-msg'),row=$('co-actions');
+  hmsShuffle(M.opts).forEach(([text,ok],k)=>{const b=document.createElement('button');b.className='choice';b.dataset.ok=ok?'1':'0';b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>';
+    b.onclick=()=>{
+      if(!ok){msg.hidden=false;msg.classList.remove('ok');msg.textContent=cf(CO.tryAgain,{hint:M.hint});b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');narrativeText=body.innerText;return;}
+      b.classList.add('hms-yes');body.querySelectorAll('#co-choices .choice').forEach(x=>x.disabled=true);
+      msg.hidden=false;msg.classList.add('ok');msg.textContent='✨ '+M.yes;
+      const fresh=!r.mods.includes(i);if(fresh){r.mods.push(i);mcStore();}
+      hmsReward(b,fresh?2:0,fresh?3:0,{word:fresh?'🎓':''});
+      const nx=S.mods.findIndex((_,k)=>!r.mods.includes(k+1))+1;
+      const add=(label,primary,run)=>{const x=document.createElement('button');x.className=primary?'primary-button':'secondary-button';x.textContent=label;x.onclick=run;row.append(x);return x;};
+      add(CO.backCourse,false,()=>openMcCourse(id));
+      if(nx)add(CO.nextMod,true,()=>openMcModule(id,nx)).focus();
+      else if(!r.passed)add(CO.toFinal,true,()=>openMcFinal(id)).focus();
+      else add(CO.certT+' →',true,()=>openMcCert(id)).focus();
+      narrativeText=body.innerText;
+    };$('co-choices').append(b);});
+  narrativeText=body.innerText;
+}
+function openMcFinal(id,skipName){
+  const S=mcSpec(id),r=mc.courses[id];
+  if(r.mods.length<S.mods.length)return openMcCourse(id);
+  if(!r.passed&&!mcLockedName()&&!profile.name&&skipName!==true){
+    openModal('<span class="overline">'+esc(CO.kicker)+'</span><h2 id="modal-heading">'+esc(CO.finalNameT)+'</h2>'+coachHTML('co-delores',CO.finalNameHi)+'<div id="co-name-host"></div>',true);
+    paintBust($('co-delores'),{cast:'delores'},26,2);
+    courseNameForm($('co-name-host'),{skip:CO.finalNoName,done:()=>openMcFinal(id,true)});
+    narrativeText=body.innerText;return;
+  }
+  const qs=hmsShuffle(S.final),R={i:0,score:0};
+  function ask(){
+    const Q=qs[R.i];
+    openModal('<span class="overline">'+esc(cf(CO.qOf,{n:R.i+1,total:qs.length}))+'</span><h2 id="modal-heading">'+esc(CO.finalT)+'</h2>'+
+      '<div class="gm-dots" aria-hidden="true">'+qs.map((_,k)=>'<i class="'+(k<R.i?'done':k===R.i?'now':'')+'"></i>').join('')+'</div>'+
+      '<p class="gm-ask co-q">'+esc(Q.q)+'</p><div class="choices" id="co-choices"></div><p class="hms-msg" id="co-msg" hidden></p><div class="action-row" id="co-actions"></div>',true);
+    hmsShuffle(Q.opts).forEach(([text,ok],k)=>{const b=document.createElement('button');b.className='choice';b.dataset.ok=ok?'1':'0';b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>';
+      b.onclick=()=>{
+        body.querySelectorAll('#co-choices .choice').forEach(x=>{x.disabled=true;if(x.dataset.ok==='1')x.classList.add('hms-yes');});
+        if(ok){R.score++;joySound('pop');}else{b.classList.add('hms-no');joySound('boop');}
+        const m=$('co-msg');m.hidden=false;m.classList.toggle('ok',!!ok);m.textContent=(ok?CO.right:CO.wrong)+' '+Q.why;
+        const last=R.i===qs.length-1,x=document.createElement('button');x.className='primary-button';x.textContent=last?CO.seeScore:CO.next;
+        x.onclick=()=>{R.i++;last?result():ask();};$('co-actions').append(x);x.focus();narrativeText=body.innerText;
+      };$('co-choices').append(b);});
+    narrativeText=body.innerText;
+  }
+  function result(){
+    const pass=R.score>=COURSE_PASS,fresh=pass&&!r.passed;
+    r.tries++;r.best=Math.max(r.best,R.score);
+    if(fresh){r.passed=isoDay();r.salt=mcSalt();r.name=fullName(mcLockedName())||fullName(profile.name)||'';}
+    mcStore();
+    openModal('<span class="overline">'+esc(CO.kicker)+'</span><h2 id="modal-heading">'+esc(pass?S.passT:CO.failT)+'</h2>'+
+      '<div class="co-score'+(pass?' pass':'')+'"><b>'+R.score+' / '+qs.length+'</b></div>'+
+      coachHTML('co-delores',pass?cf(CO.passP,{n:R.score,total:qs.length}):cf(CO.failP,{n:R.score,total:qs.length,need:COURSE_PASS}))+
+      '<div class="action-row" id="co-actions"></div>',true);
+    paintBust($('co-delores'),{cast:'delores'},26,2);
+    const row=$('co-actions'),add=(label,primary,run)=>{const x=document.createElement('button');x.className=primary?'primary-button':'secondary-button';x.textContent=label;x.onclick=run;row.append(x);return x;};
+    add(CO.backCourse,false,()=>openMcCourse(id));
+    if(pass)add(CO.getCert,true,()=>openMcCert(id)).focus();else add(CO.retry,true,()=>openMcFinal(id)).focus();
+    if(fresh){hmsReward(body.querySelector('.co-score'),5,10,{big:true,word:'🎓'});celebrate({icon:S.icon,kicker:CO.kicker,label:S.pin[0],confetti:true});if(!mcCheckMaster())checkPins();}
+    else checkPins();
+    narrativeText=body.innerText;
+  }
+  ask();
+}
+
+/* The same Silver Key design as the check-in certificate; the Master one gets a double gold frame. */
+function mcDrawCert(cv,{name,course:courseName,steps,date,code,master}){
+  const c=cv.getContext('2d'),W=cv.width,H=cv.height,C=CO.c,serif='Georgia,"Times New Roman",serif';
+  const gold='#b8892f',deep='#2f5d50',ink='#3b3223';
+  c.clearRect(0,0,W,H);
+  const g=c.createRadialGradient(W/2,H/2,80,W/2,H/2,W*.7);g.addColorStop(0,'#fffaf0');g.addColorStop(1,master?'#efdcae':'#f3e6c4');c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.strokeStyle=gold;c.lineWidth=10;c.strokeRect(22,22,W-44,H-44);
+  if(master){c.lineWidth=3;c.strokeRect(34,34,W-68,H-68);}
+  c.strokeStyle=deep;c.lineWidth=2;c.strokeRect(42,42,W-84,H-84);
+  for(const [x,y,sx,sy] of [[42,42,1,1],[W-42,42,-1,1],[42,H-42,1,-1],[W-42,H-42,-1,-1]]){
+    c.save();c.translate(x,y);c.scale(sx,sy);c.strokeStyle=gold;c.lineWidth=3;
+    c.beginPath();c.moveTo(0,70);c.bezierCurveTo(0,20,20,0,70,0);c.stroke();
+    c.beginPath();c.moveTo(16,92);c.bezierCurveTo(14,38,38,14,92,16);c.stroke();
+    c.fillStyle=gold;c.beginPath();c.arc(30,30,7,0,Math.PI*2);c.fill();
+    c.beginPath();c.arc(70,4,4,0,Math.PI*2);c.arc(4,70,4,0,Math.PI*2);c.fill();
+    c.restore();}
+  c.strokeStyle='#7aa58a';c.lineWidth=2;
+  {const y=70;c.beginPath();for(let x=170;x<=W-170;x+=4){const yy=y+Math.sin(x/28)*5;x===170?c.moveTo(x,yy):c.lineTo(x,yy);}c.stroke();
+   c.fillStyle='#9cc7a8';for(let x=200;x<W-170;x+=56){c.beginPath();c.ellipse(x,y+Math.sin(x/28)*5-7,7,3.5,-.6,0,Math.PI*2);c.fill();}}
+  c.textAlign='center';c.textBaseline='alphabetic';
+  c.fillStyle=deep;c.font='bold 20px '+serif;
+  if('letterSpacing' in c)c.letterSpacing='4px';
+  c.fillText(master?'SILVER KEY MASTER CERTIFICATE  ·  KMC CREATIVE COMPANY, LLC':C.org,W/2,128);
+  if('letterSpacing' in c)c.letterSpacing='0px';
+  c.fillStyle=ink;c.font='bold 62px '+serif;c.fillText(master?MC.mc.title:C.title,W/2,206);
+  c.font='italic 26px '+serif;c.fillStyle='#5c4e36';c.fillText(C.certifies,W/2,264);
+  const nm=cleanText(name,40)||C.placeholder;let size=64;
+  c.font='bold '+size+'px '+serif;while(c.measureText(nm).width>W-280&&size>30){size-=2;c.font='bold '+size+'px '+serif;}
+  c.fillStyle=cleanText(name,40)?deep:'#b9ab8c';c.fillText(nm,W/2,348);
+  c.strokeStyle=gold;c.lineWidth=2;c.beginPath();c.moveTo(W/2-330,370);c.lineTo(W/2+330,370);c.stroke();
+  c.font='italic 26px '+serif;c.fillStyle='#5c4e36';c.fillText(master?MC.mc.completed:C.completed,W/2,418);
+  {let cs=46;c.font='bold '+cs+'px '+serif;while(c.measureText(courseName).width>W-220&&cs>26){cs-=2;c.font='bold '+cs+'px '+serif;}}c.fillStyle=ink;c.fillText(courseName,W/2,476);
+  {let ss=19;c.font=ss+'px '+serif;while(c.measureText(steps).width>W-180&&ss>13){ss--;c.font=ss+'px '+serif;}}c.fillStyle='#5c4e36';c.fillText(steps,W/2,516);
+  const sx=W/2,sy=636;
+  c.fillStyle=gold;c.beginPath();for(let k=0;k<32;k++){const a=k/32*Math.PI*2,rr=k%2?66:76;c.lineTo(sx+Math.cos(a)*rr,sy+Math.sin(a)*rr);}c.closePath();c.fill();
+  c.fillStyle='#e9c76b';c.beginPath();c.arc(sx,sy,56,0,Math.PI*2);c.fill();
+  c.strokeStyle='#fff6d8';c.lineWidth=2;c.beginPath();c.arc(sx,sy,48,0,Math.PI*2);c.stroke();
+  if(master){/* a little crown */c.fillStyle='#7a5a1c';c.beginPath();c.moveTo(sx-26,sy+4);c.lineTo(sx-26,sy-20);c.lineTo(sx-13,sy-6);c.lineTo(sx,sy-26);c.lineTo(sx+13,sy-6);c.lineTo(sx+26,sy-20);c.lineTo(sx+26,sy+4);c.closePath();c.fill();
+    c.fillStyle='#e9c76b';for(const d of [-13,0,13]){c.beginPath();c.arc(sx+d,sy-3,3,0,Math.PI*2);c.fill();}}
+  else{c.fillStyle='#7a5a1c';c.beginPath();c.arc(sx-14,sy-6,13,0,Math.PI*2);c.fill();c.fillStyle='#e9c76b';c.beginPath();c.arc(sx-14,sy-6,5,0,Math.PI*2);c.fill();
+    c.fillStyle='#7a5a1c';c.fillRect(sx-2,sy-9,30,6);c.fillRect(sx+18,sy-3,5,9);c.fillRect(sx+10,sy-3,5,6);}
+  c.font='bold 12px Arial,sans-serif';c.fillStyle='#7a5a1c';c.fillText(master?MC.mc.seal:C.seal,sx,sy+30);
+  c.fillStyle=master?deep:'#8c3b3b';for(const d of [-1,1]){c.beginPath();c.moveTo(sx+d*20,sy+60);c.lineTo(sx+d*40,sy+100);c.lineTo(sx+d*29,sy+92);c.lineTo(sx+d*20,sy+104);c.lineTo(sx+d*6,sy+64);c.closePath();c.fill();}
+  const line=(x,label,value,font)=>{c.font=font;c.fillStyle=ink;c.fillText(value,x,650);c.strokeStyle='#8a7652';c.lineWidth=1.5;c.beginPath();c.moveTo(x-150,664);c.lineTo(x+150,664);c.stroke();c.font='16px '+serif;c.fillStyle='#6b5d44';c.fillText(label,x,690);};
+  line(250,C.date,date?coursePretty(date):'','24px '+serif);
+  line(W-250,C.signRole,C.sign,'italic 24px '+serif);
+  c.font='15px Arial,sans-serif';c.fillStyle='#6b5d44';c.fillText(C.id+': '+code,W/2,H-76);
+  c.font='13px Arial,sans-serif';c.fillStyle='#8a7c62';c.fillText(master?MC.mc.fine:C.fine,W/2,H-54);
+}
+/* A certificate screen for one record: a course, or the Master Certificate. */
+function mcCertScreen(o){
+  const {rec,kick,title,courseName,steps,code,liName,file,fine,master,back}=o;
+  const locked=!!rec.name;
+  const draw=n=>mcDrawCert($('co-cert'),{name:n,course:courseName,steps,date:rec.passed,code:mcCode(code,rec,n||''),master});
+  openModal(titleHTML(title,kick)+(locked?'<p class="joy-hint co-locked">'+esc(CO.lockedNote)+'</p>':'<p class="modal-description">'+esc(CO.addOnce)+'</p><div id="co-name-host"></div>')+
+    '<canvas id="co-cert" class="co-cert" width="1200" height="850" role="img" aria-label="'+esc((master?MC.mc.title:CO.c.title)+' · '+courseName)+'"></canvas>'+
+    '<div class="action-row" id="co-actions"></div><p class="joy-hint">'+esc(CO.liHow)+'</p><p class="joy-hint co-fine">'+esc(fine)+'</p>',true);
+  const cv=$('co-cert'),row=$('co-actions');
+  draw(rec.name);
+  if(!locked){
+    courseNameForm($('co-name-host'),{save:CO.lockIt,skip:'',done:()=>{rec.name=fullName(mcLockedName())||fullName(profile.name);mcStore();mcCertScreen(o);}});
+    $('co-name').oninput=e=>draw(e.target.value);
+  }
+  const save=document.createElement('button');save.className='primary-button';save.textContent=CO.save;
+  save.onclick=()=>{if(DEMO_BUILD)return openFullEdition();draw(rec.name);
+    const a=document.createElement('a');a.download=file;a.href=cv.toDataURL('image/png');document.body.append(a);a.click();a.remove();toast(CO.saved);};
+  const li=document.createElement('a');li.className='secondary-button co-li';li.textContent=CO.li;li.target='_blank';li.rel='noopener noreferrer';li.href=mcLinkedIn(liName,code,rec,rec.name);
+  li.onclick=e=>{if(DEMO_BUILD){e.preventDefault();return openFullEdition();}};
+  const bk=document.createElement('button');bk.className='secondary-button';bk.textContent=CO.backCourse;bk.onclick=back;
+  if(locked)row.append(save,li,bk);else row.append(bk);
+  narrativeText=body.innerText;
+}
+function openMcCert(id){
+  const S=mcSpec(id),r=mc.courses[id];if(!r.passed)return openMcCourse(id);
+  const args={rec:r,kick:CO.kicker,title:CO.certT,courseName:S.c.course,steps:S.c.steps,code:S.code,liName:S.liName,file:S.file,
+    fine:CO.fine.replace(/ Every HMS[^]*$| Cada HMS[^]*$/,''),master:false,back:()=>openMcCourse(id)};
+  mcCertScreen(args);
+}
+function openMcMaster(){
+  if(!mc.master.passed)return openCourses();
+  mcCertScreen({rec:mc.master,kick:MC.masterKick,title:MC.masterT,courseName:MC.mc.course,steps:MC.mc.steps,code:'MST',liName:MC.masterLi,file:'silver-key-master-certificate.png',fine:MC.masterFine,master:true,back:openCourses});
+}
+
+/* ---------- Ways in: the title button opens the catalog; the check-in course links back ---------- */
+{const b=$('co-title');if(b){b.innerHTML=esc(MC.titleBtn)+' · <b>'+mcPassedCount()+' / 4</b> →';b.onclick=openCourses;}}
+const mcOpenCourse=openCourse;
+openCourse=function(){const r=mcOpenCourse.apply(this,arguments);const row=$('co-actions');
+  if(row&&!$('mc-all')){const b=document.createElement('button');b.id='mc-all';b.className='secondary-button';b.textContent=MC.allBtn;b.onclick=openCourses;row.prepend(b);}
+  return r;};
+PINS.push(
+  ...MC.courses.map(S=>({id:'course-'+S.id,icon:S.icon,name:S.pin[0],hint:S.pin[1],test:()=>!!mc.courses[S.id].passed})),
+  {id:'course-master',icon:'👑',name:MC.masterPin[0],hint:MC.masterPin[1],test:()=>!!mc.master.passed}
+);
+{const st=document.createElement('style');st.textContent=`
+.mc-list{margin-top:12px}.mc-card.mc-wait{opacity:.7;cursor:default;animation:none}
+.mc-card.mc-master:not(.got){opacity:.75}.mc-card.mc-master.got{background:#fff1b8;border-color:#c9952f}
+.mc-swap{display:grid;gap:6px;margin:12px 0}
+.mc-swap p{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0;padding:6px 10px;border-radius:12px;background:#fffaf0;border:1px solid #e0cf9e}
+.mc-swap s{color:#8a7c62}.mc-swap b{color:#2f5d50}
+.mc-greet{display:flex;gap:10px;align-items:center;margin:12px 0;padding:10px 14px;border-radius:18px;background:#fff8e1;border:1px solid #e0cf9e}
+.mc-greet span{font-size:26px}.mc-greet p{margin:0;font:italic 16px Georgia,serif;color:#2f5d50;line-height:1.4}
+.mc-msg{display:grid;gap:4px;margin:12px auto;max-width:320px;padding:12px 14px;border-radius:6px;background:#fffbe6;border:1px solid #e3cf7a;box-shadow:2px 3px 0 #e8d9a8;transform:rotate(-1deg)}
+.mc-msg>b{font:bold 13px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8c3b3b}
+.mc-msg p{display:flex;gap:8px;margin:0;border-bottom:1px dashed #e3cf7a;padding:2px 0}.mc-msg small{min-width:68px;font:12px Arial,sans-serif;color:#6b6450}.mc-msg span{font:15px 'Courier New',monospace}
+.mc-msg em{justify-self:end;font:bold 12px Arial,sans-serif;color:#2f5d50;font-style:normal}
+.mc-chips{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:12px 0}
+.mc-chips li{padding:6px 10px;border-radius:99px;background:#fffaf0;border:1px solid #e0cf9e;font-size:14px;animation:funPop .5s calc(var(--k)*.1s) both}
+.mc-order li:first-child,.mc-status li:last-child{background:#fff1b8;border-color:#c9952f;font-weight:700}
+.mc-order li+li::before,.mc-status li+li::before{content:'→ ';color:#8a7c62}
+.mc-dnd{display:flex;align-items:center;justify-content:center;gap:14px;margin:12px 0}
+.mc-hanger{display:grid;justify-items:center;gap:2px;padding:14px 12px 10px;border-radius:40px 40px 10px 10px;background:#4a3f6b;color:#fff7df;font-size:20px;box-shadow:0 3px 8px #0002}
+.mc-hanger b{font:bold 12px Arial,sans-serif;letter-spacing:.04em}
+.mc-text{padding:8px 12px;border-radius:16px 16px 16px 4px;background:#dff3e6;border:1px solid #9fd38c;font:bold 14px Arial,sans-serif;color:#2f5d50}
+body.reduce-motion .mc-chips li{animation:none}
+`;document.head.append(st);}
+checkPins();
+/* ==== end MORE COURSES v1 ==== */
 
 
 })();
