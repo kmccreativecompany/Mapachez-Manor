@@ -69,7 +69,7 @@ class Course(base.Growth):
             self.page.locator('#co-actions .primary-button').click()
             self.page.wait_for_selector('.co-why')
             self.assertIn(f'LESSON {n} OF 6', self.page.locator('#modal-body .overline').inner_text())
-            self.page.locator('#co-choices .choice', has_text=rights[n - 1]).click()
+            self.page.evaluate('r => [...document.querySelectorAll("#co-choices .choice")].find(b => b.querySelector("b").textContent === r).click()', rights[n - 1])
         self.assertEqual(sorted(self.c()['course']['mods']), [1, 2, 3, 4, 5, 6])
         self.assertIn('final check', self.page.locator('#co-actions').inner_text().lower())
 
