@@ -19,7 +19,8 @@ Object.defineProperty(window,'cotTest',{get:()=>({
  open:(tab)=>{if(cottage.live==null&&!tab)cottage.live=true;openCottage(tab||'inside');},tap:id=>cotTap(id),say:()=>document.getElementById('cot-say').textContent,
  motion:on=>{settings.motion=on;applySettings();},
  enterPlay:()=>{state.flags.briefed=true;state.phase='playing';},
- setPts:n=>{growth.pts={trust:n,care:0,team:0};},grade:()=>payGrade(),speed:()=>world.options.speed(),
+ setPts:n=>{growth.pts={trust:n,care:0,team:0};},grade:()=>payGrade(),speed:()=>world.options.speed(),outdoorSpeed:()=>{const was=festivalActive;festivalActive=true;const v=world.options.speed();festivalActive=was;return v;},
+ commute:()=>playCommute(),
  setLive:v=>{cottage.live=v;storeCottage();},rides:COT_RIDES.map(r=>r.id),projects:DREAM_PROJECTS.map(p=>p.id),dreamText:DREAM_TEXT,ct2:CT2_TEXT
 })});
 """
@@ -248,27 +249,28 @@ class Cottage(base.Growth):
     def test_15_rides_cost_tips_follow_you_and_change_speed(self):
         self.page.evaluate('cotTest.setTips(100)')
         self.page.evaluate("cotTest.open('rides')")
-        self.assertEqual(self.page.locator('.cot-rides li').count(), 9)
+        self.assertEqual(self.page.locator('.cot-rides li').count(), 11)
         self.page.locator('.cot-rides li', has_text='Bike with a basket').locator('button').click()
         st = self.c()
         self.assertEqual(st['cottage']['rides'], ['bike'])
         self.assertEqual(st['cottage']['ride'], 'bike')
         self.assertEqual(st['joy']['tips'], 40)
         self.assertIn('ride-first', st['pins'])
-        self.assertAlmostEqual(self.page.evaluate('cotTest.speed()'), 1.55)
+        self.assertEqual(self.page.evaluate('cotTest.speed()'), 1, 'everyone walks inside the manor')
+        self.assertAlmostEqual(self.page.evaluate('cotTest.outdoorSpeed()'), 1.55)
         self.page.locator('.cot-rides li', has_text='Bike with a basket').locator('button', has_text='Walk instead').click()
         self.assertEqual(self.c()['cottage']['ride'], '')
-        self.assertEqual(self.page.evaluate('cotTest.speed()'), 1)
+        self.assertEqual(self.page.evaluate('cotTest.outdoorSpeed()'), 1)
         self.assertTrue(self.page.locator('.cot-rides li', has_text='Flying car').locator('button').is_disabled())
 
     def test_16_the_snail_is_slow_and_the_flying_car_flies(self):
         self.page.evaluate('cotTest.setTips(400)')
         self.page.evaluate("cotTest.open('rides')")
         self.page.locator('.cot-rides li', has_text='Giant snail').locator('button').click()
-        self.assertLess(self.page.evaluate('cotTest.speed()'), 1)
+        self.assertLess(self.page.evaluate('cotTest.outdoorSpeed()'), 1)
         self.assertIn('ride-snail', self.c()['pins'])
         self.page.locator('.cot-rides li', has_text='Flying car').locator('button').click()
-        self.assertEqual(self.page.evaluate('cotTest.speed()'), 2)
+        self.assertEqual(self.page.evaluate('cotTest.outdoorSpeed()'), 2)
         self.assertIn('ride-sky', self.c()['pins'])
         # The ride is drawn in the manor without errors.
         self.page.keyboard.press('Escape')
@@ -317,6 +319,31 @@ class Cottage(base.Growth):
         for banned in ('opossum', 'infp', 'broken', 'repair bill', 'rent due'):
             self.assertNotIn(banned, words)
 
+
+    def test_20_hoverboard_and_teleporter_and_the_trip_in(self):
+        self.page.evaluate('cotTest.setTips(470)')
+        self.page.evaluate("cotTest.open('rides')")
+        self.page.locator('.cot-rides li', has_text='Hoverboard').locator('button').click()
+        self.page.locator('.cot-rides li', has_text='Pocket teleporter').locator('button').click()
+        st = self.c()
+        self.assertEqual(st['cottage']['rides'], ['hover', 'tele'])
+        self.assertEqual(st['cottage']['ride'], 'tele')
+        self.assertEqual(st['joy']['tips'], 0)
+        self.assertEqual(self.page.evaluate('cotTest.outdoorSpeed()'), 3)
+        self.assertEqual(self.page.evaluate('cotTest.speed()'), 3, 'the teleporter is the one ride allowed inside')
+        # Starting the night plays the trip in from home, once.
+        self.page.keyboard.press('Escape')
+        self.page.evaluate('document.querySelector(".title-actions button").click()')
+        self.page.wait_for_selector('#commute')
+        self.assertIn('teleport', self.page.locator('#commute').inner_text())
+        self.assertIn('allowed inside the manor', self.page.locator('#commute').inner_text())
+        self.page.locator('#commute').click()
+        self.assertEqual(self.page.locator('#commute').count(), 0)
+
+    def test_21_no_trip_without_a_ride(self):
+        self.page.evaluate('document.querySelector(".title-actions button").click()')
+        self.page.wait_for_timeout(900)
+        self.assertEqual(self.page.locator('#commute').count(), 0)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
