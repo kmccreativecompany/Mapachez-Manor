@@ -10178,6 +10178,41 @@ checkPins();
 /* ==== end MORE COURSES v1 ==== */
 
 
+/* ==== DRAMAS v1: "Watch the manor dramas" (short funny videos about the manor) ====
+   To show the button, paste real video links into MANOR_DRAMAS below. While the list is empty the
+   button stays hidden. Links open in a new tab; nothing is embedded, so it costs nothing to run.
+   Example: {title:'The Stapler Mystery',url:'https://youtube.com/shorts/xxxxxxxxxxx',where:'YouTube'},
+   Scripts and posting notes: docs/dramas.md. */
+const MANOR_DRAMAS=[
+];
+const DRAMA_TEXT={
+  en:{button:'🎬 Watch the manor dramas',heading:'Manor dramas',kicker:'TINY STORIES FROM THE MANOR',intro:'Short, silly moments from behind the front desk. Each one opens in a new tab.',close:'Back to the manor'},
+  es:{button:'🎬 Mira los dramas de la mansión',heading:'Dramas de la mansión',kicker:'PEQUEÑAS HISTORIAS DE LA MANSIÓN',intro:'Momentos cortos y graciosos detrás de la recepción. Cada uno se abre en una pestaña nueva.',close:'Volver a la mansión'}
+};
+const DRT=DRAMA_TEXT[profile.lang]||DRAMA_TEXT.en;
+function dramaLinks(){return MANOR_DRAMAS.filter(d=>d&&typeof d.url==='string'&&/^https:\/\/[^\s"'<>]+$/.test(d.url));}
+function openDrama(d){const w=window.open(d.url,'_blank','noopener');if(w)w.opener=null;}
+function openDramas(){
+  const list=dramaLinks();if(!list.length)return;
+  if(list.length===1){openDrama(list[0]);return;}
+  openModal(titleHTML(DRT.heading,DRT.kicker)+'<p>'+esc(DRT.intro)+'</p><ul class="drama-list">'+list.map(d=>
+    '<li><a href="'+esc(d.url)+'" target="_blank" rel="noopener noreferrer">🎬 '+esc(d.title||d.url)+(d.where?' <small>· '+esc(d.where)+'</small>':'')+'</a></li>').join('')+
+    '</ul><div class="drama-actions"><button class="primary-button" id="drama-close">'+esc(DRT.close)+'</button></div>');
+  const c=$('drama-close');if(c)c.onclick=closeModal;
+}
+{const anchor=document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg drama';b.id='drama-title';b.type='button';
+  b.textContent=DRT.button+' →';b.hidden=!dramaLinks().length;b.onclick=openDramas;anchor.after(b);}}
+{const st=document.createElement('style');st.textContent=`
+.joy-title-mg.drama{border-color:rgba(255,158,196,.6);background:rgba(255,126,182,.16);color:#ffe3f0}
+.drama-list{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}
+.drama-list a{display:block;padding:10px 14px;border-radius:12px;background:#fff6fb;border:1px solid #f0bcd6;color:#5a2f4a;text-decoration:none;font:15px Georgia,serif}
+.drama-list a:hover,.drama-list a:focus{background:#ffe9f4}
+.drama-list small{color:#8a6a7d}
+.drama-actions{margin-top:12px}
+`;document.head.append(st);}
+/* ==== end DRAMAS v1 ==== */
+
 })();
 </script>
 </body>
