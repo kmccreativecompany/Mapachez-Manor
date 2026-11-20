@@ -32,7 +32,9 @@ In Room Rush, housekeeping's "sparkling clean" call makes a room 🔍, and only 
 
 ## Lessons (about a minute each)
 
-1. Find a booking. 2. Check a room. 3. Read guest notes. 4. Read a bill. 5. Check a guest in.
+1. Find a booking. 2. Check a room. 3. Read guest notes. 4. Read a bill. 5. Check a guest in
+(pick a ✨ room, then phone with area code, email and a card on file, and only then the keys).
+The deeper why lives in the Front Desk Check-In e-course (`docs/course.md`).
 
 Delores says what to tap and the next tap glows with a little pointing paw. Wrong taps do
 nothing. Lessons 1 to 4 end with one gentle question ("Look again" on a miss, never a penalty).

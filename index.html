@@ -5359,7 +5359,11 @@ en:{
       {say:'Juniper Glow just walked in! Tap 📅 Bookings.',want:'tab:bookings'},
       {say:'Tap Juniper Glow. See “Arriving tonight”?',want:'booking:juniper'},
       {say:'Tap ✅ Check in.',want:'checkin:juniper'},
-      {say:'Now pick a room with ✨. Cleaned isn’t enough on its own: only a room a supervisor has inspected is ready.',want:'pick:201'}]}
+      {say:'Now pick a room with ✨. Cleaned isn’t enough on its own: only a room a supervisor has inspected is ready.',want:'pick:201'},
+      {say:'Room 201 is held for her. Before any keys, three things go on file. First, 📱 her phone number, with the area code.',want:'info:phone'},
+      {say:'Next, ✉️ her email. Read it back to her, letter by letter.',want:'info:email'},
+      {say:'Last, 💳 a card on file for the room and any extras.',want:'info:card'},
+      {say:'Everything is on file. Now, and only now, make the room keys. 🔑',want:'keys:juniper'}]}
   ],
   coachEnd:'You did it! That’s exactly how it’s done at the desk.',
   /* Look-it-up questions */
@@ -5422,7 +5426,11 @@ es:{
       {say:'¡Acaba de llegar Juniper Glow! Toca 📅 Reservas.',want:'tab:bookings'},
       {say:'Toca Juniper Glow. ¿Ves “Llega esta noche”?',want:'booking:juniper'},
       {say:'Toca ✅ Registrar entrada.',want:'checkin:juniper'},
-      {say:'Ahora elige una habitación con ✨. Limpia no basta: solo está lista si una supervisora la inspeccionó.',want:'pick:201'}]}
+      {say:'Ahora elige una habitación con ✨. Limpia no basta: solo está lista si una supervisora la inspeccionó.',want:'pick:201'},
+      {say:'La 201 queda reservada para ella. Antes de las llaves, tres cosas quedan en su ficha. Primero, 📱 su teléfono, con el código de área.',want:'info:phone'},
+      {say:'Ahora, ✉️ su correo. Léeselo en voz alta, letra por letra.',want:'info:email'},
+      {say:'Por último, 💳 una tarjeta en ficha para la habitación y los extras.',want:'info:card'},
+      {say:'Todo está en su ficha. Ahora, y solo ahora, prepara las llaves. 🔑',want:'keys:juniper'}]}
   ],
   coachEnd:'¡Lo lograste! Así se hace en recepción.',
   qKicker:'UN HUÉSPED TIENE UNA PREGUNTA',qShift:'TURNO RÁPIDO · HUÉSPED {n} DE {total} · HMS',
@@ -5513,11 +5521,11 @@ function hmsPill(kind){return '<span class="hms-pill '+kind+'">'+esc(kind==='arr
 function hmsStatus(s){const [i,l]=HT.status[s];return '<span class="hms-st '+s+'"><span aria-hidden="true">'+i+'</span> '+esc(l)+'</span>';}
 /* opt: {tab, sel, onAct(act), glow:'tab:rooms', rooms, lock} */
 function hmsScreen(host,opt={}){
-  const S={tab:opt.tab||'bookings',sel:opt.sel||'',rooms:{...(opt.rooms||HMS_ROOMS)},checked:{},picking:'',room:opt.room||'',msg:'',glow:opt.glow||''};
+  const S={tab:opt.tab||'bookings',sel:opt.sel||'',rooms:{...(opt.rooms||HMS_ROOMS)},checked:{},waiting:{},picking:'',room:opt.room||'',msg:'',glow:opt.glow||''};
   host.innerHTML='';const pc=document.createElement('div');pc.className='hms-pc';host.append(pc);
   const act=(a,run)=>{run?.();render();opt.onAct?.(a,S);};
   function rowsFor(kind){
-    return '<div class="hms-list">'+HMS_GUESTS.map(g=>{const L=hL(g),pill=S.checked[g.id]?'checked':g.status;
+    return '<div class="hms-list">'+HMS_GUESTS.map(g=>{const L=hL(g),pill=S.checked[g.id]&&!S.waiting[g.id]?'checked':g.status;
       return '<button class="hms-row" data-act="'+kind+':'+g.id+'"><canvas class="hms-face" data-face="'+g.id+'" aria-hidden="true"></canvas><span class="hms-row-main"><b>'+esc(L.name)+'</b><small>'+esc(HT.room)+' '+g.room+(kind==='bill'?' · '+esc(HT.total)+' '+money(billTotal(L.bill)):' · '+esc(HT.nightsN(g.nights)))+'</small></span>'+(kind==='booking'?hmsPill(pill):'')+'</button>';}).join('')+'</div>';
   }
   function body(){
@@ -5533,7 +5541,7 @@ function hmsScreen(host,opt={}){
     if(S.tab==='bookings'){
       if(S.picking===g.id)return head+'<p class="hms-say">'+esc(ht(HT.pickRoom,{name:L.name}))+'</p><div class="hms-rooms">'+Object.keys(S.rooms).map(n=>'<button class="hms-room '+S.rooms[n]+'" data-act="pick:'+n+'"><b>'+n+'</b><span class="hms-room-ic" aria-hidden="true">'+HT.status[S.rooms[n]][0]+'</span><small>'+esc(HT.status[S.rooms[n]][1])+'</small></button>').join('')+'</div>'+(S.msg?'<p class="hms-msg">'+esc(S.msg)+'</p>':'');
       const rows=[[HT.room,g.room],[HT.nights,HT.nightsN(g.nights)],[HT.arrives,L.arrive],[HT.leaves,L.leave],[HT.checkout,L.checkout],[HT.bookNote,L.book]];
-      return head+'<div class="hms-card"><dl class="hms-dl">'+rows.map(([a,b])=>'<dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd>').join('')+'</dl>'+hmsPill(S.checked[g.id]?'checked':g.status)+'</div>'+
+      return head+'<div class="hms-card"><dl class="hms-dl">'+rows.map(([a,b])=>'<dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd>').join('')+'</dl>'+hmsPill(S.checked[g.id]&&!S.waiting[g.id]?'checked':g.status)+'</div>'+
         '<div class="hms-actions"><button data-act="guest:'+g.id+'">'+esc(HT.profile)+'</button><button data-act="bill:'+g.id+'">'+esc(HT.bill)+'</button>'+(g.status==='arriving'&&!S.checked[g.id]?'<button class="go" data-act="checkin:'+g.id+'">'+esc(HT.checkIn)+'</button>':'')+'</div>'+(S.msg?'<p class="hms-msg ok">'+esc(S.msg)+'</p>':'');
     }
     if(S.tab==='guests')return head+'<div class="hms-card"><span class="hms-label">'+esc(HT.notes)+'</span><ul class="hms-notes">'+L.notes.map(([n,w])=>'<li class="'+(w?'warn':'')+'">'+(w?'⚠️ ':'• ')+esc(n)+'</li>').join('')+'</ul><span class="hms-label">'+esc(HT.features)+'</span><div>'+L.features.map(f=>'<span class="feature-chip">'+esc(f)+'</span>').join('')+'</div></div>';
@@ -7637,9 +7645,7 @@ en:{
   noteSlid:'You slide a note under the door: “{role} stopped by. Call the desk anytime. Sweet dreams 🌙” Next check-in, ask for a number!',
   openHms:'🖥️ Open the desk computer',
   phoneLabel:'📱 Phone',phoneNone:'Not on file yet. Ask at check-in!',
-  phoneCoach:'Delores: “One more thing! Ask for a phone number. If their door ever says Do Not Disturb, you can text instead of knocking.”',
-  askPhone:'📱 Ask for a phone number',skipPhone:'Skip it',
-  gavePhone:'“Of course! It’s {phone}.”',savedPhone:'Saved to {name}’s profile ✓',skipped:'Okay. No phone number on file for {name}.',
+
   pins:{knock:['Knock Knock','Knock on all six guest room doors.'],quiet:['Quiet Hands','Text a guest with a Do Not Disturb sign, kindly.'],number:['Number, Please','Save a guest’s phone number at check-in.']}
 },
 es:{
@@ -7686,26 +7692,32 @@ es:{
   noteSlid:'Deslizas una nota bajo la puerta: “Ha pasado {role}. Llame a recepción cuando quiera. Dulces sueños 🌙” ¡En el próximo registro, pide un número!',
   openHms:'🖥️ Abrir el ordenador de recepción',
   phoneLabel:'📱 Teléfono',phoneNone:'Aún no está. ¡Pídelo al registrar la entrada!',
-  phoneCoach:'Delores: “¡Una cosa más! Pide un número de teléfono. Si algún día su puerta dice No molestar, podrás escribirle en vez de llamar a la puerta.”',
-  askPhone:'📱 Pedir un teléfono',skipPhone:'Saltar',
-  gavePhone:'“¡Claro! Es el {phone}.”',savedPhone:'Guardado en la ficha de {name} ✓',skipped:'Vale. No hay teléfono en la ficha de {name}.',
   pins:{knock:['Toc toc','Llama a las seis puertas de las habitaciones.'],quiet:['Manos silenciosas','Escribe con amabilidad a un huésped con el cartel de No molestar.'],number:['Número, por favor','Guarda el teléfono de un huésped al registrar su entrada.']}
 }};
 const KT=KNOCK_TEXT[profile.lang]||KNOCK_TEXT.en;
 const KNOCK_ACTS=['read','nap','yoga','snack','knit','plant','dance','paint','puzzle','tea'];
-/* Fictional numbers only (the 555-01xx range is reserved for make-believe). */
-const STORY_PHONES={finch:'555-0186',vesper:'555-0123',vale:'555-0164',nine:'555-0199'};
-const ARRIVAL_PHONES={juniper:'555-0117',fuzz:'555-0152'};
+/* Fictional numbers only (the 555-01xx range is reserved for make-believe), always with an area code. */
+const STORY_PHONES={finch:'(312) 555-0186',vesper:'(415) 555-0123',vale:'(512) 555-0164',nine:'(808) 555-0199'};
+const ARRIVAL_PHONES={juniper:'(207) 555-0117',fuzz:'(907) 555-0152'};
+/* What arriving guests tell you at check-in. Every detail is make-believe: example.com emails
+   (a domain kept for examples) and well-known test card endings, only ever shown masked. */
+const ARRIVAL_INFO={
+  juniper:{area:'207',num:'555-0117',email:'juniper.glow@example.com',typos:['juniperglow@example.com','juniper.glow@exmaple.com'],card:'JUNIPER GLOW',last4:'4242',exp:'09/29'},
+  fuzz:{area:'907',num:'555-0152',email:'captain.fuzz@example.com',typos:['captain.fuzz@example','captian.fuzz@example.com'],card:'BARNABY FUZZ',last4:'4444',exp:'03/30'}
+};
 
 /* ---------- Save ---------- */
 const KNOCK_KEY='mapachez_knock_v1';
-function createKnock(){return {version:1,doors:[],knocks:0,phones:{},checked:{},kind:0,calls:0,notes:0,saved:0,cleared:{seed:0,rooms:[]}};}
+function createKnock(){return {version:1,doors:[],knocks:0,phones:{},emails:{},cards:{},checked:{},kind:0,calls:0,notes:0,saved:0,keys:0,cleared:{seed:0,rooms:[]}};}
 function normaliseKnock(v){
   const k=createKnock();if(!v||typeof v!=='object'||v.version!==1)return k;
-  for(const f of ['knocks','kind','calls','notes','saved'])k[f]=Math.max(0,v[f]|0);
+  for(const f of ['knocks','kind','calls','notes','saved','keys'])k[f]=Math.max(0,v[f]|0);
   if(Array.isArray(v.doors))k.doors=[...new Set(v.doors.map(Number).filter(n=>n>=201&&n<=206))];
   for(const id of Object.keys(ARRIVAL_PHONES)){
-    if(typeof v.phones?.[id]==='string')k.phones[id]=v.phones[id]===ARRIVAL_PHONES[id]?ARRIVAL_PHONES[id]:'';
+    /* Older saves kept the number without its area code; those still count. */
+    if(typeof v.phones?.[id]==='string')k.phones[id]=v.phones[id]===ARRIVAL_PHONES[id]||v.phones[id]===ARRIVAL_INFO[id].num?ARRIVAL_PHONES[id]:'';
+    if(v.emails?.[id]===ARRIVAL_INFO[id].email)k.emails[id]=ARRIVAL_INFO[id].email;
+    if(v.cards?.[id]===true)k.cards[id]=true;
     if(/^20[1-6]$/.test(v.checked?.[id]||''))k.checked[id]=v.checked[id];
   }
   if(v.cleared&&typeof v.cleared==='object')k.cleared={seed:+v.cleared.seed||0,rooms:Array.isArray(v.cleared.rooms)?v.cleared.rooms.map(Number).filter(n=>n>=201&&n<=206):[]};
@@ -7957,6 +7969,54 @@ function phoneStep(n,g){
   narrativeText=body.innerText;
 }
 
+/* ---------- Check-in words (English and Spanish) ---------- */
+const CHECKIN_TEXT={
+ en:{
+  head:'🔑 Before the keys',every:'Every HMS looks a little different, but most hotels check guests in this same way.',
+  items:{phone:['📱','Phone, with area code'],email:['✉️','Email address'],card:['💳','Card on file']},
+  asking:'Ask now',waiting:'Next',emailLabel:'✉️ Email',cardLabel:'💳 Card on file',
+  start:'Delores: “Room’s held! Before {name} gets keys, three things go on file. I’ll tell you why as we go.”',
+  held:'Room {r} is held for {name}. Keys come after three quick things.',
+  keysLocked:'🔒 Room keys · fill in all three first',keysGo:'🔑 Make the room keys',
+  keysDone:'🔑🔑 Two keys for {name}, in a little sleeve with “{r}” written inside. Welcome to the manor!',
+  keysWhy:'Delores: “Keys come last, so every guest can be reached and every room is truly ready. And notice we wrote the number inside the sleeve instead of saying it out loud. The lobby has ears.”',
+  typed:'What did you type? Pick the one that matches exactly.',
+  cardBrand:'TEST CARD',cardAria:'A pretend card, number hidden except the last four digits',
+  ask:{
+   phone:{guest:'My cell? It’s {num}.',reply:'Oh! {area}.',
+    opts:[['📍 “And the area code?”',1,''],['💾 Save {num} as it is',0,'Those 7 digits exist in hundreds of towns. Without the area code, a text could land on a stranger’s phone. Ask for it!'],['⏭️ Skip it. {name} looks tired',0,'No number means no texting when the door says Do Not Disturb, and no way to reach {name} in an emergency. It only takes a few seconds.']],
+    why:'Delores: “With the area code, the number works from anywhere. We text guests when the room is ready, when a package arrives, or when their door says Do Not Disturb.”'},
+   email:{guest:'It’s {email}.',no:['Read it back, letter by letter. One tiny typo and the receipt flies off to a stranger.'],
+    why:'Delores: “The confirmation, the receipt and the folio (that’s the itemized bill) all go to email. Leave a scarf behind? That’s how we tell them. Reading it back catches typos.”'},
+   card:{guest:'Here you go!',
+    opts:[['✔️ Check name and date, HMS holds it, hand back',1,''],['📝 Copy the number onto a sticky note',0,'Never write a card number down or say it out loud. The HMS keeps it safe and only ever shows the last 4 digits.'],['⏭️ Skip it for now. {name} can just pay at checkout',0,'Without a card on file, nothing covers the room or extras like room service. A hold now means a quick, easy checkout later.']],
+    why:'Delores: “The card holds the room plus a little extra for incidentals, like room service or a lamp that lost a pillow fight. It’s a hold, not a charge, and it drops off after checkout.”'}
+  }
+ },
+ es:{
+  head:'🔑 Antes de las llaves',every:'Cada HMS se ve un poco distinto, pero casi todos los hoteles registran la entrada así.',
+  items:{phone:['📱','Teléfono, con código de área'],email:['✉️','Correo electrónico'],card:['💳','Tarjeta en ficha']},
+  asking:'Pregunta ahora',waiting:'Después',emailLabel:'✉️ Correo',cardLabel:'💳 Tarjeta en ficha',
+  start:'Delores: “¡Habitación reservada! Antes de que {name} reciba las llaves, tres cosas quedan en su ficha. Te cuento el porqué en cada paso.”',
+  held:'La {r} queda reservada para {name}. Las llaves llegan tras tres cositas.',
+  keysLocked:'🔒 Llaves · completa las tres primero',keysGo:'🔑 Preparar las llaves',
+  keysDone:'🔑🔑 Dos llaves para {name}, en un sobrecito con “{r}” escrito dentro. ¡Bienvenida a la mansión!',
+  keysWhy:'Delores: “Las llaves van al final, para poder contactar a cada huésped y que cada habitación esté de verdad lista. Y fíjate: escribimos el número dentro del sobre en vez de decirlo en voz alta. El vestíbulo tiene oídos.”',
+  typed:'¿Qué escribiste? Elige el que coincide exactamente.',
+  cardBrand:'TARJETA DE PRUEBA',cardAria:'Una tarjeta de mentira, con el número oculto salvo los cuatro últimos dígitos',
+  ask:{
+   phone:{guest:'¿Mi móvil? Es el {num}.',reply:'¡Ah! {area}.',
+    opts:[['📍 “¿Y el código de área?”',1,''],['💾 Guardar {num} tal cual',0,'Esos 7 dígitos existen en cientos de ciudades. Sin el código de área, un mensaje podría llegar a un desconocido. ¡Pregúntalo!'],['⏭️ Saltarlo. {name} parece cansada',0,'Sin número no podemos escribir cuando la puerta dice No molestar, ni avisar a {name} en una emergencia. Solo toma unos segundos.']],
+    why:'Delores: “Con el código de área, el número funciona desde cualquier lugar. Escribimos a los huéspedes cuando la habitación está lista, cuando llega un paquete o cuando su puerta dice No molestar.”'},
+   email:{guest:'Es {email}.',no:['Léelo en voz alta, letra por letra. Un error pequeñito y el recibo se va volando a un desconocido.'],
+    why:'Delores: “La confirmación, el recibo y el folio (la cuenta detallada) van al correo. ¿Se dejó una bufanda? Así le avisamos. Leerlo en voz alta atrapa los errores.”'},
+   card:{guest:'¡Aquí tiene!',
+    opts:[['✔️ Revisar nombre y fecha, el HMS la retiene, devolverla',1,''],['📝 Copiar el número en una notita',0,'Nunca escribas ni digas en voz alta el número de una tarjeta. El HMS lo guarda seguro y solo muestra los 4 últimos dígitos.'],['⏭️ Saltarlo por ahora. {name} puede pagar al salir, sin más',0,'Sin tarjeta en ficha, nada cubre la habitación ni extras como el servicio a la habitación. Una retención ahora hace la salida rápida y fácil.']],
+    why:'Delores: “La tarjeta retiene la habitación y un poquito más para extras, como el servicio a la habitación o una lámpara que perdió una pelea de almohadas. Es una retención, no un cobro, y desaparece tras la salida.”'}
+  }
+ }
+};
+const CI=CHECKIN_TEXT[profile.lang]||CHECKIN_TEXT.en;
 /* ---------- The desk computer: ask for a phone number at check-in, and show it on profiles ---------- */
 function phoneLine(id){
   if(STORY_PHONES[id])return STORY_PHONES[id];
@@ -7968,19 +8028,67 @@ function decoratePhone(host,S){
   const num=phoneLine(S.sel);
   card.insertAdjacentHTML('beforeend','<span class="hms-label">'+esc(KT.phoneLabel)+'</span><p class="knock-num'+(num?'':' none')+'">'+esc(num||KT.phoneNone)+'</p>');
 }
-function phoneCard(host,id,room){
-  host.querySelector('.knock-phone')?.remove();
-  const g=hmsGuest(id),name=hL(g).name;
-  const card=document.createElement('div');card.className='joy-panel knock-phone';
-  card.innerHTML='<div class="hms-coach"><canvas aria-hidden="true"></canvas><p>'+esc(KT.phoneCoach)+'</p></div><div class="action-row"></div><p class="hms-msg ok" hidden></p>';
-  host.append(card);paintBust(card.querySelector('canvas'),{cast:'delores'},26,2);
-  const row=card.querySelector('.action-row'),msg=card.querySelector('.hms-msg');
-  const ask=document.createElement('button');ask.className='primary-button';ask.textContent=KT.askPhone;
-  const skip=document.createElement('button');skip.className='secondary-button';skip.textContent=KT.skipPhone;
-  ask.onclick=()=>{knock.phones[id]=ARRIVAL_PHONES[id];knock.saved++;storeKnock();row.remove();msg.hidden=false;msg.textContent=kt(KT.gavePhone,{phone:ARRIVAL_PHONES[id]})+' '+kt(KT.savedPhone,{name});hmsReward(msg,1,2,{word:'📱'});narrativeText=body.innerText;};
-  skip.onclick=()=>{knock.phones[id]='';storeKnock();row.remove();msg.hidden=false;msg.classList.remove('ok');msg.textContent=kt(KT.skipped,{name});narrativeText=body.innerText;};
-  row.append(ask,skip);
-  void room;narrativeText=body.innerText;
+function decorateInfo(host,S){
+  decoratePhone(host,S);
+  if(S.tab!=='guests'||!S.sel||!ARRIVAL_INFO[S.sel])return;
+  const card=host.querySelector('.hms-body .hms-card');if(!card||card.querySelector('.ci-file'))return;
+  const I=ARRIVAL_INFO[S.sel],em=knock.checked[S.sel]&&knock.emails[S.sel],cd=knock.checked[S.sel]&&knock.cards[S.sel];
+  card.insertAdjacentHTML('beforeend','<span class="hms-label">'+esc(CI.emailLabel)+'</span><p class="knock-num ci-file'+(em?'':' none')+'">'+esc(em||KT.phoneNone)+'</p>'+
+    '<span class="hms-label">'+esc(CI.cardLabel)+'</span><p class="knock-num'+(cd?'':' none')+'">'+esc(cd?'•••• •••• •••• '+I.last4+' · '+I.exp:KT.phoneNone)+'</p>');
+}
+/* ---------- Check-in: phone (with area code), email and a card on file, THEN the keys ----------
+   Each step is one tap between three choices. Delores says why after every right answer. */
+function checkinCard(host,id,room,S,emit){
+  host.querySelector('.ci-card')?.remove();
+  const g=hmsGuest(id),name=hL(g).name,first=name.split(' ')[0],I=ARRIVAL_INFO[id];
+  const got={phone:!!knock.phones[id],email:!!knock.emails[id],card:!!knock.cards[id]};
+  const order=['phone','email','card'];
+  const card=document.createElement('div');card.className='joy-panel ci-card';
+  card.innerHTML='<div class="ci-head"><b>'+esc(CI.head)+'</b><small>'+esc(CI.every)+'</small></div>'+
+    '<ol class="ci-list">'+order.map(k=>'<li data-k="'+k+'"><span class="ci-ic" aria-hidden="true">'+CI.items[k][0]+'</span><span><b>'+esc(CI.items[k][1])+'</b><small class="ci-val"></small></span><span class="ci-tick" aria-hidden="true"></span></li>').join('')+'</ol>'+
+    '<div class="hms-coach ci-coach"><canvas aria-hidden="true"></canvas><p class="ci-why" aria-live="polite"></p></div>'+
+    '<div class="ci-step"></div><button class="primary-button ci-keys" disabled>'+esc(CI.keysLocked)+'</button><p class="hms-msg ok ci-done" hidden></p>';
+  host.append(card);paintBust(card.querySelector('.ci-coach canvas'),{cast:'delores'},26,2);
+  const why=card.querySelector('.ci-why'),step=card.querySelector('.ci-step'),keys=card.querySelector('.ci-keys');
+  why.textContent=kt(CI.start,{name:first});
+  const val=k=>k==='phone'?ARRIVAL_PHONES[id]:k==='email'?I.email:'•••• '+I.last4;
+  function paint(){
+    const now=order.find(k=>!got[k]);
+    card.querySelectorAll('.ci-list li').forEach(li=>{const k=li.dataset.k;li.classList.toggle('got',got[k]);li.classList.toggle('now',k===now);
+      li.querySelector('.ci-val').textContent=got[k]?val(k):k===now?CI.asking:CI.waiting;li.querySelector('.ci-tick').textContent=got[k]?'✓':'';});
+    step.innerHTML='';
+    if(!now){keys.disabled=false;keys.textContent=CI.keysGo;keys.classList.add('hms-glow');return;}
+    const Q=CI.ask[now],say=kt(Q.guest,{num:I.num,email:I.email});
+    step.innerHTML='<p class="ci-say"><b>'+esc(name)+':</b> “'+esc(say)+'”</p>'+(now==='card'?'<div class="ci-cc" aria-label="'+esc(CI.cardAria)+'"><small>'+esc(CI.cardBrand)+'</small><span>•••• •••• •••• '+esc(I.last4)+'</span><span class="ci-cc-row"><b>'+esc(I.card)+'</b><b>'+esc(I.exp)+'</b></span></div>':'')+
+      (now==='email'?'<p class="ci-typed">'+esc(CI.typed)+'</p>':'')+'<div class="choices"></div><p class="hms-msg" hidden></p>';
+    const opts=now==='email'?[[I.email,1,''],[I.typos[0],0,Q.no[0]],[I.typos[1],0,Q.no[0]]]:Q.opts.map(([t,ok,no])=>[kt(t,{num:I.num,name:first}),ok,no]);
+    const host2=step.querySelector('.choices'),msg=step.querySelector('.hms-msg');
+    hmsShuffle(opts).forEach(([text,ok,no],k)=>{
+      const b=document.createElement('button');b.className='choice';b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>';
+      b.onclick=()=>{
+        if(!ok){msg.hidden=false;msg.classList.remove('ok');msg.textContent='🌱 '+kt(no,{name:first});b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');narrativeText=body.innerText;return;}
+        got[now]=true;
+        if(now==='phone'){knock.phones[id]=ARRIVAL_PHONES[id];knock.saved++;}
+        if(now==='email')knock.emails[id]=I.email;
+        if(now==='card')knock.cards[id]=true;
+        storeKnock();
+        why.textContent=(Q.reply?'“'+kt(Q.reply,{area:I.area})+'” ':'')+Q.why;
+        hmsReward(card.querySelector('.ci-list li[data-k="'+now+'"]'),1,2,{word:CI.items[now][0]});
+        paint();emit('info:'+now);narrativeText=body.innerText;
+      };host2.append(b);});
+    narrativeText=body.innerText;
+  }
+  keys.onclick=()=>{
+    if(keys.disabled)return;
+    for(const k of Object.keys(knock.checked))if(knock.checked[k]===room&&k!==id)delete knock.checked[k];
+    knock.checked[id]=room;knock.keys++;storeKnock();
+    keys.remove();step.innerHTML='';why.textContent=CI.keysWhy;
+    const done=card.querySelector('.ci-done');done.hidden=false;done.textContent=kt(CI.keysDone,{r:room,name:first});
+    delete S.waiting[id];S.set({msg:ht(HT.checkedInMsg,{name,r:room})});
+    hmsReward(done,2,3,{big:true,word:'🔑'});
+    emit('keys:'+id);narrativeText=body.innerText;
+  };
+  paint();
 }
 const knockHmsScreen=hmsScreen;
 hmsScreen=function(host,opt={}){
@@ -7990,12 +8098,12 @@ hmsScreen=function(host,opt={}){
     const [kind,arg]=String(a).split(':');
     if(kind==='pick'){
       const id=Object.keys(s.checked).find(k=>s.checked[k]===arg);
-      if(id){for(const k of Object.keys(knock.checked))if(knock.checked[k]===arg&&k!==id)delete knock.checked[k];knock.checked[id]=arg;knock.phones[id]=knock.phones[id]||'';storeKnock();phoneCard(host,id,arg);}
+      if(id&&ARRIVAL_INFO[id]){s.waiting[id]=1;s.set({msg:kt(CI.held,{r:arg,name:hL(hmsGuest(id)).name})});checkinCard(host,id,arg,s,x=>userAct?.(x,s));}
     }
-    decoratePhone(host,s);
+    decorateInfo(host,s);
   }});
-  S=S0;const set=S.set;S.set=o=>{set(o);decoratePhone(host,S);};
-  decoratePhone(host,S);return S;
+  S=S0;const set=S.set;S.set=o=>{set(o);decorateInfo(host,S);};
+  decorateInfo(host,S);return S;
 };
 
 /* ---------- Wiring: guests leave the painted rooms (they're behind doors now) ---------- */
@@ -8026,6 +8134,22 @@ PINS.push(
 .kp-choice b{font-weight:600}
 .knock-num{font-size:16px;font-weight:700;margin:2px 0 0}.knock-num.none{font-weight:400;opacity:.8}
 .knock-phone,.knock-lesson{margin-top:12px}
+.ci-card{margin-top:12px;display:grid;gap:10px}
+.ci-head{display:grid;gap:2px}.ci-head b{font:bold 17px Georgia,serif}.ci-head small{font-size:13px;color:#6b6450}
+.ci-card small{letter-spacing:normal;text-transform:none;font-family:Arial,sans-serif}
+.ci-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.ci-list li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:1px solid #e0cf9e;background:#fffaf0;opacity:.7}
+.ci-list li.now{opacity:1;border-color:#c9952f;box-shadow:0 0 0 2px #ffd84d88}
+.ci-list li.got{opacity:1;background:#effbe9;border-color:#9fd38c}
+.ci-list li>span:nth-child(2){flex:1;display:grid}.ci-list small{font-size:13px;color:#4b5a40;overflow-wrap:anywhere}
+.ci-ic{font-size:20px}.ci-tick{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:#d9cfb4}
+.ci-list li.got .ci-tick{background:#7fdc6a}
+.ci-say{margin:0;font-size:16px;line-height:1.4}.ci-typed{margin:0;font-size:14px;color:#6b6450}
+.ci-step .choice b{overflow-wrap:anywhere}
+.ci-cc{max-width:280px;aspect-ratio:1.6;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(135deg,#2f5d50,#4f8a73 60%,#c9a14a);box-shadow:0 4px 12px #1d463633;font-family:'Courier New',monospace}
+.ci-cc small{font:bold 11px Arial,sans-serif;letter-spacing:.12em;opacity:.85}.ci-cc span{font-size:17px;letter-spacing:.06em}
+.ci-cc-row{display:flex;justify-content:space-between;font-size:13px!important}
+.ci-keys{justify-self:start}.ci-keys:disabled{opacity:.6;cursor:not-allowed}
 `;document.head.append(st);}
 checkPins();
 /* ==== end KNOCK v1 ==== */
@@ -8791,7 +8915,7 @@ const NN_SAVE='mapachez_nights_v1';
 const NN_STEPS=[
   {id:'book',icon:'📖',en:'Your Memory Book of pins and keepsakes',es:'Tu Libro de recuerdos, con insignias y tesoros',sel:['#title-memories','#memory-button','#growth-pins','#keepsakes-button']},
   {id:'closet',icon:'🎀',en:'The closet, for gifts from thankful guests',es:'El armario, para los regalos de huéspedes agradecidos',sel:['#joy-side-closet']},
-  {id:'hms',icon:'🖥️',en:'The desk computer (HMS)',es:'La computadora de recepción (HMS)',sel:['#hms-title','#joy-side-hms']},
+  {id:'hms',icon:'🖥️',en:'The desk computer (HMS)',es:'La computadora de recepción (HMS)',sel:['#hms-title','#joy-side-hms','#co-title']},
   {id:'festival',icon:'🎪',en:'The festival grounds',es:'El festival en los jardines',sel:['#explore-festival','#festival-button','#places-button']},
   {id:'mystery',icon:'🕯️',en:'Mystery guests',es:'Huéspedes misteriosos',sel:['#joy-title-mg','#joy-side-mg']},
   {id:'lilies',icon:'🔍',en:'The lily mystery',es:'El misterio de los lirios',sel:['#growth-notebook']},
@@ -8865,6 +8989,367 @@ const nnOpenSettings=openSettings;openSettings=function(){
 $('settings-button').onclick=openSettings;$('title-settings').onclick=openSettings;
 nnApply(false);
 /* ==== end NEW NIGHTS v1 ==== */
+
+/* ==== COURSE v1: the Front Desk Check-In e-course, taught by Delores, with a certificate ====
+   Six tiny lessons (each one says HOW and WHY), a friendly final check (5 of 6 to pass, retry
+   anytime), then a certificate drawn on the device: name, date and a certificate ID. It saves as
+   a picture and opens LinkedIn's free "Add to profile" form. No servers, nothing to pay for.
+   It is a certificate of completion from a training game, never an accreditation. */
+const COURSE_TEXT={
+ en:{
+  kicker:'SILVER KEY ACADEMY · E-COURSE',title:'Front Desk Check-In',
+  hi:'Delores: “Welcome to class! I’ll teach you how to check a guest in, and why we do every step. Six tiny lessons, one friendly final check, then a certificate with your name on it.”',
+  hiBack:'Delores: “Welcome back, star pupil. Pick up right where you left off.”',
+  hiDone:'Delores: “You’ve mastered check-in! Your certificate is ready whenever you are.”',
+  progress:'{n} of {total} lessons',modsH:'Lessons',start:'Start',done:'Done ✓',
+  finalT:'Final check',finalD:'6 questions. Get 5 right to earn your certificate.',finalLocked:'Finish all 6 lessons first',
+  certT:'Your certificate',certD:'Save it, print it, add it to LinkedIn',
+  path:['👋 Greet','📅 Booking','🪪 ID','📱 Phone','✉️ Email','💳 Card','✨ Room ready','🔑 Keys'],
+  areaTag:'area code',numTag:'number',
+  mods:[
+   {t:'The check-in path',d:'Every HMS is different. The path is the same.',vis:'path',
+    how:'Every hotel picks its own HMS, the desk computer program. The buttons, colors and names change from hotel to hotel. But almost all of them check a guest in along this same path. Learn the path, and any desk will feel like home.',
+    why:'When you know the path, a brand-new system is just new buttons. You’ll always know what comes next, and why.',
+    q:'Which step always comes last?',opts:[['🔑 The room keys',1],['📅 Finding the booking in the HMS',0],['🪪 Checking the photo ID',0]],yes:'Yes! Keys are a promise that everything else is done.',hint:'Look at the end of the path.'},
+   {t:'Find the booking, check the ID',d:'The right person, the right room.',
+    how:'Greet them warmly, ask for their name, and find their booking in the HMS. Then ask for a photo ID and check that the name matches the booking.',
+    why:'The ID makes sure the right person gets the right room. It keeps every guest safe, including the one standing in front of you.',
+    q:'The name on the ID doesn’t match the booking. What now?',opts:[['Kindly ask, and get a manager if unsure',1],['Hand over a key anyway, because they seem so lovely and tired',0],['Say “Nope!”',0]],yes:'Exactly. Kind, curious and careful.',hint:'Be kind, and be careful.'},
+   {t:'Phone number, with the area code',d:'Ten digits, not seven.',vis:'phone',
+    how:'Ask for a mobile number. If they only give seven digits, ask for the area code. Then read the whole number back to them.',
+    why:'We text guests when the room is ready, when a package arrives, or when their door says Do Not Disturb. Without the area code, those seven digits could belong to someone in any city.',
+    q:'Which number is ready to save?',opts:[['(207) 555-0117',1],['555-0117',0],['207-555-01 (close enough!)',0]],yes:'Area code, then the number. Perfect.',hint:'It needs all ten digits.'},
+   {t:'Email address',d:'Type it, then read it back.',
+    how:'Ask for an email address and type it in. Then read it back, letter by letter, especially the part after the @.',
+    why:'The confirmation, the receipt and the folio (the itemized bill) all go to email. If a guest leaves a scarf behind, that’s how we tell them.',
+    q:'Bramble says “bramble.knox@example.com”. Which did you type right?',opts:[['bramble.knox@example.com',1],['bramble.knox@exmaple.com',0],['bramble.knox@example.com.com',0]],yes:'Letter for letter. The receipt will land safely.',hint:'Read the part after the @ very slowly.'},
+   {t:'A card on file',d:'A hold, not a charge.',vis:'card',
+    how:'Ask for a credit or debit card. Check that the name matches and the date hasn’t passed. The HMS places a hold, and you hand the card right back.',
+    why:'The hold covers the room plus incidentals: room service, the minibar, a lamp that lost a pillow fight. It drops off after checkout. Never write a card number down or read it out loud. The HMS only ever shows the last 4 digits.',
+    q:'What’s the right way to handle the card?',opts:[['Check name and date, hold, hand back',1],['Copy the number onto a sticky note for later',0],['Read the number out loud so you don’t forget',0]],yes:'Safe and speedy. That’s the way.',hint:'Card numbers stay inside the HMS.'},
+   {t:'Then, the keys',d:'Last, and only when the room is ready.',vis:'path',
+    how:'Only when the phone, email and card are on file, and the room shows ✨ clean, inspected & ready, do you make the keys. Write the room number inside the key sleeve.',
+    why:'Keys last means no guest walks into an unready room, and we can always reach them. We don’t say the room number out loud, because the lobby has ears.',
+    q:'Everything’s on file, but Room 201 shows 🔍 Cleaned, not inspected. Keys?',opts:[['Not yet. Offer tea while a supervisor inspects it',1],['Yes. Cleaned is close enough',0],['Give them another room’s key',0]],yes:'Patience is part of the welcome. Tea helps.',hint:'Only ✨ rooms are ready.'}
+  ],
+  modOf:'LESSON {n} OF {total}',whyH:'Why it matters',nextMod:'Next lesson →',toFinal:'Take the final check →',backCourse:'Back to the course',tryAgain:'🌱 Not quite. {hint}',
+  final:[
+   {q:'A guest says their number is “555-0188”. What’s missing?',opts:[['The area code',1],['Their email',0],['Nothing. Save it!',0]],why:'Seven digits exist in hundreds of towns. Ask for the area code.'},
+   {q:'Why do we ask for an email at check-in?',opts:[['So receipts and news reach them',1],['To send them a cheerful joke every single morning',0],['No reason. It’s just one more box to fill in',0]],why:'Email carries the confirmation, the receipt and the folio.'},
+   {q:'Why is there a card on file?',opts:[['To hold the room and extras',1],['To charge them twice, just in case something happens',0],['So we can read it aloud',0]],why:'It’s a hold for the room and incidentals, not a charge.'},
+   {q:'Where does a card number belong?',opts:[['Safe inside the HMS, shown only as the last 4 digits',1],['On a sticky note by the phone',0],['Written on the key sleeve',0]],why:'Never write card numbers down or say them out loud.'},
+   {q:'Every HMS looks different. What stays the same?',opts:[['The path, from booking to keys',1],['The exact colors and shapes of every button',0],['Nothing at all, everything is different',0]],why:'Learn the path, and any desk computer feels familiar.'},
+   {q:'When do the room keys come out?',opts:[['Last, once everything is on file and the room is ✨',1],['First, to save time',0],['Whenever someone asks loudly',0]],why:'Keys come last, for a ready room and a guest we can reach.'}
+  ],
+  qOf:'FINAL CHECK · QUESTION {n} OF {total}',right:'✨ Right!',wrong:'🌱 Not quite.',next:'Next →',seeScore:'See my score →',
+  passT:'You mastered check-in! 🎓',passP:'{n} of {total}. Delores is dabbing a happy tear with her tail.',
+  failT:'So close!',failP:'{n} of {total}. You need {need}. Everything you missed is in the lessons you already have. Try again anytime, as often as you like.',
+  getCert:'🎓 Get my certificate',retry:'Try again',
+  certIntro:'Type your name the way you want it on your certificate.',nameL:'Your name',namePh:'First and last name',
+  save:'⬇️ Save the picture',li:'Add to LinkedIn',needName:'Type your name first, so it can go on the certificate.',saved:'Saved! Look in your downloads.',
+  liHow:'LinkedIn opens with the course filled in. You can also post the picture you saved.',
+  fine:'This is a certificate of completion from a training game. It is not an accreditation or license. Every HMS is different; this course teaches the general check-in path most of them use.',
+  c:{org:'SILVER KEY ACADEMY  ·  MAPÁCHEZ MANOR',title:'Certificate of Completion',certifies:'This certifies that',completed:'has completed the e-course',course:'Front Desk Check-In',
+     steps:'Booking · ID · Phone with area code · Email · Card on file · Keys last',date:'Date',sign:'Delores',signRole:'Head of the Front Desk',id:'Certificate ID',
+     fine:'Certificate of completion from a training game. Not an accreditation or license.',placeholder:'Your name here',seal:'MASTERED'},
+  liName:'Front Desk Check-In (Silver Key Academy e-course)',liOrg:'Silver Key Games',
+  titleBtn:'🎓 Check-in e-course · certificate',hmsBtn:'🎓 E-course: Front Desk Check-In',hmsBtnD:'Learn the why behind every step, and earn a certificate.',
+  pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']}
+ },
+ es:{
+  kicker:'SILVER KEY ACADEMY · CURSO EN LÍNEA',title:'Registro de entrada en recepción',
+  hi:'Delores: “¡Bienvenida a clase! Te enseño a registrar la entrada de un huésped, y por qué hacemos cada paso. Seis lecciones chiquitas, un repaso final amable y luego un certificado con tu nombre.”',
+  hiBack:'Delores: “Bienvenida de nuevo, alumna estrella. Sigue donde lo dejaste.”',
+  hiDone:'Delores: “¡Dominas el registro de entrada! Tu certificado está listo cuando quieras.”',
+  progress:'{n} de {total} lecciones',modsH:'Lecciones',start:'Empezar',done:'Hecha ✓',
+  finalT:'Repaso final',finalD:'6 preguntas. Acierta 5 para ganar tu certificado.',finalLocked:'Termina primero las 6 lecciones',
+  certT:'Tu certificado',certD:'Guárdalo, imprímelo, añádelo a LinkedIn',
+  path:['👋 Saludar','📅 Reserva','🪪 Identificación','📱 Teléfono','✉️ Correo','💳 Tarjeta','✨ Habitación lista','🔑 Llaves'],
+  areaTag:'código de área',numTag:'número',
+  mods:[
+   {t:'El camino del registro',d:'Cada HMS es distinto. El camino es el mismo.',vis:'path',
+    how:'Cada hotel elige su propio HMS, el programa del ordenador de recepción. Los botones, colores y nombres cambian de un hotel a otro. Pero casi todos registran la entrada siguiendo este mismo camino. Aprende el camino y cualquier recepción te parecerá tu casa.',
+    why:'Si conoces el camino, un sistema nuevo solo tiene botones nuevos. Siempre sabrás qué viene después, y por qué.',
+    q:'¿Qué paso va siempre al final?',opts:[['🔑 Las llaves',1],['📅 Buscar la reserva en el HMS',0],['🪪 Revisar la identificación',0]],yes:'¡Sí! Las llaves son la promesa de que todo lo demás está hecho.',hint:'Mira el final del camino.'},
+   {t:'Busca la reserva, revisa la identificación',d:'La persona correcta, la habitación correcta.',
+    how:'Saluda con calidez, pregunta su nombre y busca su reserva en el HMS. Luego pide una identificación con foto y comprueba que el nombre coincide con la reserva.',
+    why:'La identificación asegura que la persona correcta recibe la habitación correcta. Protege a cada huésped, incluido quien tienes delante.',
+    q:'El nombre de la identificación no coincide con la reserva. ¿Y ahora?',opts:[['Preguntar con amabilidad, y si dudas, a un gerente',1],['Dar la llave igualmente, porque parece encantador y está cansado',0],['Decir “¡No!”',0]],yes:'Exacto. Amable, curiosa y cuidadosa.',hint:'Sé amable, y sé cuidadosa.'},
+   {t:'Teléfono, con código de área',d:'Diez dígitos, no siete.',vis:'phone',
+    how:'Pide un número de móvil. Si solo te dan siete dígitos, pregunta el código de área. Luego léeles el número completo.',
+    why:'Escribimos a los huéspedes cuando la habitación está lista, cuando llega un paquete o cuando su puerta dice No molestar. Sin el código de área, esos siete dígitos podrían ser de alguien en cualquier ciudad.',
+    q:'¿Qué número está listo para guardar?',opts:[['(207) 555-0117',1],['555-0117',0],['207-555-01 (¡casi!)',0]],yes:'Código de área y luego el número. Perfecto.',hint:'Necesita los diez dígitos.'},
+   {t:'Correo electrónico',d:'Escríbelo y léelo en voz alta.',
+    how:'Pide un correo electrónico y escríbelo. Luego léelo en voz alta, letra por letra, sobre todo lo que va después de la @.',
+    why:'La confirmación, el recibo y el folio (la cuenta detallada) van al correo. Si un huésped se deja una bufanda, así le avisamos.',
+    q:'Bramble dice “bramble.knox@example.com”. ¿Cuál escribiste bien?',opts:[['bramble.knox@example.com',1],['bramble.knox@exmaple.com',0],['bramble.knox@example.com.com',0]],yes:'Letra por letra. El recibo llegará sano y salvo.',hint:'Lee muy despacio lo que va después de la @.'},
+   {t:'Una tarjeta en ficha',d:'Una retención, no un cobro.',vis:'card',
+    how:'Pide una tarjeta de crédito o débito. Comprueba que el nombre coincide y que la fecha no ha pasado. El HMS hace una retención y devuelves la tarjeta enseguida.',
+    why:'La retención cubre la habitación y los extras: servicio a la habitación, el minibar, una lámpara que perdió una pelea de almohadas. Desaparece tras la salida. Nunca escribas ni digas en voz alta el número de una tarjeta. El HMS solo muestra los 4 últimos dígitos.',
+    q:'¿Cuál es la forma correcta de tratar la tarjeta?',opts:[['Revisar nombre y fecha, retener, devolver',1],['Copiar el número en una notita para después',0],['Leer el número en voz alta para no olvidarlo',0]],yes:'Segura y rápida. Así se hace.',hint:'Los números de tarjeta se quedan dentro del HMS.'},
+   {t:'Y entonces, las llaves',d:'Al final, y solo con la habitación lista.',vis:'path',
+    how:'Solo cuando el teléfono, el correo y la tarjeta están en ficha, y la habitación muestra ✨ limpia, inspeccionada y lista, preparas las llaves. Escribe el número dentro del sobre de las llaves.',
+    why:'Llaves al final significa que nadie entra en una habitación sin preparar y que siempre podemos contactar al huésped. No decimos el número en voz alta, porque el vestíbulo tiene oídos.',
+    q:'Todo está en ficha, pero la 201 muestra 🔍 Limpia, sin inspeccionar. ¿Llaves?',opts:[['Aún no. Ofrece un té mientras una supervisora la inspecciona',1],['Sí. Limpia ya casi vale',0],['Darle la llave de otra',0]],yes:'La paciencia es parte de la bienvenida. El té ayuda.',hint:'Solo las habitaciones ✨ están listas.'}
+  ],
+  modOf:'LECCIÓN {n} DE {total}',whyH:'Por qué importa',nextMod:'Siguiente lección →',toFinal:'Hacer el repaso final →',backCourse:'Volver al curso',tryAgain:'🌱 Casi. {hint}',
+  final:[
+   {q:'Un huésped dice que su número es “555-0188”. ¿Qué falta?',opts:[['El código de área',1],['Su correo',0],['Nada. ¡Guárdalo ya!',0]],why:'Siete dígitos existen en cientos de ciudades. Pregunta el código de área.'},
+   {q:'¿Por qué pedimos un correo al registrar la entrada?',opts:[['Para que les lleguen recibos y avisos',1],['Para mandarles un chiste alegre todas las mañanas',0],['Por nada. Es solo una casilla más que rellenar',0]],why:'El correo lleva la confirmación, el recibo y el folio.'},
+   {q:'¿Por qué hay una tarjeta en ficha?',opts:[['Para retener la habitación y los extras',1],['Para cobrar dos veces, por si acaso pasa algo raro',0],['Para leerla en voz alta',0]],why:'Es una retención para la habitación y los extras, no un cobro.'},
+   {q:'¿Dónde va el número de una tarjeta?',opts:[['Seguro dentro del HMS, mostrando solo los 4 últimos dígitos',1],['En una notita junto al teléfono',0],['Escrito en el sobre de las llaves',0]],why:'Nunca escribas ni digas en voz alta un número de tarjeta.'},
+   {q:'Cada HMS se ve distinto. ¿Qué se mantiene igual?',opts:[['El camino, de la reserva a las llaves',1],['Los colores y las formas exactas de cada botón',0],['Nada de nada, todo es distinto siempre',0]],why:'Aprende el camino y cualquier ordenador de recepción te sonará.'},
+   {q:'¿Cuándo salen las llaves?',opts:[['Al final, con todo en ficha y la habitación ✨',1],['Primero, para ahorrar tiempo',0],['Cuando alguien las pide en voz alta',0]],why:'Las llaves van al final: habitación lista y huésped localizable.'}
+  ],
+  qOf:'REPASO FINAL · PREGUNTA {n} DE {total}',right:'✨ ¡Correcto!',wrong:'🌱 Casi.',next:'Siguiente →',seeScore:'Ver mi resultado →',
+  passT:'¡Dominas el registro de entrada! 🎓',passP:'{n} de {total}. Delores se seca una lagrimita feliz con la cola.',
+  failT:'¡Casi!',failP:'{n} de {total}. Necesitas {need}. Todo lo que fallaste está en las lecciones que ya tienes. Inténtalo cuando quieras, todas las veces que quieras.',
+  getCert:'🎓 Ver mi certificado',retry:'Intentarlo otra vez',
+  certIntro:'Escribe tu nombre tal como lo quieres en tu certificado.',nameL:'Tu nombre',namePh:'Nombre y apellido',
+  save:'⬇️ Guardar la imagen',li:'Añadir a LinkedIn',needName:'Escribe tu nombre primero, para ponerlo en el certificado.',saved:'¡Guardado! Míralo en tus descargas.',
+  liHow:'LinkedIn se abre con el curso ya escrito. También puedes publicar la imagen que guardaste.',
+  fine:'Es un certificado de finalización de un juego de formación. No es una acreditación ni una licencia. Cada HMS es distinto; este curso enseña el camino general que usan casi todos.',
+  c:{org:'SILVER KEY ACADEMY  ·  MAPÁCHEZ MANOR',title:'Certificado de finalización',certifies:'Se certifica que',completed:'ha completado el curso en línea',course:'Registro de entrada en recepción',
+     steps:'Reserva · Identificación · Teléfono con código · Correo · Tarjeta · Llaves al final',date:'Fecha',sign:'Delores',signRole:'Jefa de recepción',id:'ID del certificado',
+     fine:'Certificado de finalización de un juego de formación. No es una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'DOMINADO'},
+  liName:'Registro de entrada en recepción (curso de Silver Key Academy)',liOrg:'Silver Key Games',
+  titleBtn:'🎓 Curso de registro de entrada · certificado',hmsBtn:'🎓 Curso: Registro de entrada',hmsBtnD:'Aprende el porqué de cada paso y gana un certificado.',
+  pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']}
+ }
+};
+const CO=COURSE_TEXT[profile.lang]||COURSE_TEXT.en;
+const COURSE_KEY='mapachez_course_v1',COURSE_PASS=5;
+function createCourse(){return {version:1,mods:[],tries:0,best:0,passed:'',salt:''};}
+function normaliseCourse(v){
+  const c=createCourse();if(!v||typeof v!=='object'||v.version!==1)return c;
+  if(Array.isArray(v.mods))c.mods=[...new Set(v.mods.filter(n=>Number.isInteger(n)&&n>=1&&n<=CO.mods.length))];
+  c.tries=Math.max(0,v.tries|0);c.best=Math.min(CO.final.length,Math.max(0,v.best|0));
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v.passed||''))c.passed=v.passed;
+  if(/^[a-z0-9]{1,12}$/.test(v.salt||''))c.salt=v.salt;
+  return c;
+}
+let course=createCourse();
+try{course=normaliseCourse(JSON.parse(localStorage.getItem(COURSE_KEY)||'null'));}catch{}
+function storeCourse(){try{localStorage.setItem(COURSE_KEY,JSON.stringify(course));}catch{}}
+const cf=(s,v)=>ht(s,v);
+const isoDay=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function coursePretty(iso){const [y,m,d]=iso.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(profile.lang==='es'?'es':'en',{year:'numeric',month:'long',day:'numeric'});}
+function courseCode(name){return 'SKA-CHK-'+sum4(cleanText(name,40).toLowerCase()+'|'+course.passed+'|'+course.salt).toUpperCase()+'-'+sum4(course.salt+'|'+course.passed).toUpperCase();}
+function coachHTML(id,text){return '<div class="hms-coach"><canvas id="'+id+'" aria-hidden="true"></canvas><p>'+esc(text)+'</p></div>';}
+function courseVisual(kind){
+  if(kind==='path')return '<ol class="co-path">'+CO.path.map((p,k)=>'<li style="--k:'+k+'">'+esc(p)+'</li>').join('')+'</ol>';
+  if(kind==='phone')return '<div class="co-phone" aria-hidden="true"><span><b>(207)</b><small>'+esc(CO.areaTag)+'</small></span><span><b>555-0117</b><small>'+esc(CO.numTag)+'</small></span></div>';
+  if(kind==='card')return '<div class="ci-cc co-cc" aria-hidden="true"><small>'+esc(CI.cardBrand)+'</small><span>•••• •••• •••• 4242</span><span class="ci-cc-row"><b>BRAMBLE KNOX</b><b>09/29</b></span></div>';
+  return '';
+}
+
+/* ---------- Course home ---------- */
+function openCourse(){
+  if(world)world.stop();
+  const total=CO.mods.length,n=course.mods.length,next=CO.mods.findIndex((_,k)=>!course.mods.includes(k+1))+1;
+  openModal(titleHTML(CO.title,CO.kicker)+coachHTML('co-delores',course.passed?CO.hiDone:n?CO.hiBack:CO.hi)+
+    '<div class="co-progress"><span class="bar" role="meter" aria-label="'+esc(CO.modsH)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+n+'"><i style="width:'+Math.round(n/total*100)+'%"></i></span><small>'+esc(cf(CO.progress,{n,total}))+'</small></div>'+
+    '<h3 class="pins-heading">'+esc(CO.modsH)+'</h3><div class="hms-cards" id="co-mods"></div>'+
+    '<div class="hms-cards co-end" id="co-end"></div><div class="action-row" id="co-actions"></div>',true);
+  paintBust($('co-delores'),{cast:'delores'},26,2);
+  CO.mods.forEach((M,k)=>{const i=k+1,got=course.mods.includes(i),b=document.createElement('button');
+    b.className='hms-lesson'+(got?' got':'')+(i===next?' next':'');b.dataset.mod=i;
+    b.innerHTML='<span class="hms-num">'+(got?'✓':i)+'</span><span><b>'+esc(M.t)+'</b><small>'+esc(M.d)+'</small></span><span class="hms-go">'+esc(got?CO.done:CO.start)+'</span>';
+    b.onclick=()=>openCourseModule(i);$('co-mods').append(b);});
+  const ready=n>=total,end=$('co-end');
+  const fin=document.createElement('button');fin.className='hms-lesson game co-final'+(ready&&!course.passed?' next':'');fin.disabled=!ready;
+  fin.innerHTML='<span class="hms-num" aria-hidden="true">'+(ready?'📝':'🔒')+'</span><span><b>'+esc(CO.finalT)+'</b><small>'+esc(ready?CO.finalD:CO.finalLocked)+'</small></span><span class="hms-go">'+esc(course.best?course.best+' / '+CO.final.length:'')+'</span>';
+  fin.onclick=()=>openCourseFinal();end.append(fin);
+  if(course.passed){const c=document.createElement('button');c.className='hms-lesson game got next co-cert-open';
+    c.innerHTML='<span class="hms-num" aria-hidden="true">🎓</span><span><b>'+esc(CO.certT)+'</b><small>'+esc(CO.certD)+'</small></span><span class="hms-go">→</span>';c.onclick=openCourseCert;end.append(c);}
+  const back=document.createElement('button');back.className='primary-button';back.textContent=titleVisible?t('Done'):t('Back to the manor');back.onclick=closeModal;$('co-actions').append(back);
+  narrativeText=body.innerText;
+  requestAnimationFrame(()=>body.querySelector('#co-end .next,#co-mods .next')?.focus());
+}
+
+/* ---------- One lesson: how, why, one tap to check ---------- */
+function openCourseModule(i){
+  const M=CO.mods[i-1],total=CO.mods.length;
+  openModal('<span class="overline">'+esc(cf(CO.modOf,{n:i,total}))+'</span><h2 id="modal-heading">'+esc(M.t)+'</h2>'+
+    coachHTML('co-delores',M.how)+courseVisual(M.vis)+
+    '<div class="co-why"><b>💡 '+esc(CO.whyH)+'</b><p>'+esc(M.why)+'</p></div>'+
+    '<p class="gm-ask">'+esc(M.q)+'</p><div class="choices" id="co-choices"></div><p class="hms-msg" id="co-msg" hidden></p><div class="action-row" id="co-actions"></div>',true);
+  paintBust($('co-delores'),{cast:'delores'},26,2);
+  const msg=$('co-msg'),row=$('co-actions');
+  hmsShuffle(M.opts).forEach(([text,ok],k)=>{const b=document.createElement('button');b.className='choice';b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>';
+    b.onclick=()=>{
+      if(!ok){msg.hidden=false;msg.classList.remove('ok');msg.textContent=cf(CO.tryAgain,{hint:M.hint});b.classList.remove('hms-no');void b.offsetWidth;b.classList.add('hms-no');b.disabled=true;joySound('boop');narrativeText=body.innerText;return;}
+      b.classList.add('hms-yes');body.querySelectorAll('#co-choices .choice').forEach(x=>x.disabled=true);
+      msg.hidden=false;msg.classList.add('ok');msg.textContent='✨ '+M.yes;
+      const fresh=!course.mods.includes(i);if(fresh){course.mods.push(i);storeCourse();}
+      hmsReward(b,fresh?2:0,fresh?3:0,{word:fresh?'🎓':''});
+      const nx=CO.mods.findIndex((_,k)=>!course.mods.includes(k+1))+1;
+      const add=(label,primary,run)=>{const x=document.createElement('button');x.className=primary?'primary-button':'secondary-button';x.textContent=label;x.onclick=run;row.append(x);return x;};
+      add(CO.backCourse,false,openCourse);
+      if(nx)add(CO.nextMod,true,()=>openCourseModule(nx)).focus();
+      else if(!course.passed)add(CO.toFinal,true,openCourseFinal).focus();
+      else add(CO.certT+' →',true,openCourseCert).focus();
+      narrativeText=body.innerText;
+    };$('co-choices').append(b);});
+  narrativeText=body.innerText;
+}
+
+/* ---------- Final check: six questions, five to pass, no limit on tries ---------- */
+function openCourseFinal(){
+  if(course.mods.length<CO.mods.length)return openCourse();
+  const qs=hmsShuffle(CO.final),R={i:0,score:0};
+  function ask(){
+    const Q=qs[R.i];
+    openModal('<span class="overline">'+esc(cf(CO.qOf,{n:R.i+1,total:qs.length}))+'</span><h2 id="modal-heading">'+esc(CO.finalT)+'</h2>'+
+      '<div class="gm-dots" aria-hidden="true">'+qs.map((_,k)=>'<i class="'+(k<R.i?'done':k===R.i?'now':'')+'"></i>').join('')+'</div>'+
+      '<p class="gm-ask co-q">'+esc(Q.q)+'</p><div class="choices" id="co-choices"></div><p class="hms-msg" id="co-msg" hidden></p><div class="action-row" id="co-actions"></div>',true);
+    hmsShuffle(Q.opts).forEach(([text,ok],k)=>{const b=document.createElement('button');b.className='choice';b.dataset.ok=ok?'1':'0';b.innerHTML='<span>'+(k+1)+'</span><span><b>'+esc(text)+'</b></span>';
+      b.onclick=()=>{
+        body.querySelectorAll('#co-choices .choice').forEach(x=>{x.disabled=true;if(x.dataset.ok==='1')x.classList.add('hms-yes');});
+        if(ok){R.score++;joySound('pop');}else{b.classList.add('hms-no');joySound('boop');}
+        const m=$('co-msg');m.hidden=false;m.classList.toggle('ok',!!ok);m.textContent=(ok?CO.right:CO.wrong)+' '+Q.why;
+        const last=R.i===qs.length-1,x=document.createElement('button');x.className='primary-button';x.textContent=last?CO.seeScore:CO.next;
+        x.onclick=()=>{R.i++;last?result():ask();};$('co-actions').append(x);x.focus();narrativeText=body.innerText;
+      };$('co-choices').append(b);});
+    narrativeText=body.innerText;
+  }
+  function result(){
+    const pass=R.score>=COURSE_PASS,fresh=pass&&!course.passed;
+    course.tries++;course.best=Math.max(course.best,R.score);
+    if(fresh){course.passed=isoDay();course.salt=Math.random().toString(36).slice(2,10)||'mapachez';}
+    storeCourse();
+    openModal('<span class="overline">'+esc(CO.kicker)+'</span><h2 id="modal-heading">'+esc(pass?CO.passT:CO.failT)+'</h2>'+
+      '<div class="co-score'+(pass?' pass':'')+'"><b>'+R.score+' / '+qs.length+'</b></div>'+
+      coachHTML('co-delores',pass?cf(CO.passP,{n:R.score,total:qs.length}):cf(CO.failP,{n:R.score,total:qs.length,need:COURSE_PASS}))+
+      '<div class="action-row" id="co-actions"></div>',true);
+    paintBust($('co-delores'),{cast:'delores'},26,2);
+    const row=$('co-actions'),add=(label,primary,run)=>{const x=document.createElement('button');x.className=primary?'primary-button':'secondary-button';x.textContent=label;x.onclick=run;row.append(x);return x;};
+    add(CO.backCourse,false,openCourse);
+    if(pass)add(CO.getCert,true,openCourseCert).focus();else add(CO.retry,true,openCourseFinal).focus();
+    if(fresh){hmsReward(body.querySelector('.co-score'),5,10,{big:true,word:'🎓'});celebrate({icon:'🎓',kicker:CO.kicker,label:CO.pins.cert[0],confetti:true});}
+    else checkPins();
+    narrativeText=body.innerText;
+  }
+  ask();
+}
+
+/* ---------- The certificate: drawn with code on the device ---------- */
+function drawCertificate(cv,name){
+  const c=cv.getContext('2d'),W=cv.width,H=cv.height,C=CO.c,serif='Georgia,"Times New Roman",serif';
+  const gold='#b8892f',deep='#2f5d50',ink='#3b3223';
+  c.clearRect(0,0,W,H);
+  const g=c.createRadialGradient(W/2,H/2,80,W/2,H/2,W*.7);g.addColorStop(0,'#fffaf0');g.addColorStop(1,'#f3e6c4');c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.strokeStyle=gold;c.lineWidth=10;c.strokeRect(22,22,W-44,H-44);
+  c.strokeStyle=deep;c.lineWidth=2;c.strokeRect(42,42,W-84,H-84);
+  /* curly corners */
+  for(const [x,y,sx,sy] of [[42,42,1,1],[W-42,42,-1,1],[42,H-42,1,-1],[W-42,H-42,-1,-1]]){
+    c.save();c.translate(x,y);c.scale(sx,sy);c.strokeStyle=gold;c.lineWidth=3;
+    c.beginPath();c.moveTo(0,70);c.bezierCurveTo(0,20,20,0,70,0);c.stroke();
+    c.beginPath();c.moveTo(16,92);c.bezierCurveTo(14,38,38,14,92,16);c.stroke();
+    c.fillStyle=gold;c.beginPath();c.arc(30,30,7,0,Math.PI*2);c.fill();
+    c.beginPath();c.arc(70,4,4,0,Math.PI*2);c.arc(4,70,4,0,Math.PI*2);c.fill();
+    c.restore();}
+  /* little vine along the top and bottom */
+  c.strokeStyle='#7aa58a';c.lineWidth=2;
+  for(const y of [70]){c.beginPath();for(let x=170;x<=W-170;x+=4){const yy=y+Math.sin(x/28)*5;x===170?c.moveTo(x,yy):c.lineTo(x,yy);}c.stroke();
+    c.fillStyle='#9cc7a8';for(let x=200;x<W-170;x+=56){c.beginPath();c.ellipse(x,y+Math.sin(x/28)*5-7,7,3.5,-.6,0,Math.PI*2);c.fill();}}
+  c.textAlign='center';c.textBaseline='alphabetic';
+  c.fillStyle=deep;c.font='bold 20px '+serif;
+  if('letterSpacing' in c)c.letterSpacing='4px';
+  c.fillText(C.org,W/2,128);
+  if('letterSpacing' in c)c.letterSpacing='0px';
+  c.fillStyle=ink;c.font='bold 62px '+serif;c.fillText(C.title,W/2,206);
+  c.font='italic 26px '+serif;c.fillStyle='#5c4e36';c.fillText(C.certifies,W/2,264);
+  const nm=cleanText(name,40)||C.placeholder;let size=64;
+  c.font='bold '+size+'px '+serif;while(c.measureText(nm).width>W-280&&size>30){size-=2;c.font='bold '+size+'px '+serif;}
+  c.fillStyle=cleanText(name,40)?deep:'#b9ab8c';c.fillText(nm,W/2,348);
+  c.strokeStyle=gold;c.lineWidth=2;c.beginPath();c.moveTo(W/2-330,370);c.lineTo(W/2+330,370);c.stroke();
+  c.font='italic 26px '+serif;c.fillStyle='#5c4e36';c.fillText(C.completed,W/2,418);
+  c.font='bold 46px '+serif;c.fillStyle=ink;c.fillText(C.course,W/2,476);
+  c.font='19px '+serif;c.fillStyle='#5c4e36';c.fillText(C.steps,W/2,516);
+  /* seal: a gold rosette with a little key */
+  const sx=W/2,sy=636;
+  c.fillStyle=gold;c.beginPath();for(let k=0;k<32;k++){const a=k/32*Math.PI*2,r=k%2?66:76;c.lineTo(sx+Math.cos(a)*r,sy+Math.sin(a)*r);}c.closePath();c.fill();
+  c.fillStyle='#e9c76b';c.beginPath();c.arc(sx,sy,56,0,Math.PI*2);c.fill();
+  c.strokeStyle='#fff6d8';c.lineWidth=2;c.beginPath();c.arc(sx,sy,48,0,Math.PI*2);c.stroke();
+  c.fillStyle='#7a5a1c';c.beginPath();c.arc(sx-14,sy-6,13,0,Math.PI*2);c.fill();c.fillStyle='#e9c76b';c.beginPath();c.arc(sx-14,sy-6,5,0,Math.PI*2);c.fill();
+  c.fillStyle='#7a5a1c';c.fillRect(sx-2,sy-9,30,6);c.fillRect(sx+18,sy-3,5,9);c.fillRect(sx+10,sy-3,5,6);
+  c.font='bold 12px Arial,sans-serif';c.fillStyle='#7a5a1c';c.fillText(C.seal,sx,sy+30);
+  c.fillStyle='#8c3b3b';for(const d of [-1,1]){c.beginPath();c.moveTo(sx+d*20,sy+60);c.lineTo(sx+d*40,sy+100);c.lineTo(sx+d*29,sy+92);c.lineTo(sx+d*20,sy+104);c.lineTo(sx+d*6,sy+64);c.closePath();c.fill();}
+  /* date and signature */
+  const line=(x,label,value,font)=>{c.font=font;c.fillStyle=ink;c.fillText(value,x,650);c.strokeStyle='#8a7652';c.lineWidth=1.5;c.beginPath();c.moveTo(x-150,664);c.lineTo(x+150,664);c.stroke();c.font='16px '+serif;c.fillStyle='#6b5d44';c.fillText(label,x,690);};
+  line(250,C.date,course.passed?coursePretty(course.passed):'',  '24px '+serif);
+  line(W-250,C.signRole,C.sign,'italic 40px "Brush Script MT","Segoe Script",cursive,'+serif);
+  c.font='15px Arial,sans-serif';c.fillStyle='#6b5d44';c.fillText(C.id+': '+courseCode(name),W/2,H-76);
+  c.font='13px Arial,sans-serif';c.fillStyle='#8a7c62';c.fillText(C.fine,W/2,H-54);
+}
+function courseLinkedIn(name){
+  const [y,m]=(course.passed||isoDay()).split('-').map(Number);
+  const q=new URLSearchParams({startTask:'CERTIFICATION_NAME',name:CO.liName,organizationName:CO.liOrg,issueYear:String(y),issueMonth:String(m),certId:courseCode(name)});
+  return 'https://www.linkedin.com/profile/add?'+q.toString();
+}
+function openCourseCert(){
+  if(!course.passed)return openCourse();
+  openModal(titleHTML(CO.certT,CO.kicker)+'<p class="modal-description">'+esc(CO.certIntro)+'</p>'+
+    '<label class="name-line">'+esc(CO.nameL)+'<input id="co-name" maxlength="40" autocomplete="name" value="'+esc(profile.name||'')+'" placeholder="'+esc(CO.namePh)+'"></label>'+
+    '<canvas id="co-cert" class="co-cert" width="1200" height="850" role="img" aria-label="'+esc(CO.c.title+' · '+CO.c.course)+'"></canvas>'+
+    '<div class="action-row" id="co-actions"></div><p class="joy-hint">'+esc(CO.liHow)+'</p><p class="joy-hint co-fine">'+esc(CO.fine)+'</p>',true);
+  const cv=$('co-cert'),inp=$('co-name'),row=$('co-actions');
+  const draw=()=>drawCertificate(cv,inp.value);draw();
+  inp.oninput=()=>{draw();li.href=courseLinkedIn(inp.value);};
+  inp.onchange=()=>{profile.name=cleanText(inp.value,40);storeProfile();};
+  const need=()=>{if(cleanText(inp.value,40))return false;inp.focus();toast(CO.needName);return true;};
+  const save=document.createElement('button');save.className='primary-button';save.textContent=CO.save;
+  save.onclick=()=>{if(DEMO_BUILD)return openFullEdition();if(need())return;draw();
+    const a=document.createElement('a');a.download='silver-key-check-in-certificate.png';a.href=cv.toDataURL('image/png');document.body.append(a);a.click();a.remove();toast(CO.saved);};
+  const li=document.createElement('a');li.className='secondary-button co-li';li.textContent=CO.li;li.target='_blank';li.rel='noopener noreferrer';li.href=courseLinkedIn(inp.value);
+  li.onclick=e=>{if(DEMO_BUILD){e.preventDefault();return openFullEdition();}if(need())e.preventDefault();};
+  const back=document.createElement('button');back.className='secondary-button';back.textContent=CO.backCourse;back.onclick=openCourse;
+  row.append(save,li,back);
+  narrativeText=body.innerText;
+}
+
+/* ---------- Ways in: the title screen and the desk computer ---------- */
+const courseOpenHms=openHms;
+openHms=function(){
+  const r=courseOpenHms.apply(this,arguments);
+  const skill=body.querySelector('.hms-skill');
+  if(skill&&!$('co-hms')){const b=document.createElement('button');b.id='co-hms';b.className='hms-lesson game co-hms'+(course.passed?' got':'');
+    b.innerHTML='<span class="hms-num" aria-hidden="true">🎓</span><span><b>'+esc(CO.hmsBtn)+'</b><small>'+esc(CO.hmsBtnD)+'</small></span><span class="hms-go">'+(course.passed?'✓':course.mods.length+' / '+CO.mods.length)+'</span>';
+    b.onclick=openCourse;skill.after(b);}
+  return r;
+};
+{const anchor=$('hms-title')||$('joy-title-gift')||document.querySelector('.title-actions');
+ if(anchor){const b=document.createElement('button');b.className='joy-title-mg co';b.id='co-title';
+  b.innerHTML=esc(CO.titleBtn)+' · <b>'+(course.passed?'✓':course.mods.length+' / '+CO.mods.length)+'</b> →';b.onclick=openCourse;anchor.after(b);}}
+PINS.push(
+  {id:'course-first',icon:'📚',name:CO.pins.first[0],hint:CO.pins.first[1],test:()=>course.mods.length>=1},
+  {id:'course-cert',icon:'🎓',name:CO.pins.cert[0],hint:CO.pins.cert[1],test:()=>!!course.passed}
+);
+{const st=document.createElement('style');st.textContent=`
+.co-progress{display:grid;gap:4px;margin:12px 0 0}.co-progress small{font:12px Arial,sans-serif;color:#6b6450}
+.co-progress .bar{display:block;height:10px;border-radius:99px;background:#efe3c4;overflow:hidden}.co-progress .bar i{display:block;height:100%;background:linear-gradient(90deg,#7fdc6a,#c9a14a)}
+.co-end{margin-top:12px}.co-final:disabled{opacity:.6;cursor:not-allowed;animation:none}
+.co-hms{margin:10px 0 0}
+.co-path{list-style:none;display:flex;flex-wrap:wrap;gap:6px;padding:0;margin:12px 0}
+.co-path li{padding:6px 10px;border-radius:99px;background:#fffaf0;border:1px solid #e0cf9e;font-size:14px;animation:funPop .5s calc(var(--k)*.08s) both}
+.co-path li:last-child{background:#fff1b8;border-color:#c9952f;font-weight:700}
+.co-phone{display:flex;gap:8px;justify-content:center;margin:12px 0}
+.co-phone span{display:grid;justify-items:center;gap:2px;padding:8px 14px;border-radius:14px;background:#fffaf0;border:1px solid #e0cf9e}
+.co-phone span:first-child{background:#fff1b8;border-color:#c9952f}.co-phone b{font:bold 22px 'Courier New',monospace}.co-phone small{font:12px Arial,sans-serif;color:#6b6450}
+.co-cc{margin:12px auto}
+.co-why{margin:12px 0 0;padding:10px 14px;border-radius:14px;background:#effbe9;border:1px solid #9fd38c}
+.co-why b{font:bold 14px Arial,sans-serif;color:#2f5d50}.co-why p{margin:4px 0 0;line-height:1.5}
+.co-score{display:grid;place-items:center;margin:12px auto;width:120px;height:120px;border-radius:50%;background:#fffaf0;border:3px solid #e0cf9e;font:bold 30px Georgia,serif}
+.co-score.pass{background:#fff1b8;border-color:#c9952f}
+.co-cert{display:block;width:100%;height:auto;margin:10px 0;border-radius:10px;box-shadow:0 4px 16px #4b2f1c33}
+.co-li{display:inline-flex;align-items:center;text-decoration:none}
+.co-fine{margin-top:6px}
+body.reduce-motion .co-path li{animation:none}
+`;document.head.append(st);}
+checkPins();
+/* ==== end COURSE v1 ==== */
+
 
 })();
 </script>
