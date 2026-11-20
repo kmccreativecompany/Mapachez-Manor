@@ -9054,7 +9054,17 @@ const COURSE_TEXT={
      fine:'Certificate of completion for a gamified e-course. Not an accreditation or license.',placeholder:'Your name here',seal:'COMPLETED'},
   liName:'Silver Key Certificate: Front Desk Check-In & Guest Registration Fundamentals',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Check-in e-course · certificate',hmsBtn:'🎓 E-course: Front Desk Check-In',hmsBtnD:'Learn the why behind every step, and earn a certificate.',
-  pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']}
+  pins:{first:['Class Is In','Finish your first e-course lesson.'],cert:['Certified!','Master the Front Desk Check-In e-course.']},
+  nameKick:'BEFORE WE START',nameT:'Your name, for your certificates',
+  nameHi:'Delores: “Welcome to the manor! A little secret: this is also a gamified e-course. Finish a course and you earn a real certificate of completion for your resume. If you’d like your name on it, type your first and last name here.”',
+  nameNote:'Optional. Your name goes on every certificate you earn, and it can’t be changed once a certificate is earned, so please use your own.',
+  nameSave:'Save my name',nameSkip:'Skip for now',nameTwo:'Please type your first and last name.',nameSaved:'Saved! It will go on your certificates.',
+  nameRemind:'🎓 This is an e-course. Want your name on your certificate? Add your first and last name before the final check.',nameAdd:'Add my name',
+  nameOn:'🎓 Your certificate will say: {name}',
+  finalNameT:'Whose certificate is this?',finalNameHi:'Delores: “Before the final check: the certificate will carry your first and last name, and it can’t be changed afterwards. It’s for your own resume, so make it yours!”',
+  finalNoName:'Take the check without a name',
+  lockedNote:'🔒 The name on this certificate is locked, so it always belongs to the person who earned it.',
+  addOnce:'Add your first and last name. It can only be added once.',lockIt:'Put my name on it'
  },
  es:{
   kicker:'SILVER KEY CERTIFICATE · CURSO EN LÍNEA',title:'Fundamentos de registro de entrada y recepción de huéspedes',
@@ -9114,18 +9124,30 @@ const COURSE_TEXT={
      fine:'Certificado de finalización de un curso en línea gamificado. No es una acreditación ni una licencia.',placeholder:'Tu nombre aquí',seal:'COMPLETADO'},
   liName:'Silver Key Certificate: Fundamentos de registro de entrada y recepción de huéspedes',liOrg:'KMC Creative Company, LLC',
   titleBtn:'🎓 Curso de registro de entrada · certificado',hmsBtn:'🎓 Curso: Registro de entrada',hmsBtnD:'Aprende el porqué de cada paso y gana un certificado.',
-  pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']}
+  pins:{first:['Hay clase','Termina tu primera lección del curso.'],cert:['¡Certificada!','Domina el curso de registro de entrada.']},
+  nameKick:'ANTES DE EMPEZAR',nameT:'Tu nombre, para tus certificados',
+  nameHi:'Delores: “¡Bienvenida a la mansión! Un secretito: esto también es un curso en línea gamificado. Al terminar un curso ganas un certificado de finalización de verdad para tu currículum. Si quieres tu nombre en él, escribe aquí tu nombre y apellido.”',
+  nameNote:'Opcional. Tu nombre va en cada certificado que ganes y no se puede cambiar una vez ganado, así que usa el tuyo.',
+  nameSave:'Guardar mi nombre',nameSkip:'Ahora no',nameTwo:'Escribe tu nombre y tu apellido, por favor.',nameSaved:'¡Guardado! Irá en tus certificados.',
+  nameRemind:'🎓 Esto es un curso en línea. ¿Quieres tu nombre en el certificado? Añade tu nombre y apellido antes del repaso final.',nameAdd:'Añadir mi nombre',
+  nameOn:'🎓 Tu certificado dirá: {name}',
+  finalNameT:'¿De quién es este certificado?',finalNameHi:'Delores: “Antes del repaso final: el certificado llevará tu nombre y apellido, y no se puede cambiar después. Es para tu propio currículum, ¡que sea tuyo!”',
+  finalNoName:'Hacer el repaso sin nombre',
+  lockedNote:'🔒 El nombre de este certificado está bloqueado, para que siempre sea de quien lo ganó.',
+  addOnce:'Añade tu nombre y apellido. Solo se puede añadir una vez.',lockIt:'Poner mi nombre'
  }
 };
 const CO=COURSE_TEXT[profile.lang]||COURSE_TEXT.en;
 const COURSE_KEY='mapachez_course_v1',COURSE_PASS=5;
-function createCourse(){return {version:1,mods:[],tries:0,best:0,passed:'',salt:''};}
+function createCourse(){return {version:1,mods:[],tries:0,best:0,passed:'',salt:'',name:'',asked:false};}
 function normaliseCourse(v){
   const c=createCourse();if(!v||typeof v!=='object'||v.version!==1)return c;
   if(Array.isArray(v.mods))c.mods=[...new Set(v.mods.filter(n=>Number.isInteger(n)&&n>=1&&n<=CO.mods.length))];
   c.tries=Math.max(0,v.tries|0);c.best=Math.min(CO.final.length,Math.max(0,v.best|0));
   if(/^\d{4}-\d{2}-\d{2}$/.test(v.passed||''))c.passed=v.passed;
   if(/^[a-z0-9]{1,12}$/.test(v.salt||''))c.salt=v.salt;
+  if(c.passed&&typeof v.name==='string')c.name=cleanText(v.name,40);
+  c.asked=v.asked===true;
   return c;
 }
 let course=createCourse();
@@ -9143,15 +9165,58 @@ function courseVisual(kind){
   return '';
 }
 
+/* ---------- Whose certificate: one name, asked early, locked once earned ---------- */
+const fullName=v=>{const n=cleanText(v,40);return n.split(' ').filter(w=>/\p{L}/u.test(w)).length>=2?n:'';};
+const certName=()=>course.passed?course.name:(profile.name||'');
+/* A small name form. done(saved) runs after Save or Skip. */
+function courseNameForm(host,{save=CO.nameSave,skip=CO.nameSkip,done}){
+  host.innerHTML='<label class="name-line">'+esc(CO.nameL)+'<input id="co-name" maxlength="40" autocomplete="name" value="'+esc(profile.name||'')+'" placeholder="'+esc(CO.namePh)+'"></label>'+
+    '<p class="hms-msg" id="co-name-msg" hidden></p><div class="action-row" id="co-name-row"></div>';
+  const inp=host.querySelector('#co-name'),msg=host.querySelector('#co-name-msg'),row=host.querySelector('#co-name-row');
+  const ok=document.createElement('button');ok.className='primary-button';ok.textContent=save;
+  ok.onclick=()=>{const n=fullName(inp.value);if(!n){msg.hidden=false;msg.textContent='🌱 '+CO.nameTwo;inp.focus();return;}
+    profile.name=n;storeProfile();course.asked=true;storeCourse();toast(CO.nameSaved);done(true);};
+  inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ok.click();}};
+  row.append(ok);
+  if(skip){const no=document.createElement('button');no.className='secondary-button';no.textContent=skip;no.onclick=()=>{course.asked=true;storeCourse();done(false);};row.append(no);}
+}
+/* At the very start: Delores explains it's an e-course and offers to put your name on certificates. */
+function openNameWelcome(next){
+  openModal('<span class="overline">'+esc(CO.nameKick)+'</span><h2 id="modal-heading">'+esc(CO.nameT)+'</h2>'+coachHTML('co-delores',CO.nameHi)+
+    '<p class="joy-hint co-name-note">'+esc(CO.nameNote)+'</p><div id="co-name-host"></div>',true);
+  paintBust($('co-delores'),{cast:'delores'},26,2);
+  courseNameForm($('co-name-host'),{done:()=>next()});
+  narrativeText=body.innerText;
+}
+/* Asked once, right after the very first guest, so that guest is still one tap away. */
+let nameAfterHook=false;
+const courseAfterChoice=afterChoice;
+afterChoice=function(){
+  const was=profile.hooked,r=courseAfterChoice.apply(this,arguments);
+  if(!was&&profile.hooked&&!profile.name&&!course.asked&&!course.passed)nameAfterHook=true;
+  return r;
+};
+for(const [get,set] of [[()=>startQuickShift,f=>{startQuickShift=f;}],[()=>beginNew,f=>{beginNew=f;}]]){
+  const orig=get();
+  set(function(){if(nameAfterHook&&!profile.name&&!course.asked){nameAfterHook=false;const args=arguments;return openNameWelcome(()=>orig.apply(this,args));}return orig.apply(this,arguments);});
+}
+
+/* Once a certificate carries a name, the progress report's name box is locked too. */
+const courseOpenReport=openReport;
+openReport=function(){if(course.name&&profile.name!==course.name){profile.name=course.name;storeProfile();}const r=courseOpenReport.apply(this,arguments);const inp=$('report-name');
+  if(inp&&course.name){inp.value=course.name;inp.readOnly=true;inp.onchange=null;inp.title=CO.lockedNote;}return r;};
+
 /* ---------- Course home ---------- */
 function openCourse(){
   if(world)world.stop();
   const total=CO.mods.length,n=course.mods.length,next=CO.mods.findIndex((_,k)=>!course.mods.includes(k+1))+1;
   openModal(titleHTML(CO.title,CO.kicker)+coachHTML('co-delores',course.passed?CO.hiDone:n?CO.hiBack:CO.hi)+
     '<div class="co-progress"><span class="bar" role="meter" aria-label="'+esc(CO.modsH)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+n+'"><i style="width:'+Math.round(n/total*100)+'%"></i></span><small>'+esc(cf(CO.progress,{n,total}))+'</small></div>'+
+    (course.passed?'':profile.name?'<p class="co-name-on">'+esc(cf(CO.nameOn,{name:profile.name}))+'</p>':'<div class="co-remind"><p>'+esc(CO.nameRemind)+'</p><button class="secondary-button" id="co-add-name">'+esc(CO.nameAdd)+'</button></div>')+
     '<h3 class="pins-heading">'+esc(CO.modsH)+'</h3><div class="hms-cards" id="co-mods"></div>'+
     '<div class="hms-cards co-end" id="co-end"></div><div class="action-row" id="co-actions"></div>',true);
   paintBust($('co-delores'),{cast:'delores'},26,2);
+  $('co-add-name')?.addEventListener('click',()=>openNameWelcome(openCourse));
   CO.mods.forEach((M,k)=>{const i=k+1,got=course.mods.includes(i),b=document.createElement('button');
     b.className='hms-lesson'+(got?' got':'')+(i===next?' next':'');b.dataset.mod=i;
     b.innerHTML='<span class="hms-num">'+(got?'✓':i)+'</span><span><b>'+esc(M.t)+'</b><small>'+esc(M.d)+'</small></span><span class="hms-go">'+esc(got?CO.done:CO.start)+'</span>';
@@ -9195,8 +9260,14 @@ function openCourseModule(i){
 }
 
 /* ---------- Final check: six questions, five to pass, no limit on tries ---------- */
-function openCourseFinal(){
+function openCourseFinal(skipName){
   if(course.mods.length<CO.mods.length)return openCourse();
+  if(!course.passed&&!profile.name&&skipName!==true){
+    openModal('<span class="overline">'+esc(CO.kicker)+'</span><h2 id="modal-heading">'+esc(CO.finalNameT)+'</h2>'+coachHTML('co-delores',CO.finalNameHi)+'<div id="co-name-host"></div>',true);
+    paintBust($('co-delores'),{cast:'delores'},26,2);
+    courseNameForm($('co-name-host'),{skip:CO.finalNoName,done:()=>openCourseFinal(true)});
+    narrativeText=body.innerText;return;
+  }
   const qs=hmsShuffle(CO.final),R={i:0,score:0};
   function ask(){
     const Q=qs[R.i];
@@ -9216,7 +9287,7 @@ function openCourseFinal(){
   function result(){
     const pass=R.score>=COURSE_PASS,fresh=pass&&!course.passed;
     course.tries++;course.best=Math.max(course.best,R.score);
-    if(fresh){course.passed=isoDay();course.salt=Math.random().toString(36).slice(2,10)||'mapachez';}
+    if(fresh){course.passed=isoDay();course.salt=Math.random().toString(36).slice(2,10)||'mapachez';course.name=fullName(profile.name)||'';}
     storeCourse();
     openModal('<span class="overline">'+esc(CO.kicker)+'</span><h2 id="modal-heading">'+esc(pass?CO.passT:CO.failT)+'</h2>'+
       '<div class="co-score'+(pass?' pass':'')+'"><b>'+R.score+' / '+qs.length+'</b></div>'+
@@ -9290,22 +9361,24 @@ function courseLinkedIn(name){
 }
 function openCourseCert(){
   if(!course.passed)return openCourse();
-  openModal(titleHTML(CO.certT,CO.kicker)+'<p class="modal-description">'+esc(CO.certIntro)+'</p>'+
-    '<label class="name-line">'+esc(CO.nameL)+'<input id="co-name" maxlength="40" autocomplete="name" value="'+esc(profile.name||'')+'" placeholder="'+esc(CO.namePh)+'"></label>'+
+  const locked=!!course.name;
+  openModal(titleHTML(CO.certT,CO.kicker)+(locked?'<p class="joy-hint co-locked">'+esc(CO.lockedNote)+'</p>':'<p class="modal-description">'+esc(CO.addOnce)+'</p><div id="co-name-host"></div>')+
     '<canvas id="co-cert" class="co-cert" width="1200" height="850" role="img" aria-label="'+esc(CO.c.title+' · '+CO.c.course)+'"></canvas>'+
     '<div class="action-row" id="co-actions"></div><p class="joy-hint">'+esc(CO.liHow)+'</p><p class="joy-hint co-fine">'+esc(CO.fine)+'</p>',true);
-  const cv=$('co-cert'),inp=$('co-name'),row=$('co-actions');
-  const draw=()=>drawCertificate(cv,inp.value);draw();
-  inp.oninput=()=>{draw();li.href=courseLinkedIn(inp.value);};
-  inp.onchange=()=>{profile.name=cleanText(inp.value,40);storeProfile();};
-  const need=()=>{if(cleanText(inp.value,40))return false;inp.focus();toast(CO.needName);return true;};
+  const cv=$('co-cert'),row=$('co-actions');
+  drawCertificate(cv,course.name);
+  if(!locked){
+    courseNameForm($('co-name-host'),{save:CO.lockIt,skip:'',done:()=>{course.name=fullName(profile.name);storeCourse();openCourseCert();}});
+    $('co-name').oninput=e=>drawCertificate(cv,e.target.value);
+  }
+  const need=()=>{if(course.name)return false;$('co-name')?.focus();toast(CO.needName);return true;};
   const save=document.createElement('button');save.className='primary-button';save.textContent=CO.save;
-  save.onclick=()=>{if(DEMO_BUILD)return openFullEdition();if(need())return;draw();
+  save.onclick=()=>{if(DEMO_BUILD)return openFullEdition();if(need())return;drawCertificate(cv,course.name);
     const a=document.createElement('a');a.download='silver-key-check-in-certificate.png';a.href=cv.toDataURL('image/png');document.body.append(a);a.click();a.remove();toast(CO.saved);};
-  const li=document.createElement('a');li.className='secondary-button co-li';li.textContent=CO.li;li.target='_blank';li.rel='noopener noreferrer';li.href=courseLinkedIn(inp.value);
+  const li=document.createElement('a');li.className='secondary-button co-li';li.textContent=CO.li;li.target='_blank';li.rel='noopener noreferrer';li.href=courseLinkedIn(course.name);
   li.onclick=e=>{if(DEMO_BUILD){e.preventDefault();return openFullEdition();}if(need())e.preventDefault();};
   const back=document.createElement('button');back.className='secondary-button';back.textContent=CO.backCourse;back.onclick=openCourse;
-  row.append(save,li,back);
+  if(locked)row.append(save,li,back);else row.append(back);
   narrativeText=body.innerText;
 }
 
@@ -9345,6 +9418,8 @@ PINS.push(
 .co-cert{display:block;width:100%;height:auto;margin:10px 0;border-radius:10px;box-shadow:0 4px 16px #4b2f1c33}
 .co-li{display:inline-flex;align-items:center;text-decoration:none}
 .co-fine{margin-top:6px}
+.co-remind{margin:12px 0 0;padding:10px 14px;border-radius:14px;background:#fff8e1;border:1px solid #e0cf9e;display:grid;gap:8px}.co-remind p{margin:0;line-height:1.45}.co-remind button{justify-self:start}
+.co-name-on{margin:12px 0 0;font-size:14px;color:#2f5d50}.co-locked{margin:4px 0 0}.co-name-note{margin:10px 0 0}
 body.reduce-motion .co-path li{animation:none}
 `;document.head.append(st);}
 checkPins();

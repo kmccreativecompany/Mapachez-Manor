@@ -13,7 +13,7 @@ import test_growth as base
 INSPECTOR = """
 Object.defineProperty(window,'courseTest',{get:()=>({
  course:structuredClone(course),pins:Object.keys(growth.pins),joy:structuredClone(joy),
- open:()=>openCourse(),hms:()=>openHms(),mod:n=>openCourseModule(n),final:()=>openCourseFinal(),cert:()=>openCourseCert(),
+ open:()=>openCourse(),hms:()=>openHms(),setName:n=>{profile.name=n;storeProfile();},profileName:()=>profile.name,mod:n=>openCourseModule(n),final:()=>openCourseFinal(),cert:()=>openCourseCert(),
  rights:()=>CO.mods.map(m=>m.opts.find(o=>o[1])[0]),finalRights:()=>CO.final.map(q=>q.opts.find(o=>o[1])[0]),
  allMods:()=>{course.mods=[1,2,3,4,5,6];storeCourse();},
  normalise:v=>normaliseCourse(v),code:n=>courseCode(n),li:n=>courseLinkedIn(n)
@@ -80,6 +80,7 @@ class Course(base.Growth):
         self.assertIn('ten digits', self.page.locator('#co-msg').inner_text())
 
     def test_04_final_check_needs_five_of_six_and_can_be_retried(self):
+        self.page.evaluate("courseTest.setName('Rosa Quill')")
         self.page.evaluate('courseTest.allMods()')
         self.page.evaluate('courseTest.final()')
         self.answer_final(wrong=2)
@@ -94,17 +95,30 @@ class Course(base.Growth):
         self.assertTrue(c['course']['passed'])
         self.assertIn('course-cert', c['pins'])
 
-    def test_05_certificate_has_name_date_code_and_linkedin_link(self):
+    def test_05_name_is_asked_before_the_final_check_and_locked_on_the_certificate(self):
         self.page.evaluate('courseTest.allMods()')
+        self.page.evaluate('courseTest.open()')
+        self.assertIn('Add your first and last name', self.page.locator('.co-remind').inner_text())
         self.page.evaluate('courseTest.final()')
+        self.assertIn('Whose certificate is this?', self.page.locator('#modal-heading').inner_text())
+        self.page.fill('#co-name', 'Rosa')
+        self.page.locator('#co-name-row .primary-button').click()
+        self.assertIn('first and last name', self.page.locator('#co-name-msg').inner_text())
+        self.page.fill('#co-name', 'Rosa Quill')
+        self.page.locator('#co-name-row .primary-button').click()
         self.answer_final()
         self.page.locator('#co-actions .primary-button', has_text='certificate').click()
         self.page.wait_for_selector('#co-cert')
-        self.assertIn('not an accreditation', self.page.locator('#modal-body').inner_text())
-        self.page.fill('#co-name', 'Rosa Quill')
+        body = self.page.locator('#modal-body').inner_text()
+        self.assertIn('not an accreditation', body)
+        self.assertIn('locked', body)
+        self.assertEqual(self.page.locator('#co-name').count(), 0)
+        self.assertEqual(self.c()['course']['name'], 'Rosa Quill')
+        # Changing the profile name later doesn't change the certificate.
+        self.page.evaluate("courseTest.setName('Someone Else')")
+        self.page.evaluate('courseTest.cert()')
         code = self.page.evaluate("courseTest.code('Rosa Quill')")
         self.assertRegex(code, r'^SKC-CHK-[0-9A-Z]{4}-[0-9A-Z]{4}$')
-        self.assertEqual(code, self.page.evaluate("courseTest.code('rosa quill')"))
         href = self.page.locator('.co-li').get_attribute('href')
         u = urlparse(href)
         self.assertEqual(u.netloc, 'www.linkedin.com')
@@ -117,17 +131,30 @@ class Course(base.Growth):
         with self.page.expect_download() as d:
             self.page.locator('#co-actions .primary-button', has_text='Save the picture').click()
         self.assertTrue(d.value.suggested_filename.endswith('.png'))
-        # the canvas really has the certificate drawn on it
         filled = self.page.evaluate("(()=>{const c=document.getElementById('co-cert').getContext('2d').getImageData(600,330,1,1).data;return c[3]})()")
         self.assertGreater(filled, 0)
 
+    def test_05b_passing_without_a_name_lets_you_add_it_once(self):
+        self.page.evaluate('courseTest.allMods()')
+        self.page.evaluate('courseTest.final()')
+        self.page.locator('#co-name-row .secondary-button').click()
+        self.answer_final()
+        self.page.locator('#co-actions .primary-button', has_text='certificate').click()
+        self.assertEqual(self.page.locator('#co-actions', has_text='Save the picture').count(), 0)
+        self.page.fill('#co-name', 'June Glowe')
+        self.page.locator('#co-name-row .primary-button').click()
+        self.page.wait_for_selector('.co-locked')
+        self.assertEqual(self.c()['course']['name'], 'June Glowe')
+        self.assertEqual(self.page.locator('#co-name').count(), 0)
+
     def test_06_saves_recover_from_junk(self):
         self.assertEqual(self.page.evaluate("courseTest.normalise('nope').mods"), [])
-        c = self.page.evaluate("courseTest.normalise({version:1,mods:[1,2,99,'x',2],best:40,passed:'yesterday',salt:'<b>'})")
+        c = self.page.evaluate("courseTest.normalise({version:1,mods:[1,2,99,'x',2],best:40,passed:'yesterday',salt:'<b>',name:'Nope Person'})")
         self.assertEqual(c['mods'], [1, 2])
         self.assertEqual(c['best'], 6)
         self.assertEqual(c['passed'], '')
         self.assertEqual(c['salt'], '')
+        self.assertEqual(c['name'], '')
 
     def test_07_phone_layout_fits(self):
         self.context.close()
