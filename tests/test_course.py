@@ -42,8 +42,9 @@ class Course(base.Growth):
         self.assertTrue(rights)
 
     def test_01_title_and_desk_computer_open_the_course(self):
-        self.assertIn('Check-in e-course', self.page.locator('#co-title').inner_text())
+        self.assertIn('E-courses', self.page.locator('#co-title').inner_text())
         self.page.locator('#co-title').click()
+        self.page.locator('#mc-open-chk').click()
         self.assertIn('Front Desk Check-In', self.page.locator('#modal-body').inner_text())
         self.assertEqual(self.page.locator('#co-mods .hms-lesson').count(), 6)
         self.assertTrue(self.page.locator('.co-final').is_disabled())
