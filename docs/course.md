@@ -46,7 +46,7 @@ course name, a signature line reading "Issued by KMC Creative Company, LLC" and 
 
 - **⬇️ Save the picture** downloads a PNG.
 - **Add to LinkedIn** opens LinkedIn's free "Add to profile" form with the course name, the
-  organization (KMC Creative Company, LLC, the issuer) and the name "Silver Key Certificate: Front Desk Check-In", the month and year, and the certificate ID filled in.
+  organization (KMC Creative Company, LLC, the issuer) and the name "Silver Key Certificate: Front Desk Check-In & Guest Registration Fundamentals", the month and year, and the certificate ID filled in.
 
 The certificate calls it a gamified e-course, and both the certificate and the screen say it is a
 certificate of completion, not an accreditation or license.
