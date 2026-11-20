@@ -16,7 +16,7 @@ buttons and names change, but almost every one follows the same path:
 
 | Where | What |
 | --- | --- |
-| Title screen | "🎓 Check-in e-course · certificate · n / 6 →" |
+| Title screen | "🎓 E-courses · certificates · n / 4 →" opens the catalog of all four courses (see `docs/courses.md`) |
 | Desk computer home (H) | "🎓 E-course: Front Desk Check-In", right under the HMS skill bar |
 
 ## Lessons (six, about 30 seconds each)
@@ -58,7 +58,7 @@ course name, a signature line reading "Issued by KMC Creative Company, LLC" and 
 `SKC-CHK-1A2B-3C4D`, made from the name, date and a random salt saved on the device.
 
 - **⬇️ Save the picture** downloads a PNG.
-- **Add to LinkedIn** opens LinkedIn's free "Add to profile" form with the course name, the
+- **Show it off on LinkedIn** (see `docs/certificates.md`): the "Add to profile" form with the course name, the credential link, the
   organization (KMC Creative Company, LLC, the issuer) and the name "Silver Key Certificate: Front Desk Check-In & Guest Registration Fundamentals", the month and year, and the certificate ID filled in.
 
 The certificate calls it a gamified e-course, and both the certificate and the screen say it is a

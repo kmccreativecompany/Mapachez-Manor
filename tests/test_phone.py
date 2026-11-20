@@ -99,7 +99,7 @@ class Phone(base.Growth):
         self.assertFalse(self.page.locator('#title-training').is_visible(), 'Title keeps one desk button: Learn the HMS')
         self.enter_manor()
         self.page.locator('#training-button').click()
-        self.page.wait_for_selector('.hms-skill')
+        self.page.wait_for_selector('#hms-next-go')
         self.assertEqual(self.page.locator('iframe').count(), 0)
         self.assertEqual(self.page.locator('#hms-lessons .hms-lesson').count(), 5)
         self.assertEqual(self.page.locator('#hms-games .hms-lesson').count(), 3)
@@ -136,7 +136,7 @@ class Desktop(Phone):
         self.enter_manor()
         self.page.locator('#world').focus()
         self.page.keyboard.press('t')
-        self.page.wait_for_selector('.hms-skill')
+        self.page.wait_for_selector('#hms-next-go')
         self.assertEqual(self.page.locator('iframe').count(), 0)
 
 

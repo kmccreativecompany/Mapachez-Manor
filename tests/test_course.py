@@ -42,12 +42,14 @@ class Course(base.Growth):
         self.assertTrue(rights)
 
     def test_01_title_and_desk_computer_open_the_course(self):
-        self.assertIn('Check-in e-course', self.page.locator('#co-title').inner_text())
+        self.assertIn('E-courses', self.page.locator('#co-title').inner_text())
         self.page.locator('#co-title').click()
+        self.page.locator('#mc-open-chk').click()
         self.assertIn('Front Desk Check-In', self.page.locator('#modal-body').inner_text())
         self.assertEqual(self.page.locator('#co-mods .hms-lesson').count(), 6)
         self.assertTrue(self.page.locator('.co-final').is_disabled())
         self.page.evaluate('courseTest.hms()')
+        self.page.locator('#hms-more summary').click()
         self.page.locator('#co-hms').click()
         self.assertIn('LESSONS', self.page.locator('#modal-body').inner_text().upper())
 
@@ -119,7 +121,7 @@ class Course(base.Growth):
         self.page.evaluate('courseTest.cert()')
         code = self.page.evaluate("courseTest.code('Rosa Quill')")
         self.assertRegex(code, r'^SKC-CHK-[0-9A-Z]{4}-[0-9A-Z]{4}$')
-        href = self.page.locator('.co-li').get_attribute('href')
+        href = self.page.locator('.cs-add').get_attribute('href')
         u = urlparse(href)
         self.assertEqual(u.netloc, 'www.linkedin.com')
         q = parse_qs(u.query)

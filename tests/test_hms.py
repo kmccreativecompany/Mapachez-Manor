@@ -56,7 +56,7 @@ class Hms(base.Growth):
         btn = self.page.locator('#hms-title')
         self.assertIn('Learn the HMS', btn.inner_text())
         btn.click()
-        self.page.wait_for_selector('.hms-skill')
+        self.page.wait_for_selector('#hms-next-go')
         text = self.page.locator('#modal-body').inner_text()
         self.assertIn('hotel management system', text.lower())
         self.assertEqual(self.page.locator('#hms-lessons .hms-lesson').count(), 5)
@@ -147,7 +147,7 @@ class Hms(base.Growth):
         self.enter_manor()
         self.assertIn('hms', self.page.evaluate('hmsTest.enterPlay()'))
         self.page.evaluate("hmsTest.interact('hms')")
-        self.page.wait_for_selector('.hms-skill')
+        self.page.wait_for_selector('#hms-next-go')
 
     def test_09_quick_shift_includes_one_hms_guest_after_a_lesson(self):
         self.page.evaluate('hmsTest.firstLesson()')
