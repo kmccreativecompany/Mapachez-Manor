@@ -4718,22 +4718,25 @@ renderGrowth();checkPins();
    sound setting. Progress lives in its own key, mapachez_joy_v1. */
 const JOY_TEXT={
 en:{
-  tips:'Tips',tipsGain:'+{n} tips',jar:'Tip jar',jarFull:'Tip jar full!',jarGift:'A gift box is waiting',
+  tips:'Tips',tipsGain:'+{n} tips',jar:'Tip jar',jarFull:'Tip jar full!',jarGift:'Your guests left you a gift box',
   combo:['','','Nice!','Sparkle streak!','On a roll!','Dazzling!','Unstoppable!','Legendary!'],
-  giftKicker:'A GIFT FOR YOU',giftWhy:{shift:'For a good shift',perfect:'For a perfect shift',jar:'From a full tip jar',mystery:'For good instincts',hms:'For learning the HMS'},
-  giftTag:'With thanks, for your {skill}.',giftTagPlain:'With thanks, for looking after our guests.',
+  giftKicker:'A GIFT FROM A GUEST',giftWhy:{shift:'For a good shift',perfect:'For a perfect shift',jar:'From a full tip jar',mystery:'For good instincts',hms:'For learning the HMS'},
+  giftTag:'Thank you for your {skill}. It made my stay.',giftTagPlain:'Thank you for looking after me so kindly.',
+  giftFrom:'From {who}',giftFromJar:'From {who} and a few other guests',giftSign:'— {who}',
+  giftTagJar:'We all chipped in. Thank you for every little kindness.',giftTagHms:'You found my booking in a blink. Thank you!',
+  giftTagMystery:'You guessed! I knew you would. Thank you for keeping my secret.',giftTagGhost:'Thank you for making me feel so welcome. I wrapped it myself. It took a while.',
   tapHint:['Tap the box!','Again!','One more!'],glowHint:{1:'Ooh, it’s glowing a little…',2:'It’s glowing gold!'},
   rar:['Lovely','Rare','Super rare'],newItem:'NEW',
-  wearNow:'Wear it now',wearing:'Now wearing: {name}',openNext:'Open the next gift 🎁 ({n})',keepGoing:'Lovely!',
+  wearNow:'Wear it at home',wearing:'Saved for off the clock: {name}. You’ll wear it at home.',openNext:'Open the next gift 🎁 ({n})',keepGoing:'Lovely!',
   allFound:'You already have everything! The box is full of tips instead.',
-  giftPanel:'You earned a gift box!',openGift:'🎁 Open your gift!',giftWaiting:'🎁 {n} gift waiting',giftsWaiting:'🎁 {n} gifts waiting',
-  goodShiftHint:'3 or more best answers in a quick shift earns a gift box.',
-  closet:'Closet',closetKicker:'YOUR CLOSET',closetIntro:'Outfits and treasures from gift boxes and mystery guests. Tap an outfit to wear it.',
-  outfits:'Outfits',treasures:'Treasures',fromGuests:'From mystery guests',takeOff:'Take it off',wear:'Wear',on:'Wearing',
+  giftPanel:'A thankful guest left you a gift box!',openGift:'🎁 Open your gift!',giftWaiting:'🎁 {n} gift waiting',giftsWaiting:'🎁 {n} gifts waiting',
+  goodShiftHint:'Get 3 or more best answers in a quick shift and a thankful guest leaves you a gift box.',
+  closet:'Closet',closetKicker:'YOUR CLOSET',closetIntro:'Outfits and treasures that thankful guests gave you. At work you wear your uniform, so gift outfits are for off the clock, like at home in your cottage.',dressCode:'👔 Dress code: uniform at work. Outfits are for home.',
+  outfits:'Outfits',treasures:'Treasures',fromGuests:'From mystery guests',takeOff:'Take it off',wear:'Wear at home',on:'At home ✓',
   locked:'Find it in a gift box',lockedGuest:'Solve a mystery guest',collection:'Collection: {n} of {total}',play:'▶ Play',
   mgKicker:'TONIGHT’S MYSTERY GUEST',mgButton:'Mystery guest',mgPart:'Part {n} of {total}',mgNewPart:'🕯️ THE MYSTERY GUEST · PART {n} OF {total}',
   mgLocked:'Unlocks after your next quick shift, or after helping 5 guests in the manor.',
-  mgGuessAsk:'Make a guess. Guess right and you get a bonus gift box 🎁',mgYourGuess:'Your guess: {g}',mgWait:'We’ll see…',
+  mgGuessAsk:'Make a guess. Guess right and the guest leaves you a gift box 🎁',mgYourGuess:'Your guess: {g}',mgWait:'We’ll see…',
   mgRight:'🔮 You guessed it! Good instincts.',mgWrong:'Not quite, but what a lovely surprise.',mgNoGuess:'What a lovely surprise.',
   mgSecret:'The secret',mgTomorrow:'A new mystery guest checks in tomorrow.',mgArrived:'A mystery guest checked in tonight',mgStill:'Your mystery guest is still here',
   mgOpen:'Open the case →',mgShift:'✨ Quick shift: unlock the next part',mgSolvedN:'Mystery guests met: {n}',
@@ -4741,22 +4744,25 @@ en:{
   pins:{gift:['Unwrapped','Open your first gift box.'],rare:['Lucky Paws','Find a super rare gift.'],dress:['Dressed Up','Wear an outfit from a gift box.'],jar:['Full Jar','Fill the tip jar.'],mystery:['Secret Keeper','Learn a mystery guest’s secret.'],instinct:['Good Instincts','Guess a mystery guest’s secret right.'],collector:['Collector','Collect 10 gift treasures and outfits.']}
 },
 es:{
-  tips:'Propinas',tipsGain:'+{n} propinas',jar:'Bote de propinas',jarFull:'¡Bote de propinas lleno!',jarGift:'Te espera una caja de regalo',
+  tips:'Propinas',tipsGain:'+{n} propinas',jar:'Bote de propinas',jarFull:'¡Bote de propinas lleno!',jarGift:'Tus huéspedes te dejaron una caja de regalo',
   combo:['','','¡Bien!','¡Racha brillante!','¡Imparable!','¡Deslumbrante!','¡Increíble!','¡Legendario!'],
-  giftKicker:'UN REGALO PARA TI',giftWhy:{shift:'Por un buen turno',perfect:'Por un turno perfecto',jar:'De un bote de propinas lleno',mystery:'Por tu buen instinto',hms:'Por aprender el HMS'},
-  giftTag:'Con cariño, por tu {skill}.',giftTagPlain:'Con cariño, por cuidar a los huéspedes.',
+  giftKicker:'UN REGALO DE UN HUÉSPED',giftWhy:{shift:'Por un buen turno',perfect:'Por un turno perfecto',jar:'De un bote de propinas lleno',mystery:'Por tu buen instinto',hms:'Por aprender el HMS'},
+  giftTag:'Gracias por tu {skill}. Me alegraste la estancia.',giftTagPlain:'Gracias por cuidarme con tanto cariño.',
+  giftFrom:'De parte de {who}',giftFromJar:'De parte de {who} y otros huéspedes',giftSign:'— {who}',
+  giftTagJar:'Pusimos un poquito entre todos. Gracias por cada detalle.',giftTagHms:'Encontraste mi reserva en un segundo. ¡Gracias!',
+  giftTagMystery:'¡Lo adivinaste! Sabía que lo harías. Gracias por guardar mi secreto.',giftTagGhost:'Gracias por hacerme sentir tan bienvenida. Lo envolví yo. Tardé un rato.',
   tapHint:['¡Toca la caja!','¡Otra vez!','¡Una más!'],glowHint:{1:'Oh, brilla un poquito…',2:'¡Brilla en dorado!'},
   rar:['Bonito','Raro','Súper raro'],newItem:'NUEVO',
-  wearNow:'Póntelo ya',wearing:'Ahora llevas: {name}',openNext:'Abrir el siguiente regalo 🎁 ({n})',keepGoing:'¡Qué bonito!',
+  wearNow:'Ponértelo en casa',wearing:'Guardado para tu tiempo libre: {name}. Te lo pondrás en casa.',openNext:'Abrir el siguiente regalo 🎁 ({n})',keepGoing:'¡Qué bonito!',
   allFound:'¡Ya lo tienes todo! La caja viene llena de propinas.',
-  giftPanel:'¡Ganaste una caja de regalo!',openGift:'🎁 ¡Abre tu regalo!',giftWaiting:'🎁 {n} regalo esperando',giftsWaiting:'🎁 {n} regalos esperando',
-  goodShiftHint:'3 o más mejores respuestas en un turno rápido dan una caja de regalo.',
-  closet:'Armario',closetKicker:'TU ARMARIO',closetIntro:'Ropa y tesoros de las cajas de regalo y de los huéspedes misteriosos. Toca una prenda para ponértela.',
-  outfits:'Ropa',treasures:'Tesoros',fromGuests:'De los huéspedes misteriosos',takeOff:'Quitármelo',wear:'Ponérmelo',on:'Puesto',
+  giftPanel:'¡Un huésped agradecido te dejó una caja de regalo!',openGift:'🎁 ¡Abre tu regalo!',giftWaiting:'🎁 {n} regalo esperando',giftsWaiting:'🎁 {n} regalos esperando',
+  goodShiftHint:'Con 3 o más mejores respuestas en un turno rápido, un huésped agradecido te deja una caja de regalo.',
+  closet:'Armario',closetKicker:'TU ARMARIO',closetIntro:'Ropa y tesoros que te regalaron huéspedes agradecidos. En el trabajo llevas uniforme, así que la ropa de regalo es para tu tiempo libre, como en casa, en tu casita.',dressCode:'👔 Código de vestimenta: uniforme en el trabajo. La ropa de regalo es para casa.',
+  outfits:'Ropa',treasures:'Tesoros',fromGuests:'De los huéspedes misteriosos',takeOff:'Quitármelo',wear:'En casa',on:'En casa ✓',
   locked:'Búscalo en una caja de regalo',lockedGuest:'Resuelve un huésped misterioso',collection:'Colección: {n} de {total}',play:'▶ Tocar',
   mgKicker:'EL HUÉSPED MISTERIOSO DE ESTA NOCHE',mgButton:'Huésped misterioso',mgPart:'Parte {n} de {total}',mgNewPart:'🕯️ EL HUÉSPED MISTERIOSO · PARTE {n} DE {total}',
   mgLocked:'Se abre tras tu próximo turno rápido, o tras ayudar a 5 huéspedes en la mansión.',
-  mgGuessAsk:'Adivina. Si aciertas, ganas una caja de regalo extra 🎁',mgYourGuess:'Tu respuesta: {g}',mgWait:'Ya veremos…',
+  mgGuessAsk:'Adivina. Si aciertas, el huésped te deja una caja de regalo 🎁',mgYourGuess:'Tu respuesta: {g}',mgWait:'Ya veremos…',
   mgRight:'🔮 ¡Lo adivinaste! Qué buen instinto.',mgWrong:'Casi, pero qué sorpresa tan bonita.',mgNoGuess:'Qué sorpresa tan bonita.',
   mgSecret:'El secreto',mgTomorrow:'Mañana llega un nuevo huésped misterioso.',mgArrived:'Esta noche llegó un huésped misterioso',mgStill:'Tu huésped misterioso sigue aquí',
   mgOpen:'Abrir el caso →',mgShift:'✨ Turno rápido: descubre la siguiente parte',mgSolvedN:'Huéspedes misteriosos conocidos: {n}',
@@ -4987,11 +4993,13 @@ function drawHat(c,id,r,cx,top,u,time=0){
   rows.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch==='.')return;c.fillStyle=HAT_COL[ch]||'#fff';const [a,b,w2,h2]=cell(x,y);c.fillRect(a,b,w2,h2);}));
 }
 const joyPlayerRecipe=()=>playerLook().recipe;
-/* In the manor: the player's outfit follows every step and hop. */
+/* Dress code: at work (the manor, the festival) the player wears their uniform. Gift outfits are worn
+   off the clock only, at home in the cottage. joyOffClock is set while home is being drawn. */
+let joyOffClock=false;
 const joyDrawBeing=drawBeing;
 drawBeing=function(c,x,y,r,step=0,dir='down',carrying=false,scale=1){
   joyDrawBeing.apply(this,arguments);
-  if(!joy.wearing||r!==joyPlayerRecipe())return;
+  if(!joy.wearing||!joyOffClock||r!==joyPlayerRecipe())return;
   const t=castNow(),U=PX_U*scale,bob=r.kind==='raccoon'?racMood(r,t,step).bob*U:0,top=Math.round(y)+12*scale-PX_FEET*U-bob;
   drawHat(c,joy.wearing,r,Math.round(x),top,U,t);
 };
@@ -5071,6 +5079,9 @@ dialog.joy-glow{box-shadow:0 0 0 3px #ffd84d88,0 0 40px 6px #ffd84d66,0 16px 44p
 .joy-prize-text{text-align:center}
 .joy-prize-text h3{margin:6px 0 2px;font:22px Georgia,serif;color:var(--ink)}
 .joy-prize-text p{margin:0 0 4px;color:var(--muted);font:14px/1.5 Georgia,serif}
+.joy-from{display:flex;align-items:center;justify-content:center;gap:8px;margin:-2px 0 6px;font:bold 14px Georgia,serif;color:#7a5414}
+.joy-from-face{width:44px;height:33px;image-rendering:pixelated;border-radius:50%;background:#fff3d6;border:2px solid #e8cf94}
+.joy-tag b{font-style:normal;font-size:12px;color:#8a6a2b}
 .joy-tag{margin:6px auto 0;max-width:340px;padding:6px 12px;border:1px dashed #c9a254;border-radius:8px;background:#fffaf0;font:italic 13px Georgia,serif;color:#6b5a3a;text-align:center}
 .joy-closet-top{display:flex;align-items:center;gap:14px;margin:4px 0 8px}
 .joy-closet-top canvas{width:96px;height:129px;image-rendering:pixelated;flex:none;background:radial-gradient(circle,#fff7df,#f6ead000 70%)}
@@ -5126,7 +5137,7 @@ showMomentResult=function(i,k,mode,host){
   const gain=best?3+Math.min(3,Math.max(0,run-1)):ok?1:0;
   const was=joy.tips;joy.tips+=gain;joy.jar+=gain;let jarFull=false;
   if(joy.jar>=JOY_JAR){joy.jar-=JOY_JAR;joy.jars++;joy.gifts.push('jar');jarFull=true;}
-  if(mode==='shift'&&shift){shift.joyTips=(shift.joyTips||0)+gain;if(best)shift.joySkills=[...(shift.joySkills||[]),GUEST_MOMENTS[i]?.dept].filter(Boolean);}
+  if(mode==='shift'&&shift){shift.joyTips=(shift.joyTips||0)+gain;if(best){shift.joySkills=[...(shift.joySkills||[]),GUEST_MOMENTS[i]?.dept].filter(Boolean);shift.joyGuests=[...(shift.joyGuests||[]),GUEST_MOMENTS[i]?.guest].filter(Boolean);}}
   /* Manor play also moves the mystery guest's story along: one part for every five guests helped. */
   let part=0;if(mode!=='shift'&&mgCurrent()&&joy.mg.part<MG_PARTS){joy.mg.since++;if(joy.mg.since>=5){joy.mg.since=0;part=mgAdvance();}}
   storeJoy();
@@ -5136,7 +5147,7 @@ showMomentResult=function(i,k,mode,host){
     '<span class="joy-jar"><span aria-hidden="true">🫙</span><span class="bar" role="meter" aria-label="'+esc(JT.jar)+'" aria-valuemin="0" aria-valuemax="'+JOY_JAR+'" aria-valuenow="'+joy.jar+'"><i style="width:'+(jarFull?100:Math.round(Math.max(0,joy.jar-gain)/JOY_JAR*100))+'%"></i></span><span aria-hidden="true">🎁</span></span>'+
     (!gain?'<p class="joy-hint">'+esc(best||ok?'':'🌱 ')+esc(profile.lang==='es'?'Las mejores respuestas dan propinas.':'Best answers earn tips.')+'</p>':'')+'</div>'+'';
   box.prepend(stage);
-  paintBuddy(stage.querySelector('.joy-buddy'),{k:2,mood:best?'h':''});
+  paintBuddy(stage.querySelector('.joy-buddy'),{k:2,mood:best?'h':'',hat:''});
   if(jarFull)stage.insertAdjacentHTML('afterend','<div class="joy-panel"><small>🫙 '+esc(JT.jarFull)+'</small><p><span class="joy-mini-gift" aria-hidden="true">🎁</span>'+esc(JT.jarGift)+'</p><button class="secondary-button joy-open-gift">'+esc(JT.openGift)+'</button></div>');
   if(part)box.querySelector('.action-row')?.insertAdjacentHTML('beforebegin',mgPartPanel(part));wireMg(box);box.querySelectorAll('.joy-open-gift').forEach(b=>b.onclick=openGift);
   modal.classList.toggle('joy-glow',best&&run>=3&&!joyCalm());
@@ -5165,19 +5176,36 @@ function rollGift(reason){
   for(const r of [rar,rar-1,rar-2,rar+1,rar+2])if(r>=0&&r<=2&&free(r).length){const list=free(r);return list[Math.random()*list.length|0];}
   return null;
 }
-function giftTag(reason,skills){
-  if(reason==='mystery')return '';const s=skills&&skills.length?skills[Math.random()*skills.length|0]:'';
+/* Every gift box comes from a thankful guest, never from the manager: it says who on the tag. */
+let joyLastSkills=[],joyLastGuests=[];
+const GIFT_GHOSTS=[];/* thankful guests who happen to be ghosts (GHOSTS v1 fills this) */
+function giftSender(reason){
+  const pick=a=>a[Math.random()*a.length|0];
+  if(reason==='mystery'){const g=MG_GUESTS.find(x=>x.id===joy.mg.solved.at(-1))||mgCurrent();if(g)return {name:joyL(g).name,recipe:mgLook(g),mystery:true};}
+  if((reason==='shift'||reason==='perfect')&&joyLastGuests.length)return {name:pick(joyLastGuests)};
+  if(GIFT_GHOSTS.length&&Math.random()<.18)return {...pick(GIFT_GHOSTS),ghost:true};
+  const pool=[...new Set(GUEST_MOMENTS.map(m=>m.guest).filter(Boolean))];
+  return {name:pool.length?pick(pool):'A guest'};
+}
+function giftTag(reason,skills,from){
+  if(reason==='mystery')return JT.giftTagMystery;if(from&&from.ghost)return JT.giftTagGhost;
+  if(reason==='jar')return JT.giftTagJar;if(reason==='hms')return JT.giftTagHms;
+  const s=skills&&skills.length?skills[Math.random()*skills.length|0]:'';
   return s?jt(JT.giftTag,{skill:t(s).toLowerCase()}):JT.giftTagPlain;
 }
-let joyLastSkills=[];
+function giftFromHTML(reason,from){
+  return '<p class="joy-from"><canvas class="joy-from-face" aria-hidden="true"></canvas><span>'+esc(jt(reason==='jar'?JT.giftFromJar:JT.giftFrom,{who:from.name}))+'</span></p>';
+}
+let joyGiftFrom=null;
 function openGift(){
   if(!joy.gifts.length)return;if(world)world.stop();
   const reason=joy.gifts[0],item=rollGift(reason),rar=item?item.rar:0;
-  const glow=JT.glowHint[rar]||'';
-  openModal('<span class="overline">'+esc(JT.giftKicker)+'</span><h2 id="modal-heading">'+esc(JT.giftWhy[reason]||JT.giftWhy.shift)+'</h2>'+
+  const glow=JT.glowHint[rar]||'';joyGiftFrom=giftSender(reason);
+  openModal('<span class="overline">'+esc(JT.giftKicker)+'</span><h2 id="modal-heading">'+esc(JT.giftWhy[reason]||JT.giftWhy.shift)+'</h2>'+giftFromHTML(reason,joyGiftFrom)+
     '<div class="joy-giftstage r'+rar+'"><div class="joy-rays" aria-hidden="true"></div><button class="joy-gift" aria-label="'+esc(JT.tapHint[0])+'"><span class="joy-lid"></span><span class="joy-box"></span></button><div class="joy-prize" aria-hidden="true"></div><p class="joy-gift-hint" aria-live="polite">'+esc(glow?glow+' '+JT.tapHint[0]:JT.tapHint[0])+'</p></div>'+
     '<div class="joy-prize-text" aria-live="polite"></div><div class="action-row" id="joy-gift-actions"></div>');
   const btn=body.querySelector('.joy-gift'),stage=body.querySelector('.joy-giftstage'),hint=body.querySelector('.joy-gift-hint');
+  {const face=body.querySelector('.joy-from-face'),f=joyGiftFrom;if(face&&!paintBust(face,f.recipe?{recipe:f.recipe}:{name:f.name,cast:f.cast||f.name},24,2))face.remove();}
   let taps=0;const need=joyCalm()?1:3;
   btn.onclick=()=>{
     if(btn.classList.contains('open'))return;taps++;
@@ -5194,8 +5222,8 @@ function revealGift(reason,item,stage,btn){
   if(item){rar=item.rar;joy.owned.push(item.id);joy.bestRar=Math.max(joy.bestRar,rar);const [name,line]=joyL(item);label=name;
     prize.innerHTML=item.type==='wear'?'<canvas></canvas>':'<span class="joy-emoji">'+item.icon+'</span>';
     if(item.type==='wear')paintBuddy(prize.querySelector('canvas'),{k:3,mood:'h',hat:item.id});
-    const tag=giftTag(reason,joyLastSkills);
-    html='<span class="joy-rar r'+rar+'">'+esc(JT.rar[rar])+(rar?' '+'✦'.repeat(rar):'')+'</span><span class="joy-new">'+esc(JT.newItem)+'</span><h3>'+(item.type==='wear'?item.icon+' ':'')+esc(name)+'</h3><p>'+esc(line)+'</p>'+(tag?'<p class="joy-tag">'+esc(tag)+'</p>':'');
+    const from=joyGiftFrom||giftSender(reason),tag=giftTag(reason,joyLastSkills,from);
+    html='<span class="joy-rar r'+rar+'">'+esc(JT.rar[rar])+(rar?' '+'✦'.repeat(rar):'')+'</span><span class="joy-new">'+esc(JT.newItem)+'</span><h3>'+(item.type==='wear'?item.icon+' ':'')+esc(name)+'</h3><p>'+esc(line)+'</p>'+(tag?'<p class="joy-tag">“'+esc(tag)+'”<br><b>'+esc(jt(JT.giftSign,{who:from.name}))+'</b></p>':'');
   }else{joy.tips+=15;label=JT.allFound;prize.innerHTML='<span class="joy-emoji">🪙</span>';html='<h3>+15 🪙</h3><p>'+esc(JT.allFound)+'</p>';}
   storeJoy();
   btn.classList.add('open');stage.classList.add('opened');text.innerHTML=html;
@@ -5217,7 +5245,7 @@ function openCloset(){
   if(world)world.stop();
   const wear=GIFTS.filter(g=>g.type==='wear'),keep=GIFTS.filter(g=>g.type==='keep'),have=joy.owned.length+joy.mg.solved.length,total=GIFTS.length+MG_GUESTS.length;
   openModal(titleHTML(JT.closet,JT.closetKicker)+'<div class="joy-closet-top"><canvas id="joy-closet-me" aria-hidden="true"></canvas><div><p class="modal-description" style="margin:0">'+esc(JT.closetIntro)+'</p><p class="joy-hint" style="margin-top:6px"><b>'+esc(jt(JT.collection,{n:have,total}))+'</b> · 🪙 '+joy.tips+'</p>'+(joy.wearing?'<button class="text-button" id="joy-off">'+esc(JT.takeOff)+'</button>':'')+'</div></div>'+
-    '<h3 class="pins-heading">'+esc(JT.outfits)+'</h3><ul class="joy-grid" id="joy-wear"></ul><h3 class="pins-heading">'+esc(JT.treasures)+'</h3><ul class="joy-keeps" id="joy-keep"></ul><h3 class="pins-heading">'+esc(JT.fromGuests)+'</h3><ul class="joy-keeps" id="joy-mgk"></ul><div class="action-row" id="joy-closet-actions"></div>');
+    '<h3 class="pins-heading">'+esc(JT.outfits)+'</h3><p class="joy-hint joy-dress">'+esc(JT.dressCode)+'</p><ul class="joy-grid" id="joy-wear"></ul><h3 class="pins-heading">'+esc(JT.treasures)+'</h3><ul class="joy-keeps" id="joy-keep"></ul><h3 class="pins-heading">'+esc(JT.fromGuests)+'</h3><ul class="joy-keeps" id="joy-mgk"></ul><div class="action-row" id="joy-closet-actions"></div>');
   paintBuddy($('joy-closet-me'),{k:3,mood:'h'});
   if($('joy-off'))$('joy-off').onclick=()=>{joy.wearing='';storeJoy();openCloset();};
   const grid=$('joy-wear');
@@ -5316,7 +5344,7 @@ const joyInteract=interact;interact=function(id){if(id==='mystery-guest'){openMy
 /* ---------- The end of a quick shift: tips, a gift box for a good shift, and the next part of the story ---------- */
 const joyFinishShift=finishShift;
 finishShift=function(){
-  const s=shift,best=s?.best|0,size=s?.list?.length||SHIFT_SIZE,tips=s?.joyTips|0;joyLastSkills=s?.joySkills||[];
+  const s=shift,best=s?.best|0,size=s?.list?.length||SHIFT_SIZE,tips=s?.joyTips|0;joyLastSkills=s?.joySkills||[];joyLastGuests=s?.joyGuests||[];
   let gift=null;if(best>=Math.min(3,size)){gift=best===size?'perfect':'shift';joy.gifts.push(gift);}
   const fresh=mgArrive(),part=fresh?1:mgAdvance();storeJoy();
   joyFinishShift();
@@ -5392,7 +5420,7 @@ en:{
   explore:'🔎 Explore on my own',bigLab:'Big practice lab →',bigLabHint:'For later: the full practice HMS at the training desk.',
   levelLine:'HMS skill',xp:'{n} HMS points',toNext:'{n} to {level}',maxed:'Top level!',
   levels:['New at the desk','Finds things fast','Desk helper','HMS whiz','Desk wizard'],
-  lessonDone:'Lesson done!',nextLesson:'Next lesson →',backHome:'Back to the desk computer',graduate:'🎓 You learned the whole HMS!',graduateGift:'Delores left you a gift box for it.',
+  lessonDone:'Lesson done!',nextLesson:'Next lesson →',backHome:'Back to the desk computer',graduate:'🎓 You learned the whole HMS!',graduateGift:'A guest you helped at the desk left you a gift box.',
   tryAgain:'🌱 Look again. {hint}',
   lessons:[
     {t:'Find a booking',d:'Who is staying, and for how long.',steps:[
@@ -5455,7 +5483,7 @@ es:{
   explore:'🔎 Explorar por mi cuenta',bigLab:'Laboratorio grande →',bigLabHint:'Para más adelante: el HMS completo de práctica en el escritorio de formación.',
   levelLine:'Habilidad HMS',xp:'{n} puntos HMS',toNext:'{n} para {level}',maxed:'¡Nivel máximo!',
   levels:['Primer día en el mostrador','Encuentra todo rápido','Ayudante de recepción','Estrella del HMS','Magia del mostrador'],
-  lessonDone:'¡Lección hecha!',nextLesson:'Siguiente lección →',backHome:'Volver al ordenador',graduate:'🎓 ¡Aprendiste todo el HMS!',graduateGift:'Delores te dejó una caja de regalo.',
+  lessonDone:'¡Lección hecha!',nextLesson:'Siguiente lección →',backHome:'Volver al ordenador',graduate:'🎓 ¡Aprendiste todo el HMS!',graduateGift:'Un huésped al que ayudaste en el mostrador te dejó una caja de regalo.',
   tryAgain:'🌱 Mira otra vez. {hint}',
   lessons:[
     {t:'Encontrar una reserva',d:'Quién se aloja y por cuánto tiempo.',steps:[
@@ -6738,7 +6766,7 @@ en:{
   tea:'The teapot hums. Tea will be ready exactly when you need it.',
   visitorKick:'A VISITOR AT YOUR DOOR',
   visitors:{
-    delores:{name:'Delores',arrive:'Delores stops by with a housewarming pie',lines:['I brought a pie. It is mostly crust, because I believe in crust.','Look at you, settling in. The manor is lucky to have you next door.','If you hear tapping on your roof at night, that is my cousin. He is just saying hello.']},
+    delores:{name:'Delores',arrive:'Delores stops by with a thank-you card from a guest',lines:['A guest asked me to pass this on. I didn’t read it. I read the envelope. It says ‘for the kind one.’','Look at you, settling in. The manor is lucky to have you next door.','If you hear tapping on your roof at night, that is my cousin. He is just saying hello.']},
     penny:{name:'Penny Puffwing',arrive:'Penny Puffwing flutters over to see your place',lines:['I appraised your cottage. Value: priceless. I checked twice, then once more for fun.','Fun fact: a comfy home helps people do their best work. I made that fact up, but I believe it.','Your cottage has excellent coin-pile potential. That is a compliment.']}
   },
   pins:{first:['Home Sweet Home','Buy something for your cottage.'],cozy:['Snug as a Sock','Fill your cottage with 9 things.'],all:['Coziest Cottage','Bring all 18 things home.'],concert:['Tiny Concert','Play the record player in your cottage.']}
@@ -6769,7 +6797,7 @@ es:{
   tea:'La tetera tararea. El té estará listo justo cuando lo necesites.',
   visitorKick:'UNA VISITA EN TU PUERTA',
   visitors:{
-    delores:{name:'Delores',arrive:'Delores pasa a verte con una tarta de bienvenida',lines:['Te traje una tarta. Casi todo es masa, porque creo en la masa.','Mírate, ya instalándote. La mansión tiene suerte de tenerte al lado.','Si oyes golpecitos en el tejado por la noche, es mi primo. Solo viene a saludar.']},
+    delores:{name:'Delores',arrive:'Delores pasa a verte con una tarjeta de agradecimiento de un huésped',lines:['Un huésped me pidió que te diera esto. No la leí. Leí el sobre. Dice ‘para la persona amable’.','Mírate, ya instalándote. La mansión tiene suerte de tenerte al lado.','Si oyes golpecitos en el tejado por la noche, es mi primo. Solo viene a saludar.']},
     penny:{name:'Penny Puffwing',arrive:'Penny Puffwing viene volando a ver tu casa',lines:['Tasé tu casita. Valor: incalculable. Lo comprobé dos veces, y una más por diversión.','Dato curioso: un hogar cómodo ayuda a trabajar mejor. Me lo inventé, pero me lo creo.','Tu casita tiene un potencial excelente para montones de monedas. Es un cumplido.']}
   },
   pins:{first:['Hogar, dulce hogar','Compra algo para tu casita.'],cozy:['Calentita como un calcetín','Llena tu casita con 9 cosas.'],all:['La casita más acogedora','Lleva las 18 cosas a casa.'],concert:['Concierto diminuto','Toca el tocadiscos de tu casita.']}
@@ -6922,10 +6950,10 @@ function drawCottageRoom(c,t,calm){
   if(cotHas('cushion'))cotWith(c,'cushion',t,152,232,()=>{ellipse(c,152,236,22,7,'#e7a3c0');ellipse(c,152,234,17,5,'#f6c8da');try{drawMuffin(c,152,232,'sleep',1,calm?0:t);}catch{}});
   /* you, at home */
   const hop=t-cot.hop<600&&!calm?Math.sin((t-cot.hop)/600*Math.PI)*10:0;
-  try{c.save();c.translate(0,-hop);drawBeing(c,214,222,playerLook().recipe,0,'down',false,1.25);c.restore();}catch{c.restore();}
+  try{c.save();c.translate(0,-hop);joyOffClock=true;drawBeing(c,214,222,playerLook().recipe,0,'down',false,1.25);c.restore();}catch{c.restore();}finally{joyOffClock=false;}
   if(hop){heartPath(c,226,170-hop,4,'#f28aa8');heartPath(c,203,176-hop*.6,3,'#ffb3c9');}
   const v=cotVisitor();
-  if(v==='delores')try{drawPerson(c,264,226,{cast:'delores'},0,'down',false,1.2);ellipse(c,284,214,8,3,'#c48a4c');ellipse(c,284,212,7,2.4,'#e8b46a');}catch{}
+  if(v==='delores')try{drawPerson(c,264,226,{cast:'delores'},0,'down',false,1.2);/* a guest's thank-you card */c.save();c.translate(284,208);c.rotate(-.12);c.fillStyle='#fffaf0';c.fillRect(-7,-5,14,10);c.strokeStyle='#c9952f';c.lineWidth=1;c.strokeRect(-7,-5,14,10);c.beginPath();c.moveTo(-7,-5);c.lineTo(0,1);c.lineTo(7,-5);c.stroke();c.fillStyle='#e0607e';c.beginPath();c.arc(0,1,1.8,0,Math.PI*2);c.fill();c.restore();}catch{}
   if(v==='penny')try{drawPenny(c,258,236,1.05,calm?0:t,calm,{pile:false});}catch{}
   if(cotHas('record'))cotWith(c,'record',t,318,224,()=>{rect(c,300,216,36,26,'#a8784e',2);for(let k=0;k<3;k++)rect(c,300,222+k*7,36,1.2,'#8a5e3e');rect(c,302,206,32,10,'#6b3f2a',2);
     ellipse(c,314,206,11,2.8,'#222');ellipse(c,314,206,3,1,'#e2655f');c.strokeStyle='#c99a3e';c.lineWidth=2;c.beginPath();c.moveTo(326,205);c.lineTo(332,194);c.stroke();
@@ -7014,7 +7042,7 @@ function openCottage(tab){
   cv.addEventListener('pointerdown',e=>{const r=cv.getBoundingClientRect(),s=r.width/COT_W,x=(e.clientX-r.left)/s,y=(e.clientY-r.top)/s;
     const hit=cotTargets().find(([,a,b,w,h])=>x>=a&&x<=a+w&&y>=b&&y<=b+h);if(hit)cotTap(hit[0]);});
   renderCottageShop();
-  if(fresh){cottage.met.push(v);storeCottage();const V=CT.visitors[v];cotSay(V.name+': “'+V.lines[0]+'”');celebrate({icon:v==='penny'?'🐉':'🥧',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
+  if(fresh){cottage.met.push(v);storeCottage();const V=CT.visitors[v];cotSay(V.name+': “'+V.lines[0]+'”');celebrate({icon:v==='penny'?'🐉':'💌',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
   else cotSay(first?CT.intro:cotPick(CT.hello));
   requestAnimationFrame(cotLoop);
   cotWire();
@@ -7049,7 +7077,7 @@ function buyCottageThing(id,btn){
   cotSparkle(id);cotSay(ctx_(CT.bought,{name:L[0]})+' '+L[1]);
   renderCottageShop();if(joyCalm())cotPaint();
   const v=COTTAGE_VISITORS.find(x=>before<x.at&&cottage.owned.length>=x.at);
-  if(v){cottage.met.push(v.id);cot.visitor=v.id;storeCottage();const V=CT.visitors[v.id];setTimeout(()=>{cotSay(V.name+': “'+V.lines[0]+'”');if(joyCalm())cotPaint();},1400);celebrate({icon:v.id==='penny'?'🐉':'🥧',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
+  if(v){cottage.met.push(v.id);cot.visitor=v.id;storeCottage();const V=CT.visitors[v.id];setTimeout(()=>{cotSay(V.name+': “'+V.lines[0]+'”');if(joyCalm())cotPaint();},1400);celebrate({icon:v.id==='penny'?'🐉':'💌',kicker:CT.visitorKick,label:V.arrive,confetti:true});}
   else if(cotLevel()>lvBefore)celebrate({icon:'🏡',kicker:CT.cozy,label:CT.levels[cotLevel()],confetti:cotLevel()>=3});
   checkPins();renderGrowth();narrativeText=body.innerText;
 }
@@ -8532,6 +8560,234 @@ PINS.push(
 );
 renderGrowth();checkPins();
 /* ==== end STAR SERVICE v1 ==== */
+
+/* ==== GHOSTS v1: friendly ghost guests, and nobody at the manor thinks this is unusual ====
+   Mr. Hiroshi Tanaka is travelling with his wife, Emiko. Emiko is a ghost. That is the whole joke:
+   everyone treats it as perfectly normal, and the lesson is a real one. Every guest in a party gets
+   the same care: their own key, their own cup, their own menu, a table for two.
+   - The Tanakas drift along the guest corridor. Tap them for a little exchange, and once a day a
+     quick service moment (best answer: 3 tips, into the same tip jar as everything else).
+   - Two new lobby chats: the Tanakas, and two ghost guests (Ngozi Eze and Lars Lindqvist) who
+     compare the politest way upstairs.
+   - Ghosts are drawn from the same pixel chibi kit: pale and soft, a little see-through, and
+     floating, with their feet fading into a wisp. Cute, never spooky.
+   - Ghost guests sometimes leave you a gift box too.
+   English and Spanish, written ahead of time, nothing downloaded, nothing costs money to run.
+   Save key: mapachez_ghosts_v1. */
+const GHOST_TEXT={
+en:{
+  name:'The Tanakas',kicker:'GUESTS IN ROOM 205',mapName:'The Tanakas',
+  intro:'Mr. Hiroshi Tanaka is travelling with his wife, Emiko. Emiko is a ghost. At Mapachez Manor, nobody finds this unusual.',
+  hiroshi:'Hiroshi',emiko:'Emiko',
+  banter:[
+    [['e','Hiroshi, you’re snoring.'],['h','I’m awake.'],['e','Then you’re snoring awake. Very impressive.']],
+    [['h','She still steals all the blankets.'],['e','I don’t even get cold.'],['h','Exactly. She does it for fun.']],
+    [['e','I floated into the spa by mistake.'],['h','Was it nice?'],['e','Lovely. I said sorry to the towels.']],
+    [['h','We always travel light.'],['e','I travel very light.'],['h','She says that at every airport.']],
+    [['e','He packed my favourite scarf.'],['h','You can’t wear it, dear.'],['e','I like knowing it came along.']],
+    [['h','Forty years, and she still laughs at my jokes.'],['e','Forty-two. And only the bad ones.']]
+  ],
+  askKicker:'A QUICK MOMENT',done:'Lovely. See you around the corridor.',later:'Maybe later',
+  allDone:'You’ve looked after the Tanakas beautifully. They wave every time you pass.',
+  best:'✨ Best answer · +3 tips',ok:'🌱 Close. {why}',miss:'🌙 {why}',
+  moments:[
+    {id:'cups',q:'At breakfast, Mr. Tanaka asks for two cups of green tea. Emiko can’t drink tea. She just likes holding something warm.',
+     opts:[['Bring two warm cups, and set one at her place','Emiko wraps her hands around the cup and glows a little brighter. “He always remembers,” she says. “So did you.”'],
+           ['Bring one cup, and an empty one for show','A kind thought, but an empty cup is a cold cup. Every guest gets a warm one.'],
+           ['Ask if her cup can be billed to “the other side”','Hiroshi laughs so hard he spills. Emiko laughs harder. Still, her tea is simply part of their stay.']]},
+    {id:'keys',q:'At check-in, Emiko asks for her own key card. She can walk through doors. She still likes having a key.',
+     opts:[['Make a second key and hand it to her, by name','“Mrs. Tanaka, your key.” She holds it up to the light like a prize.'],
+           ['Give both keys to Mr. Tanaka','He passes one to her anyway. Next time, hand each guest their own.'],
+           ['Tell her that, technically, she doesn’t need one','True. But a key says “you belong here.” Every guest gets one.']]},
+    {id:'bed',q:'Housekeeping asks which side of the bed to turn down. Emiko doesn’t sleep, but she loves the window side, for the moon.',
+     opts:[['Turn down both sides, with a chocolate by the window','In the morning the chocolate is gone. Nobody knows how. Hiroshi winks.'],
+           ['Turn down Mr. Tanaka’s side only','He sleeps well. Emiko watches the moon from the chair. Both sides would have been kinder.'],
+           ['Leave her a night-light shaped like a little ghost','She thinks it is hilarious and keeps it. But what she wanted was her side of the bed.']]},
+    {id:'table',q:'Mr. Tanaka books dinner. The host stand asks him, “Table for one?”',
+     opts:[['A table for two, by the window, with two menus','Emiko reads the menu for a long time and happily orders nothing. Hiroshi orders her favourite dessert anyway, to share.'],
+           ['A table for one, with an extra chair pulled up','Close! A place setting and a menu for her makes it a proper dinner for two.'],
+           ['Ask the chef to make the soup “extra spooky”','The chef draws a tiny face in the cream. Emiko adores it. Still, the real gift is a proper table for two.']]}
+  ],
+  closetHome:'🏡 See it at home',
+  pins:{plus:['Party of Two','Look after every guest in a party: help the Tanakas 4 times.'],normal:['Nobody Minds','Say hello to the Tanakas 7 times.']},
+  chats:[
+    {id:'tanaka-photos',title:'Two hundred and twelve photos',a:{name:'Mr. Hiroshi Tanaka'},b:{name:'Mrs. Emiko Tanaka'},
+     intro:'A couple share the lobby sofa. One of them is slightly see-through. Nobody at the desk mentions it.',
+     lines:[[0,'Smile for the photo, dear.'],[1,'You know I don’t show up in photos.'],[0,'I know. I take them anyway.'],[1,'How many this trip?'],[0,'Two hundred and twelve.'],[1,'Of what?'],[0,'Me, and a lovely glow next to me.'],[1,'That glow is very photogenic.']],
+     end:'He shows the desk his favourite: him, beaming, with a soft little glow beside him. Everyone agrees it is her best side.'},
+    {id:'walls',title:'The politest way upstairs',a:{name:'Ms. Ngozi Eze'},b:{name:'Mr. Lars Lindqvist'},
+     intro:'Two guests floating a few inches above the carpet are comparing notes.',
+     lines:[[1,'Do you take the stairs or the lift?'],[0,'Neither. I take the wall.'],[1,'Isn’t that a bit rude?'],[0,'I always knock first.'],[1,'On the wall?'],[0,'Manners matter, Lars.'],[1,'I tried the lift once.'],[0,'And?'],[1,'It went up. I stayed.']],
+     end:'They agree the stairs are the most polite. Then Ngozi drifts up through the ceiling, waving.'}
+  ]
+},
+es:{
+  name:'Los Tanaka',kicker:'HUÉSPEDES DE LA HABITACIÓN 205',mapName:'Los Tanaka',
+  intro:'El señor Hiroshi Tanaka viaja con su esposa, Emiko. Emiko es un fantasma. En la Mansión Mapachez, a nadie le parece raro.',
+  hiroshi:'Hiroshi',emiko:'Emiko',
+  banter:[
+    [['e','Hiroshi, estás roncando.'],['h','Estoy despierto.'],['e','Entonces roncas despierto. Impresionante.']],
+    [['h','Todavía me roba todas las mantas.'],['e','Si yo ni tengo frío.'],['h','Exacto. Lo hace por diversión.']],
+    [['e','Entré flotando al spa sin querer.'],['h','¿Y qué tal?'],['e','Precioso. Les pedí perdón a las toallas.']],
+    [['h','Siempre viajamos ligeros.'],['e','Yo viajo muy ligera.'],['h','Lo dice en cada aeropuerto.']],
+    [['e','Me trajo mi bufanda favorita.'],['h','No te la puedes poner, cariño.'],['e','Me gusta saber que vino con nosotros.']],
+    [['h','Cuarenta años, y todavía se ríe de mis chistes.'],['e','Cuarenta y dos. Y solo de los malos.']]
+  ],
+  askKicker:'UN MOMENTITO',done:'Qué bien. Nos vemos por el pasillo.',later:'Quizá luego',
+  allDone:'Cuidaste a los Tanaka de maravilla. Te saludan cada vez que pasas.',
+  best:'✨ Mejor respuesta · +3 propinas',ok:'🌱 Casi. {why}',miss:'🌙 {why}',
+  moments:[
+    {id:'cups',q:'En el desayuno, el señor Tanaka pide dos tazas de té verde. Emiko no puede beber té. Solo le gusta sostener algo calentito.',
+     opts:[['Llevar dos tazas calientes y poner una en su sitio','Emiko rodea la taza con las manos y brilla un poquito más. «Él siempre se acuerda», dice. «Y tú también».'],
+           ['Llevar una taza, y otra vacía de adorno','Buena intención, pero una taza vacía es una taza fría. Cada huésped recibe una calentita.'],
+           ['Preguntar si su taza se cobra «al más allá»','Hiroshi se ríe tanto que lo derrama. Emiko se ríe más. Aun así, su té es parte de la estancia.']]},
+    {id:'keys',q:'En el check-in, Emiko pide su propia tarjeta llave. Puede atravesar puertas. Aun así, le gusta tener llave.',
+     opts:[['Hacer una segunda llave y dársela a ella, por su nombre','«Señora Tanaka, su llave». La levanta a la luz como si fuera un premio.'],
+           ['Darle las dos llaves al señor Tanaka','Él le pasa una de todos modos. La próxima vez, dale a cada huésped la suya.'],
+           ['Decirle que, técnicamente, no la necesita','Es verdad. Pero una llave dice «este es tu sitio». Cada huésped recibe una.']]},
+    {id:'bed',q:'Limpieza pregunta qué lado de la cama abrir. Emiko no duerme, pero le encanta el lado de la ventana, por la luna.',
+     opts:[['Abrir los dos lados, con un bombón junto a la ventana','Por la mañana el bombón ya no está. Nadie sabe cómo. Hiroshi guiña un ojo.'],
+           ['Abrir solo el lado del señor Tanaka','Él duerme bien. Emiko mira la luna desde el sillón. Los dos lados habrían sido más amables.'],
+           ['Dejarle una lucecita de noche con forma de fantasmita','Le parece graciosísima y se la queda. Pero lo que quería era su lado de la cama.']]},
+    {id:'table',q:'El señor Tanaka reserva la cena. En la entrada le preguntan: «¿Mesa para uno?».',
+     opts:[['Una mesa para dos, junto a la ventana, con dos cartas','Emiko lee la carta un buen rato y, feliz, no pide nada. Hiroshi pide su postre favorito igual, para compartir.'],
+           ['Una mesa para uno, con una silla extra','¡Casi! Un cubierto y una carta para ella la convierten en una cena para dos de verdad.'],
+           ['Pedir al chef una sopa «extra terrorífica»','El chef dibuja una carita en la crema. A Emiko le encanta. Aun así, el regalo de verdad es una mesa para dos.']]}
+  ],
+  closetHome:'🏡 Verlo en casa',
+  pins:{plus:['Mesa para dos','Cuida a cada huésped del grupo: ayuda a los Tanaka 4 veces.'],normal:['A nadie le extraña','Saluda a los Tanaka 7 veces.']},
+  chats:[
+    {id:'tanaka-photos',title:'Doscientas doce fotos',a:{name:'Mr. Hiroshi Tanaka'},b:{name:'Mrs. Emiko Tanaka'},
+     intro:'Una pareja comparte el sofá del vestíbulo. Una de las dos personas se transparenta un poco. Nadie en el mostrador lo menciona.',
+     lines:[[0,'Sonríe para la foto, cariño.'],[1,'Sabes que no salgo en las fotos.'],[0,'Lo sé. Las hago igual.'],[1,'¿Cuántas llevas este viaje?'],[0,'Doscientas doce.'],[1,'¿De qué?'],[0,'De mí, y de un brillito precioso a mi lado.'],[1,'Ese brillito sale muy bien.']],
+     end:'Le enseña al mostrador su favorita: él, radiante, con un brillito suave al lado. Todos coinciden en que es su mejor perfil.'},
+    {id:'walls',title:'La forma más educada de subir',a:{name:'Ms. Ngozi Eze'},b:{name:'Mr. Lars Lindqvist'},
+     intro:'Dos huéspedes que flotan unos centímetros sobre la alfombra comparan apuntes.',
+     lines:[[1,'¿Usted sube por la escalera o en ascensor?'],[0,'Ninguno. Subo por la pared.'],[1,'¿No es un poco grosero?'],[0,'Siempre llamo primero.'],[1,'¿A la pared?'],[0,'Los modales importan, Lars.'],[1,'Una vez probé el ascensor.'],[0,'¿Y?'],[1,'Él subió. Yo me quedé.']],
+     end:'Acuerdan que la escalera es lo más educado. Luego Ngozi sube flotando por el techo, diciendo adiós.'}
+  ]
+}};
+const GHT=GHOST_TEXT[profile.lang]||GHOST_TEXT.en;
+const GHOST_NAMES={hiroshi:'Mr. Hiroshi Tanaka',emiko:'Mrs. Emiko Tanaka',ngozi:'Ms. Ngozi Eze',lars:'Mr. Lars Lindqvist'};
+
+/* ---------- The look: soft, pale and a little see-through, floating with a wispy tail ---------- */
+Object.assign(CAST_PINS,{
+  'Mrs. Emiko Tanaka':{ghost:1,kind:'human',skin:'#eef3ff',hair:'#cfd8ff',color:'#c3cdf0',outfit:'scarf',hairdo:'bun',extra:'',extra2:'',specs:0},
+  'Ms. Ngozi Eze':{ghost:1,skin:'#f1ecff',hair:'#d9c9ff',color:'#cbbff0',outfit:'bow',hairdo:'curly'},
+  'Mr. Lars Lindqvist':{ghost:1,skin:'#ecf7f6',hair:'#cfeee8',color:'#b9d9d6',outfit:'cardigan',hairdo:'short',specs:1}
+});
+for(const k of [...CAST_CACHE.keys()])if(/^(Mrs\. Emiko Tanaka|Ms\. Ngozi Eze|Mr\. Lars Lindqvist)\|/.test(k))CAST_CACHE.delete(k);
+const GHOST_SPRITES=new WeakMap();
+function ghostSprite(o){
+  let g=GHOST_SPRITES.get(o);if(g)return g;
+  g=document.createElement('canvas');g.width=o.width;g.height=o.height;const c=g.getContext('2d');
+  c.drawImage(o,0,0);
+  c.globalCompositeOperation='source-atop';c.fillStyle='rgba(232,240,255,.42)';c.fillRect(0,0,g.width,g.height);
+  /* The body fades away toward the feet, so they float on a soft wisp instead of standing. */
+  c.globalCompositeOperation='destination-in';const fade=c.createLinearGradient(0,0,0,g.height);
+  fade.addColorStop(0,'rgba(0,0,0,.84)');fade.addColorStop(.62,'rgba(0,0,0,.8)');fade.addColorStop(.9,'rgba(0,0,0,.12)');fade.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=fade;c.fillRect(0,0,g.width,g.height);GHOST_SPRITES.set(o,g);return g;
+}
+const ghostPxSprite=pxSprite;
+pxSprite=function(r){const o=ghostPxSprite.apply(this,arguments);return r&&r.ghost?ghostSprite(o):o;};
+const ghostDrawBeing=drawBeing;
+drawBeing=function(c,x,y,r,step=0,dir='down',carrying=false,scale=1){
+  if(!r||!r.ghost)return ghostDrawBeing.apply(this,arguments);
+  const t=castNow(),lift=(4+(t?Math.sin(t/700+(r.seed||0))*2.2:0))*scale;
+  /* a soft moonlit glow, then the ghost a few pixels above the floor (still stepping, so they "glide") */
+  const g=c.createRadialGradient(x,y-12*scale-lift,2,x,y-12*scale-lift,26*scale);g.addColorStop(0,'rgba(214,228,255,.38)');g.addColorStop(1,'rgba(214,228,255,0)');
+  c.save();c.fillStyle=g;c.beginPath();c.arc(x,y-12*scale-lift,26*scale,0,CAST_TAU);c.fill();c.restore();
+  const res=ghostDrawBeing.call(this,c,x,y-lift,r,0,dir,carrying,scale);
+  if(t){c.save();c.globalAlpha=.55+.35*Math.sin(t/300+(r.seed||0));c.fillStyle='#ffffff';for(let k=0;k<2;k++){const a=t/900+k*Math.PI+(r.seed||0);c.fillRect(Math.round(x+Math.cos(a)*15*scale),Math.round(y-20*scale-lift+Math.sin(a)*8*scale),Math.max(1,Math.round(1.6*scale)),Math.max(1,Math.round(1.6*scale)));}c.restore();}
+  return res;
+};
+
+/* ---------- Save ---------- */
+const GHOST_KEY='mapachez_ghosts_v1';
+function createGhosts(){return {version:1,visits:0,done:[],best:0,day:''};}
+let ghosts=createGhosts();
+try{const v=JSON.parse(localStorage.getItem(GHOST_KEY)||'null');if(v&&v.version===1){
+  ghosts.visits=Math.max(0,v.visits|0);ghosts.best=Math.max(0,v.best|0);ghosts.day=typeof v.day==='string'?v.day:'';
+  ghosts.done=Array.isArray(v.done)?[...new Set(v.done.filter(id=>GHT.moments.some(m=>m.id===id)))]:[];}}catch{}
+function storeGhosts(){try{localStorage.setItem(GHOST_KEY,JSON.stringify(ghosts));}catch{}}
+const ghostNextMoment=()=>ghosts.day===dayKey()?null:GHT.moments.find(m=>!ghosts.done.includes(m.id))||null;
+
+/* ---------- The Tanakas on the guest corridor ---------- */
+const GHOST_SPOTS=[{x:500,y:440},{x:820,y:440},{x:380,y:440},{x:1000,y:440}];
+function ghostSpot(){
+  const busy=[...(typeof guestMomentAvailable==='function'&&guestMomentAvailable()?[guestSpot()]:[]),...(typeof mgVisible==='function'&&mgVisible()?[mgSpot()]:[])].filter(Boolean);
+  for(const p of GHOST_SPOTS)if((!world||world.walkable(p.x,p.y))&&!busy.some(b=>Math.hypot(b.x-p.x,b.y-p.y)<90))return p;
+  return null;
+}
+function ghostsVisible(){return !!state&&!titleVisible&&!festivalActive&&state.phase==='playing'&&!!state.flags.briefed;}
+function drawTanakas(c,time,calm){
+  if(!ghostsVisible())return;const p=ghostSpot();if(!p)return;
+  const sway=calm?0:Math.sin(time/2600)*22,dir=calm?'down':Math.cos(time/2600)>0?'right':'left',x=p.x+sway;
+  drawPerson(c,x-12,p.y,{name:GHOST_NAMES.hiroshi,cast:GHOST_NAMES.hiroshi},0,calm?'down':dir,false,1.1);
+  drawPerson(c,x+14,p.y,{name:GHOST_NAMES.emiko,cast:GHOST_NAMES.emiko},0,calm?'down':dir,false,1.1);
+  if(ghostNextMoment()){const bob=calm?0:Math.sin(time/320)*2;ellipse(c,x,p.y-58+bob,8,8,'#eef3ff');c.strokeStyle='#8f9fd6';c.lineWidth=1.6;c.beginPath();c.arc(x,p.y-58+bob,8,0,Math.PI*2);c.stroke();text(c,'♡',x,p.y-54+bob,11,'#6f7fc0','Georgia');}
+  if(LABELS)plaque(c,GHT.mapName,x,p.y+22);
+}
+const ghostExtras=world.options.extras;
+world.options.extras=()=>{const list=ghostExtras();if(ghostsVisible()){const p=ghostSpot();if(p)list.push({id:'tanakas',...p,name:GHT.mapName});}return list;};
+const ghostDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{ghostDrawExtras(c,time,calm);drawTanakas(c,time,calm);};
+const ghostInteract=interact;interact=function(id){if(id==='tanakas'){openTanakas();return;}return ghostInteract.apply(this,arguments);};
+
+function ghostLines(pair){return '<ol class="overheard-dialogue chat-lines">'+pair.map(([w,l])=>'<li class="s'+(w==='e'?1:0)+'"><b>'+esc(w==='e'?GHT.emiko:GHT.hiroshi)+'</b>“'+esc(l)+'”</li>').join('')+'</ol>';}
+function openTanakas(){
+  if(world)world.stop();
+  const first=ghosts.visits===0;ghosts.visits++;storeGhosts();
+  const pair=GHT.banter[(ghosts.visits-1)%GHT.banter.length],m=ghostNextMoment();
+  openModal('<div class="scene-head ghost-head"><div class="portrait bust"><canvas id="ghost-face-h" aria-hidden="true"></canvas></div><div class="portrait bust ghost-bust"><canvas id="ghost-face-e" aria-hidden="true"></canvas></div><div><span class="overline">'+esc(GHT.kicker)+'</span><h2 id="modal-heading">'+esc(GHT.name)+'</h2></div></div>'+
+    (first?'<p class="modal-description">'+esc(GHT.intro)+'</p>':'')+ghostLines(pair)+
+    (m?'<div class="ghost-ask"><small>'+esc(GHT.askKicker)+'</small><p>'+esc(m.q)+'</p></div>':(ghosts.done.length>=GHT.moments.length?'<p class="joy-hint">'+esc(GHT.allDone)+'</p>':''))+'<p class="ghost-res" id="ghost-res" aria-live="polite" hidden></p><div class="action-row" id="ghost-actions"></div>');
+  paintBust($('ghost-face-h'),{name:GHOST_NAMES.hiroshi,cast:GHOST_NAMES.hiroshi});paintBust($('ghost-face-e'),{name:GHOST_NAMES.emiko,cast:GHOST_NAMES.emiko});
+  const row=$('ghost-actions'),add=(label,primary,run)=>{const b=document.createElement('button');b.className=primary?'primary-button':'secondary-button';b.textContent=label;b.onclick=run;row.append(b);return b;};
+  if(m){
+    const host=choices(m.opts.map((o,i)=>({text:o[0],run:()=>answerTanakas(m,i,host)})),'tanakas-'+m.id);host.classList.add('ghost-choices');
+    $('ghost-res').before(host);add(GHT.later,false,closeModal);
+  }else add(t('Back to the manor'),true,closeModal);
+  checkPins();narrativeText=body.innerText;
+}
+function answerTanakas(m,i,host){
+  host.querySelectorAll('button').forEach(b=>b.disabled=true);
+  const [label,why]=m.opts[i],res=$('ghost-res');
+  ghosts.done.push(m.id);ghosts.day=dayKey();if(i===0){ghosts.best++;hmsTip(3);}storeGhosts();
+  res.hidden=false;res.className='ghost-res r'+i;
+  res.innerHTML=i===0?'<b>'+esc(GHT.best)+'</b><br>'+esc(why):esc((i===1?GHT.ok:GHT.miss).replace('{why}',why));
+  if(i===0){const [x,y]=centerOf(res);burst(x,y,1,{hearts:true});joySound('coin',1);}
+  const row=$('ghost-actions');row.innerHTML='';const b=document.createElement('button');b.className='primary-button';b.textContent=GHT.done;b.onclick=closeModal;row.append(b);b.focus();
+  announce(label);checkPins();renderGrowth();narrativeText=body.innerText;
+}
+
+/* ---------- Two more lobby chats ---------- */
+for(const c of GHT.chats)if(!CHAT.list.some(x=>x.id===c.id))CHAT.list.push(c);
+if(GHT!==GHOST_TEXT.en&&CHATS_TEXT.en!==CHAT)for(const c of GHOST_TEXT.en.chats)if(!CHATS_TEXT.en.list.some(x=>x.id===c.id))CHATS_TEXT.en.list.push(c);
+if(GHT!==GHOST_TEXT.es&&CHATS_TEXT.es!==CHAT)for(const c of GHOST_TEXT.es.chats)if(!CHATS_TEXT.es.list.some(x=>x.id===c.id))CHATS_TEXT.es.list.push(c);
+
+/* ---------- Ghost guests leave gifts too ---------- */
+GIFT_GHOSTS.push(...['emiko','ngozi','lars'].map(k=>({name:GHOST_NAMES[k]})));
+
+/* ---------- The closet: outfits are for home, so offer a quick trip there ---------- */
+const ghostOpenCloset=openCloset;
+openCloset=function(){const r=ghostOpenCloset.apply(this,arguments);
+  if(joy.wearing&&typeof cottage!=='undefined'&&cottage.live===true&&typeof openCottage==='function'){const row=$('joy-closet-actions');
+    if(row){const b=document.createElement('button');b.className='secondary-button';b.id='joy-see-home';b.textContent=GHT.closetHome;b.onclick=()=>openCottage('inside');row.prepend(b);}}
+  return r;};
+
+const ghostCss=document.createElement('style');ghostCss.textContent=
+ '.ghost-head{display:flex;align-items:center;gap:6px}.ghost-head .portrait{flex:none}.ghost-bust{margin-left:-14px;filter:drop-shadow(0 0 8px #c9d6ff)}'+
+ '.ghost-ask{margin:12px 0 4px;padding:10px 12px;border-radius:12px;background:#f1f4ff;border:1px solid #c9d3f2}.ghost-ask small{font:bold 11px Arial,sans-serif;letter-spacing:.08em;color:#5d6aa3}.ghost-ask p{margin:4px 0 0}'+
+ '.ghost-res{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:#fff8e6;border:1px solid #ecd59a}.ghost-res.r0{background:#effae9;border-color:#a9d79a}'+
+ '.joy-dress{margin:-4px 0 8px}';
+document.head.append(ghostCss);
+PINS.push(
+  {id:'party-of-two',icon:'🫖',name:GHT.pins.plus[0],hint:GHT.pins.plus[1],test:()=>ghosts.done.length>=GHT.moments.length},
+  {id:'nobody-minds',icon:'👻',name:GHT.pins.normal[0],secret:true,hint:GHT.pins.normal[1],test:()=>ghosts.visits>=7}
+);
+renderGrowth();checkPins();
+/* ==== end GHOSTS v1 ==== */
 
 
 })();
