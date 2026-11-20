@@ -1,6 +1,5 @@
 """Browser checks for SPLIT v1: the manor and the desk computer (HMS) side by side.
-Computers and tablets: manor on the left, HMS on the right. Phones: a slide-up HMS drawer with the
-manor above. Room changes in the HMS show up on the matching manor room.
+On every screen the HMS slides up as a drawer over the bottom half, with the manor above. Room changes in the HMS show up on the matching manor room.
 
 Run: python tests/test_split.py
 Set CHROMIUM_PATH if Chromium is not installed at /usr/bin/chromium.
@@ -35,19 +34,29 @@ class Split(hbase.Hms):
         return self.page.evaluate("""()=>{const m=document.getElementById('modal').getBoundingClientRect(),
           c=document.getElementById('canvas-wrap').getBoundingClientRect();return {m:[m.left,m.top,m.right,m.bottom],c:[c.left,c.top,c.right,c.bottom],w:innerWidth,h:innerHeight};}""")
 
-    def test_01_wide_screen_puts_the_manor_left_and_the_hms_right(self):
+    def test_01_hms_slides_up_as_a_drawer_with_the_manor_above(self):
         self.manor_open_hms()
         self.assertTrue(self.ev('split.on'))
         b = self.boxes()
-        self.assertAlmostEqual(b['m'][2], b['w'], delta=2)       # HMS hugs the right edge
-        self.assertLess(b['c'][2], b['m'][0] + 1)                 # the manor ends where the HMS starts
-        self.assertGreater(b['c'][2] - b['c'][0], 500)             # and is still big
+        self.assertAlmostEqual(b['m'][3], b['h'], delta=2)               # drawer sits on the bottom edge
+        self.assertAlmostEqual(b['m'][1], b['h'] * .44, delta=12)        # and covers about half
+        self.assertLessEqual(b['m'][2] - b['m'][0], 862)                 # never stretched too wide
+        self.assertAlmostEqual(b['m'][0], b['w'] - b['m'][2], delta=2)   # centered
+        self.assertLess(b['c'][1], 2)                                    # the manor fills the top
+        self.assertGreater(b['m'][1] - b['c'][1], 300)
         self.assertTrue(self.page.locator('#split-tag').is_visible())
+        self.assertTrue(self.page.locator('#split-handle').is_visible())
         # Nothing removed: every lesson, game and the next step are still there.
         self.assertEqual(self.page.locator('#hms-lessons .hms-lesson').count(), 5)
         self.assertEqual(self.page.locator('#hms-games .hms-lesson').count(), 3)
         self.assertEqual(self.page.locator('.hms-next').count(), 1)
-        self.shot('01-desk-home-side-by-side.png')
+        self.shot('01-drawer-home.png')
+        self.page.locator('#split-handle').click()
+        self.page.wait_for_timeout(400)
+        self.assertAlmostEqual(self.boxes()['m'][1], b['h'] * .14, delta=12)
+        self.page.locator('#split-handle').click()
+        self.page.wait_for_timeout(400)
+        self.assertAlmostEqual(self.boxes()['m'][1], b['h'] * .44, delta=12)
 
     def test_02_practice_hotel_room_changes_light_up_the_manor_room(self):
         self.manor_open_hms()
@@ -104,7 +113,7 @@ class Split(hbase.Hms):
         self.page.locator(f'[data-st="{a["to"]}"]').click()
         self.page.wait_for_timeout(100)
         self.assertEqual(self.ev(f'split.board["{a["r"]}"]'), a['to'])
-        self.shot('04-room-rush-side-by-side.png')
+        self.shot('04-room-rush.png')
 
     def test_05_closing_brings_back_the_normal_manor_and_other_windows_stay_centered(self):
         self.manor_open_hms()
@@ -125,23 +134,6 @@ class Split(hbase.Hms):
 class PhoneSplit(Split):
     def setUp(self, viewport=None):
         super().setUp(viewport=viewport or {'width': 390, 'height': 844})
-
-    def test_01_wide_screen_puts_the_manor_left_and_the_hms_right(self):
-        """On phones the HMS is a drawer over the bottom half, with the manor above it."""
-        self.manor_open_hms()
-        b = self.boxes()
-        self.assertAlmostEqual(b['m'][3], b['h'], delta=2)
-        self.assertAlmostEqual(b['m'][1], b['h'] * .44, delta=12)
-        self.assertLess(b['c'][1], 2)
-        self.assertGreater(b['m'][1] - b['c'][1], 300)           # plenty of manor showing
-        self.assertTrue(self.page.locator('#split-handle').is_visible())
-        self.shot('05-drawer-home.png')
-        self.page.locator('#split-handle').click()
-        self.page.wait_for_timeout(400)
-        self.assertAlmostEqual(self.boxes()['m'][1], b['h'] * .14, delta=12)
-        self.page.locator('#split-handle').click()
-        self.page.wait_for_timeout(400)
-        self.assertAlmostEqual(self.boxes()['m'][1], b['h'] * .44, delta=12)
 
     def test_02_practice_hotel_room_changes_light_up_the_manor_room(self):
         super().test_02_practice_hotel_room_changes_light_up_the_manor_room()

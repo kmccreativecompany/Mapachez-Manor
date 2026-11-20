@@ -10501,9 +10501,9 @@ body.reduce-motion .hms-next{animation:none}
 `;document.head.append(st);}
 /* ==== end HMS FRIENDLY v1 ==== */
 /* ==== SPLIT v1: the manor and the desk computer side by side ====
-   - When the desk computer (HMS) opens during play, the manor stays on screen. Computers and
-     tablets: manor on the left, HMS on the right. Phones: the HMS slides up as a drawer over the
-     bottom half, with the manor still showing above. A little handle makes the drawer taller.
+   - When the desk computer (HMS) opens during play, the manor stays on screen: the HMS slides up
+     as a drawer over the bottom half (centered, never wider than 860px), with the manor showing
+     above. A little handle makes the drawer taller.
    - Whatever room board the HMS is showing (real HMS, lessons, Room Rush, Booking Builder or the
      practice hotel), each manor room wears a matching badge: 🧹 dirty, 🔍 cleaned, ✨ ready,
      🛌 guest, 🔧 fixing. Change a room in the HMS and that room reacts right next to it
@@ -10521,7 +10521,6 @@ const SPLIT_COL={tidy:['#ffe3d6','#f09a74','🧹'],clean:['#fff5c9','#e8c34a','�
 const SPLIT_PING={tidy:['🧹','#d9a27f'],clean:['🧽','#8fd0ff'],ready:['✨','#ffd84d'],guest:['🔑','#ff8fb1'],fix:['🔧','#b9a2e6']};
 const split={on:false,next:false,board:null,sel:'',focus:'',pings:[],tall:false};
 const splitCan=()=>!!state&&!titleVisible&&!festivalActive;
-const splitPhone=()=>innerWidth<900;
 /* Wrap every way into the desk computer, so its window opens beside the manor. */
 for(const name of ['openHms','exploreHms','startLesson','openHmsQuestion','gameShell','openPracticeHotel']){
   const fn={openHms,exploreHms,startLesson,openHmsQuestion,gameShell,openPracticeHotel}[name];
@@ -10578,7 +10577,7 @@ world.resize=function(){
   splitResize();
   if(!split.on||!this.width)return;
   const fit=Math.min(this.width/W,this.height/H);
-  this.scale=fit*W>=760?fit:Math.min(this.width/1000,this.height/380);
+  this.scale=fit*1000>=520?fit:Math.min(this.width/1000,this.height/380);
   this.zoomed=true;this.camReady=false;
 };
 world.camera=function(snap){
@@ -10617,26 +10616,20 @@ const splitDrawExtras=world.options.drawExtras;
 world.options.drawExtras=function(c,time,calm){const r=splitDrawExtras?.apply(this,arguments);drawSplit(c,time,calm);return r;};
 addEventListener('resize',()=>{if(split.on)world.resize();});
 {const st=document.createElement('style');st.textContent=`
-:root{--split-w:clamp(380px,42vw,600px)}
-#modal.modal.split{position:fixed;inset:0 0 0 auto;margin:0;width:var(--split-w);max-width:none;height:100dvh;max-height:100dvh;border-radius:24px 0 0 24px;overflow:auto;animation:splitIn .28s ease-out}
+:root{--split-h:56dvh}
+#modal.modal.split{position:fixed;inset:auto 0 0 0;margin:0 auto;width:min(100%,860px);max-width:none;height:var(--split-h);max-height:var(--split-h);border-radius:24px 24px 0 0;padding-top:34px;overflow:auto;animation:splitUp .28s ease-out;transition:height .25s ease,max-height .25s ease}
+#modal.modal.split.tall{--split-h:86dvh}
+body.split-tall{--split-h:86dvh}
 #modal.split::backdrop{background:transparent;backdrop-filter:none}
-body.hms-split::before{content:'';position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 30% 40%,#2c5a48,#10302a 75%)}
-body.hms-split #canvas-wrap{position:fixed;z-index:41;left:16px;top:50%;transform:translateY(-50%);right:calc(var(--split-w) + 16px);width:auto;height:auto;max-height:calc(100dvh - 32px);aspect-ratio:1280/800;margin:0;border-radius:18px}
-.split-tag{position:absolute;left:12px;top:12px;z-index:3;padding:6px 12px;border-radius:99px;background:#fffaf0e8;border:2px solid #c9a45c;color:#23493f;font:bold 13px Arial,sans-serif;pointer-events:none;box-shadow:0 3px 10px #0003}
-.split-handle{display:none}
-@keyframes splitIn{from{transform:translateX(40px);opacity:0}}
+body.hms-split::before{content:'';position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 30%,#2c5a48,#10302a 75%)}
+body.hms-split #canvas-wrap{position:fixed;z-index:41;left:0;right:0;top:0;bottom:calc(var(--split-h) - 22px);width:auto;height:auto;max-height:none;aspect-ratio:auto;margin:0;border-width:0;border-radius:0;outline:none;box-shadow:none}
+.split-tag{position:absolute;left:12px;bottom:32px;z-index:3;padding:6px 12px;border-radius:99px;background:#fffaf0e8;border:2px solid #c9a45c;color:#23493f;font:bold 13px Arial,sans-serif;pointer-events:none;box-shadow:0 3px 10px #0003}
+#modal.split .split-handle{display:block;position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:30px;border:0;background:transparent;cursor:pointer;z-index:3}
+#modal.split .split-handle span{display:block;width:54px;height:6px;margin:10px auto 0;border-radius:6px;background:#c9a45c}
+#modal .split-handle[hidden],.split-handle{display:none}
 @keyframes splitUp{from{transform:translateY(60px);opacity:0}}
 body.reduce-motion #modal.modal.split{animation:none}
-@media(max-width:899px){
- #modal.modal.split{inset:auto 0 0 0;width:100%;height:56dvh;max-height:56dvh;border-radius:24px 24px 0 0;padding-top:34px;animation-name:splitUp;transition:height .25s ease,max-height .25s ease}
- #modal.modal.split.tall{height:86dvh;max-height:86dvh}
- body.hms-split #canvas-wrap{left:0;right:0;top:0;bottom:calc(56dvh - 22px);transform:none;max-height:none;aspect-ratio:auto;border-width:0;border-radius:0}
- body.split-tall #canvas-wrap{bottom:calc(86dvh - 22px)}
- .split-tag{font-size:11px;left:8px;top:auto;bottom:32px;padding:4px 10px}
- #modal.split .split-handle{display:block;position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:30px;border:0;background:transparent;cursor:pointer;z-index:3}
- #modal.split .split-handle span{display:block;width:54px;height:6px;margin:10px auto 0;border-radius:6px;background:#c9a45c}
- #modal.split .split-handle[hidden]{display:none}
-}
+@media(max-width:899px){#modal.modal.split{width:100%}.split-tag{font-size:11px;left:8px;padding:4px 10px}}
 `;document.head.append(st);}
 /* ==== end SPLIT v1 ==== */
 
