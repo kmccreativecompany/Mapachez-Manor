@@ -21,6 +21,10 @@ The world and training remain playable from one offline HTML file.
 See [integration notes](docs/silver-key-integration.md) for saves, source files,
 and browser regression checks.
 
+## Procedural guests and family origins
+
+Unscripted guests now receive deterministic combinations of body textures, eye counts, hair, ears, wings, tails and other features. Biological relatives can share a species origin through an explicit `familyId` and `familyRole: 'biological'`. Adopted relatives, partners, stepfamily and pets are not forced to share that origin. Ghost or robot spouses can be given the same internal origin through `heritageId`, without losing their distinctive appearance. These internal identifiers are not shown to players, and the existing fixed cast stays intact. See [NPC families and forms](docs/npc-families-and-forms.md).
+
 ## Mix-and-match character creator
 
 Choose **Who are you?** on the title screen to make a character from independent pixel-art parts. The creator supports 1, 2 or 3 eyes, 1A through 4C hair textures, bald styles and head coverings, plus interchangeable ears, horns, antlers, antennae, wings, mermaid and animal tails, fur, feathers, scales, metal and ghostly appearances. Choose optional facial hair, one round glasses style (three frame colors), and one classic manual wheelchair for any character. The homepage includes a prominent **Character Creator** button. All selections update the front, side and back preview. Use **Surprise me** or **Save my look**. There are no required species categories.
