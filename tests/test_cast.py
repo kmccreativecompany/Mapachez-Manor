@@ -76,7 +76,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 68_000, 'The modular pixel kit, character creator and raccoon moods should stay under 68 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 76_000, 'The pixel kit, modular options, facial hair, eyewear and mobility should stay under 76 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -187,6 +187,36 @@ class Cast(unittest.TestCase):
             {'headwear': 'hijab'}, {'markings': 'freckles'}
         ]:
             self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', opts), base, opts)
+
+    def test_09_facial_hair_glasses_mermaid_and_wheelchair(self):
+        """All additions are independently selectable and saved to the game character."""
+        self.assertEqual(self.page.locator('#title-who').count(), 1)
+        self.assertIn('Character Creator', self.page.locator('#title-who').inner_text())
+        self.page.locator('#title-who').click()
+        self.page.locator('[data-tab="face"]').click()
+        self.page.locator('[data-opt="facialHair"][data-value="handlebar"]').click()
+        self.page.locator('[data-opt="glasses"][data-value="round"]').click()
+        self.page.locator('[data-opt="glassesColor"][data-value="#2b2433"]').click()
+        self.page.locator('[data-tab="features"]').click()
+        self.page.locator('[data-opt="tail"][data-value="mermaid"]').click()
+        self.page.locator('[data-tab="mobility"]').click()
+        self.page.locator('[data-opt="mobility"][data-value="wheelchair"]').click()
+        self.assertEqual(self.page.locator('#pp-view').count(), 1)
+        self.assertEqual(self.page.locator('#pp-side').count(), 1)
+        self.assertEqual(self.page.locator('#pp-back').count(), 1)
+        self.page.locator('#pp-done').click()
+        for k, v in [('facialHair', 'handlebar'), ('glasses', 'round'),
+                     ('glassesColor', '#2b2433'), ('tail', 'mermaid'),
+                     ('mobility', 'wheelchair')]:
+            self.assertEqual(self.page.evaluate('(k)=>window.castTest.player()[k]', k), v, k)
+        self.page.reload()
+        self.assertEqual(self.page.evaluate('window.castTest.player().mobility'), 'wheelchair')
+        self.assertEqual(self.page.evaluate('window.castTest.player().tail'), 'mermaid')
+        base = self.page.evaluate('window.mixPixels({})')
+        for option in ({'facialHair':'full-beard'}, {'glasses':'round'},
+                       {'glasses':'round','eyes':3}, {'tail':'mermaid'},
+                       {'mobility':'wheelchair'}, {'tail':'mermaid','mobility':'wheelchair'}):
+            self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', option), base, option)
 
     def test_10_standing_characters_are_cached_and_cheap(self):
         ms = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');c.canvas.width=1280;c.canvas.height=800;const d=window.castTest.drawPerson;
