@@ -12,8 +12,9 @@ When the desk computer (HMS) opens during play, the manor stays on screen.
   a key and hearts). The room you're looking at, or the one housekeeping is radioing about,
   glows gold, and the camera slides to it on small screens. The desk computer gets a soft ring.
 - **Nothing removed:** every HMS screen, lesson, game and button is unchanged. Only where the
-  window sits changed. From the title screen, and for every non-HMS window, the window stays
-  centered as before.
+  window sits changed. Every non-HMS window stays centered as before.
+- **From the title screen:** "Learn the HMS" walks into the manor first (your saved evening,
+  or a new one when there's none), then the drawer slides up.
 
 Code: `SPLIT v1` block after `HMS FRIENDLY v1` in `index.html`. Tests: `tests/test_split.py`
 (set `SPLIT_SHOTS=<folder>` to save screenshots).
