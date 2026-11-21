@@ -81,32 +81,60 @@ class Chats(base.Growth):
         thought = self.page.locator('.chat-thought').inner_text()
         self.assertIn('mayordomo' if language == 'es' else 'Butler thought', thought)
 
+    def test_05_replacement_jokes_have_clear_punchlines_and_preserve_the_story(self):
+        text = self.c()['text']
+        original = {'email','bells','toast','time','sunday','muffin',
+                    'inbox','blankets','circle','tuesday','photo','duchess'}
+        for lang in ('en','es'):
+            chats = text[lang]['list']
+            self.assertEqual(chats[0]['id'], 'blankets')
+            self.assertEqual(chats[-1]['id'], 'letter')
+            self.assertTrue(chats[-1].get('memory'))
+            for chat in chats:
+                if chat['id'] in original:
+                    self.assertTrue(chat.get('thought'), chat['id'])
+        english = {x['id']:x for x in text['en']['list']}
+        self.assertIn('Margaret needs to know', english['bells']['lines'][-1][1])
+        self.assertIn('DNA test', english['email']['lines'][-1][1])
+        self.assertIn('seven videos', english['inbox']['lines'][-1][1])
+
+        # The original memory-book mystery remains functional despite its new position.
+        story_index = len(text[self.lang]['list'])-1
+        self.page.evaluate("""index => localStorage.setItem('mapachez_chats_v1',
+            JSON.stringify({version:1,next:index,heard:[],bye:0}))""", story_index)
+        self.page.reload()
+        self.enter_manor()
+        self.page.evaluate('window.chatTest.listen()')
+        self.choose('Seguir escuchando' if self.lang == 'es' else 'Keep listening')
+        self.assertTrue(self.c()['fern'], 'Story clue should still unlock its memory')
+        self.assertIn('letter', self.c()['chats']['heard'])
+
     def test_02_hearing_a_chat_fades_the_bubble_and_sends_the_pair_off(self):
         self.enter_manor()
         self.assertIn('lobby-conversation', self.c()['extras'])
         self.page.evaluate('window.chatTest.listen()')
-        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'A letter sealed in gold')
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'The secret to a peaceful marriage')
         self.assertEqual(self.page.locator('.chat-lines li').count(), 3)
         self.choose('Keep listening')
         body = self.page.locator('#modal-body').inner_text()
-        self.assertIn('The same one, twice.', body)
-        self.assertIn('the same note', body)
-        self.assertTrue(self.c()['fern'], 'The letter chat still fills the Memory Book page')
+        self.assertIn('very comfortable sofa', body)
+        self.assertIn('Butler thought', body)
+        self.assertFalse(self.c()['fern'], 'Ordinary jokes should not mark the mystery heard')
         self.assertIn('listening-ear', self.c()['pins'])
         self.choose('Return to your evening')
         self.page.wait_for_function('window.chatTest.phase !== "here"')
         self.assertNotIn('lobby-conversation', self.c()['extras'], 'Nobody to listen to while the chairs are empty')
         toast = self.page.locator('#toast').inner_text()
         self.assertIn(f'Overheard: 1 of {len(self.c()["text"]["en"]["list"])}', toast)
-        self.assertIn('Zinnia Starling, getting up: “Sorry, I have a video meeting that really could have been an email.”', toast)
+        self.assertIn('Mrs. Calder, getting up: “Sorry, I have a video meeting that really could have been an email.”', toast)
         saved = json.loads(self.page.evaluate("localStorage.getItem('mapachez_chats_v1')"))
-        self.assertEqual((saved['next'], saved['heard'], saved['bye']), (1, ['letter'], 1))
+        self.assertEqual((saved['next'], saved['heard'], saved['bye']), (1, ['blankets'], 1))
         self.page.wait_for_function('document.getElementById("lobby-chatter").hidden')
         # A new pair settles in after the chairs have been empty a while.
         self.page.evaluate('window.chatTest.skip(40000)')
         self.page.wait_for_function('window.chatTest.phase === "here"', timeout=8000)
         self.page.evaluate('window.chatTest.listen()')
-        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Could have been an email')
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), "We're like a family")
 
     def test_03_every_pair_takes_a_turn_and_earns_all_ears(self):
         self.enter_manor()
@@ -142,9 +170,9 @@ class ChatsSpanish(Chats):
     def test_02_hearing_a_chat_fades_the_bubble_and_sends_the_pair_off(self):
         self.enter_manor()
         self.page.evaluate('window.chatTest.listen()')
-        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Una carta con sello dorado')
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'El secreto de un matrimonio feliz')
         self.choose('Seguir escuchando')
-        self.assertIn('La misma, dos veces.', self.page.locator('#modal-body').inner_text())
+        self.assertIn('sofá muy cómodo', self.page.locator('#modal-body').inner_text())
         self.choose('Volver a tu noche')
         self.page.wait_for_function('window.chatTest.phase !== "here"')
         self.assertIn(f'Escuchadas: 1 de {len(self.c()["text"]["es"]["list"])}', self.page.locator('#toast').inner_text())
