@@ -386,7 +386,7 @@ body.large-text .fun-night p,body.large-text .fun-remember,body.large-text .fun-
       <p class="chapter-label">CHAPTER ONE</p>
       <h2>The Midnight Rehearsal</h2>
       <p class="title-copy">A quiet hotel. Three unfinished stories.<br>Some nights are worth staying up for.</p>
-      <div class="title-actions"><button id="begin" class="primary-button">Begin your night <svg><use href="#arrow"/></svg></button><button id="title-quick" class="glass-button" aria-keyshortcuts="Q">✨ Quick shift · 3 min</button><button id="continue" class="glass-button" hidden>Continue your evening</button><button id="explore-festival" class="glass-button">Explore the festival <svg><use href="#arrow"/></svg></button><button id="title-training" class="glass-button">Training desk</button><button id="title-memories" class="glass-button" aria-keyshortcuts="M">Memory Book</button></div>
+      <div class="title-actions"><button id="begin" class="primary-button">Begin your night <svg><use href="#arrow"/></svg></button><button id="title-who" class="glass-button" type="button" aria-haspopup="dialog">🎨 Character Creator</button><button id="title-quick" class="glass-button" aria-keyshortcuts="Q">✨ Quick shift · 3 min</button><button id="continue" class="glass-button" hidden>Continue your evening</button><button id="explore-festival" class="glass-button">Explore the festival <svg><use href="#arrow"/></svg></button><button id="title-training" class="glass-button">Training desk</button><button id="title-memories" class="glass-button" aria-keyshortcuts="M">Memory Book</button></div>
       <p class="title-foot">Explore. Listen. Leave things a little better.</p>
     </div>
     <div class="title-bottom"><span>ONE STORY SHIFT · PLAY AT YOUR PACE</span><span>Original world &amp; characters · Silver Key Games</span></div>
@@ -1134,11 +1134,14 @@ function castMake(choices={}){const r={...castLook('maker'),...choices,seed:1};r
 /* PIXEL CHIBI v3: every being is painted on a small 32 x 44 pixel grid from its recipe, the way a pixel
    artist would: big head, big glossy eyes, chunky hair, coloured outlines and light from the top left.
    Each grid is made once (per direction, step and blink), kept in memory and scaled up crisply. */
+/* STORYBOOK v1: The existing cast keeps its recipe, directions, saves and secret identities.
+   Simplify facial markings instead of replacing the entire renderer or adding image downloads. */
+const CAST_STORYBOOK=true;
 const PX_W=32,PX_H=44,PX_FEET=40,PX_U=1.12,PX_RGB=new Map();
 function pxRGB(h){let v=PX_RGB.get(h);if(!v){const n=parseInt(h.slice(1,7),16);v=[n>>16,n>>8&255,n&255];PX_RGB.set(h,v);}return v;}
 function pxPaint(r,dir,blink,frame,mood=''){
   const W=PX_W,H=PX_H,col=new Array(W*H).fill(null),mat=new Array(W*H).fill(null),shade=new Set(),cast=new Set();
-  const k=r.kind,back=dir==='up',fx=dir==='right'||dir==='left'?1:0,ex=[r.extra,r.extra2],seed=r.seed||0,bit=n=>Math.floor(seed*3.17+n*5.3)%3===0;
+  const k=r.kind,back=dir==='up',fx=dir==='right'||dir==='left'?1:0,ex=[r.extra,r.extra2],seed=r.seed||0,bit=n=>Math.floor(seed*3.17+n*5.3)%3===0,mix=!!r.mix;
   const T=castTone,K='#2b2433',gold='#e0b85a',white='#fffaf0',cream='#f6eedb';
   const P=(x,y,c,m=c,on)=>{x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=W||y>=H)return;const i=y*W+x;if(on&&mat[i]!==on)return;col[i]=c;mat[i]=m;};
   const R=(x,y,w,h,c,m,on)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)P(x+i,y+j,c,m,on);};
@@ -1153,6 +1156,18 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const bigEye=(x,y)=>{if(blink){R(x,y+3,6,1,K);return;}S(['.KKKK.','KSSSSK','KSWDDK','KSDKIK','KSIKIK','KSLIWK','.KKKK.'],x,y,{K,S:white,W:white,D:T(iris,-.35),I:iris,L:T(iris,.4)});};
   const tinyEye=(x,y)=>{if(blink){R(x,y+2,3,1,K);return;}S(['KKK','DWD','ILI'],x,y,{K,D:T(iris,-.35),I:iris,L:T(iris,.4),W:white});};
   const face=(hy,eyes=2,mouth=bit(4)?1:0,blushCol='#f78aa6')=>{const o=fx;
+    /* Small, readable faces: 2-3 pixel eyes and a tiny mouth. Keep rare eye counts. */
+    if(CAST_STORYBOOK){
+      if(eyes===1){R(14+o,hy,4,3,K);if(!blink)P(15+o,hy,white);}
+      else if(eyes===3){for(const [x,y] of [[10,hy+1],[16,hy-2],[22,hy+1]]){R(x+o,y,2,blink?1:2,K);if(!blink)P(x+o,y,white);}}
+      else{for(const x of [11,20]){R(x+o,hy,2,blink?1:3,K);if(!blink)P(x+o,hy,white);}}
+      R(15+o,hy+6,3,1,'#70444b');
+      if(r.fangs){P(15+o,hy+7,white);P(18+o,hy+7,white);}
+      if(r.tooth)P(17+o,hy+7,white);
+      for(const bx of [8,24])P(bx+o,hy+5,T(skin,.16));
+      if(r.specs){for(const sx of [9,18]){R(sx+o,hy-1,6,1,gold);R(sx+o,hy+4,6,1,gold);P(sx+o,hy,gold);P(sx+5+o,hy,gold);}P(17+o,hy+1,gold);}
+      return;
+    }
     if(eyes===1)bigEye(13+o,hy-3);else if(eyes===3){tinyEye(11+o,hy);tinyEye(19+o,hy);tinyEye(15+o,hy-4);}else{eye(10+o,hy-2,iris,!r.specs);eye(18+o,hy-2,iris,!r.specs);}
     const my=hy+5,mc='#6a3038',ms=Math.floor(seed*7)%3;
     if(ms===0){P(14+o,my,mc);P(15+o,my+1,mc);P(16+o,my,mc);P(17+o,my+1,mc);P(18+o,my,mc);}
@@ -1167,7 +1182,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const legs=(legCol,shoe,hoof)=>{const l=frame===1?-1:0,rr=frame===3?-1:0;
     R(13,33,3,5+l,legCol);R(17,33,3,5+rr,legCol);shade.add(legCol);
     R(12,37+l,4,2,shoe);R(17,37+rr,4,2,shoe);P(12,37+l,T(shoe,.35));P(17,37+rr,T(shoe,.35));if(hoof){P(14,38+l,K);P(19,38+rr,K);}};
-  const torso=(base=coat,armCol=coat,hand=skin)=>{R(11,23,11,10,base);R(12,22,9,1,base);R(8,24,3,7,armCol);R(22,24,3,7,armCol);P(9,23,armCol);P(23,23,armCol);
+  const torso=(base=coat,armCol=coat,hand=skin)=>{R(11,23,11,10,base);R(12,22,9,1,base);
+    if(mix){if(r.body==='blob')R(9,27,15,6,base);if(r.body==='tall')R(13,21,7,3,base);if(r.body==='wiggly')R(12,31,9,5,base);}R(8,24,3,7,armCol);R(22,24,3,7,armCol);P(9,23,armCol);P(23,23,armCol);
     R(8,30,3,1,cream);R(22,30,3,1,cream);R(8,31,3,2,hand);R(22,31,3,2,hand);shade.add(base);shade.add(armCol);};
   const outfit=(neck=22)=>{const o=r.outfit;
     if(!back){if(o==='vest'||o==='cardigan'||o==='hat'){R(15,neck,3,4,cream,cream);R(16,neck+4,1,1,cream,cream);P(14,neck,white,white);P(18,neck,white,white);P(13,neck+1,coatDk);P(14,neck+2,coatDk);P(19,neck+1,coatDk);P(18,neck+2,coatDk);
@@ -1181,18 +1197,37 @@ function pxPaint(r,dir,blink,frame,mood=''){
     R(11,32,11,1,gold,gold);
   };
   const hat=(top)=>{R(11,top-6,11,6,coat);R(9,top,15,1,coatDk);R(11,top-2,11,1,gold);P(19,top-2,'#f4c2d4');P(12,top-5,T(coat,.35));};
-  const hairDo=(hy)=>{const hd=r.hairdo;
+  const hairDo=(hy)=>{const hd=r.hairdo;if(hd==='bald')return;
     if(back){E(16.5,hy,10.6,9.6,hair);if(hd==='long')R(6,hy,21,14,hair);if(hd==='bun')E(16.5,hy-10,3.6,3.2,hair);return;}
     E(16.5,hy-1.5,10.6,8.6,hair);E(16.5,hy+1.5,8.6,6.6,skin,skin);
     const drop=[1,2,1,0,1,2,2,1,0,1,2,1,0,1,2,1,1];for(let x=8;x<=24;x++)R(x,hy-6,1,3+drop[x-8],hair);
     if(hd==='long'){for(const x of [6,7,25,26])R(x,hy-2,1,(x===6||x===26)?14:13,hair);}else{R(6,hy-2,2,7,hair);R(25,hy-2,2,7,hair);}
-    if(hd==='curly')for(const [x,y] of [[8,-6],[12,-9],[16.5,-10],[21,-9],[25,-6],[6,0],[27,0],[6,5],[27,5]])E(x,hy+y,2.8,2.8,hair);
+    if(hd==='curly')for(const [x,y] of [[8,-6],[12,-9],[16.5,-10],[21,-9],[25,-6],[6,0],[27,0],[6,5],[27,5]])E(x,hy+y,r.hairPattern?.[0]==='4'?2:2.8,2.8,hair);
+    if(mix&&r.hairPattern){const t=r.hairPattern[0],h=r.hairPattern[1];
+      if(t==='1')for(let x=9;x<=24;x+=h==='a'?6:h==='b'?4:3)P(x,hy-6,hairLt,hair);
+      if(t==='2')for(let x=8;x<=25;x+=h==='c'?3:h==='b'?4:5)for(let yy=hy-7;yy<=hy+1;yy+=3)P(x+(yy%2),yy,hairLt,hair);
+      if(t==='3'||t==='4')for(let x=7;x<=26;x+=t==='4'?2:3)for(let yy=hy-8;yy<=hy+4;yy+=t==='4'?3:4)P(x+(yy%2),yy,h==='c'?hairDk:hairLt,hair);
+    }
     if(hd==='bun'){E(16.5,hy-10,3.6,3.2,hair);R(14,hy-7,6,1,coat);}
     for(const [x,y] of [[11,-7],[12,-8],[13,-8],[14,-8],[20,-8],[21,-7],[9,-4],[10,-5],[22,-5],[7,1],[7,2],[26,2]])P(x,hy+y,hairLt,hair);
   };
   const longBack=(hy)=>{if(r.hairdo==='long'&&!back){R(7,hy,19,12,hair);for(let x=7;x<26;x+=2)P(x,hy+12,hair);}};
   const ears=(hy,pointy)=>{if(pointy){for(const [x,y] of [[6,hy],[5,hy],[4,hy-1],[3,hy-2],[5,hy+1],[6,hy+1],[6,hy+2]])mirror([[x,y]],skin,skin);mirror([[5,hy]],T(skin,-.15),skin);}
     else mirror([[6,hy+1],[6,hy+2]],skin,skin);};
+  /* Modular tails and wings, behind the body, independent of its appearance. */
+  if(mix){
+    const tail=r.tail||'none',wing=r.wings||'none',c=r.skin||'#c7a78d';
+    if(tail!=='none'&&!back)for(let i=0;i<6;i++){
+      const x=25+Math.round(3*Math.sin(i*.4)),y=34-i*2,
+        tc=tail==='raccoon'&&i%2?'#4d4559':tail==='fox'?'#d18c58':tail==='feather'?'#c8accd':c;
+      E(x,y,tail==='fox'?3.3:2.1,tail==='feather'?3.3:2.2,tc,'tail');
+    }
+    if(wing!=='none')for(const side of [-1,1]){
+      const x=16.5+side*12;
+      E(x,25,wing==='butterfly'?4.8:3.8,wing==='bat'?5.5:7,wing==='bat'?'#85617b':wing==='butterfly'?'#d0b2ef':'#e8e7ed','wing');
+      if(wing==='butterfly')E(x+side,32,3,3.6,'#eabbdc','wing');
+    }
+  }
   /* Painting by kind. */
   if(k==='raccoon'){
     /* Raccoons are the stars. Four face styles (button, plush, fluffy, classic) and any fur colour;
@@ -1230,6 +1265,13 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(st!=='plush'){R(9+o,11,4,1,crm,crm);R(20+o,11,4,1,crm,crm);}
       /* Eyes. */
       for(const ex of st==='plush'?[10,19]:[9,20]){
+        if(CAST_STORYBOOK){
+          const sx=ex+(plush?-1:0)+o;
+          if(happy){R(sx+1,17,3,1,crm);P(sx,16,crm);P(sx+4,16,crm);}
+          else if(blink)R(sx,17,4,1,crm);
+          else{R(sx,15,4,3,ink);P(sx+1,15,white);}
+          continue;
+        }
         if(happy){for(const [dx,dy] of [[0,17],[1,16],[2,15],[3,15],[4,16],[5,17]])P(ex+dx-(plush?1:0)+o,dy,'#fff4fa');continue;}
         if(blink){P(ex+o,17,'#d8d0e0');R(ex+1+o,16,plush?2:3,1,'#d8d0e0');P(ex+(plush?3:4)+o,17,'#d8d0e0');continue;}
         /* Plush eyes: big glossy drops with a warm iris, a big top-left shine and a tiny bottom sparkle. */
@@ -1261,7 +1303,10 @@ function pxPaint(r,dir,blink,frame,mood=''){
     R(7,6,19,16,m);for(const [x,y] of [[7,6],[25,6],[7,21],[25,21]])P(x,y,null);col[6*W+7]=col[6*W+25]=col[21*W+7]=col[21*W+25]=null;mat[6*W+7]=mat[6*W+25]=mat[21*W+7]=mat[21*W+25]=null;
     R(5,11,2,5,brass);R(26,11,2,5,brass);
     if(!back){const o=fx;R(9+o,9,15,10,'#2b2a36','scr');
-      if(blink){R(11+o,13,3,1,'#ffd98a');R(19+o,13,3,1,'#ffd98a');}else{for(const x of [11,19]){R(x+o,12,3,3,'#ffd98a');P(x+o,12,white);P(x+2+o,14,'#e0a040');}}
+      if(mix){const xs=r.eyes===1?[15]:r.eyes===3?[10,16,22]:[11,20];
+        for(const x of xs){const y=xs.length===3&&x===16?11:13;R(x+o,y,3,blink?1:2,'#ffe3a1');if(!blink)P(x+o,y,white);}R(15+o,17,3,1,'#ffe3a1');
+      }else if(CAST_STORYBOOK){for(const x of [11,20]){R(x+o,13,3,blink?1:2,'#ffe3a1');if(!blink)P(x+o,13,white);}R(15+o,17,3,1,'#ffe3a1');}
+      else if(blink){R(11+o,13,3,1,'#ffd98a');R(19+o,13,3,1,'#ffd98a');}else{for(const x of [11,19]){R(x+o,12,3,3,'#ffd98a');P(x+o,12,white);P(x+2+o,14,'#e0a040');}}
       P(14+o,16,'#ffd98a');R(15+o,17,3,1,'#ffd98a');P(18+o,16,'#ffd98a');R(10+o,16,2,1,'#ff8fb0');R(21+o,16,2,1,'#ff8fb0');R(10+o,10,3,1,'#4a4858');R(7,19,1,1,'#ff9aa8');}
     if(r.outfit==='hat')hat(5);
   }
@@ -1294,7 +1339,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(type==='wraps'){for(const y of [hy-6,hy-3,hy+4,hy+7])for(let x=8;x<=25;x++)if((x+y)%5)P(x,y,'#ddd2ba',headCol);P(24,hy-4,'#ddd2ba');P(25,hy-3,'#ddd2ba');}
       if(type==='squid')for(const x of [8,12,16.5,21,25]){for(let j=0;j<4;j++)P(x+(j%2?.5:0),hy-8-j,skin,skin);}
       if(type==='wraps'){R(9,hy-1,15,4,'#3a3040','band');for(const x of [11,18]){if(blink)R(x+o,hy+1,4,1,'#ffd36a');else{R(x+o,hy-1,4,4,'#ffd36a');P(x+o,hy-1,white);P(x+3+o,hy+2,'#e0a040');}}R(15+o,hy+5,3,1,'#6a3038');R(8+o,hy+4,2,1,'#e8c0a0');R(23+o,hy+4,2,1,'#e8c0a0');}
-      else face(hy+1,type==='human'||fae||type==='wolf'?2:r.eyes);
+      else face(hy+1,mix?r.eyes:(type==='human'||fae||type==='wolf'?2:r.eyes));
       if(fae&&bit(7))for(const x of [10,12,21,23])P(x+o,hy+5,T(skin,-.3));}
     if(r.cape){mirror([[8,20],[8,21],[9,21],[8,22],[9,22],[10,22]],r.cape,r.cape);if(!back)mirror([[9,22]],'#a8344a',r.cape);}
     /* Head extras. */
@@ -1306,6 +1351,119 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(ex.includes('leaves')&&!back){for(const x of [9,11,13,20,22,24])P(x,top+2+(x%3===0?0:1),x%2?'#6f9f5c':'#8fbf74','lf');E(16.5,top+1.5,1.6,1.6,'#f7c9d8','fl');P(16,top+1,'#f2d36a','fl');}
     if(type==='ant'||ex.includes('antennae')&&!fae){const one=r.eyes===1;for(const s of one?[0]:[1,-1]){const bx=s?16+s*4:16;for(let j=0;j<4;j++)P(s?bx+s*(j>>1):16,top-j,T(skin,-.3));const tx=s?bx+s*2:16;E(tx+.5,top-5,1.6,1.6,'#f5d76a','bulb');P(tx,top-6,white,'bulb');}}
     if(r.outfit==='hat')hat(top+2);
+  }
+  /* Modular head additions, coverings and textures. Existing cast recipes are unchanged. */
+  if(mix){
+    const color=r.skin||'#d39b74',surf=r.surface||'skin',texture=r.texture||'smooth';
+    if(surf!=='skin'&&surf!=='ghostly')for(let y=8;y<34;y++)for(let x=5;x<28;x++){
+      const i=y*W+x;if(mat[i]!==color)continue;
+      if(surf==='scales'&&((x+y)%5===0||texture==='plated'&&x%4===0))P(x,y,T(color,-.2),color);
+      else if(surf==='feathers'&&(x+y)%4===0)P(x,y,T(color,.28),color);
+      else if(surf==='fur'&&(x*3+y)%7===0)P(x,y,T(color,texture==='curly'?-.2:.25),color);
+      else if(surf==='metal'&&(x+y)%10===0)P(x,y,'#f3e8bc',color);
+    }
+    if(surf==='fur'&&(texture==='fluffy'||texture==='shaggy'))for(const [x,y] of [[6,13],[5,17],[6,21],[26,13],[27,17],[26,21]])P(x,y,color,color);
+    if(r.markings==='freckles')for(const x of [10,12,21,23])P(x,21,T(color,-.35),'mark');
+    if(r.markings==='spots')for(const [x,y] of [[8,13],[25,13],[9,23],[24,23]])E(x,y,1.5,1.5,T(color,-.34),'mark');
+    if(r.markings==='stripes')for(const x of [8,10,22,24])R(x,18,1,4,T(color,-.35),'mark');
+    if(r.markings==='mask'){E(12,17,5,3.5,T(color,-.55),'mark');E(21,17,5,3.5,T(color,-.55),'mark');}
+    if(r.expression==='happy'){R(15,22,3,1,'#874953','mouth');P(16,23,'#874953','mouth');}
+    if(r.expression==='surprised'){R(16,21,2,3,'#874953','mouth');}
+    if(r.expression==='skeptical'){R(10,12,5,1,'#4c3845','brow');}
+    const ears=r.ears||'human';
+    if(ears!=='human')for(const side of [-1,1]){const x=side<0?7:25;
+      if(ears==='rabbit'){E(x,5,2.7,6.3,color,'ear');R(x,3,1,5,'#e5a5a8','ear');}
+      if(ears==='cat'||ears==='pointed'){E(x,8,3,5,color,'ear');P(x,7,'#e5a5a8','ear');}
+      if(ears==='round')E(x,12,3.5,3.5,color,'ear');
+      if(ears==='floppy')E(x+side*2,15,3,6,color,'ear');
+    }
+    if(r.horns&&r.horns!=='none')for(const side of [-1,1]){const x=side<0?12:21;for(let j=0;j<5;j++)P(x+side*(j>>1),7-j,r.horns==='curled'?'#cba75d':'#eee0ba','horn');}
+    if(r.antlers&&r.antlers!=='none')for(const side of [-1,1]){const x=side<0?9:23;
+      for(let j=0;j<7;j++)P(x+side*(j>>1),8-j,'#a17c50','antler');
+      for(let j=0;j<3;j++)P(x+side*(2+j),4-j,'#a17c50','antler');
+    }
+    if(r.antennae&&r.antennae!=='none')for(const x of [13,20]){for(let j=0;j<5;j++)P(x,7-j,'#536b64','antenna');E(x,2,1.6,1.6,'#eacb76','antenna');}
+    const cover=r.headwear||'none',hc=r.headwearColor||'#77536f';
+    if(cover==='hijab'||cover==='scarf'){
+      E(16.5,11,11,9,hc,'wrap');if(!back)E(16.5,16,8,6,color,color);
+      R(6,19,4,13,hc,'wrap');R(23,19,4,13,hc,'wrap');
+    }else if(cover==='turban'||cover==='wrap'){E(16.5,8,11,6,hc,'wrap');R(8,8,18,3,T(hc,-.2),'wrap');}
+    else if(cover==='kufi'){R(9,5,16,8,hc,'wrap');}
+    else if(cover==='bandana'){R(7,9,20,4,hc,'wrap');}
+  }
+  /* Creator-only facial hair, one round spectacle design, mermaid tail, and
+     one classic wheelchair. The pinned story cast is unaffected. */
+  if(mix){
+    const furColor=r.facialHairColor||r.hair||'#60473b';
+    const facial=r.facialHair||'none';
+    if(!back){
+      if(facial==='stubble'){
+        for(const x of [10,12,14,18,21,23])for(const y of [23,25])
+          if((x+y)%3!==0)P(x,y,T(furColor,.16),'facial');
+      }
+      if(['mustache','handlebar','goatee','short-beard','full-beard','long-beard','mutton'].includes(facial)){
+        R(12,22,3,2,furColor,'facial');R(18,22,3,2,furColor,'facial');
+        P(15,23,furColor,'facial');P(17,23,furColor,'facial');
+        if(facial==='handlebar'){
+          P(10,21,furColor,'facial');P(11,22,furColor,'facial');
+          P(22,21,furColor,'facial');P(21,22,furColor,'facial');
+        }
+      }
+      if(['goatee','short-beard','full-beard','long-beard','mutton'].includes(facial)){
+        const row=facial==='goatee'?5:facial==='short-beard'?7:facial==='long-beard'?11:9;
+        for(let y=24;y<24+row;y++)for(let x=9;x<=23;x++){
+          const boundary=(facial==='goatee'?Math.abs(x-16)<=3:Math.abs(x-16)<=Math.min(7,Math.max(3,(33-y))));
+          if(boundary&&(y>25||x<12||x>20))P(x,y,furColor,'facial');
+        }
+      }
+      if(['sideburns','mutton'].includes(facial))for(const x of [8,23])R(x,20,2,7,furColor,'facial');
+      if(facial==='whiskers')for(const x of [5,8,24,27])P(x,23+(x%2),furColor,'facial');
+
+      if(r.glasses==='round'){
+        const frameColor=r.glassesColor||'#c9a45c';
+        const n=r.eyes===1?1:r.eyes===3?3:2;
+        const lens=n===1?[[14,16]]:n===3?[[9,17],[15,13],[21,17]]:[[9,16],[19,16]];
+        for(const [x,y] of lens){
+          R(x,y,5,1,frameColor,'glasses');R(x,y+5,5,1,frameColor,'glasses');
+          R(x,y+1,1,4,frameColor,'glasses');R(x+4,y+1,1,4,frameColor,'glasses');
+        }
+        if(n===2)R(14,18,5,1,frameColor,'glasses');
+        if(n===1){R(19,19,4,1,frameColor,'glasses');R(5,19,9,1,frameColor,'glasses');}
+        if(n===3){P(14,18,frameColor,'glasses');P(20,18,frameColor,'glasses');}
+      }
+    }
+    const mermaid=r.tail==='mermaid',chair=r.mobility==='wheelchair';
+    if(chair){
+      const seat=r.chairColor||'#7a394a',edge='#c9a45c',tire='#292833',rim='#e6c58a';
+      /* One recognizable classic manual wheelchair, independently selectable. */
+      if(dir==='left'||dir==='right'){
+        R(8,24,2,11,edge,'chair');R(9,29,16,4,seat,'chair');
+        R(11,27,13,1,edge,'chair');R(24,32,2,6,edge,'chair');
+        E(10,35,6.5,6.5,tire,'wheel');E(10,35,4.6,4.6,rim,'wheel');
+        E(10,35,3.6,3.6,tire,'wheel');E(10,35,1.4,1.4,edge,'wheel');
+        for(let q=0;q<4;q++){const a=(q+frame%4)*Math.PI/2;P(10+Math.round(Math.cos(a)*3),35+Math.round(Math.sin(a)*3),rim,'wheel');}
+        E(26,39,2.4,2.4,tire,'wheel');E(26,39,1,1,edge,'wheel');
+      }else{
+        R(8,26,2,12,edge,'chair');R(24,26,2,12,edge,'chair');
+        R(9,29,16,5,seat,'chair');R(10,34,14,1,edge,'chair');
+        if(back)R(9,23,16,10,seat,'chair');
+        for(const x of [5,28]){E(x,35,3.6,6,tire,'wheel');R(x-1,31,2,8,rim,'wheel');}
+        R(11,39,12,2,edge,'chair');
+      }
+      if(!back)for(const x of [8,24])E(x,26,1.5,1.5,edge,'armrest');
+    }
+    if(mermaid){
+      const fin=r.tailColor||'#73b7ae',dark=T(fin,-.28),light=T(fin,.32);
+      /* The fins cover the walking legs; wheelchair users have a short tail
+         support that stays within the same collision footprint. */
+      E(17,33,chair?5.2:5.7,5.7,fin,'fin');R(13,32,8,2,light,'fin');
+      for(const x of [13,16,19])P(x,35+(x%2),dark,'fin');
+      if(!back){
+        E(13,39,3.6,3.3,fin,'fin');E(22,39,3.6,3.3,fin,'fin');
+        for(const x of [12,16,20,23])P(x,40,light,'fin');
+      }else{E(17,40,7,2.5,fin,'fin');}
+      if(chair)R(13,41,11,1,'#c9a45c','support');
+    }
   }
   /* Light from the top left, a shadow under the hair, then a soft coloured outline. */
   const out=col.slice(),glow=ex.includes('glow');
@@ -1383,8 +1541,16 @@ function savePlayerChoice(v){playerChoice=v;try{localStorage.setItem(PLAYER_KEY,
 function playerSkins(kind){return kind==='human'?[...CAST_FUNSKIN.slice(0,6),...CAST_SKIN]:kind==='fae'?[...CAST_FAE,...CAST_FUNSKIN.slice(6)]:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
 function playerRaccoon(coat,fur){const b=castLook('player',{color:coat});if(!fur)return b;const k=coat+fur;if(playerRaccoon.k!==k){playerRaccoon.k=k;playerRaccoon.r={...b,fur};}return playerRaccoon.r;}
 function playerRecipe(coat){
-  const v=playerChoice;if(!v||v.kind==='raccoon')return playerRaccoon(coat,v&&v.fur);
-  const k=JSON.stringify(v)+coat;if(playerRecipe.k!==k){playerRecipe.k=k;playerRecipe.r=castMake({...v,color:coat,outfit:'vest',extra2:''});}return playerRecipe.r;
+  const v=playerChoice;if(!v||!v.mix&&v.kind==='raccoon')return playerRaccoon(coat,v&&v.fur);
+  const key=JSON.stringify(v)+coat;
+  if(playerRecipe.k!==key){
+    playerRecipe.k=key;
+    const mix=!!v.mix;
+    playerRecipe.r=castMake({...v,kind:mix?(v.surface==='metal'?'construct':'human'):v.kind,
+      ghost:mix&&v.surface==='ghostly'?1:v.ghost||0,
+      color:coat,outfit:'vest',extra:mix?'':v.extra,extra2:''});
+  }
+  return playerRecipe.r;
 }
 /* Pronouns are optional and stay on this device (never in score codes or team reports).
    Pick several, type your own, or skip: skipping means "they" in English and no gendered words in Spanish. */
@@ -1401,39 +1567,207 @@ function deloresWelcome(){
   if(profile.lang==='es')return 'Delores, al conserje de noche: “Cuida de '+p.es+'. Lleva el abrigo impecable.”';
   return 'Delores, to the night porter: “Look after '+p.en[1]+'. '+cap(p.en[2])+' coat is very well pressed.”';
 }
-function randomPlayer(kind){
-  const pick=a=>a[Math.floor(Math.random()*a.length)],k=kind||pick(PLAYER_KINDS)[0];
-  return {kind:k,body:pick(['round','tall','blob','wiggly']),eyes:pick([1,2,3]),extra:PLAYER_EXTRAS[k]?pick(PLAYER_EXTRAS[k]):'',hairdo:pick(CAST_OPTIONS.hairdo),skin:pick(playerSkins(k)),hair:pick(CAST_OPTIONS.hair)};
+/* CHARACTER CREATOR MIX v1: Every feature is optional and independent.
+   "Species" is not a player-facing category; existing character saves remain readable. */
+const MIX_SKINS=[...CAST_SKIN,'#f6c8ac','#cce7db','#d2c5f2','#b7dce5','#aad1a0','#eee2d3','#c0bec3'];
+const MIX_HAIR_TYPES=['1a','1b','1c','2a','2b','2c','3a','3b','3c','4a','4b','4c'];
+const MIX_COVERS=['none','hijab','scarf','wrap','turban','kufi','bandana'];
+const MIX_SURFACES={skin:['smooth','freckles'],fur:['short','fluffy','curly','shaggy'],feathers:['soft','layered'],scales:['fine','plated'],metal:['polished','brushed'],ghostly:['soft']};
+function mixDefault(previous){
+  if(previous&&previous.mix)return {...previous};
+  const old=previous||{};
+  return {mix:true,kind:'human',body:'round',eyes:2,skin:old.skin||'#ecc09f',
+    hair:old.hair||'#6b4a32',hairdo:old.kind==='raccoon'?'bald':old.hairdo||'long',
+    hairPattern:'2b',headwear:'none',headwearColor:'#77536f',
+    surface:old.kind==='raccoon'?'fur':'skin',texture:old.kind==='raccoon'?'fluffy':'smooth',
+    ears:old.kind==='raccoon'?'round':'human',horns:'none',antlers:'none',antennae:'none',
+    wings:'none',tail:old.kind==='raccoon'?'raccoon':'none',markings:'none',
+    facialHair:'none',facialHairColor:old.hair||'#6b4a32',glasses:'none',glassesColor:'#c9a45c',
+    mobility:'none',chairColor:'#7a394a',tailColor:'#73b7ae',
+    pronouns:old.pronouns||[],own:old.own||''};
+}
+function mixRecipe(v,coat){
+  return castMake({...v,kind:v.surface==='metal'?'construct':'human',
+    ghost:v.surface==='ghostly'?1:0,extra:'',extra2:'',color:coat,outfit:'vest'});
+}
+function randomPlayer(){
+  const pick=a=>a[Math.floor(Math.random()*a.length)],r=mixDefault();
+  r.body=pick(['round','tall','blob','wiggly']);r.eyes=pick([1,2,3]);
+  r.surface=pick(Object.keys(MIX_SURFACES));r.texture=pick(MIX_SURFACES[r.surface]);
+  r.ears=pick(['human','cat','rabbit','pointed','floppy','round']);
+  r.horns=pick(['none','none','short','curled']);
+  r.antlers=pick(['none','none','branch','fork']);
+  r.antennae=pick(['none','none','orbs']);
+  r.wings=pick(['none','none','feather','butterfly','bat']);
+  r.tail=pick(['none','none','raccoon','fox','cat','lizard','feather']);
+  r.hairPattern=pick(MIX_HAIR_TYPES);
+  r.hairdo=r.hairPattern[0]>='3'?'curly':'long';
+  r.headwear=pick(['none','none','none','hijab','scarf','wrap','turban']);
+  r.skin=pick(MIX_SKINS);r.hair=pick([...CAST_HAIR,...CAST_BRIGHT]);
+  r.facialHair=pick(['none','none','none','short-beard','mustache','goatee','stubble','handlebar']);r.facialHairColor=r.hair;
+  r.glasses=pick(['none','none','none','round']);r.glassesColor=pick(['#c9a45c','#2b2433','#c2c7cc']);
+  r.mobility=pick(['none','none','none','wheelchair']);r.chairColor=pick(['#7a394a','#245143','#243d65','#e6d1b0']);
+  if(Math.random()<.15)r.tail='mermaid';r.tailColor=pick(['#73b7ae','#9a8ecb','#df9fa9','#80a4d2']);
+  return r;
+}
+/* Small code-drawn pixel thumbnails for the creator, no image downloads. */
+function mixThumbnail(canvas){
+  const [field,value]=canvas.dataset.icon.split(':'),c=canvas.getContext('2d');
+  const P=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+  const ink='#4b3546',gold='#c89e60',rose='#c88891',fur='#b18a68',blue='#a5cada';
+  c.clearRect(0,0,24,24);c.imageSmoothingEnabled=false;
+  if(field==='eyes'){
+    const xs=value==='1'?[11]:value==='3'?[5,11,17]:[7,15];
+    for(const x of xs){P(x,11,3,4,ink);P(x,11,1,1,'#ffffff');}
+  }else if(field==='ears'){
+    P(8,10,9,9,fur);
+    if(value==='rabbit')for(const x of [7,17]){P(x,2,3,11,fur);P(x+1,4,1,6,rose);}
+    else if(value==='cat'||value==='pointed')for(const x of [6,17]){P(x,6,4,7,fur);P(x+1,7,1,3,rose);}
+    else if(value==='floppy')for(const x of [2,19])P(x,11,4,10,fur);
+    else if(value==='round')for(const x of [5,18])P(x,8,4,5,fur);
+  }else if(field==='horns'||field==='antlers'||field==='antennae'){
+    P(8,14,9,6,fur);
+    for(const x of [8,18]){
+      if(field==='antennae'){P(x,5,1,11,ink);P(x-1,3,3,3,gold);}
+      else if(field==='antlers'){P(x,4,2,12,fur);P(x+(x<12?-3:3),7,4,2,fur);P(x+(x<12?-2:2),5,2,4,fur);}
+      else{P(x,8,4,8,ink);P(x+(x<12?-1:1),5,3,5,gold);}
+    }
+  }else if(field==='wings'){
+    P(11,11,3,11,ink);
+    if(value!=='none')for(const x of [3,15]){P(x,5,6,12,value==='bat'?ink:value==='butterfly'?'#d6ade9':blue);P(x+1,8,4,3,'#ffffff');}
+  }else if(field==='tail'){
+    if(value==='mermaid'){
+      P(9,3,6,12,'#73b7ae');P(7,15,10,4,'#73b7ae');
+      P(3,18,8,5,'#87cfc4');P(13,18,8,5,'#87cfc4');
+    }else if(value!=='none')for(let i=0;i<5;i++){let col=value==='raccoon'&&i%2?ink:value==='fox'?'#cf885d':value==='feather'?'#d4a8c4':fur;
+      P(3+i*3,16-Math.floor(i/2)*2,4,5,col);}
+  }else if(field==='hairPattern'||field==='hairdo'||field==='headwear'){
+    P(7,11,11,10,'#ebc2a1');
+    const cover=field==='headwear'&&value!=='none',col=cover?'#77536f':ink;
+    P(5,6,15,7,col);if(cover){P(5,13,3,10,col);P(17,13,3,10,col);}
+    else if(value==='bald')P(5,6,15,7,'#ebc2a1');
+    else if(value[0]==='3'||value[0]==='4')for(const x of [4,7,10,13,16,19])P(x,6+x%2,3,4,col);
+    else if(value[0]==='2')for(const x of [5,10,15])P(x,5+x%3,4,3,col);
+  }else if(field==='facialHair'){
+    P(5,8,14,12,'#edc7a6');const f=value==='none'?'#edc7a6':ink;
+    if(value.includes('beard')||value==='goatee')P(8,17,9,5,f);
+    if(value==='mustache'||value==='handlebar'||value==='goatee')P(8,16,9,2,f);
+    if(value==='stubble'||value==='sideburns'||value==='mutton')for(const x of [6,17])P(x,14,2,6,f);
+  }else if(field==='glasses'){
+    if(value==='round'){for(const x of [4,14]){P(x,9,7,1,gold);P(x,15,7,1,gold);P(x,10,1,5,gold);P(x+6,10,1,5,gold);}P(11,11,3,1,gold);}
+  }else if(field==='mobility'){
+    if(value==='wheelchair'){P(4,8,14,8,'#7a394a');P(2,17,7,7,ink);P(4,19,3,3,gold);P(17,17,5,5,ink);}
+  }else if(field==='surface'||field==='texture'){
+    P(4,4,16,16,'#ddbb9c');for(let x=6;x<19;x+=4)for(let y=6;y<19;y+=4){
+      if(value==='fur'||value==='fluffy'||value==='shaggy'||value==='curly')P(x,y,2,2,fur);
+      if(value==='scales'||value==='fine'||value==='plated')P(x,y,3,2,blue);
+      if(value==='feathers'||value==='layered')P(x,y,3,2,'#e6cee4');
+      if(value==='metal')P(x,y,3,2,'#b3b3bc');
+    }
+  }else{P(8,6,8,9,fur);P(6,15,12,6,gold);}
 }
 function openPlayerPicker(){
-  let v={...(playerChoice||{kind:'raccoon'})};
-  const cycle=(f,list)=>{v[f]=list[(list.indexOf(v[f])+1)%list.length];draw();};
+  let v=mixDefault(playerChoice),tab='body';
+  const T=(x)=>esc(t(x));
   function draw(){
-    const k=v.kind,parts=[];
-    if(k==='monster'||k==='alien')parts.push(['body','Shape',CAST_OPTIONS.body],['eyes','Eyes',[1,2,3]]);
-    if(k==='human'||k==='fae')parts.push(['hairdo','Hair',CAST_OPTIONS.hairdo],['hair','Hair colour',CAST_OPTIONS.hair]);
-    if(PLAYER_EXTRAS[k])parts.push(['extra',k==='fae'?'Magic':'Extra',PLAYER_EXTRAS[k]]);
-    const chip=(on,label,attr)=>'<button class="'+(on?'primary-button':'secondary-button')+'" style="flex:0 0 auto;padding:8px 12px" '+attr+(on?' aria-pressed="true"':'')+'>'+esc(t(label))+'</button>',es=profile.lang==='es',pro=v.pronouns||[];
-    openModal(titleHTML(t('Who are you tonight?'),t('YOUR LOOK'))+
-      '<div style="display:flex;justify-content:center"><canvas id="pp-view" width="320" height="260" style="width:160px;height:130px" aria-hidden="true"></canvas></div>'+
-      '<p class="scene-context" style="text-align:center">'+esc(t('Pick anything. You can change it any time from the title screen.'))+'</p>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+PLAYER_KINDS.map(([id,l])=>chip(v.kind===id,l,'data-kind="'+id+'"')).join('')+'</div>'+
-      (k==='raccoon'?'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+['',...CAST_RACFUR].map(c=>'<button data-fur="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+((v.fur||'')===c?'#4b2f1c':'#fff')+';background:'+(c||'#a29eab')+'"></button>').join('')+'</div>':'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+parts.map(([f,l])=>chip(false,t(l)+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+playerSkins(k).map(c=>'<button data-skin="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+(v.skin===c?'#4b2f1c':'#fff')+';background:'+c+'"></button>').join('')+'</div>')+
-      '<h3 style="text-align:center;margin:22px 0 4px;font:normal 18px Georgia,serif">'+esc(t('What should guests call you? Optional.'))+'</h3>'+
-      '<p style="text-align:center;margin:0;font-size:13px;color:#5a6655">'+esc(t('Pick any, or none. Skip it and everyone says “they”.'))+'</p>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+Object.entries(PRONOUNS).map(([id,p])=>chip(pro.includes(id),es?p[1]:p[0],'data-pro="'+id+'"')).join('')+
-      '<input id="pp-own" maxlength="24" autocomplete="off" aria-label="'+esc(t('Your own words'))+'" placeholder="'+esc(t('Type your own, like xe/xem'))+'" value="'+esc(v.own||'')+'" style="flex:1 1 180px;max-width:240px;padding:9px 12px;border:1px solid #cbd0bb;border-radius:5px;font:inherit"></div>'+
-      '<div class="action-row" style="justify-content:center">'+chip(false,'🎲 Randomize','id="pp-random"')+'<button id="pp-done" class="primary-button" style="flex:0 0 auto">'+esc(t('That’s me'))+'</button></div>');
-    const c=$('pp-view').getContext('2d');c.scale(2,2);
-    drawBeing(c,80,104,v.kind==='raccoon'?playerRaccoon(currentLook().coat,v.fur):castMake({...v,color:currentLook().coat,outfit:'vest',extra2:''}),1e-6,'down',false,2.5);
-    const body=$('pp-view').closest('dialog')||document;
-    body.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.kind;v={...(id==='raccoon'?{kind:id}:{...randomPlayer(id),...(v.kind===id?v:{})}),pronouns:v.pronouns,own:v.own};draw();});
-    body.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{const f=b.dataset.cycle,p=parts.find(x=>x[0]===f);cycle(f,p[2]);});
-    body.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{v.skin=b.dataset.skin;draw();});
-    body.querySelectorAll('[data-fur]').forEach(b=>b.onclick=()=>{v.fur=b.dataset.fur||undefined;draw();});
-    body.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();});
-    $('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24).trim();};
+    const modal=document.getElementById('pp-mix');
+    const pro=v.pronouns||[];
+    const chip=(field,value,label)=>{
+      const on=String(v[field]||'none')===String(value);
+      const icon=['eyes','ears','horns','antlers','antennae','wings','tail','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
+        ?'<canvas class="pp-icon" width="24" height="24" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
+      return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
+        '" aria-pressed="'+on+'">'+icon+T(label)+'</button>';
+    };
+    const group=(name,buttons)=>'<fieldset class="pp-group"><legend>'+T(name)+'</legend><div class="pp-options">'+buttons+'</div></fieldset>';
+    const opts=(field,values)=>values.map(a=>chip(field,a[0],a[1])).join('');
+    const colorGroup=(field,colors,title)=>group(title,colors.map(c=>{
+      const chosen=v[field]===c;
+      return '<button class="pp-swatch'+(chosen?' picked':'')+'" data-opt="'+field+'" data-value="'+c+
+        '" aria-pressed="'+chosen+'" aria-label="'+T(title)+' '+c+'" title="'+c+
+        '" style="background:'+c+'"></button>';
+    }).join(''));
+    let fields='';
+    if(tab==='body'){
+      fields+=group('Body shape',opts('body',[['round','● Round'],['tall','▯ Tall'],['blob','◕ Soft'],['wiggly','♧ Petite']]));
+      fields+=group('Eyes for everyone',opts('eyes',[[1,'◉ One eye'],[2,'◉ ◉ Two eyes'],[3,'◉ ◉ ◉ Three eyes']]));
+      fields+=colorGroup('skin',MIX_SKINS,'Body color');
+      fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical']]));
+    }
+    if(tab==='hair'){
+      fields+=group('Hair texture',opts('hairPattern',MIX_HAIR_TYPES.map(h=>[h,h.toUpperCase()])).concat('')+
+        chip('hairdo','bald','Bald / shaved')+
+        chip('hairdo','short','Short cut')+
+        chip('hairdo','bun','Bun / updo'));
+      fields+=group('Head coverings',opts('headwear',MIX_COVERS.map(x=>[x,{none:'None',hijab:'Hijab',scarf:'Scarf',wrap:'Headwrap',turban:'Turban',kufi:'Kufi',bandana:'Bandana'}[x]])));
+      fields+=colorGroup('hair',[...CAST_HAIR,...CAST_BRIGHT],'Hair color');
+      fields+=colorGroup('headwearColor',['#77536f','#254c41','#d6b66e','#e0d2c4','#38415a','#9a6072','#583547'],'Head covering color');
+      fields+='<p class="pp-hint">Hair textures 1A to 4C describe strand pattern, not identity. Head coverings are available with every body and feature.</p>';
+    }
+    if(tab==='face'){
+      fields+=group('Facial hair',opts('facialHair',[['none','None'],['stubble','Stubble'],['mustache','Classic mustache'],['handlebar','Handlebar'],['goatee','Goatee'],['short-beard','Short beard'],['full-beard','Full beard'],['long-beard','Long beard'],['sideburns','Sideburns'],['mutton','Mutton chops'],['whiskers','Whiskers']]));
+      fields+=colorGroup('facialHairColor',[...CAST_HAIR,'#b9aa9f','#e2d1a7',...CAST_BRIGHT.slice(0,5)],'Facial hair color');
+      fields+=group('Glasses',opts('glasses',[['none','No glasses'],['round','Round glasses']]));
+      fields+=colorGroup('glassesColor',['#c9a45c','#2b2433','#c2c7cc'],'Glasses frame');
+      fields+='<p class="pp-hint">One round glasses design, automatically fitted to one, two or three eyes. Facial hair is available to everyone.</p>';
+    }
+    if(tab==='features'){
+      fields+=group('Ears',opts('ears',[['human','Small'],['pointed','Pointed'],['cat','Cat-like'],['rabbit','Long'],['floppy','Floppy'],['round','Round']]));
+      fields+=group('Horns',opts('horns',[['none','None'],['short','Short'],['curled','Curled']]));
+      fields+=group('Antlers',opts('antlers',[['none','None'],['branch','Branching'],['fork','Forked']]));
+      fields+=group('Antennae',opts('antennae',[['none','None'],['orbs','Glowing bulbs']]));
+      fields+=group('Wings',opts('wings',[['none','None'],['feather','Feathered'],['butterfly','Butterfly'],['bat','Bat']]));
+      fields+=group('Tail',opts('tail',[['none','None'],['raccoon','Striped'],['fox','Fluffy'],['cat','Curved'],['lizard','Reptilian'],['feather','Plumed'],['mermaid','Mermaid fin']]));
+    }
+    if(tab==='mobility'){
+      fields+=group('Mobility',opts('mobility',[['none','On foot / Tail / Float'],['wheelchair','Classic manual wheelchair']]));
+      fields+=colorGroup('chairColor',['#7a394a','#245143','#243d65','#e6d1b0'],'Wheelchair seat color');
+      fields+=colorGroup('tailColor',['#73b7ae','#9a8ecb','#df9fa9','#80a4d2'],'Mermaid tail color');
+      fields+='<p class="pp-hint">One classic chair design with burgundy seating and brass wheels. Available to any character, with tail support when needed.</p>';
+    }
+    if(tab==='surface'){
+      fields+=group('Surface',opts('surface',[['skin','Smooth skin'],['fur','Fur'],['feathers','Feathers'],['scales','Scales'],['metal','Metal'],['ghostly','Ghostly']]));
+      fields+=group('Surface pattern',opts('texture',(MIX_SURFACES[v.surface]||['smooth']).map(x=>[x,x[0].toUpperCase()+x.slice(1)])));
+      fields+=group('Markings',opts('markings',[['none','None'],['spots','Spots'],['stripes','Stripes'],['freckles','Freckles'],['mask','Eye mask']]));
+      fields+=colorGroup('skin',MIX_SKINS,'Surface color');
+      fields+='<p class="pp-hint">Any eye count, hairstyle, wings or tail can be paired with any surface.</p>';
+    }
+    if(tab==='profile'){
+      fields+=group('Optional pronouns',Object.entries(PRONOUNS).map(([id,p])=>'<button type="button" class="pp-choice'+(pro.includes(id)?' picked':'')+
+        '" data-pro="'+id+'" aria-pressed="'+pro.includes(id)+'">'+T(profile.lang==='es'?p[1]:p[0])+'</button>').join(''));
+      fields+='<label class="pp-label" for="pp-own">'+T('Your own words (optional)')+'</label><input id="pp-own" maxlength="24" autocomplete="off" placeholder="xe/xem" value="'+esc(v.own||'')+'">';
+      fields+='<p class="pp-hint">You can leave this blank. Pronouns stay on your device.</p>';
+    }
+    const tabs=[['body','Body & Eyes'],['hair','Hair & Coverings'],['face','Face & Glasses'],['features','Ears & Extras'],['surface','Surface'],['mobility','Tail & Mobility'],['profile','About Me']];
+    const html=titleHTML(t('Create your character'),t('MIX & MATCH'))+
+      '<section id="pp-mix">'+
+      '<style>#pp-mix{color:#40352f}#pp-mix .pp-tabs,#pp-mix .pp-options{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}#pp-mix button{cursor:pointer}#pp-mix .pp-tab,#pp-mix .pp-choice{border:1px solid #ac9076;border-radius:9px;padding:9px 11px;background:#fff6e8;color:#432b36;font:600 14px Georgia,serif;min-height:42px}#pp-mix .pp-choice{display:inline-flex;align-items:center;gap:5px}#pp-mix .pp-icon{width:30px;height:30px;image-rendering:pixelated}#pp-mix .picked{background:#773d50!important;color:#fff8ec!important;border-color:#773d50!important;box-shadow:inset 0 0 0 1px #e6c899}#pp-mix .pp-tabs{position:sticky;top:0;background:#f8f0df;padding:8px 0;z-index:2}#pp-mix .pp-group{border:1px solid #d4c0a0;border-radius:10px;margin:10px 0;padding:12px}#pp-mix legend{font:600 17px Georgia,serif;color:#65394b;padding:0 8px}#pp-mix .pp-preview{display:flex;justify-content:center;align-items:end;gap:8px;padding:8px 0;background:#f6ecdf;border-radius:12px}#pp-mix .pp-preview canvas{image-rendering:pixelated}#pp-mix .pp-label{display:block;margin:8px 0;font-weight:600}#pp-mix input{padding:11px;border-radius:8px;border:1px solid #ac9076;width:100%;max-width:260px}#pp-mix .pp-swatch{width:36px;height:36px;min-height:36px;border:2px solid #fff;border-radius:9px;outline:1px solid #b5a18e}#pp-mix .pp-hint{text-align:center;font-size:13px;color:#685c50}#pp-mix .pp-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}#pp-mix .pp-actions button{padding:12px 18px;min-height:44px}</style>'+
+      '<p class="pp-hint">No species categories. Pick any combination of shapes, eyes, textures, wings and tails.</p>'+
+      '<div class="pp-preview"><canvas id="pp-side" width="90" height="145" aria-label="Side view"></canvas><canvas id="pp-view" width="160" height="160" role="img" aria-label="Live character preview"></canvas><canvas id="pp-back" width="90" height="145" aria-label="Back view"></canvas></div>'+
+      '<div class="pp-tabs" role="tablist">'+tabs.map(([id,name])=>'<button class="pp-tab'+(tab===id?' picked':'')+'" data-tab="'+id+'" role="tab" aria-selected="'+(tab===id)+'">'+T(name)+'</button>').join('')+'</div>'+
+      fields+'<div class="pp-actions"><button class="secondary-button" id="pp-random">🎲 '+T('Surprise me')+'</button><button class="primary-button" id="pp-done">♥ '+T('Save my look')+'</button></div></section>';
+    openModal(html);
+    const looks=mixRecipe(v,currentLook().coat);
+    for(const [id,dir,x,y,scale] of [['pp-view','down',80,126,2.5],['pp-side','right',45,109,1.6],['pp-back','up',45,109,1.6]]){
+      const g=$(id).getContext('2d');g.clearRect(0,0,g.canvas.width,g.canvas.height);
+      drawBeing(g,x,y,looks,0,dir,false,scale);
+    }
+    const root=$('pp-mix');
+    root.querySelectorAll('canvas[data-icon]').forEach(mixThumbnail);
+    root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;draw();});
+    root.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{
+      const field=b.dataset.opt,value=b.dataset.value;
+      v[field]=field==='eyes'?Number(value):value;
+      if(field==='surface'){v.texture=MIX_SURFACES[value][0];}
+      if(field==='texture'&&value==='freckles'){v.markings='freckles';}
+      if(field==='hairPattern'){v.hairdo=value[0]>='3'?'curly':'long';}
+      if(field==='hairdo'&&value!=='bald')v.hairPattern='';
+      draw();
+    });
+    root.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{
+      const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();
+    });
+    if($('pp-own'))$('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24);};
     $('pp-random').onclick=()=>{v={...randomPlayer(),pronouns:v.pronouns,own:v.own};draw();};
     $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(deloresWelcome());};
   }
@@ -3181,8 +3515,8 @@ Object.assign(WORDS.es||{},{'Who are you?':'¿Quién eres?','Who are you tonight
  'Raccoon':'Mapache','Person':'Persona','Fae folk':'Hada','Monster':'Monstruo','Alien':'Extraterrestre','Robot':'Robot','Shape':'Forma','Eyes':'Ojos','Hair':'Pelo','Hair colour':'Color de pelo','Magic':'Magia','Extra':'Detalle','Colour':'Color',
  '🎲 Randomize':'🎲 Al azar','That’s me':'Soy yo','What should guests call you? Optional.':'¿Cómo quieres que te nombren? Es opcional.','Pick any, or none. Skip it and everyone says “they”.':'Elige los que quieras, o ninguno. Si lo dejas en blanco, nadie usará un género para ti.',
  'Your own words':'Tus propias palabras','Type your own, like xe/xem':'Escribe los tuyos'});
-{const b=document.createElement('button');b.id='title-who';b.className='glass-button';b.textContent=t('Who are you?');$('title-memories')?.after(b);b.onclick=openPlayerPicker;
- const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent=t('Who are you?');return r;};}
+{const b=$('title-who');b.onclick=openPlayerPicker;
+ const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent='🎨 '+t('Character Creator');return r;};}
 const castInteract=interact;interact=function(id){if(festivalActive&&muffinInteract(id))return;return castInteract.apply(this,arguments);};
 $('title-quick').onclick=startQuickShift;
 addEventListener('keydown',e=>{

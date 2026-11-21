@@ -21,6 +21,12 @@ The world and training remain playable from one offline HTML file.
 See [integration notes](docs/silver-key-integration.md) for saves, source files,
 and browser regression checks.
 
+## Mix-and-match character creator
+
+Choose **Who are you?** on the title screen to make a character from independent pixel-art parts. The creator supports 1, 2 or 3 eyes, 1A through 4C hair textures, bald styles and head coverings, plus interchangeable ears, horns, antlers, antennae, wings, mermaid and animal tails, fur, feathers, scales, metal and ghostly appearances. Choose optional facial hair, one round glasses style (three frame colors), and one classic manual wheelchair for any character. The homepage includes a prominent **Character Creator** button. All selections update the front, side and back preview. Use **Surprise me** or **Save my look**. There are no required species categories.
+
+Previous saved players keep their original look until saved again. The experience stays offline, and story characters remain unchanged. See [character creator notes](docs/mix-and-match-creator.md) for controls and limitations.
+
 ## Guest moments, growth bars and pins
 
 After the briefing, a guest with a gold **!** waits in the manor. Walk over and
