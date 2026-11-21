@@ -1223,7 +1223,79 @@ function pxPaint(r,dir,blink,frame,mood=''){
     R(11,32,11,1,gold,gold);
   };
   const hat=(top)=>{R(11,top-6,11,6,coat);R(9,top,15,1,coatDk);R(11,top-2,11,1,gold);P(19,top-2,'#f4c2d4');P(12,top-5,T(coat,.35));};
+
+  /* HAIR POLISH v1: distinct, readable silhouettes, retained across front, side and back. */
+  const styledHair=(hy)=>{
+    const st=r.hairStyle,type=(r.hairPattern||'2b')[0],part=dir==='left'?-1:dir==='right'?1:0;
+    const mass=(x,y,w,h,c=hair)=>E(x,y,w,h,c,hair);
+    const lock=(x,a,b,rad=2.5,phase=0)=>{
+      for(let y=a;y<=b;y+=3)mass(x+Math.round(Math.sin(y*.65+phase)*1.3),y,rad,2.2);
+    };
+    const curls=(x,a,b,rad=2.7)=>{
+      for(let y=a;y<=b;y+=Math.max(3,Math.round(rad*1.6)))
+        mass(x+Math.round(Math.sin(y*.55+x)*1.2),y,rad,rad);
+    };
+    if(back){
+      mass(16.5,hy-3,9.6,7.7);
+      if(st==='high-puff'){mass(16.5,hy-12,7.5,5.1);R(14,hy-8,5,3,hairDk,hair);}
+      else if(st==='low-bun'){mass(16.5,hy+8,6,4.6);mass(16.5,hy+8,2.8,2.5,hairDk);}
+      else if(st==='cloud-curls'){mass(16.5,hy-5,12.8,9.4);for(const x of [5,9,16,23,28])mass(x,hy-8-(x%3),3.1,3.2);}
+      else if(st==='long-curls'||st==='curly-bob'){const end=st==='long-curls'?36:29;for(const x of [7,11,15,20,25])curls(x,hy-4,end,st==='long-curls'?2.8:2.4);}
+      else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){const end=st==='wavy-bob'?29:st==='long-waves'?38:34;for(const x of [7,11,15,20,25])lock(x,hy-4,end,2.5,x*.24);}
+      else if(st==='sleek-bob'||st==='shoulder-straight'){const end=st==='sleek-bob'?29:35;R(7,hy,19,end-hy,hair,hair);for(const x of [10,16,23])R(x,hy+2,1,end-hy-4,hairDk,hair);}
+      else if(st==='soft-pixie'){mass(16.5,hy-7,10,4.5);}
+      else if(st==='close-crop'){mass(16.5,hy-5,9,5);}
+      return;
+    }
+    if(st==='cloud-curls')mass(16.5,hy-5,12.6,9.4);
+    else if(st==='soft-pixie')mass(16.5,hy-4,10.3,6.2);
+    else if(st==='close-crop')mass(16.5,hy-3.3,9.5,5.4);
+    else mass(16.5,hy-3.5,10.4,7.6);
+    /* Clear face-shaped opening. Locks are laid in front only along its edges. */
+    E(16.5,hy+.7,8.6,7,skin,skin);
+    if(st==='close-crop'){
+      mass(16.5,hy-6.1,8.8,3.2);for(const x of [11,15,20,23])P(x,hy-8,hairLt,hair,'hair');
+    }else if(st==='soft-pixie'){
+      mass(12,hy-7,6.9,3.6);mass(22,hy-8,5,3.5);
+      R(8,hy-5,10,2,hair,hair);R(8,hy-3,5,2,hair,hair);
+      mass(7,hy,2.8,4.3);mass(26,hy-1,2.2,3.1);
+      for(const x of [10,14,20])P(x+part,hy-8,hairLt,hair,'hair');
+    }else if(st==='sleek-bob'||st==='shoulder-straight'){
+      const end=st==='sleek-bob'?28:34;
+      R(6,hy-3,3,end-hy+4,hair,hair);R(24,hy-3,3,end-hy+4,hair,hair);
+      R(7,end,3,2,hair,hair);R(23,end,4,2,hair,hair);
+      R(10,hy-7,7,2,hair,hair);R(11,hy-5,4,1,hairLt,hair);
+      for(const x of [7,25])R(x,hy+3,1,end-hy-4,hairDk,hair);
+    }else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){
+      const end=st==='wavy-bob'?28:st==='long-waves'?38:34;
+      lock(7,hy-4,end,2.8,0);lock(25,hy-4,end,2.8,2.1);
+      lock(9,hy+1,end-2,1.9,1);lock(23,hy+1,end-2,1.9,3);
+      R(11,hy-7,9,2,hair,hair);
+      for(const [x,y] of [[8,-4],[13,-8],[22,-7],[25,2],[7,9]])P(x,hy+y,hairLt,hair,'hair');
+    }else if(st==='long-curls'||st==='curly-bob'){
+      const end=st==='long-curls'?36:28,rad=st==='long-curls'?2.9:2.5;
+      for(const x of [7,10,24,27])curls(x,hy-5,end,rad);
+      for(const [x,y] of [[8,-9],[12,-10],[16,-10],[20,-10],[24,-9],[6,-4],[27,-3]])mass(x,hy+y,2.8,2.8);
+      for(const x of [8,12,24])P(x,hy-9,hairLt,hair,'hair');
+    }else if(st==='cloud-curls'){
+      for(const [x,y] of [[5,-6],[10,-12],[17,-14],[24,-12],[28,-6],[5,0],[28,0],[6,6],[27,6]])mass(x,hy+y,3.2,3.2);
+      for(const [x,y] of [[10,-10],[15,-12],[21,-11],[7,-5],[25,-4]])P(x,hy+y,hairLt,hair,'hair');
+    }else if(st==='high-puff'){
+      mass(16.5,hy-12,7.7,5.1);
+      for(const [x,y] of [[10,-14],[14,-17],[19,-17],[24,-14],[9,-11],[24,-11]])mass(x,hy+y,2.5,2.4);
+      R(12,hy-5,9,2,hairDk,hair);P(15,hy-14,hairLt,hair,'hair');
+    }else if(st==='low-bun'){
+      mass(16.5,hy-5,9,5);mass(27,hy+5,3,3.8);
+      for(const x of [10,14,19,22])P(x,hy-8,hairLt,hair,'hair');
+    }
+    /* Strand pattern is subtle, never allowed to erase a silhouette or face. */
+    if(type==='1'){for(const x of [12,18,23])P(x,hy-8,hairLt,hair,'hair');}
+    if(type==='2'){for(const x of [9,13,21,25])P(x,hy-7+(x%3),hairLt,hair,'hair');}
+    if(type==='3'||type==='4')for(let x=9;x<=25;x+=type==='4'?3:4)
+      P(x,hy-9+((x%3)?1:0),hairLt,hair,'hair');
+  };
   const hairDo=(hy)=>{const hd=r.hairdo;if(hd==='bald')return;
+    if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){styledHair(hy);return;}
     if(back){E(16.5,hy,10.6,9.6,hair);if(hd==='long')R(6,hy,21,14,hair);if(hd==='bun')E(16.5,hy-10,3.6,3.2,hair);return;}
     E(16.5,hy-1.5,10.6,8.6,hair);E(16.5,hy+1.5,8.6,6.6,skin,skin);
     const drop=[1,2,1,0,1,2,2,1,0,1,2,1,0,1,2,1,1];for(let x=8;x<=24;x++)R(x,hy-6,1,3+drop[x-8],hair);
@@ -1268,7 +1340,20 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(hd==='bun'){E(16.5,hy-10,3.6,3.2,hair);R(14,hy-7,6,1,coat);}
     for(const [x,y] of [[11,-7],[12,-8],[13,-8],[14,-8],[20,-8],[21,-7],[9,-4],[10,-5],[22,-5],[7,1],[7,2],[26,2]])P(x,hy+y,hairLt,hair);
   };
-  const longBack=(hy)=>{if(r.hairdo==='long'&&!back){R(7,hy,19,12,hair);for(let x=7;x<26;x+=2)P(x,hy+12,hair);}};
+  const longBack=(hy)=>{
+    if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){
+      if(back)return;
+      const st=r.hairStyle,end=st==='long-waves'?39:st==='long-curls'?37:
+        st==='soft-waves'||st==='shoulder-straight'?34:
+        st==='wavy-bob'||st==='curly-bob'||st==='sleek-bob'?29:0;
+      if(end){R(7,hy+2,19,end-hy-1,hair,hair);
+        if(st.includes('waves')||st.includes('curls')||st==='wavy-bob'||st==='curly-bob')
+          for(let y=hy+7;y<end;y+=4){P(6+y%3,y,hair,hair);P(27-y%3,y,hair,hair);}
+      }
+      return;
+    }
+    if(r.hairdo==='long'&&!back){R(7,hy,19,12,hair);for(let x=7;x<26;x+=2)P(x,hy+12,hair);}
+  };
   const ears=(hy,pointy)=>{if(pointy){for(const [x,y] of [[6,hy],[5,hy],[4,hy-1],[3,hy-2],[5,hy+1],[6,hy+1],[6,hy+2]])mirror([[x,y]],skin,skin);mirror([[5,hy]],T(skin,-.15),skin);}
     else mirror([[6,hy+1],[6,hy+2]],skin,skin);};
   /* Modular tails and wings, behind the body, independent of its appearance. */
