@@ -10834,6 +10834,138 @@ body.reduce-motion .hms-next{animation:none}
 @media(max-width:520px){.ph-tile{min-height:104px}.ph-ic{font-size:26px}.hms-tile{min-height:88px}}
 `;document.head.append(st);}
 /* ==== end HMS FRIENDLY v1 ==== */
+/* ==== SPLIT v1: the manor and the desk computer side by side ====
+   - When the desk computer (HMS) opens during play, the manor stays on screen: the HMS slides up
+     as a drawer over the bottom half (centered, never wider than 860px), with the manor showing
+     above. A little handle makes the drawer taller.
+   - Whatever room board the HMS is showing (real HMS, lessons, Room Rush, Booking Builder or the
+     practice hotel), each manor room wears a matching badge: 🧹 dirty, 🔍 cleaned, ✨ ready,
+     🛌 guest, 🔧 fixing. Change a room in the HMS and that room reacts right next to it
+     (bubbles, sparkles, a key and hearts). The room you're looking at glows gold.
+   - Nothing in the HMS was removed or moved; this only changes where the window sits.
+   Everything is drawn with code, nothing is downloaded and nothing costs money to run. */
+const SPLIT_TEXT={
+ en:{tag:'🏨 The manor · rooms change as you work',bigger:'Make the desk computer bigger',smaller:'Show more of the manor'},
+ es:{tag:'🏨 La mansión · las habitaciones cambian mientras trabajas',bigger:'Agrandar el ordenador de recepción',smaller:'Ver más de la mansión'}
+};
+const SPT=SPLIT_TEXT[profile.lang]||SPLIT_TEXT.en;
+const SPLIT_ROOMS=['201','202','203','204','205','206'];
+const splitRoomX=r=>270+160*(+r-201);
+const SPLIT_COL={tidy:['#ffe3d6','#f09a74','🧹'],clean:['#fff5c9','#e8c34a','🔍'],ready:['#dcf7d4','#6cc25a','✨'],guest:['#e3e9fd','#8ea3e6','🛌'],fix:['#ece4f7','#9b86c4','🔧']};
+const SPLIT_PING={tidy:['🧹','#d9a27f'],clean:['🧽','#8fd0ff'],ready:['✨','#ffd84d'],guest:['🔑','#ff8fb1'],fix:['🔧','#b9a2e6']};
+const split={on:false,next:false,board:null,sel:'',focus:'',pings:[],tall:false};
+const splitCan=()=>!!state&&!titleVisible&&!festivalActive;
+/* Wrap every way into the desk computer, so its window opens beside the manor. */
+for(const name of ['openHms','exploreHms','startLesson','openHmsQuestion','gameShell','openPracticeHotel']){
+  const fn={openHms,exploreHms,startLesson,openHmsQuestion,gameShell,openPracticeHotel}[name];
+  const wrapped=function(){split.next=true;try{return fn.apply(this,arguments);}finally{split.next=false;}};
+  if(name==='openHms')openHms=wrapped;else if(name==='exploreHms')exploreHms=wrapped;else if(name==='startLesson')startLesson=wrapped;
+  else if(name==='openHmsQuestion')openHmsQuestion=wrapped;else if(name==='gameShell')gameShell=wrapped;else openPracticeHotel=wrapped;
+}
+for(const id of Object.keys(HMS_GAMES)){const g=HMS_GAMES[id];HMS_GAMES[id]=function(){split.next=true;try{return g.apply(this,arguments);}finally{split.next=false;}};}
+const splitOpenModal=openModal;
+openModal=function(){
+  const want=split.next&&splitCan();split.next=false;
+  const r=splitOpenModal.apply(this,arguments);
+  splitSet(want);if(want)splitScan();
+  return r;
+};
+function splitSet(on){
+  const was=split.on;split.on=on;
+  modal.classList.toggle('split',on);modal.classList.toggle('tall',on&&split.tall);
+  document.body.classList.toggle('hms-split',on);document.body.classList.toggle('split-tall',on&&split.tall);
+  $('split-handle').hidden=!on;$('split-tag').hidden=!on;
+  if(!on){split.board=null;split.sel='';split.focus='';split.pings=[];}
+  if(on!==was){world.camReady=false;requestAnimationFrame(()=>world.resize());}
+}
+modal.addEventListener('close',()=>splitSet(false));
+/* The little drawer handle (phones) and the label over the manor. */
+{const h=document.createElement('button');h.type='button';h.id='split-handle';h.className='split-handle';h.hidden=true;
+ const label=()=>{h.setAttribute('aria-label',split.tall?SPT.smaller:SPT.bigger);h.title=h.getAttribute('aria-label');};label();
+ h.innerHTML='<span aria-hidden="true"></span>';
+ h.onclick=()=>{split.tall=!split.tall;label();splitSet(true);};
+ modal.prepend(h);
+ const tag=document.createElement('div');tag.id='split-tag';tag.className='split-tag';tag.hidden=true;tag.textContent=SPT.tag;$('canvas-wrap').append(tag);}
+/* Read the room board the HMS is showing right now, and ping any room that changed. */
+function splitScan(){
+  if(!split.on)return;
+  const host=$('modal-body'),board={};let sel='';
+  host.querySelectorAll('.hms-room,.ph-tile').forEach(t=>{
+    const r=(t.dataset.r||t.querySelector('b')?.textContent||'').trim();if(!SPLIT_ROOMS.includes(r))return;
+    const st=Object.keys(SPLIT_COL).find(k=>t.classList.contains(k));if(!st)return;
+    board[r]=st;if(t.classList.contains('on'))sel=r;});
+  const has=Object.keys(board).length>0;
+  if(!sel){const m=(host.querySelector('.hms-who small,.ph-info b,.hms-radio p')?.textContent||'').match(/\b(20[1-6])\b/);if(m)sel=m[1];}
+  const prev=split.board;
+  if(has&&prev){const changed=SPLIT_ROOMS.filter(r=>board[r]&&prev[r]&&board[r]!==prev[r]);
+    if(changed.length&&changed.length<=2)for(const r of changed){split.pings.push({r,st:board[r],t0:performance.now()});split.focus=r;}}
+  split.board=has?board:null;
+  if(sel)split.focus=sel;
+  split.sel=sel;
+}
+{let queued=false;new MutationObserver(()=>{if(!split.on||queued)return;queued=true;requestAnimationFrame(()=>{queued=false;splitScan();});})
+  .observe($('modal-body'),{childList:true,subtree:true,attributes:true,attributeFilter:['class']});}
+/* Camera: fit the whole manor when there's room, otherwise frame the guest rooms and follow the action. */
+const splitResize=world.resize.bind(world),splitCamera=world.camera.bind(world);
+world.resize=function(){
+  splitResize();
+  if(!split.on||!this.width)return;
+  const fit=Math.min(this.width/W,this.height/H);
+  this.scale=fit*1000>=520?fit:Math.min(this.width/1000,this.height/380);
+  this.zoomed=true;this.camReady=false;
+};
+world.camera=function(snap){
+  if(!split.on)return splitCamera(snap);
+  const fx=split.focus?splitRoomX(split.focus):670,fy=330;
+  const fit=(view,size,center)=>size<=view?(view-size)/2:Math.min(0,Math.max(view-size,view/2-center));
+  const tx=fit(this.width,W*this.scale,fx*this.scale),ty=fit(this.height,H*this.scale,fy*this.scale),k=snap||!this.camReady?1:.12;
+  this.ox+=(tx-this.ox)*k;this.oy+=(ty-this.oy)*k;this.camReady=true;
+};
+/* Drawing: badges, a gold glow on the room you're looking at, and little reactions. */
+function drawSplit(c,time,calm){
+  if(!split.on)return;
+  const now=performance.now();
+  /* the desk computer you're sitting at */
+  const pulse=calm?0:Math.sin(time/400)*3;
+  c.save();c.strokeStyle='#ffd84d';c.globalAlpha=.75;c.lineWidth=3;c.beginPath();c.arc(HMS_SPOT.x,HMS_SPOT.y,30+pulse,0,Math.PI*2);c.stroke();c.restore();
+  if(split.sel){const x=splitRoomX(split.sel);
+    c.save();c.shadowColor='#ffd84d';c.shadowBlur=calm?10:14+pulse*3;c.strokeStyle='#ffd84d';c.lineWidth=6;
+    c.beginPath();if(c.roundRect)c.roundRect(x-78,70,156,292,12);else c.rect(x-78,70,156,292);c.stroke();c.restore();}
+  if(split.board)for(const r of SPLIT_ROOMS){const st=split.board[r];if(!st)continue;const [bg,line,ic]=SPLIT_COL[st],x=splitRoomX(r),y=205;
+    c.save();c.shadowColor='rgba(20,30,25,.35)';c.shadowBlur=8;c.shadowOffsetY=3;
+    c.beginPath();c.arc(x,y,40,0,Math.PI*2);c.fillStyle=bg;c.fill();c.restore();
+    c.lineWidth=5;c.strokeStyle=line;c.beginPath();c.arc(x,y,40,0,Math.PI*2);c.stroke();
+    c.font='42px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#222';c.fillText(ic,x,y+2);
+    c.textBaseline='alphabetic';}
+  split.pings=split.pings.filter(p=>now-p.t0<1600);
+  for(const p of split.pings){
+    const k=(now-p.t0)/1600,x=splitRoomX(p.r),[ic,col]=SPLIT_PING[p.st]||SPLIT_PING.ready,e=calm?.5:k;
+    c.save();c.globalAlpha=1-e;c.strokeStyle=col;c.lineWidth=5;c.beginPath();c.arc(x,205,40+e*90,0,Math.PI*2);c.stroke();
+    if(!calm)for(let i=0;i<8;i++){const a=i/8*Math.PI*2+k*2,d=30+k*80;c.fillStyle=i%2?col:'#fff7d6';c.beginPath();c.arc(x+Math.cos(a)*(d+20),205+Math.sin(a)*d*.7,6*(1-k)+2,0,Math.PI*2);c.fill();}
+    c.globalAlpha=Math.min(1,(1-k)*1.6);c.font='44px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';c.textAlign='center';c.fillText(ic,x,150-(calm?10:k*60));
+    if(p.st==='guest'&&!calm){c.font='22px sans-serif';for(const d of [-34,34])c.fillText('💗',x+d,160-k*80-Math.abs(d)*.3);}
+    c.restore();}
+}
+const splitDrawExtras=world.options.drawExtras;
+world.options.drawExtras=function(c,time,calm){const r=splitDrawExtras?.apply(this,arguments);drawSplit(c,time,calm);return r;};
+addEventListener('resize',()=>{if(split.on)world.resize();});
+{const st=document.createElement('style');st.textContent=`
+:root{--split-h:56dvh}
+#modal.modal.split{position:fixed;inset:auto 0 0 0;margin:0 auto;width:min(100%,860px);max-width:none;height:var(--split-h);max-height:var(--split-h);border-radius:24px 24px 0 0;padding-top:34px;overflow:auto;animation:splitUp .28s ease-out;transition:height .25s ease,max-height .25s ease}
+#modal.modal.split.tall{--split-h:86dvh}
+body.split-tall{--split-h:86dvh}
+#modal.split::backdrop{background:transparent;backdrop-filter:none}
+body.hms-split::before{content:'';position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 30%,#2c5a48,#10302a 75%)}
+body.hms-split #canvas-wrap{position:fixed;z-index:41;left:0;right:0;top:0;bottom:calc(var(--split-h) - 22px);width:auto;height:auto;max-height:none;aspect-ratio:auto;margin:0;border-width:0;border-radius:0;outline:none;box-shadow:none}
+.split-tag{position:absolute;left:12px;bottom:32px;z-index:3;padding:6px 12px;border-radius:99px;background:#fffaf0e8;border:2px solid #c9a45c;color:#23493f;font:bold 13px Arial,sans-serif;pointer-events:none;box-shadow:0 3px 10px #0003}
+#modal.split .split-handle{display:block;position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:30px;border:0;background:transparent;cursor:pointer;z-index:3}
+#modal.split .split-handle span{display:block;width:54px;height:6px;margin:10px auto 0;border-radius:6px;background:#c9a45c}
+#modal .split-handle[hidden],.split-handle{display:none}
+@keyframes splitUp{from{transform:translateY(60px);opacity:0}}
+body.reduce-motion #modal.modal.split{animation:none}
+@media(max-width:899px){#modal.modal.split{width:100%}.split-tag{font-size:11px;left:8px;padding:4px 10px}}
+`;document.head.append(st);}
+/* ==== end SPLIT v1 ==== */
 
 
 /* Opening a credential link (?cert=...) shows that certificate. Kept last, after every course registers. */
