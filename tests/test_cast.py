@@ -23,7 +23,7 @@ Object.defineProperty(window,'castTest',{get:()=>({
  interact:id=>interact(id),player:()=>playerLook().recipe,festival:festivalActive
 })});
 window.mixPixels=(opts)=>pxPaint(castMake({mix:true,kind:'human',eyes:2,hairdo:'bald',skin:'#ecc09f',hair:'#4a3a5c',color:'#3f6f66',extra:'',extra2:'',...opts}),'down',false,0).join('|');
-window.castTestOptions=()=>CAST_OPTIONS;window.deloresWelcomeTest=()=>deloresWelcome();window.profileTestLang=l=>{profile.lang=l;};window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
+window.castTestOptions=()=>CAST_OPTIONS;window.deloresWelcomeTest=()=>deloresWelcome();window.profileTestLang=l=>{profile.lang=l;translateTitle();};window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
 """
 TEST_HTML = HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
 
@@ -76,7 +76,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 76_000, 'The pixel kit, modular options, facial hair, eyewear and mobility should stay under 76 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 100_000, 'The offline sprite kit and full-screen creator should stay under 100 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -146,8 +146,9 @@ class Cast(unittest.TestCase):
         self.page.locator('[data-tab="features"]').click()
         self.page.locator('[data-opt="ears"][data-value="rabbit"]').click()
         self.page.locator('[data-opt="wings"][data-value="butterfly"]').click()
+        self.page.locator('[data-tab="mobility"]').click()
         self.page.locator('[data-opt="tail"][data-value="raccoon"]').click()
-        self.page.locator('[data-tab="surface"]').click()
+        self.page.locator('[data-tab="body"]').click()
         self.page.locator('[data-opt="surface"][data-value="scales"]').click()
         self.page.locator('[data-opt="texture"][data-value="plated"]').click()
         self.page.locator('[data-tab="hair"]').click()
@@ -175,7 +176,7 @@ class Cast(unittest.TestCase):
 
     def test_08_mix_eye_count_for_all_surfaces_and_faces(self):
         for kind in ['human', 'construct']:
-            faces = [self.page.evaluate('window.mixPixels(opts)', {'kind': kind, 'eyes': eyes})
+            faces = [self.page.evaluate('(opts)=>window.mixPixels(opts)', {'kind': kind, 'eyes': eyes})
                      for eyes in [1, 2, 3]]
             self.assertEqual(len(set(faces)), 3, kind + ' should support 1, 2, or 3 distinct eyes')
         base = self.page.evaluate('window.mixPixels({})')
@@ -186,7 +187,7 @@ class Cast(unittest.TestCase):
             {'hairPattern': '4c', 'hairdo': 'curly'},
             {'headwear': 'hijab'}, {'markings': 'freckles'}
         ]:
-            self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', opts), base, opts)
+            self.assertNotEqual(self.page.evaluate('(opts)=>window.mixPixels(opts)', opts), base, opts)
 
     def test_09_facial_hair_glasses_mermaid_and_wheelchair(self):
         """All additions are independently selectable and saved to the game character."""
@@ -197,9 +198,8 @@ class Cast(unittest.TestCase):
         self.page.locator('[data-opt="facialHair"][data-value="handlebar"]').click()
         self.page.locator('[data-opt="glasses"][data-value="round"]').click()
         self.page.locator('[data-opt="glassesColor"][data-value="#2b2433"]').click()
-        self.page.locator('[data-tab="features"]').click()
-        self.page.locator('[data-opt="tail"][data-value="mermaid"]').click()
         self.page.locator('[data-tab="mobility"]').click()
+        self.page.locator('[data-opt="tail"][data-value="mermaid"]').click()
         self.page.locator('[data-opt="mobility"][data-value="wheelchair"]').click()
         self.assertEqual(self.page.locator('#pp-view').count(), 1)
         self.assertEqual(self.page.locator('#pp-side').count(), 1)
@@ -216,7 +216,33 @@ class Cast(unittest.TestCase):
         for option in ({'facialHair':'full-beard'}, {'glasses':'round'},
                        {'glasses':'round','eyes':3}, {'tail':'mermaid'},
                        {'mobility':'wheelchair'}, {'tail':'mermaid','mobility':'wheelchair'}):
-            self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', option), base, option)
+            self.assertNotEqual(self.page.evaluate('(opts)=>window.mixPixels(opts)', option), base, option)
+
+    def test_09b_creator_has_five_tabs_and_distinct_hair_thumbnails(self):
+        """The refreshed creator keeps a preview visible and shows twelve distinct hair images."""
+        self.page.locator('#title-who').click()
+        self.page.wait_for_selector('#pp-mix')
+        self.assertEqual(self.page.locator('.pp-tab').count(), 5)
+        self.assertEqual(self.page.locator('.pp-stage #pp-view').count(), 1)
+        self.assertEqual(self.page.locator('.pp-angles canvas').count(), 2)
+        self.assertTrue(self.page.locator('.pp-panel').is_visible())
+        self.page.locator('[data-tab="hair"]').click()
+        options = self.page.locator('canvas[data-icon^="hairPattern:"]')
+        self.assertEqual(options.count(), 12)
+        pixels = options.evaluate_all('(all) => all.map(c => c.toDataURL())')
+        self.assertEqual(len(set(pixels)), 12, '1A through 4C must look different')
+        self.assertEqual(self.page.locator('.pp-tab').count(), 5)
+        self.page.locator('[data-opt="hairPattern"][data-value="4c"]').click()
+        self.assertEqual(self.page.locator('[data-opt="hairPattern"][data-value="4c"]').get_attribute('aria-pressed'), 'true')
+        self.assertTrue(self.page.locator('#pp-view').is_visible())
+        self.page.locator('[data-tab="face"]').click()
+        self.assertTrue(self.page.locator('[data-opt="facialHair"][data-value="mustache"]').is_visible())
+        self.assertTrue(self.page.locator('[data-pro="they"]').is_visible())
+        self.page.locator('[data-tab="body"]').click()
+        self.assertTrue(self.page.locator('[data-opt="surface"][data-value="scales"]').is_visible())
+        self.page.locator('[data-tab="mobility"]').click()
+        self.assertTrue(self.page.locator('[data-opt="tail"][data-value="mermaid"]').is_visible())
+        self.assertTrue(self.page.locator('[data-opt="mobility"][data-value="wheelchair"]').is_visible())
 
     def test_10_standing_characters_are_cached_and_cheap(self):
         ms = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');c.canvas.width=1280;c.canvas.height=800;const d=window.castTest.drawPerson;
@@ -232,12 +258,14 @@ class Cast(unittest.TestCase):
     def test_08_pronouns_are_optional_plural_or_your_own(self):
         self.assertIn('Look after them. Their coat', self.welcome(), 'No choice means they')
         self.page.locator('#title-who').click()
+        self.page.locator('[data-tab="face"]').click()
         self.page.locator('[data-pro="she"]').click()
         self.page.locator('[data-pro="they"]').click()
         self.page.locator('#pp-done').click()
         self.assertIn(self.page.locator('#toast').inner_text().split('“')[1][:16], ['Look after her. ', 'Look after them.'])
         self.assertEqual(self.page.evaluate("JSON.parse(localStorage.getItem('mapachez_player_v1')).pronouns"), ['she', 'they'])
         self.page.locator('#title-who').click()
+        self.page.locator('[data-tab="face"]').click()
         self.page.locator('[data-pro="she"]').click()
         self.page.locator('[data-pro="they"]').click()
         self.page.locator('#pp-own').fill('xe/xem/xyr')
@@ -250,7 +278,10 @@ class Cast(unittest.TestCase):
         self.page.evaluate("profileTestLang('es')")
         self.assertIn('Cuida de esta persona.', self.welcome())
         self.page.locator('#title-who').click()
-        self.assertIn('¿Quién eres esta noche?', self.page.locator('#modal-heading').inner_text())
+        self.assertIn('Crea tu personaje', self.page.locator('#modal-heading').inner_text())
+        self.assertIn('Creador de personajes', self.page.locator('#title-who').inner_text())
+        self.assertIn('Sorpréndeme', self.page.locator('#pp-random').inner_text())
+        self.page.locator('[data-tab="face"]').click()
         self.page.locator('[data-pro="they"]').click()
         self.page.locator('#pp-done').click()
         self.assertIn('Cuida de elle.', self.welcome())
