@@ -23,6 +23,9 @@ Object.defineProperty(window,'chatTest',{get:()=>({
 base.TEST_HTML = base.TEST_HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
 
 
+GHOST_CHATS = ['tanaka-photos', 'walls']  # added after the lobby chats by the ghost update
+
+
 class Chats(base.Growth):
     lang = 'en'
 
@@ -46,7 +49,9 @@ class Chats(base.Growth):
     def test_01_scripts_are_short_kind_and_match_in_both_languages(self):
         text = self.c()['text']
         en, es = text['en']['list'], text['es']['list']
-        self.assertEqual(len(en), 19)
+        # 19 lobby chats, then the 2 ghost chats the ghost update adds after them.
+        self.assertEqual(len([c for c in en if c['id'] not in GHOST_CHATS]), 19)
+        self.assertEqual([c['id'] for c in en if c['id'] in GHOST_CHATS], GHOST_CHATS)
         self.assertEqual([c['id'] for c in en], [c['id'] for c in es])
         for a, b in zip(en, es):
             self.assertEqual([l[0] for l in a['lines']], [l[0] for l in b['lines']], a['id'])
@@ -88,8 +93,10 @@ class Chats(base.Growth):
         for lang in ('en','es'):
             chats = text[lang]['list']
             self.assertEqual(chats[0]['id'], 'blankets')
-            self.assertEqual(chats[-1]['id'], 'letter')
-            self.assertTrue(chats[-1].get('memory'))
+            lobby = [c for c in chats if c['id'] not in GHOST_CHATS]
+            self.assertEqual(lobby[-1]['id'], 'letter', 'The letter clue closes the lobby chats')
+            self.assertTrue(lobby[-1].get('memory'))
+            self.assertEqual([c['id'] for c in chats[-len(GHOST_CHATS):]], GHOST_CHATS)
             for chat in chats:
                 if chat['id'] in original:
                     self.assertTrue(chat.get('thought'), chat['id'])
@@ -99,7 +106,7 @@ class Chats(base.Growth):
         self.assertIn('seven videos', english['inbox']['lines'][-1][1])
 
         # The original memory-book mystery remains functional despite its new position.
-        story_index = len(text[self.lang]['list'])-1
+        story_index = next(i for i, c in enumerate(text[self.lang]['list']) if c['id'] == 'letter')
         self.page.evaluate("""index => localStorage.setItem('mapachez_chats_v1',
             JSON.stringify({version:1,next:index,heard:[],bye:0}))""", story_index)
         self.page.reload()
