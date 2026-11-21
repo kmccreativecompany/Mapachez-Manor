@@ -1091,10 +1091,33 @@ const CAST_BRIGHT=['#ff7eb6','#f25c9a','#6fb7ff','#3f8cff','#a974ff','#c79bff','
 const CAST_FAE=['#cfe6c0','#d9cdf0','#c7e3ec','#f2d3df','#bfe0d0','#e8dcb6'];
 const CAST_BODY={round:{hy:-9,fw:9,top:-20,neck:-2,aw:12},tall:{hy:-17,fw:7,top:-27,neck:-8,aw:9},blob:{hy:-5,fw:9,top:-16,neck:2,aw:13},wiggly:{hy:-16,fw:7,top:-26,neck:-5,aw:8}};
 const CAST_CACHE=new Map(),CAST_TAU=Math.PI*2;
+/* NPC LINEAGE: family membership and biological origin are separate from form.
+   A biological family shares originKind; adopted relatives, spouses, stepfamily and
+   pets are independent unless a story author explicitly supplies heritageId.
+   This metadata is deliberately never printed in player-facing dialogue. */
+const CAST_ORIGIN_KINDS=['human','monster','alien','fae','raccoon'];
+function castOriginFromKey(key){
+  let h=2166136261;
+  for(const ch of String(key))h=Math.imul(h^ch.charCodeAt(0),16777619);
+  return CAST_ORIGIN_KINDS[(h>>>0)%CAST_ORIGIN_KINDS.length];
+}
+function castHeritageKey(base={}){
+  if(typeof base.heritageId==='string'&&base.heritageId.trim())return base.heritageId;
+  if(base.familyRole==='biological'&&typeof base.familyId==='string'&&base.familyId.trim())return base.familyId;
+  return '';
+}
+function castLineageSignature(heritageId){
+  let h=2166136261;
+  for(const ch of String(heritageId))h=Math.imul(h^ch.charCodeAt(0),16777619);
+  return {ear:['human','pointed','round','cat','rabbit','floppy'][(h>>>4)%6],
+    surface:['skin','fur','feathers','scales'][(h>>>12)%4]};
+}
 function castShade(hex,f){const n=parseInt(String(hex).slice(1,7),16)||0,t=f<0?0:255,p=Math.abs(f),m=v=>Math.round(v+(t-v)*p);return '#'+((1<<24)|(m(n>>16)<<16)|(m(n>>8&255)<<8)|m(n&255)).toString(16).slice(1);}
 function castKey(p){return p?String(p.cast||p.id||p.name||''):'';}
 function castLook(key,base={}){
-  const id=String(key),ck=id+'|'+(base.color||'')+'|'+(base.skin||'')+'|'+(base.hair||'');
+  const id=String(key),heritageKey=castHeritageKey(base),
+    ck=id+'|'+(base.color||'')+'|'+(base.skin||'')+'|'+(base.hair||'')+
+      '|'+(base.familyId||'')+'|'+(base.familyRole||'')+'|'+heritageKey+'|'+(base.form||'');
   const hit=CAST_CACHE.get(ck);if(hit)return hit;
   let h=2166136261;for(let i=0;i<id.length;i++)h=Math.imul(h^id.charCodeAt(i),16777619);
   const R=()=>{h=h+0x6D2B79F5|0;let t=Math.imul(h^h>>>15,1|h);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;},pick=a=>a[Math.floor(R()*a.length)];
@@ -1112,7 +1135,51 @@ function castLook(key,base={}){
   const racRoll=R(),racFur=R(),rf=pick(CAST_RACFUR),fam=r.kind==='raccoon';
   if(!fam&&!CAST_PINS[id]&&racRoll<.1)r.kind='raccoon';
   if(r.kind==='raccoon'&&!fam&&racFur<.55)r.fur=rf;
-  Object.assign(r,CAST_PINS[id]||CAST_PINS[id.toLowerCase()]||{});
+  const pinned=CAST_PINS[id]||CAST_PINS[id.toLowerCase()];
+  Object.assign(r,pinned||{});
+  /* The established named cast and Delores family retain their authored looks.
+     Other NPCs get modular combinations without being locked to appearance types. */
+  if(!pinned&&!CAST_FAMILY.includes(id.toLowerCase())){
+    const originKind=heritageKey?castOriginFromKey(heritageKey):
+      (r.kind==='construct'?'human':r.kind);
+    const explicitForm=base.form==='robot'||base.form==='ghost'||base.form==='living'
+      ?base.form:'';
+    const form=explicitForm||(r.kind==='construct'?'robot':'living');
+    const familySignature=heritageKey?castLineageSignature(heritageKey):null;
+    r.mix=true;
+    r.originKind=originKind;
+    r.form=form;
+    r.kind=form==='robot'?'construct':originKind;
+    r.eyes=pick([1,2,2,3]);
+    r.hairPattern=pick(['1a','1b','1c','2a','2b','2c','3a','3b','3c','4a','4b','4c']);
+    r.hairdo=R()<.08?'bald':r.hairPattern[0]>='3'?'curly':pick(['short','long','bun']);
+    const surfaces=['skin','fur','feathers','scales'];
+    r.surface=form==='robot'?'metal':form==='ghost'?'ghostly':
+      originKind==='raccoon'?'fur':familySignature?familySignature.surface:pick(surfaces);
+    r.texture=r.surface==='fur'?pick(['short','fluffy','curly','shaggy']):
+      r.surface==='scales'?pick(['fine','plated']):
+      r.surface==='feathers'?pick(['soft','layered']):'smooth';
+    r.ears=originKind==='raccoon'?'round':familySignature?familySignature.ear:
+      pick(['human','human','pointed','round','cat','rabbit','floppy']);
+    r.horns=R()<.18?pick(['short','curled']):'none';
+    r.antlers=R()<.10?pick(['branch','fork']):'none';
+    r.antennae=R()<.13?'orbs':'none';
+    r.wings=R()<.17?pick(['butterfly','feather','bat']):'none';
+    r.tail=originKind==='raccoon'?'raccoon':
+      R()<.30?pick(['cat','fox','lizard','feather','mermaid']):'none';
+    r.glasses=R()<.19?'round':'none';
+    r.glassesColor=pick(['#c9a45c','#2b2433','#c2c7cc']);
+    r.facialHair=R()<.29?pick(['stubble','mustache','goatee','short-beard','full-beard','whiskers']):'none';
+    r.facialHairColor=r.hair;
+    r.headwear=R()<.12?pick(['hijab','scarf','wrap','turban','kufi','bandana']):'none';
+    r.headwearColor=pick(['#77536f','#254c41','#d6b66e','#38415a']);
+    r.markings=R()<.20?pick(['spots','stripes','freckles']):'none';
+    r.mobility=R()<.06?'wheelchair':'none';
+    r.chairColor='#7a394a';
+    r.tailColor=pick(['#73b7ae','#9a8ecb','#df9fa9']);
+    if(form==='ghost'){r.ghost=1;r.skin=pick(['#eef3ff','#ecf7f6','#f1ecff']);}
+    /* Mechanical and ghostly appearances do not erase the underlying origin. */
+  }
   if(base.color)r.color=base.color;
   r.dark=castShade(r.skin,-.32);r.light=castShade(r.skin,.35);r.coatDk=castShade(r.color,-.3);
   CAST_CACHE.set(ck,r);return r;
