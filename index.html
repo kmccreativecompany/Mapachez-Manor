@@ -1636,7 +1636,10 @@ function mixThumbnail(canvas){
     P(11,11,3,11,ink);
     if(value!=='none')for(const x of [3,15]){P(x,5,6,12,value==='bat'?ink:value==='butterfly'?'#d6ade9':blue);P(x+1,8,4,3,'#ffffff');}
   }else if(field==='tail'){
-    for(let i=0;i<5;i++){let col=value==='raccoon'&&i%2?ink:value==='fox'?'#cf885d':value==='feather'?'#d4a8c4':fur;
+    if(value==='mermaid'){
+      P(9,3,6,12,'#73b7ae');P(7,15,10,4,'#73b7ae');
+      P(3,18,8,5,'#87cfc4');P(13,18,8,5,'#87cfc4');
+    }else if(value!=='none')for(let i=0;i<5;i++){let col=value==='raccoon'&&i%2?ink:value==='fox'?'#cf885d':value==='feather'?'#d4a8c4':fur;
       P(3+i*3,16-Math.floor(i/2)*2,4,5,col);}
   }else if(field==='hairPattern'||field==='hairdo'||field==='headwear'){
     P(7,11,11,10,'#ebc2a1');
@@ -1714,7 +1717,7 @@ function openPlayerPicker(){
       fields+=group('Antlers',opts('antlers',[['none','None'],['branch','Branching'],['fork','Forked']]));
       fields+=group('Antennae',opts('antennae',[['none','None'],['orbs','Glowing bulbs']]));
       fields+=group('Wings',opts('wings',[['none','None'],['feather','Feathered'],['butterfly','Butterfly'],['bat','Bat']]));
-      fields+=group('Tail',opts('tail',[['none','None'],['raccoon','Striped'],['fox','Fluffy'],['cat','Curved'],['lizard','Reptilian'],['feather','Plumed'],['mermaid','Mermaid fin'],['mermaid','Mermaid fin']]));
+      fields+=group('Tail',opts('tail',[['none','None'],['raccoon','Striped'],['fox','Fluffy'],['cat','Curved'],['lizard','Reptilian'],['feather','Plumed'],['mermaid','Mermaid fin']]));
     }
     if(tab==='mobility'){
       fields+=group('Mobility',opts('mobility',[['none','On foot / Tail / Float'],['wheelchair','Classic manual wheelchair']]));
