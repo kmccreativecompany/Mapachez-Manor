@@ -1892,9 +1892,9 @@ function openPlayerPicker(){
       '<div class="pp-angle"><canvas id="pp-back" width="106" height="142" role="img" aria-label="'+T('Back view')+'"></canvas>'+T('Back')+'</div></div>'+
       '<div class="pp-stage-caption">'+T('Mix any features. Your look updates instantly.')+'</div></aside>'+
       '<div class="pp-panel"><div class="pp-intro">'+T('Choose anything. No species labels, no limits on your imagination.')+'</div>'+
-      '<nav class="pp-tabs" aria-label="'+T('Character customization sections')+'">'+
-      tabs.map(([id,name])=>'<button type="button" class="pp-tab'+(tab===id?' picked':'')+'" data-tab="'+id+'" aria-current="'+(tab===id?'page':'false')+'" aria-selected="'+(tab===id)+'">'+T(name)+'</button>').join('')+
-      '</nav><div class="pp-fields" id="pp-fields" data-tab="'+tab+'">'+fields+'</div>'+
+      '<nav class="pp-tabs" role="tablist" aria-label="'+T('Character customization sections')+'">'+
+      tabs.map(([id,name])=>'<button type="button" role="tab" id="pp-tab-'+id+'" aria-controls="pp-fields" class="pp-tab'+(tab===id?' picked':'')+'" data-tab="'+id+'" aria-selected="'+(tab===id)+'" tabindex="'+(tab===id?'0':'-1')+'">'+T(name)+'</button>').join('')+
+      '</nav><div class="pp-fields" role="tabpanel" aria-labelledby="pp-tab-'+tab+'" id="pp-fields" data-tab="'+tab+'">'+fields+'</div>'+
       '<div class="pp-actions"><button type="button" class="secondary-button" id="pp-random">🎲 '+T('Surprise me')+'</button>'+
       '<button type="button" class="primary-button" id="pp-done">♥ '+T('Save my look')+'</button></div></div></section>';
     openModal(html,true);
@@ -1911,7 +1911,17 @@ function openPlayerPicker(){
       const next=all.find(el=>focusField?el.dataset.opt===focusField&&el.dataset.value===focusValue:el.dataset.tab===focusTab);
       next?.focus({preventScroll:true});
     });
-    root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;draw();});
+    root.querySelectorAll('[data-tab]').forEach(b=>{
+      b.onclick=()=>{tab=b.dataset.tab;draw();};
+      b.onkeydown=e=>{
+        const keys=['ArrowRight','ArrowLeft','Home','End'];
+        if(!keys.includes(e.key))return;
+        e.preventDefault();const index=tabs.findIndex(([id])=>id===b.dataset.tab);
+        const next=e.key==='Home'?0:e.key==='End'?tabs.length-1:
+          (index+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+        tab=tabs[next][0];draw();
+      };
+    });
     root.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{
       const field=b.dataset.opt,value=b.dataset.value;
       v[field]=field==='eyes'?Number(value):value;
