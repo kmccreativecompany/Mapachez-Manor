@@ -13,7 +13,7 @@ The code sits between `CHATS v1` markers at the end of the main script in `index
 styles marked `/* CHATS v1 */`. It replaces the old single fern conversation and reuses its
 bubble, spot and Memory Book page (a chat with `memory:true` fills that page).
 
-## The thirteen chats
+## The nineteen chats
 
 | id | Pair | Joke engine |
 | --- | --- | --- |
@@ -30,10 +30,24 @@ bubble, spot and Memory Book page (a chat with `memory:true` fills that page).
 | inbox | Ji-woo Park, Camila Rojas | Three thousand unread messages. Out-of-office: "Back soon. Stars permitting." |
 | photo | Bramble Knox, Amara Diallo | Nobody eats until the photo is right. His day off "is also a review." (He writes about food; it is never said, only shown.) |
 | circle | Basil Thorne, Noah Tremblay | "Quick questions" that take an hour, and circling back that never comes back. |
+| robot-terms | Ada Rowan, Ms. Chen | The perfect listener has anniversary terms and conditions. |
+| beta-romance | Mira Moon, Noah Tremblay | The perfect boyfriend is still in beta. |
+| counselor-conspiracy | Mrs. Calder, Gwendolyn Butterfield | The marriage counselor and its second opinion agree. |
+| romance-update | Ada Rowan, Basil Thorne | A romantic software update asks for a rating. |
+| subscription-marriage | Ada Rowan, Ji-woo Park | Six peaceful years without renewing a subscription. |
+| wifi-ex | Ada Rowan, Camila Rojas | An ex keeps trying to reconnect, until the Wi-Fi password changes. |
 
 The five work-life chats (email, toast, sunday, inbox, circle) are spread through the rotation, so a
 new player meets "Could have been an email" second. They are for tired workers to feel seen: the
 guests are tired too, and they are kind about it. Nobody's boss, job or company is mocked by name.
+
+## AI relationship jokes and thought bubbles
+
+Six optional chats add absurd, affectionate jokes about AI companionship, updates, subscriptions and marriage counseling. They are sprinkled into the existing rotation rather than opening a separate menu. Each finishes with an italic **Butler thought** bubble. Both English and Spanish are authored in the game, offline, with no AI service or network call.
+
+Ada Rowan and Mira Moon use a consistent machine-built character look in the existing pixel-art cast. The robot-husband storyline depicts a robot married to another robot, not an inter-species marriage. No new inter-species marriages are introduced. The AI jokes concern fictional character relationships rather than player relationship mechanics.
+
+Players with existing `mapachez_chats_v1` saves keep their previously heard conversation IDs and continue from their current saved rotation number. The All Ears pin now requires all nineteen chats.
 
 ## Tired little goodbyes
 
@@ -70,7 +84,7 @@ has `a` and `b` (a `cast` name keeps a guest's look the same as elsewhere), `lin
 
 `mapachez_chats_v1` on the device: `next` (which pair is in the chairs), `heard` (chat ids) and `bye` (which goodbye is next).
 Hearing the letter chat still sets the evening's old fern flag for the Memory Book page. Hearing any chat
-earns A Listening Ear; hearing all thirteen earns the All Ears pin (anyone who
+earns A Listening Ear; hearing all nineteen earns the All Ears pin (anyone who
 already earned it keeps it).
 
 ## Checks
