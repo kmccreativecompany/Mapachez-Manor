@@ -15,35 +15,37 @@ bubble, spot and Memory Book page (a chat with `memory:true` fills that page).
 
 ## The nineteen chats
 
-| id | Pair | Joke engine |
-| --- | --- | --- |
-| letter | Zinnia Starling, Sunny Marrow | A secret letter for Lady Vesper, signed with one note drawn twice. Callback to Mr. Finch's one-note triangle. |
-| bells | Gwendolyn Butterfield, Mr. Finch | Spoons, bells, one triangle. Her next obsession is set up last. |
-| time | Ms. Chen, Dr. Merriweather | At the bar: one has nine minutes, one has "centuries. I mean weeks." Her very red usual is "synthetic, wonderful for the complexion." |
-| muffin | Cece Wrenwood, Basil Thorne | Muffin and Admiral both play asleep. "Two professionals." |
-| blankets | Mrs. and Mr. Calder | Forty years: patience, kindness, separate blankets. |
-| tuesday | Mr. Alvarez, M. Nine | A delayed flight vs. a trip "through Tuesday. Twice." |
-| duchess | Pippa, Lavinia Bloom | Is Duchess a real duchess? Callback to Miso's crown drawing. |
-| email | Ms. Chen, Dr. Merriweather | A video meeting that could have been an email. Her day: one meeting that ran a century. |
-| toast | Mr. Alvarez, Sione Taufa | Spread thin, like a little jam on very big toast. Said yes to four things; wanted one nap. |
-| sunday | Zanele Dlamini, Arjun Mehta | The Sunday-night feeling, felt in horns and wings. Don't say Monday's name. |
-| inbox | Ji-woo Park, Camila Rojas | Three thousand unread messages. Out-of-office: "Back soon. Stars permitting." |
-| photo | Bramble Knox, Amara Diallo | Nobody eats until the photo is right. His day off "is also a review." (He writes about food; it is never said, only shown.) |
-| circle | Basil Thorne, Noah Tremblay | "Quick questions" that take an hour, and circling back that never comes back. |
-| robot-terms | Ada Rowan, Ms. Chen | The perfect listener has anniversary terms and conditions. |
-| beta-romance | Mira Moon, Noah Tremblay | The perfect boyfriend is still in beta. |
-| counselor-conspiracy | Mrs. Calder, Gwendolyn Butterfield | The marriage counselor and its second opinion agree. |
-| romance-update | Ada Rowan, Basil Thorne | A romantic software update asks for a rating. |
-| subscription-marriage | Ada Rowan, Ji-woo Park | Six peaceful years without renewing a subscription. |
-| wifi-ex | Ada Rowan, Camila Rojas | An ex keeps trying to reconnect, until the Wi-Fi password changes. |
+Eighteen conversations are quick, relatable social jokes. One, the gold-sealed letter, is an optional mystery clue for the Memory Book. New players start with the marriage/sofa joke, then the workplace DNA-test joke. The older triangle/spoons conversation has been replaced, not merely hidden.
 
-The five work-life chats (email, toast, sunday, inbox, circle) are spread through the rotation, so a
-new player meets "Could have been an email" second. They are for tired workers to feel seen: the
-guests are tired too, and they are kind about it. Nobody's boss, job or company is mocked by name.
+| id | Setup and punchline |
+| --- | --- |
+| blankets | A couple never goes to bed angry because their sofa is comfortable. |
+| email | A boss says the staff is family, so an employee asks for a DNA test. |
+| robot-terms | A robot spouse demands new terms and conditions before dinner. |
+| bells | An older guest doesn't care what people think, except Margaret. |
+| toast | Following a dream means becoming a professional napper. |
+| beta-romance | A perfect boyfriend is still in beta testing. |
+| time | A wealthy guest hasn't shopped for groceries since 1998. |
+| sunday | A newly promoted director's responsibilities are still being aligned. |
+| counselor-conspiracy | An AI marriage counselor agrees with the second opinion. |
+| muffin | A woman's fourth husband is her favorite because he can cook. |
+| inbox | A private person makes seven videos announcing her privacy. |
+| romance-update | A romantic spouse asks for a review after an update. |
+| circle | Gossip is rebranded as distributing family updates. |
+| photo | Money cannot buy happiness, but can fund crying on a yacht. |
+| subscription-marriage | A quiet marriage is explained by a canceled subscription. |
+| tuesday | An astrologically cautious date cancels because Mercury objects. |
+| duchess | A pet influencer gets famous by napping. |
+| wifi-ex | An ex cannot reconnect after a Wi-Fi password change. |
+| letter | Optional story clue: an envelope addressed to Lady Vesper with two identical musical notes. |
+
+The recurring guest name, character recipe and chat ID are preserved where practical. The letter still has `memory:true` and unlocks the existing Memory Book story page. The romantic robot cast is pinned to the same machine-built kind; the Calder spouses are pinned to the same human kind.
+
+Each comedy conversation ends with a clearly labeled **Butler thought** reaction. The jokes are authored offline in English and Spanish. The reveal is the last dialogue line, so the punchline is understandable without having read earlier lore.
 
 ## AI relationship jokes and thought bubbles
 
-Six optional chats add absurd, affectionate jokes about AI companionship, updates, subscriptions and marriage counseling. They are sprinkled into the existing rotation rather than opening a separate menu. Each finishes with an italic **Butler thought** bubble. Both English and Spanish are authored in the game, offline, with no AI service or network call.
+Six AI-related jokes join twelve new socially relatable scenes about marriage, wealth, family gossip, workplace culture, astrology and online life. They are mixed through the lobby rotation and finish with an italic **Butler thought** bubble. Both English and Spanish are authored in the game, offline, with no AI service or network call.
 
 Ada Rowan and Mira Moon use a consistent machine-built character look in the existing pixel-art cast. The robot-husband storyline depicts a robot married to another robot, not an inter-species marriage. No new inter-species marriages are introduced. The AI jokes concern fictional character relationships rather than player relationship mechanics.
 
@@ -58,8 +60,8 @@ The count is saved as `bye`.
 
 ## Writing rules
 
-- Rule of three, the funny word last, specific details, one small misdirection.
-- Jokes come from who guests already are (callbacks to regulars, gags and guest moments).
+- Fast setup, plain-language exchange and unmistakable punchline on the last line.
+- Prefer observational humor about universal experiences over inside jokes. Only the letter is intentionally a mystery clue.
 - Laugh with people, never at them. Hidden stories are hinted, never told. Nobody's kind of
   being is named (no "vampire", "alien", "monster"), and Muffin is only ever a cat.
 - Lines stay under 70 characters so bubbles fit on phones. The first three lines are the teaser.
@@ -78,7 +80,7 @@ Femi Adeyemi and the Nguyen family.
 
 All words live in `CHATS_TEXT.en` and `CHATS_TEXT.es`, with matching ids and speakers. Each chat
 has `a` and `b` (a `cast` name keeps a guest's look the same as elsewhere), `lines` as
-`[speaker, text]`, an optional `stage` line shown after the teaser, and an `end` line.
+`[speaker, text]`, an optional `stage` line shown after the teaser, an `end` line and for jokes a `thought` reaction.
 
 ## Saving
 
