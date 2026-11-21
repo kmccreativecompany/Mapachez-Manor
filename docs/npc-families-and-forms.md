@@ -28,7 +28,7 @@ const ghostSpouse = castLook('Wisp', {
 });
 ```
 
-`familyId` groups members socially, while `familyRole: 'biological'` activates shared species inheritance. `heritageId` explicitly shares an origin with any character or group, including a spouse. An unrelated or adopted relative who is *coincidentally* the same species is permitted, but is not automatically forced to match. `form: 'living' | 'robot' | 'ghost'` controls visible body form. The internal `originKind` tracks species of origin and is not shown to the player. Use stable, unique string identifiers.
+`familyId` groups members socially, while `familyRole: 'biological'` activates shared species inheritance. `heritageId` explicitly shares an origin with any character or group, including a spouse. An unrelated or adopted relative who is *coincidentally* the same species is permitted, but is not automatically forced to match. `form: 'living' | 'robot' | 'ghost'` controls visible body form. The internal `originKind` and `originSpecies` track the underlying origin, separately from any robot or ghost appearance, and neither is shown to the player. The family IDs `delores` and `delores-family` are reserved for Delores's established raccoon lineage. Use stable, unique string identifiers.
 
 ### Compatibility
 
