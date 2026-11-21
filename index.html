@@ -1530,6 +1530,50 @@ function randomPlayer(){
   r.skin=pick(MIX_SKINS);r.hair=pick([...CAST_HAIR,...CAST_BRIGHT]);
   return r;
 }
+/* Small code-drawn pixel thumbnails for the creator, no image downloads. */
+function mixThumbnail(canvas){
+  const [field,value]=canvas.dataset.icon.split(':'),c=canvas.getContext('2d');
+  const P=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
+  const ink='#4b3546',gold='#c89e60',rose='#c88891',fur='#b18a68',blue='#a5cada';
+  c.clearRect(0,0,24,24);c.imageSmoothingEnabled=false;
+  if(field==='eyes'){
+    const xs=value==='1'?[11]:value==='3'?[5,11,17]:[7,15];
+    for(const x of xs){P(x,11,3,4,ink);P(x,11,1,1,'#ffffff');}
+  }else if(field==='ears'){
+    P(8,10,9,9,fur);
+    if(value==='rabbit')for(const x of [7,17]){P(x,2,3,11,fur);P(x+1,4,1,6,rose);}
+    else if(value==='cat'||value==='pointed')for(const x of [6,17]){P(x,6,4,7,fur);P(x+1,7,1,3,rose);}
+    else if(value==='floppy')for(const x of [2,19])P(x,11,4,10,fur);
+    else if(value==='round')for(const x of [5,18])P(x,8,4,5,fur);
+  }else if(field==='horns'||field==='antlers'||field==='antennae'){
+    P(8,14,9,6,fur);
+    for(const x of [8,18]){
+      if(field==='antennae'){P(x,5,1,11,ink);P(x-1,3,3,3,gold);}
+      else if(field==='antlers'){P(x,4,2,12,fur);P(x+(x<12?-3:3),7,4,2,fur);P(x+(x<12?-2:2),5,2,4,fur);}
+      else{P(x,8,4,8,ink);P(x+(x<12?-1:1),5,3,5,gold);}
+    }
+  }else if(field==='wings'){
+    P(11,11,3,11,ink);
+    if(value!=='none')for(const x of [3,15]){P(x,5,6,12,value==='bat'?ink:value==='butterfly'?'#d6ade9':blue);P(x+1,8,4,3,'#ffffff');}
+  }else if(field==='tail'){
+    for(let i=0;i<5;i++){let col=value==='raccoon'&&i%2?ink:value==='fox'?'#cf885d':value==='feather'?'#d4a8c4':fur;
+      P(3+i*3,16-Math.floor(i/2)*2,4,5,col);}
+  }else if(field==='hairPattern'||field==='hairdo'||field==='headwear'){
+    P(7,11,11,10,'#ebc2a1');
+    const cover=field==='headwear'&&value!=='none',col=cover?'#77536f':ink;
+    P(5,6,15,7,col);if(cover){P(5,13,3,10,col);P(17,13,3,10,col);}
+    else if(value==='bald')P(5,6,15,7,'#ebc2a1');
+    else if(value[0]==='3'||value[0]==='4')for(const x of [4,7,10,13,16,19])P(x,6+x%2,3,4,col);
+    else if(value[0]==='2')for(const x of [5,10,15])P(x,5+x%3,4,3,col);
+  }else if(field==='surface'||field==='texture'){
+    P(4,4,16,16,'#ddbb9c');for(let x=6;x<19;x+=4)for(let y=6;y<19;y+=4){
+      if(value==='fur'||value==='fluffy'||value==='shaggy'||value==='curly')P(x,y,2,2,fur);
+      if(value==='scales'||value==='fine'||value==='plated')P(x,y,3,2,blue);
+      if(value==='feathers'||value==='layered')P(x,y,3,2,'#e6cee4');
+      if(value==='metal')P(x,y,3,2,'#b3b3bc');
+    }
+  }else{P(8,6,8,9,fur);P(6,15,12,6,gold);}
+}
 function openPlayerPicker(){
   let v=mixDefault(playerChoice),tab='body';
   const T=(x)=>esc(t(x));
@@ -1538,8 +1582,10 @@ function openPlayerPicker(){
     const pro=v.pronouns||[];
     const chip=(field,value,label)=>{
       const on=String(v[field]||'none')===String(value);
+      const icon=['eyes','ears','horns','antlers','antennae','wings','tail','hairPattern','hairdo','headwear','surface','texture'].includes(field)
+        ?'<canvas class="pp-icon" width="24" height="24" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
       return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
-        '" aria-pressed="'+on+'">'+T(label)+'</button>';
+        '" aria-pressed="'+on+'">'+icon+T(label)+'</button>';
     };
     const group=(name,buttons)=>'<fieldset class="pp-group"><legend>'+T(name)+'</legend><div class="pp-options">'+buttons+'</div></fieldset>';
     const opts=(field,values)=>values.map(a=>chip(field,a[0],a[1])).join('');
@@ -1590,7 +1636,7 @@ function openPlayerPicker(){
     const tabs=[['body','Body & Eyes'],['hair','Hair & Coverings'],['features','Ears & Extras'],['surface','Surface'],['profile','About Me']];
     const html=titleHTML(t('Create your character'),t('MIX & MATCH'))+
       '<section id="pp-mix">'+
-      '<style>#pp-mix{color:#40352f}#pp-mix .pp-tabs,#pp-mix .pp-options{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}#pp-mix button{cursor:pointer}#pp-mix .pp-tab,#pp-mix .pp-choice{border:1px solid #ac9076;border-radius:9px;padding:9px 11px;background:#fff6e8;color:#432b36;font:600 14px Georgia,serif;min-height:42px}#pp-mix .picked{background:#773d50!important;color:#fff8ec!important;border-color:#773d50!important;box-shadow:inset 0 0 0 1px #e6c899}#pp-mix .pp-tabs{position:sticky;top:0;background:#f8f0df;padding:8px 0;z-index:2}#pp-mix .pp-group{border:1px solid #d4c0a0;border-radius:10px;margin:10px 0;padding:12px}#pp-mix legend{font:600 17px Georgia,serif;color:#65394b;padding:0 8px}#pp-mix .pp-preview{display:flex;justify-content:center;align-items:end;gap:8px;padding:8px 0;background:#f6ecdf;border-radius:12px}#pp-mix .pp-preview canvas{image-rendering:pixelated}#pp-mix .pp-label{display:block;margin:8px 0;font-weight:600}#pp-mix input{padding:11px;border-radius:8px;border:1px solid #ac9076;width:100%;max-width:260px}#pp-mix .pp-swatch{width:36px;height:36px;min-height:36px;border:2px solid #fff;border-radius:9px;outline:1px solid #b5a18e}#pp-mix .pp-hint{text-align:center;font-size:13px;color:#685c50}#pp-mix .pp-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}#pp-mix .pp-actions button{padding:12px 18px;min-height:44px}</style>'+
+      '<style>#pp-mix{color:#40352f}#pp-mix .pp-tabs,#pp-mix .pp-options{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}#pp-mix button{cursor:pointer}#pp-mix .pp-tab,#pp-mix .pp-choice{border:1px solid #ac9076;border-radius:9px;padding:9px 11px;background:#fff6e8;color:#432b36;font:600 14px Georgia,serif;min-height:42px}#pp-mix .pp-choice{display:inline-flex;align-items:center;gap:5px}#pp-mix .pp-icon{width:30px;height:30px;image-rendering:pixelated}#pp-mix .picked{background:#773d50!important;color:#fff8ec!important;border-color:#773d50!important;box-shadow:inset 0 0 0 1px #e6c899}#pp-mix .pp-tabs{position:sticky;top:0;background:#f8f0df;padding:8px 0;z-index:2}#pp-mix .pp-group{border:1px solid #d4c0a0;border-radius:10px;margin:10px 0;padding:12px}#pp-mix legend{font:600 17px Georgia,serif;color:#65394b;padding:0 8px}#pp-mix .pp-preview{display:flex;justify-content:center;align-items:end;gap:8px;padding:8px 0;background:#f6ecdf;border-radius:12px}#pp-mix .pp-preview canvas{image-rendering:pixelated}#pp-mix .pp-label{display:block;margin:8px 0;font-weight:600}#pp-mix input{padding:11px;border-radius:8px;border:1px solid #ac9076;width:100%;max-width:260px}#pp-mix .pp-swatch{width:36px;height:36px;min-height:36px;border:2px solid #fff;border-radius:9px;outline:1px solid #b5a18e}#pp-mix .pp-hint{text-align:center;font-size:13px;color:#685c50}#pp-mix .pp-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}#pp-mix .pp-actions button{padding:12px 18px;min-height:44px}</style>'+
       '<p class="pp-hint">No species categories. Pick any combination of shapes, eyes, textures, wings and tails.</p>'+
       '<div class="pp-preview"><canvas id="pp-side" width="90" height="145" aria-label="Side view"></canvas><canvas id="pp-view" width="160" height="160" role="img" aria-label="Live character preview"></canvas><canvas id="pp-back" width="90" height="145" aria-label="Back view"></canvas></div>'+
       '<div class="pp-tabs" role="tablist">'+tabs.map(([id,name])=>'<button class="pp-tab'+(tab===id?' picked':'')+'" data-tab="'+id+'" role="tab" aria-selected="'+(tab===id)+'">'+T(name)+'</button>').join('')+'</div>'+
@@ -1602,11 +1648,13 @@ function openPlayerPicker(){
       drawBeing(g,x,y,looks,0,dir,false,scale);
     }
     const root=$('pp-mix');
+    root.querySelectorAll('canvas[data-icon]').forEach(mixThumbnail);
     root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;draw();});
     root.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{
       const field=b.dataset.opt,value=b.dataset.value;
       v[field]=field==='eyes'?Number(value):value;
       if(field==='surface'){v.texture=MIX_SURFACES[value][0];}
+      if(field==='texture'&&value==='freckles'){v.markings='freckles';}
       if(field==='hairPattern'){v.hairdo=value[0]>='3'?'curly':'long';}
       if(field==='hairdo'&&value!=='bald')v.hairPattern='';
       draw();
