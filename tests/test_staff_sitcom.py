@@ -1,4 +1,4 @@
-"""Browser checks for nine optional Mapáchez Manor staff sitcom scenes.
+"""Browser checks for nine unadvertised, naturally discovered staff conversations.
 
 Run: python tests/test_staff_sitcom.py
 Set CHROMIUM_PATH for a custom Chromium installation.
@@ -13,7 +13,7 @@ INSPECTOR = """
 Object.defineProperty(window,'sitcomTest',{get:()=>({
  catalog:STAFF_SITCOM,
  heard:[...staffSitcomHeard],
- menu:()=>openStaffSitcomMenu(),
+ next:()=>openStaffMoment(),
  desk:()=>desk(),
  clock:state?.minute ?? null,
  growthAnswers:growth.answers
@@ -37,10 +37,16 @@ class StaffSitcom(base.Growth):
                 self.assertTrue(episode['thinker'])
         self.assertNotIn('golfcart', json.dumps(data).lower())
 
-    def test_02_title_menu_reveal_saved_episodes_and_replay(self):
-        self.page.locator('#title-staff-sitcom').click()
-        self.assertEqual(self.page.locator('.staff-sitcom-episode').count(), 9)
-        self.page.locator('.staff-sitcom-episode').first.click()
+    def open_desk(self):
+        self.page.locator('#begin').click()
+        self.page.wait_for_selector('#game-shell:not([hidden])')
+        self.page.evaluate('window.sitcomTest.desk()')
+
+    def test_02_natural_desk_reveal_saved_scenes_and_repeat(self):
+        self.assertEqual(self.page.locator('#title-staff-sitcom').count(), 0)
+        self.assertNotIn('Staff sitcom', self.page.locator('#title-screen').inner_text())
+        self.open_desk()
+        self.page.get_by_role('button', name='Check in with the team').click()
         self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'The Five-Minute Meeting')
         self.assertEqual(self.page.locator('.staff-sitcom-lines li').count(), 3)
         self.page.get_by_role('button', name='Keep listening').click()
@@ -50,27 +56,31 @@ class StaffSitcom(base.Growth):
         saved = json.loads(self.page.evaluate("localStorage.getItem('mapachez_staff_sitcom_v1')"))
         self.assertEqual(saved, {'version':1,'heard':['meeting']})
         self.assertEqual(self.page.evaluate('window.sitcomTest.growthAnswers'), 0)
-        self.page.get_by_role('button', name='Back to staff room').click()
-        self.assertIn('Heard', self.page.locator('.staff-sitcom-episode').first.inner_text())
+        self.page.get_by_role('button', name='Back to the front desk').click()
+        self.page.get_by_role('button', name='Check in with the team').click()
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Employee of the Month')
         self.page.reload()
-        self.page.locator('#title-staff-sitcom').click()
-        self.assertIn('Heard', self.page.locator('.staff-sitcom-episode').first.inner_text())
+        self.page.locator('#begin').click()
+        self.page.evaluate('window.sitcomTest.desk()')
+        self.page.get_by_role('button', name='Check in with the team').click()
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Employee of the Month')
 
-    def test_03_desk_access_and_corrupt_save_recovery(self):
+    def test_03_corrupt_save_and_story_clock_stays_still(self):
         self.page.evaluate("localStorage.setItem('mapachez_staff_sitcom_v1', '{oops')")
         self.page.reload()
         self.assertEqual(self.page.evaluate('window.sitcomTest.heard'), [])
-        self.page.locator('#begin').click()
-        self.page.wait_for_selector('#game-shell:not([hidden])')
-        self.page.evaluate('window.sitcomTest.desk()')
-        self.page.get_by_role('button', name='Overhear the staff room').click()
-        self.assertEqual(self.page.locator('.staff-sitcom-episode').count(), 9)
+        self.open_desk()
+        before = self.page.evaluate('window.sitcomTest.clock')
+        self.page.get_by_role('button', name='Check in with the team').click()
+        self.page.get_by_role('button', name='Keep listening').click()
+        self.assertEqual(self.page.evaluate('window.sitcomTest.clock'), before)
 
-    def test_04_mobile_menu_is_usable(self):
+    def test_04_mobile_surprise_fits(self):
         self.context.close()
         self.setUp({'width':390,'height':844})
-        self.page.locator('#title-staff-sitcom').click()
-        self.assertEqual(self.page.locator('.staff-sitcom-episode').count(), 9)
+        self.open_desk()
+        self.page.get_by_role('button', name='Check in with the team').click()
+        self.assertEqual(self.page.locator('.staff-sitcom-lines li').count(), 3)
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'), 390)
         box = self.page.locator('#modal').bounding_box()
         self.assertLessEqual(box['x'] + box['width'], 390)
