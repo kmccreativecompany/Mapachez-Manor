@@ -1391,6 +1391,80 @@ function pxPaint(r,dir,blink,frame,mood=''){
     else if(cover==='kufi'){R(9,5,16,8,hc,'wrap');}
     else if(cover==='bandana'){R(7,9,20,4,hc,'wrap');}
   }
+  /* Creator-only facial hair, one round spectacle design, mermaid tail, and
+     one classic wheelchair. The pinned story cast is unaffected. */
+  if(mix){
+    const furColor=r.facialHairColor||r.hair||'#60473b';
+    const facial=r.facialHair||'none';
+    if(!back){
+      if(facial==='stubble'){
+        for(const x of [10,12,14,18,21,23])for(const y of [23,25])
+          if((x+y)%3!==0)P(x,y,T(furColor,.16),'facial');
+      }
+      if(['mustache','handlebar','goatee','short-beard','full-beard','long-beard','mutton'].includes(facial)){
+        R(12,22,3,2,furColor,'facial');R(18,22,3,2,furColor,'facial');
+        P(15,23,furColor,'facial');P(17,23,furColor,'facial');
+        if(facial==='handlebar'){
+          P(10,21,furColor,'facial');P(11,22,furColor,'facial');
+          P(22,21,furColor,'facial');P(21,22,furColor,'facial');
+        }
+      }
+      if(['goatee','short-beard','full-beard','long-beard','mutton'].includes(facial)){
+        const row=facial==='goatee'?5:facial==='short-beard'?7:facial==='long-beard'?11:9;
+        for(let y=24;y<24+row;y++)for(let x=9;x<=23;x++){
+          const boundary=(facial==='goatee'?Math.abs(x-16)<=3:Math.abs(x-16)<=Math.min(7,Math.max(3,(33-y))));
+          if(boundary&&(y>25||x<12||x>20))P(x,y,furColor,'facial');
+        }
+      }
+      if(['sideburns','mutton'].includes(facial))for(const x of [8,23])R(x,20,2,7,furColor,'facial');
+      if(facial==='whiskers')for(const x of [5,8,24,27])P(x,23+(x%2),furColor,'facial');
+
+      if(r.glasses==='round'){
+        const frameColor=r.glassesColor||'#c9a45c';
+        const n=r.eyes===1?1:r.eyes===3?3:2;
+        const lens=n===1?[[14,16]]:n===3?[[9,17],[15,13],[21,17]]:[[9,16],[19,16]];
+        for(const [x,y] of lens){
+          R(x,y,5,1,frameColor,'glasses');R(x,y+5,5,1,frameColor,'glasses');
+          R(x,y+1,1,4,frameColor,'glasses');R(x+4,y+1,1,4,frameColor,'glasses');
+        }
+        if(n===2)R(14,18,5,1,frameColor,'glasses');
+        if(n===1){R(19,19,4,1,frameColor,'glasses');R(5,19,9,1,frameColor,'glasses');}
+        if(n===3){P(14,18,frameColor,'glasses');P(20,18,frameColor,'glasses');}
+      }
+    }
+    const mermaid=r.tail==='mermaid',chair=r.mobility==='wheelchair';
+    if(chair){
+      const seat=r.chairColor||'#7a394a',edge='#c9a45c',tire='#292833',rim='#e6c58a';
+      /* One recognizable classic manual wheelchair, independently selectable. */
+      if(dir==='left'||dir==='right'){
+        R(8,24,2,11,edge,'chair');R(9,29,16,4,seat,'chair');
+        R(11,27,13,1,edge,'chair');R(24,32,2,6,edge,'chair');
+        E(10,35,6.5,6.5,tire,'wheel');E(10,35,4.6,4.6,rim,'wheel');
+        E(10,35,3.6,3.6,tire,'wheel');E(10,35,1.4,1.4,edge,'wheel');
+        for(let q=0;q<4;q++){const a=(q+frame%4)*Math.PI/2;P(10+Math.round(Math.cos(a)*3),35+Math.round(Math.sin(a)*3),rim,'wheel');}
+        E(26,39,2.4,2.4,tire,'wheel');E(26,39,1,1,edge,'wheel');
+      }else{
+        R(8,26,2,12,edge,'chair');R(24,26,2,12,edge,'chair');
+        R(9,29,16,5,seat,'chair');R(10,34,14,1,edge,'chair');
+        if(back)R(9,23,16,10,seat,'chair');
+        for(const x of [5,28]){E(x,35,3.6,6,tire,'wheel');R(x-1,31,2,8,rim,'wheel');}
+        R(11,39,12,2,edge,'chair');
+      }
+      if(!back)for(const x of [8,24])E(x,26,1.5,1.5,edge,'armrest');
+    }
+    if(mermaid){
+      const fin=r.tailColor||'#73b7ae',dark=T(fin,-.28),light=T(fin,.32);
+      /* The fins cover the walking legs; wheelchair users have a short tail
+         support that stays within the same collision footprint. */
+      E(17,33,chair?5.2:5.7,5.7,fin,'fin');R(13,32,8,2,light,'fin');
+      for(const x of [13,16,19])P(x,35+(x%2),dark,'fin');
+      if(!back){
+        E(13,39,3.6,3.3,fin,'fin');E(22,39,3.6,3.3,fin,'fin');
+        for(const x of [12,16,20,23])P(x,40,light,'fin');
+      }else{E(17,40,7,2.5,fin,'fin');}
+      if(chair)R(13,41,11,1,'#c9a45c','support');
+    }
+  }
   /* Light from the top left, a shadow under the hair, then a soft coloured outline. */
   const out=col.slice(),glow=ex.includes('glow');
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=y*W+x,m=mat[i];if(!m||!shade.has(m)||col[i]!==m)continue;
