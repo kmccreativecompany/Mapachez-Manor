@@ -1182,7 +1182,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const legs=(legCol,shoe,hoof)=>{const l=frame===1?-1:0,rr=frame===3?-1:0;
     R(13,33,3,5+l,legCol);R(17,33,3,5+rr,legCol);shade.add(legCol);
     R(12,37+l,4,2,shoe);R(17,37+rr,4,2,shoe);P(12,37+l,T(shoe,.35));P(17,37+rr,T(shoe,.35));if(hoof){P(14,38+l,K);P(19,38+rr,K);}};
-  const torso=(base=coat,armCol=coat,hand=skin)=>{R(11,23,11,10,base);R(12,22,9,1,base);R(8,24,3,7,armCol);R(22,24,3,7,armCol);P(9,23,armCol);P(23,23,armCol);
+  const torso=(base=coat,armCol=coat,hand=skin)=>{R(11,23,11,10,base);R(12,22,9,1,base);
+    if(mix){if(r.body==='blob')R(9,27,15,6,base);if(r.body==='tall')R(13,21,7,3,base);if(r.body==='wiggly')R(12,31,9,5,base);}R(8,24,3,7,armCol);R(22,24,3,7,armCol);P(9,23,armCol);P(23,23,armCol);
     R(8,30,3,1,cream);R(22,30,3,1,cream);R(8,31,3,2,hand);R(22,31,3,2,hand);shade.add(base);shade.add(armCol);};
   const outfit=(neck=22)=>{const o=r.outfit;
     if(!back){if(o==='vest'||o==='cardigan'||o==='hat'){R(15,neck,3,4,cream,cream);R(16,neck+4,1,1,cream,cream);P(14,neck,white,white);P(18,neck,white,white);P(13,neck+1,coatDk);P(14,neck+2,coatDk);P(19,neck+1,coatDk);P(18,neck+2,coatDk);
@@ -1203,7 +1204,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(hd==='long'){for(const x of [6,7,25,26])R(x,hy-2,1,(x===6||x===26)?14:13,hair);}else{R(6,hy-2,2,7,hair);R(25,hy-2,2,7,hair);}
     if(hd==='curly')for(const [x,y] of [[8,-6],[12,-9],[16.5,-10],[21,-9],[25,-6],[6,0],[27,0],[6,5],[27,5]])E(x,hy+y,r.hairPattern?.[0]==='4'?2:2.8,2.8,hair);
     if(mix&&r.hairPattern){const t=r.hairPattern[0],h=r.hairPattern[1];
-      if(t==='2')for(let x=8;x<=25;x+=4)for(let yy=hy-7;yy<=hy+1;yy+=3)P(x+(yy%2),yy,hairLt,hair);
+      if(t==='1')for(let x=9;x<=24;x+=h==='a'?6:h==='b'?4:3)P(x,hy-6,hairLt,hair);
+      if(t==='2')for(let x=8;x<=25;x+=h==='c'?3:h==='b'?4:5)for(let yy=hy-7;yy<=hy+1;yy+=3)P(x+(yy%2),yy,hairLt,hair);
       if(t==='3'||t==='4')for(let x=7;x<=26;x+=t==='4'?2:3)for(let yy=hy-8;yy<=hy+4;yy+=t==='4'?3:4)P(x+(yy%2),yy,h==='c'?hairDk:hairLt,hair);
     }
     if(hd==='bun'){E(16.5,hy-10,3.6,3.2,hair);R(14,hy-7,6,1,coat);}
@@ -1361,6 +1363,13 @@ function pxPaint(r,dir,blink,frame,mood=''){
       else if(surf==='metal'&&(x+y)%10===0)P(x,y,'#f3e8bc',color);
     }
     if(surf==='fur'&&(texture==='fluffy'||texture==='shaggy'))for(const [x,y] of [[6,13],[5,17],[6,21],[26,13],[27,17],[26,21]])P(x,y,color,color);
+    if(r.markings==='freckles')for(const x of [10,12,21,23])P(x,21,T(color,-.35),'mark');
+    if(r.markings==='spots')for(const [x,y] of [[8,13],[25,13],[9,23],[24,23]])E(x,y,1.5,1.5,T(color,-.34),'mark');
+    if(r.markings==='stripes')for(const x of [8,10,22,24])R(x,18,1,4,T(color,-.35),'mark');
+    if(r.markings==='mask'){E(12,17,5,3.5,T(color,-.55),'mark');E(21,17,5,3.5,T(color,-.55),'mark');}
+    if(r.expression==='happy'){R(15,22,3,1,'#874953','mouth');P(16,23,'#874953','mouth');}
+    if(r.expression==='surprised'){R(16,21,2,3,'#874953','mouth');}
+    if(r.expression==='skeptical'){R(10,12,5,1,'#4c3845','brow');}
     const ears=r.ears||'human';
     if(ears!=='human')for(const side of [-1,1]){const x=side<0?7:25;
       if(ears==='rabbit'){E(x,5,2.7,6.3,color,'ear');R(x,3,1,5,'#e5a5a8','ear');}
@@ -1376,7 +1385,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(r.antennae&&r.antennae!=='none')for(const x of [13,20]){for(let j=0;j<5;j++)P(x,7-j,'#536b64','antenna');E(x,2,1.6,1.6,'#eacb76','antenna');}
     const cover=r.headwear||'none',hc=r.headwearColor||'#77536f';
     if(cover==='hijab'||cover==='scarf'){
-      E(16.5,11,11,9,hc,'wrap');E(16.5,16,8,6,color,color);
+      E(16.5,11,11,9,hc,'wrap');if(!back)E(16.5,16,8,6,color,color);
       R(6,19,4,13,hc,'wrap');R(23,19,4,13,hc,'wrap');
     }else if(cover==='turban'||cover==='wrap'){E(16.5,8,11,6,hc,'wrap');R(8,8,18,3,T(hc,-.2),'wrap');}
     else if(cover==='kufi'){R(9,5,16,8,hc,'wrap');}
@@ -1568,7 +1577,7 @@ function openPlayerPicker(){
     if(tab==='surface'){
       fields+=group('Surface',opts('surface',[['skin','Smooth skin'],['fur','Fur'],['feathers','Feathers'],['scales','Scales'],['metal','Metal'],['ghostly','Ghostly']]));
       fields+=group('Surface pattern',opts('texture',(MIX_SURFACES[v.surface]||['smooth']).map(x=>[x,x[0].toUpperCase()+x.slice(1)])));
-      fields+=group('Markings',opts('markings',[['none','None'],['spots','Spots'],['stripes','Stripes'],['freckles','Freckles']]));
+      fields+=group('Markings',opts('markings',[['none','None'],['spots','Spots'],['stripes','Stripes'],['freckles','Freckles'],['mask','Eye mask']]));
       fields+=colorGroup('skin',MIX_SKINS,'Surface color');
       fields+='<p class="pp-hint">Any eye count, hairstyle, wings or tail can be paired with any surface.</p>';
     }
