@@ -1203,10 +1203,41 @@ function pxPaint(r,dir,blink,frame,mood=''){
     const drop=[1,2,1,0,1,2,2,1,0,1,2,1,0,1,2,1,1];for(let x=8;x<=24;x++)R(x,hy-6,1,3+drop[x-8],hair);
     if(hd==='long'){for(const x of [6,7,25,26])R(x,hy-2,1,(x===6||x===26)?14:13,hair);}else{R(6,hy-2,2,7,hair);R(25,hy-2,2,7,hair);}
     if(hd==='curly')for(const [x,y] of [[8,-6],[12,-9],[16.5,-10],[21,-9],[25,-6],[6,0],[27,0],[6,5],[27,5]])E(x,hy+y,r.hairPattern?.[0]==='4'?2:2.8,2.8,hair);
-    if(mix&&r.hairPattern){const t=r.hairPattern[0],h=r.hairPattern[1];
-      if(t==='1')for(let x=9;x<=24;x+=h==='a'?6:h==='b'?4:3)P(x,hy-6,hairLt,hair);
-      if(t==='2')for(let x=8;x<=25;x+=h==='c'?3:h==='b'?4:5)for(let yy=hy-7;yy<=hy+1;yy+=3)P(x+(yy%2),yy,hairLt,hair);
-      if(t==='3'||t==='4')for(let x=7;x<=26;x+=t==='4'?2:3)for(let yy=hy-8;yy<=hy+4;yy+=t==='4'?3:4)P(x+(yy%2),yy,h==='c'?hairDk:hairLt,hair);
+    if(mix&&r.hairPattern){
+      const type=r.hairPattern[0],grade=r.hairPattern[1],density=grade==='a'?0:grade==='b'?1:2;
+      if(type==='1'){
+        /* Sleek 1A to fuller 1C: strand spacing and curtain volume visibly change. */
+        for(let x=8;x<=25;x+=Math.max(2,5-density))R(x,hy-7,1,4,grade==='a'?hairLt:hairDk,hair);
+        for(const side of [-1,1])for(let z=0;z<=density;z++)
+          R(side<0?5+z:26-z,hy-1,1,10+density*2,hair,hair);
+      }else if(type==='2'){
+        /* Wavy S-shaped locks. 2C has closer, deeper waves than 2A. */
+        for(const side of [-1,1])for(let strand=0;strand<1+density;strand++){
+          const base=side<0?6+strand:26-strand;
+          for(let y=hy-4;y<=hy+9;y+=2)
+            R(base+Math.round(Math.sin((y-hy)*(.42+density*.19)+strand)* (1+density*.6)),y,2,2,
+              (y-hy)%4===0?hairLt:hair,hair);
+        }
+        for(let x=10;x<=23;x+=5-density)P(x,hy-7+((x+density)%3),hairLt,hair);
+      }else if(type==='3'){
+        /* Defined ringlet clusters, from wide 3A to compact 3C. */
+        const radius=grade==='a'?3.1:grade==='b'?2.35:1.7,step=density===0?6:density===1?4:3;
+        for(let x=7;x<=26;x+=step)E(x,hy-9+(x%3===0?1:0),radius,radius,hair,hair);
+        for(const x of [5,7,26,28])for(let y=hy-2;y<=hy+8;y+=step)
+          E(x+(y%2),y,radius*.78,radius*.95,hair,hair);
+        for(let x=8;x<=25;x+=step)P(x,hy-8,hairLt,hair);
+      }else if(type==='4'){
+        /* 4A, 4B and 4C have progressively tighter, denser coils. */
+        const step=density===0?4:density===1?3:2,rad=density===0?2.6:density===1?2.0:1.55;
+        for(let y=hy-11;y<=hy-6;y+=step)for(let x=6;x<=27;x+=step){
+          E(x+(y%2),y,rad,rad,hair,hair);
+          if((x+y)%3===0)P(x,y,hairLt,hair);
+        }
+        for(const x of [5,7,25,27])for(let y=hy-4;y<=hy+6;y+=step){
+          E(x+(y%2),y,rad,rad,hair,hair);
+          if((x+y)%4===0)P(x,y,hairLt,hair);
+        }
+      }
     }
     if(hd==='bun'){E(16.5,hy-10,3.6,3.2,hair);R(14,hy-7,6,1,coat);}
     for(const [x,y] of [[11,-7],[12,-8],[13,-8],[14,-8],[20,-8],[21,-7],[9,-4],[10,-5],[22,-5],[7,1],[7,2],[26,2]])P(x,hy+y,hairLt,hair);
@@ -1615,7 +1646,63 @@ function mixThumbnail(canvas){
   const [field,value]=canvas.dataset.icon.split(':'),c=canvas.getContext('2d');
   const P=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
   const ink='#4b3546',gold='#c89e60',rose='#c88891',fur='#b18a68',blue='#a5cada';
-  c.clearRect(0,0,24,24);c.imageSmoothingEnabled=false;
+  c.clearRect(0,0,canvas.width,canvas.height);c.imageSmoothingEnabled=false;
+  if(field==='hairPattern'||field==='hairdo'||field==='headwear'){
+    /* 40-pixel portraits: show true strand shapes, not identical hair swatches. */
+    const skin='#e9bd9b',col='#523144',shine='#906453',wrap='#785365';
+    P(10,13,20,21,skin);P(12,31,16,3,'#c58a71');
+    for(const eyeX of [16,25])P(eyeX,23,2,2,ink);
+    P(20,28,2,1,'#9f6370');
+    if(field==='hairdo'&&value==='bald')return;
+    if(field==='headwear'){
+      if(value==='none'){P(9,9,22,6,col);P(9,14,3,11,col);P(29,14,3,11,col);return;}
+      if(value==='kufi'){P(11,7,18,9,wrap);P(12,11,16,2,gold);return;}
+      if(value==='bandana'){P(9,10,22,6,wrap);P(29,15,5,3,wrap);return;}
+      if(value==='turban'||value==='wrap'){
+        P(8,7,24,10,wrap);P(12,4,16,5,wrap);P(15,7,6,9,'#af8b99');
+        P(9,15,22,2,gold);return;
+      }
+      if(value==='hijab'){P(8,8,24,14,wrap);P(6,17,6,18,wrap);P(28,17,6,18,wrap);P(11,15,18,7,skin);return;}
+      if(value==='scarf'){P(8,8,24,9,wrap);P(9,16,22,2,gold);P(29,19,5,16,wrap);return;}
+    }
+    if(field==='hairdo'){
+      if(value==='bun'){P(15,3,10,9,col);P(9,10,22,7,col);}
+      else if(value==='short'){P(9,9,22,8,col);P(9,16,5,7,col);}
+      else{P(9,7,22,9,col);P(7,14,5,21,col);P(29,14,5,21,col);}
+      return;
+    }
+    const type=value[0],grade=value[1],g=grade==='a'?0:grade==='b'?1:2;
+    if(type==='1'){
+      P(9-g,7-g,22+2*g,9+g,col);
+      P(8-g,14,4+g,19+g*2,col);
+      P(28,14,4+g,19+g*2,col);
+      for(let x=12;x<29;x+=5-g)P(x,8,1,8,shine);
+      if(g===2)P(10,12,18,2,shine);
+    }else if(type==='2'){
+      P(9,7,22,9,col);
+      for(const side of [-1,1])for(let line=0;line<1+g;line++)
+        for(let y=10;y<=34;y+=3){
+          const x=(side<0?9+line:30-line)+Math.round(Math.sin(y*(.48+g*.2)+line)* (1+g));
+          P(x,y,3,4,y%2?shine:col);
+        }
+      for(let x=11;x<=29;x+=6-g*2)P(x,9+(x%3),3,3,shine);
+    }else if(type==='3'){
+      const size=g===0?6:g===1?5:4;
+      for(let x=8;x<=32;x+=size)for(let y=7;y<=14;y+=size){
+        P(x,y,size,size,col);P(x+1,y+1,2,2,shine);
+      }
+      for(const side of [-1,1])for(let y=15;y<=32;y+=size)
+        P(side<0?5:30,y,size,size,col);
+    }else if(type==='4'){
+      const size=g===0?5:g===1?4:3;
+      for(let y=5;y<=16;y+=size)for(let x=6;x<=33;x+=size){
+        P(x,y,size,size,col);if((x+y)%3===0)P(x+1,y+1,1,1,shine);
+      }
+      for(const x of [5,31])for(let y=16;y<29;y+=size)
+        P(x,y,size,size,col);
+    }
+    return;
+  }
   if(field==='eyes'){
     const xs=value==='1'?[11]:value==='3'?[5,11,17]:[7,15];
     for(const x of xs){P(x,11,3,4,ink);P(x,11,1,1,'#ffffff');}
@@ -1674,8 +1761,9 @@ function openPlayerPicker(){
     const pro=v.pronouns||[];
     const chip=(field,value,label)=>{
       const on=String(v[field]||'none')===String(value);
+      const portrait=['hairPattern','hairdo','headwear'].includes(field);
       const icon=['eyes','ears','horns','antlers','antennae','wings','tail','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
-        ?'<canvas class="pp-icon" width="24" height="24" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
+        ?'<canvas class="pp-icon'+(portrait?' pp-hair-icon':'')+'" width="'+(portrait?40:24)+'" height="'+(portrait?40:24)+'" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
       return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
         '" aria-pressed="'+on+'">'+icon+T(label)+'</button>';
     };
