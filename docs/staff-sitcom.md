@@ -1,15 +1,17 @@
-# Staff Room Confidential (STAFF SITCOM v1)
+# Staff interactions (internal development notes)
 
-Mapáchez Manor combines **whimsical appearance with grounded workplace sitcom dialogue**.
-The joke is human behavior, not a character's species, appearance or supernatural identity.
+The whimsical setting disguises grounded, recognizable workplace conversations.
+The player should discover the humor organically. Do **not** advertise a sitcom, comedy mode, jokes, or episode collection in the game UI.
 
-## How to play
+## In-world discovery
 
-- From the title screen, select **🎭 Staff sitcom**.
-- During a shift, visit the front desk and choose **Overhear the staff room**.
-- Choose an episode, read three introductory lines, then select **Keep listening** to reveal the rest, stage direction and private thought.
-- Choose **Next staff scene** or return to the episode list. Episodes can be replayed.
-- This is optional entertainment, not a graded Silver Key question. Opening dialogue does not advance the in-world clock.
+- No title-screen comedy button, labeled sitcom mode or visible episode catalog.
+- During an ordinary shift, visit the front desk and select **Check in with the team**.
+- A staff conversation starts directly. The first three lines sound like ordinary operational chatter.
+- **Keep listening** reveals the conversation, scene payoff and private thought.
+- **Back to the front desk** resumes the shift. **Check on another coworker** moves to an unheard conversation.
+- Once every scene has been heard, conversations rotate on further check-ins.
+- Viewing a conversation is optional; it does not advance the in-world clock or award training points.
 
 ## Nine scenes
 
@@ -25,13 +27,12 @@ The joke is human behavior, not a character's species, appearance or supernatura
 | promotion | The Promotion Interview | An aspiring manager can identify problems but not solve them |
 | favor | The Tiny Favor | A small favor turns out to be a whole overnight shift |
 
-The rejected golf cart joke is **not** part of the sitcom catalog.
+The rejected golf cart joke is not included.
 
 ## Implementation
 
 The offline single-file `index.html` holds both English and Spanish scripts in
-`STAFF_SITCOM`. The feature adds a menu button, a front-desk interaction option,
-a dialogue modal and a private-thought reveal. It uses the existing read-aloud
+`STAFF_SITCOM`. The feature adds only an unobtrusive front-desk interaction, a dialogue modal and a private-thought reveal. It uses the existing read-aloud
 capability, keyboard-focusable buttons, and responsive modal styling.
 
 Save key: `mapachez_staff_sitcom_v1`, version 1, with only a `heard` ID array.
@@ -50,5 +51,5 @@ and reward progress. Corrupt or missing data starts with an empty heard list.
 ## Verification
 
 Run `python tests/test_staff_sitcom.py` with Playwright and local Chromium available.
-This covers dialogue data, menu access, reveal, saved progress, desk access and
+This covers dialogue data, natural discovery, reveal, saved progress, desk access and
 small-screen layout. Existing guest dialogue and Silver Key tests remain separate.
