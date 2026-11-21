@@ -1134,6 +1134,9 @@ function castMake(choices={}){const r={...castLook('maker'),...choices,seed:1};r
 /* PIXEL CHIBI v3: every being is painted on a small 32 x 44 pixel grid from its recipe, the way a pixel
    artist would: big head, big glossy eyes, chunky hair, coloured outlines and light from the top left.
    Each grid is made once (per direction, step and blink), kept in memory and scaled up crisply. */
+/* STORYBOOK v1: The existing cast keeps its recipe, directions, saves and secret identities.
+   Simplify facial markings instead of replacing the entire renderer or adding image downloads. */
+const CAST_STORYBOOK=true;
 const PX_W=32,PX_H=44,PX_FEET=40,PX_U=1.12,PX_RGB=new Map();
 function pxRGB(h){let v=PX_RGB.get(h);if(!v){const n=parseInt(h.slice(1,7),16);v=[n>>16,n>>8&255,n&255];PX_RGB.set(h,v);}return v;}
 function pxPaint(r,dir,blink,frame,mood=''){
@@ -1153,6 +1156,18 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const bigEye=(x,y)=>{if(blink){R(x,y+3,6,1,K);return;}S(['.KKKK.','KSSSSK','KSWDDK','KSDKIK','KSIKIK','KSLIWK','.KKKK.'],x,y,{K,S:white,W:white,D:T(iris,-.35),I:iris,L:T(iris,.4)});};
   const tinyEye=(x,y)=>{if(blink){R(x,y+2,3,1,K);return;}S(['KKK','DWD','ILI'],x,y,{K,D:T(iris,-.35),I:iris,L:T(iris,.4),W:white});};
   const face=(hy,eyes=2,mouth=bit(4)?1:0,blushCol='#f78aa6')=>{const o=fx;
+    /* Small, readable faces: 2-3 pixel eyes and a tiny mouth. Keep rare eye counts. */
+    if(CAST_STORYBOOK){
+      if(eyes===1){R(14+o,hy,4,3,K);if(!blink)P(15+o,hy,white);}
+      else if(eyes===3){for(const [x,y] of [[10,hy+1],[16,hy-2],[22,hy+1]]){R(x+o,y,2,blink?1:2,K);if(!blink)P(x+o,y,white);}}
+      else{for(const x of [11,20]){R(x+o,hy,2,blink?1:3,K);if(!blink)P(x+o,hy,white);}}
+      R(15+o,hy+6,3,1,'#70444b');
+      if(r.fangs){P(15+o,hy+7,white);P(18+o,hy+7,white);}
+      if(r.tooth)P(17+o,hy+7,white);
+      for(const bx of [8,24])P(bx+o,hy+5,T(skin,.16));
+      if(r.specs){for(const sx of [9,18]){R(sx+o,hy-1,6,1,gold);R(sx+o,hy+4,6,1,gold);P(sx+o,hy,gold);P(sx+5+o,hy,gold);}P(17+o,hy+1,gold);}
+      return;
+    }
     if(eyes===1)bigEye(13+o,hy-3);else if(eyes===3){tinyEye(11+o,hy);tinyEye(19+o,hy);tinyEye(15+o,hy-4);}else{eye(10+o,hy-2,iris,!r.specs);eye(18+o,hy-2,iris,!r.specs);}
     const my=hy+5,mc='#6a3038',ms=Math.floor(seed*7)%3;
     if(ms===0){P(14+o,my,mc);P(15+o,my+1,mc);P(16+o,my,mc);P(17+o,my+1,mc);P(18+o,my,mc);}
@@ -1230,6 +1245,13 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(st!=='plush'){R(9+o,11,4,1,crm,crm);R(20+o,11,4,1,crm,crm);}
       /* Eyes. */
       for(const ex of st==='plush'?[10,19]:[9,20]){
+        if(CAST_STORYBOOK){
+          const sx=ex+(plush?-1:0)+o;
+          if(happy){R(sx+1,17,3,1,crm);P(sx,16,crm);P(sx+4,16,crm);}
+          else if(blink)R(sx,17,4,1,crm);
+          else{R(sx,15,4,3,ink);P(sx+1,15,white);}
+          continue;
+        }
         if(happy){for(const [dx,dy] of [[0,17],[1,16],[2,15],[3,15],[4,16],[5,17]])P(ex+dx-(plush?1:0)+o,dy,'#fff4fa');continue;}
         if(blink){P(ex+o,17,'#d8d0e0');R(ex+1+o,16,plush?2:3,1,'#d8d0e0');P(ex+(plush?3:4)+o,17,'#d8d0e0');continue;}
         /* Plush eyes: big glossy drops with a warm iris, a big top-left shine and a tiny bottom sparkle. */
@@ -1261,7 +1283,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
     R(7,6,19,16,m);for(const [x,y] of [[7,6],[25,6],[7,21],[25,21]])P(x,y,null);col[6*W+7]=col[6*W+25]=col[21*W+7]=col[21*W+25]=null;mat[6*W+7]=mat[6*W+25]=mat[21*W+7]=mat[21*W+25]=null;
     R(5,11,2,5,brass);R(26,11,2,5,brass);
     if(!back){const o=fx;R(9+o,9,15,10,'#2b2a36','scr');
-      if(blink){R(11+o,13,3,1,'#ffd98a');R(19+o,13,3,1,'#ffd98a');}else{for(const x of [11,19]){R(x+o,12,3,3,'#ffd98a');P(x+o,12,white);P(x+2+o,14,'#e0a040');}}
+      if(CAST_STORYBOOK){for(const x of [11,20]){R(x+o,13,3,blink?1:2,'#ffe3a1');if(!blink)P(x+o,13,white);}R(15+o,17,3,1,'#ffe3a1');}
+      else if(blink){R(11+o,13,3,1,'#ffd98a');R(19+o,13,3,1,'#ffd98a');}else{for(const x of [11,19]){R(x+o,12,3,3,'#ffd98a');P(x+o,12,white);P(x+2+o,14,'#e0a040');}}
       P(14+o,16,'#ffd98a');R(15+o,17,3,1,'#ffd98a');P(18+o,16,'#ffd98a');R(10+o,16,2,1,'#ff8fb0');R(21+o,16,2,1,'#ff8fb0');R(10+o,10,3,1,'#4a4858');R(7,19,1,1,'#ff9aa8');}
     if(r.outfit==='hat')hat(5);
   }
