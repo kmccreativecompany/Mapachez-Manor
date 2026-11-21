@@ -80,3 +80,15 @@ Every guest moment (but one tender one) has a clearly silly extra choice and a
 funny line from the guest when you get it right. Running gags unfold between
 guests, Delores closes each quick shift with a one-liner, and a new comment card
 arrives each day. See [comedy notes](docs/comedy.md).
+
+## Staff sitcom
+
+Mapáchez Manor is also a workplace sitcom: whimsical-looking employees face
+very recognizable real-world problems. Select **🎭 Staff sitcom** on the title
+screen or visit the front desk during a shift and choose **Overhear the staff room**.
+Nine optional staff conversations include the five-minute meeting, Employee of the
+Month, outdated procedures, a malfunctioning printer, the group chat, a delayed
+checkout, team building, an interview and a tiny overnight favor. Each scene
+reveals a private thought as the punchline. English and Spanish versions work
+offline, and viewing a joke never changes the guest-service score or story clock.
+See [the staff sitcom guide](docs/staff-sitcom.md) for episode details and tests.
