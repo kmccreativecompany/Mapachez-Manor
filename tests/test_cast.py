@@ -218,6 +218,46 @@ class Cast(unittest.TestCase):
                        {'mobility':'wheelchair'}, {'tail':'mermaid','mobility':'wheelchair'}):
             self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', option), base, option)
 
+    def test_11_npc_lineages_and_robot_ghost_spouses(self):
+        """Family ancestry is shared only by explicit biological kin, never by marriage or adoption."""
+        t = 'window.castTest'
+        family = 'fictional-household:orchard'
+        mom = self.page.evaluate(f"{t}.look('Aster', {{familyId:'{family}',familyRole:'biological'}})")
+        dad = self.page.evaluate(f"{t}.look('Robin', {{familyId:'{family}',familyRole:'biological'}})")
+        child = self.page.evaluate(f"{t}.look('Sapling', {{familyId:'{family}',familyRole:'biological'}})")
+        self.assertEqual({mom['originKind'], dad['originKind'], child['originKind']},
+                         {mom['originKind']}, 'Biological family shares a species of origin')
+        self.assertTrue(all(c['mix'] for c in (mom, dad, child)))
+
+        robot = self.page.evaluate(f"{t}.look('Brass', {{familyId:'{family}',familyRole:'spouse',heritageId:'{family}',form:'robot'}})")
+        ghost = self.page.evaluate(f"{t}.look('Wisp', {{familyId:'{family}',familyRole:'spouse',heritageId:'{family}',form:'ghost'}})")
+        self.assertEqual(robot['originKind'], mom['originKind'])
+        self.assertEqual(ghost['originKind'], mom['originKind'])
+        self.assertEqual(robot['kind'], 'construct')
+        self.assertTrue(ghost['ghost'])
+        self.assertEqual(ghost['form'], 'ghost')
+        self.assertEqual(robot['form'], 'robot')
+
+        for name, family_role in [('Luma', 'adopted'), ('Momo', 'pet'), ('Zeph', 'spouse'), ('Flicker', 'step')]:
+            separate = self.page.evaluate(
+                f"{t}.look('{name}', {{familyId:'{family}',familyRole:'{family_role}'}})")
+            independent = self.page.evaluate(f"{t}.look('{name}')")
+            self.assertEqual(separate['originKind'], independent['originKind'],
+                             f'{family_role} should not inherit family species automatically')
+        picks = self.page.evaluate("""(()=>{const images=new Set(),faces=new Set();
+          for(let i=0;i<120;i++){const v=castTest.look('guest#'+i);
+          images.add(JSON.stringify([v.surface,v.ears,v.eyes,v.wings,v.tail,v.hairPattern,v.form]));
+          faces.add(v.originKind);}
+          return {looks:images.size,origins:faces.size};})()""")
+        self.assertGreater(picks['looks'], 90, 'NPCs should use many modular combinations')
+        self.assertGreater(picks['origins'], 3)
+        self.assertEqual(self.page.evaluate(f"{t}.look('delores').kind"), 'raccoon')
+
+        saved = self.page.evaluate(f"{t}.look('Sapling', {{familyId:'{family}',familyRole:'biological'}})")
+        self.page.reload()
+        again = self.page.evaluate(f"{t}.look('Sapling', {{familyId:'{family}',familyRole:'biological'}})")
+        self.assertEqual(saved, again, 'NPC appearance should remain stable across reloads')
+
     def test_10_standing_characters_are_cached_and_cheap(self):
         ms = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');c.canvas.width=1280;c.canvas.height=800;const d=window.castTest.drawPerson;
           for(let i=0;i<30;i++)d(c,40+i*40,400,{cast:'b'+i},0,'down',false,1.2);
