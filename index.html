@@ -349,6 +349,17 @@ body.large-text .fun-night p,body.large-text .fun-remember,body.large-text .fun-
 @media (prefers-reduced-motion:reduce){.heart-motes{display:none}}
 @media (max-width:560px){.heart-thought{font-size:13px;margin-top:12px}}
 /* CHATS v1: guest-to-guest chats by the lobby chairs. The bubble fades, then the pair walks apart. */
+/* COZY FOYER v1: a chunky, rounded dialogue box for the foyer chatter, manor green with a gold inner line and a little bouncing arrow. */
+.lobby-chatter.cozy .lobby-bubble{border:3px solid #2f5f4a;border-radius:18px;background:#fffaee;box-shadow:inset 0 0 0 2px #fffaee,inset 0 0 0 3.5px #c9a45c,0 4px 0 #1d4636,0 8px 16px #143d3533;padding:11px 15px 12px}
+.lobby-chatter.cozy .lobby-bubble::before{content:"✦";position:absolute;top:-12px;right:16px;font-size:17px;line-height:1;color:#e8cd8e;-webkit-text-stroke:1px #2f5f4a}
+.lobby-chatter.cozy .lobby-bubble::after{bottom:-10px;width:14px;height:14px;background:#fffaee;border-right:3px solid #2f5f4a;border-bottom:3px solid #2f5f4a}
+.lobby-chatter.cozy .lobby-bubble:hover,.lobby-chatter.cozy .lobby-bubble:focus-visible{background:#fff1f4;border-color:#24503e}.lobby-chatter.cozy .lobby-bubble:hover::after,.lobby-chatter.cozy .lobby-bubble:focus-visible::after{background:#fff1f4}
+.lobby-chatter.cozy .bubble-speaker{display:inline-block;margin:-2px 0 6px;padding:2px 9px;border-radius:999px;background:#2f5f4a;color:#fbeec4;letter-spacing:.08em}
+.lobby-chatter.cozy .bubble-hint{display:flex;justify-content:space-between;align-items:center;color:#2f5f4a;font-weight:600}
+.lobby-chatter.cozy .bubble-hint::after{content:"▼";font-size:10px;color:#c98597;animation:cozy-nudge 1.1s ease-in-out infinite}
+@keyframes cozy-nudge{50%{transform:translateY(3px)}}
+.reduce-motion .lobby-chatter.cozy .bubble-hint::after{animation:none}
+@media (prefers-reduced-motion:reduce){.lobby-chatter.cozy .bubble-hint::after{animation:none}}
 .lobby-chatter{transition:opacity .5s ease}
 .lobby-chatter.chat-fading{opacity:0}
 .reduce-motion .lobby-chatter{transition:none}
@@ -1664,6 +1675,66 @@ function roomFloor(c,r,color,label) {
   stroke(c,r.x+8,r.y+8,r.w-16,r.h-16,'#c9a45c99',1.6,12);stroke(c,r.x+13,r.y+13,r.w-26,r.h-26,'#c9a45c44',1,9);
   if(LABELS){c.letterSpacing='2px';text(c,label,r.x+r.w/2,r.y+r.h-16,10,'#7a6a43','Georgia');c.letterSpacing='0px';}
 }
+/* COZY FOYER v1 (test room): the Grand Foyer only. Still Art Nouveau and still manor green; pinks and lavenders are small accents.
+   Borrowed construction ideas: a repeating patterned floor, a patterned wallpaper band with bowed curtains, soft rounded shapes,
+   a tea corner, and a little heart bubble when someone is happy. All painted once into the cached map layer except the hearts.
+   Add ?cozy=0 to the address to see the old foyer for comparison. */
+const COZY_FOYER=!/[?&]cozy=0\b/.test(location.search);
+const COZY={sage:'#c4d6b3',cream:'#f3ead2',green:'#2f5f4a',greenDk:'#24503e',pink:'#e7a9b8',pinkDk:'#c98597',lav:'#b9a9d8',lavLt:'#e9e2f5'};
+function cozyFloorTile(){return anTile('cozyfloor',48,(g,s)=>{const h=s/2;
+  g.fillStyle=COZY.cream;g.fillRect(0,0,s,s);g.fillStyle=COZY.sage;g.fillRect(0,0,h,h);g.fillRect(h,h,h,h);
+  /* a tiny four-petal lily-bud where the tiles meet, and a gold dot at each centre */
+  for(const [x,y] of [[0,0],[s,0],[0,s],[s,s],[h,h]]){g.fillStyle='#ffffffb0';for(let i=0;i<4;i++){g.beginPath();g.ellipse(x+Math.cos(i*Math.PI/2)*3.4,y+Math.sin(i*Math.PI/2)*3.4,3.2,1.7,i*Math.PI/2,0,Math.PI*2);g.fill();}g.fillStyle='#c9a45c';g.beginPath();g.arc(x,y,1.5,0,Math.PI*2);g.fill();}
+  g.strokeStyle='#8fa98c40';g.lineWidth=1;g.strokeRect(.5,.5,s-1,s-1);});}
+function cozyPaperTile(){return anTile('cozypaper',24,(g,s)=>{
+  g.fillStyle=COZY.green;g.fillRect(0,0,s,s);
+  g.strokeStyle='#9cc08c88';g.lineWidth=1;g.beginPath();g.moveTo(0,s*.75);g.bezierCurveTo(s*.3,s*.3,s*.7,s*1.05,s,s*.6);g.stroke();
+  g.fillStyle=COZY.cream;g.beginPath();g.moveTo(s*.5,s*.18);g.bezierCurveTo(s*.32,s*.36,s*.38,s*.58,s*.5,s*.62);g.bezierCurveTo(s*.62,s*.58,s*.68,s*.36,s*.5,s*.18);g.fill();
+  g.fillStyle=COZY.pink;g.beginPath();g.arc(s*.12,s*.3,1.7,0,Math.PI*2);g.fill();g.fillStyle='#e8cd8e';g.beginPath();g.arc(s*.88,s*.88,1.2,0,Math.PI*2);g.fill();});}
+function cozyFloor(c,r,label){
+  rect(c,r.x-5,r.y-4,r.w+10,r.h+10,AN.walnut,6);
+  c.save();c.beginPath();c.roundRect(r.x,r.y,r.w,r.h,4);c.clip();
+  c.fillStyle=cozyFloorTile();c.fillRect(r.x,r.y,r.w,r.h);
+  const cx=r.x+r.w/2,cy=r.y+r.h*.45,warm=c.createRadialGradient(cx,cy,10,cx,cy,Math.max(r.w,r.h)*.75);warm.addColorStop(0,'rgba(255,244,214,.28)');warm.addColorStop(.6,'rgba(255,240,200,0)');warm.addColorStop(1,'rgba(40,60,40,.14)');c.fillStyle=warm;c.fillRect(r.x,r.y,r.w,r.h);
+  /* wallpaper band along the north wall, gold trim, and two bowed-curtain windows */
+  const top=r.y,bandH=26;c.fillStyle=cozyPaperTile();c.fillRect(r.x,top,r.w,bandH);
+  rect(c,r.x,top+bandH-3,r.w,3,AN.gold);rect(c,r.x,top+bandH,r.w,3,'rgba(30,50,36,.18)');
+  for(const wx of [100,398])cozyWindow(c,wx,top+2);
+  c.restore();
+  stroke(c,r.x+8,r.y+bandH+8,r.w-16,r.h-bandH-16,'#c9a45c99',1.6,14);
+  if(LABELS){c.letterSpacing='2px';text(c,label,r.x+r.w/2,r.y+r.h-16,10,'#5f6b46','Georgia');c.letterSpacing='0px';}
+}
+function cozyWindow(c,x,y){
+  const w=34,h=22;c.save();archPath(c,x,y,w,h);const q=c.createLinearGradient(0,y,0,y+h);q.addColorStop(0,'#f3d996');q.addColorStop(1,'#7fae9c');c.fillStyle=q;c.fill();c.strokeStyle=AN.gold;c.lineWidth=1.5;c.stroke();c.restore();
+  c.strokeStyle='#fff6dc99';c.lineWidth=1;c.beginPath();c.moveTo(x,y+2);c.lineTo(x,y+h);c.moveTo(x-w/2,y+h*.62);c.lineTo(x+w/2,y+h*.62);c.stroke();
+  /* bowed curtains: soft pink drapes caught back with a gold tie, and a lavender scalloped valance */
+  for(const k of [-1,1]){c.beginPath();c.moveTo(x+k*(w/2+4),y+1);c.quadraticCurveTo(x+k*4,y+4,x+k*(w/2-3),y+h*.62);c.quadraticCurveTo(x+k*(w/2+2),y+h*.8,x+k*(w/2+5),y+h+1);c.lineTo(x+k*(w/2+8),y+h+1);c.lineTo(x+k*(w/2+8),y+1);c.closePath();c.fillStyle=COZY.pink;c.fill();c.strokeStyle=COZY.pinkDk;c.lineWidth=.8;c.stroke();
+    ellipse(c,x+k*(w/2-1),y+h*.64,2.2,1.6,AN.gold);}
+  for(let i=0;i<5;i++)ellipse(c,x-w/2-6+i*(w+12)/4,y+1.5,(w+12)/8+.5,3,i%2?COZY.lavLt:COZY.lav);
+}
+function cozyRug(c,x,y,w,h){
+  rect(c,x-w/2,y-h/2,w,h,COZY.lav,h/2);rect(c,x-w/2+4,y-h/2+4,w-8,h-8,COZY.cream,h/2-4);stroke(c,x-w/2+8,y-h/2+8,w-16,h-16,AN.gold,1.2,h/2-8);
+  c.strokeStyle='#8fa98c';c.lineWidth=1.2;c.beginPath();c.moveTo(x-w/2+20,y);for(let k=0;k<6;k++){const a=x-w/2+20+k*(w-40)/6,b=a+(w-40)/6;c.bezierCurveTo(a+(b-a)*.3,y-7,a+(b-a)*.7,y+7,b,y);}c.stroke();
+  for(const k of [-1,1])leaf(c,x+k*(w/2-16),y,10,k>0?0:Math.PI,'#8fa98c');
+  for(let i=0;i<5;i++)ellipse(c,x-w/2+24+i*(w-48)/4,y,1.8,1.8,COZY.pink);
+}
+function cozyTea(c,x,y){
+  ellipse(c,x+2,y+14,26,7,'rgba(30,40,30,.18)');
+  rect(c,x-2,y,5,14,AN.walnutDk,2);ellipse(c,x,y,24,13,AN.walnut);ellipse(c,x,y-1.5,22,11,COZY.cream);
+  for(let i=0;i<14;i++){const a=i/14*Math.PI*2;ellipse(c,x+Math.cos(a)*22,y-1.5+Math.sin(a)*11,2.6,2,i%2?COZY.pink:'#f6d9e0');}
+  /* teapot (sage and gold), two cups, and a bud vase with a lily */
+  ellipse(c,x-6,y-4,7,6,'#8fb29a');ellipse(c,x-6,y-9,3.5,1.6,'#6f9a80');ellipse(c,x-6,y-11,1.4,1.4,AN.gold);c.strokeStyle='#6f9a80';c.lineWidth=1.6;c.beginPath();c.moveTo(x-1,y-4);c.quadraticCurveTo(x+3,y-7,x+3,y-9);c.stroke();ellipse(c,x-9,y-6,1.4,1.4,COZY.pink);
+  for(const dx of [8,13])ellipse(c,x+dx,y+3-(dx-8)*.8,3.5,2.6,'#fffaf0'),ellipse(c,x+dx,y+2.6-(dx-8)*.8,2.3,1.4,'#b88a5a');
+  rect(c,x+10,y-12,3,8,COZY.lav,1.5);lily(c,x+11.5,y-12,.42,0);
+}
+/* A little heart in a round speech bubble, for happy moments. Cheap enough to draw each frame. */
+function heartBubble(c,x,y,time,calm,seed=0){
+  const bob=calm?0:Math.sin(time/420+seed)*2;y+=bob;
+  rect(c,x-10,y-18,20,17,'#fff9ec',8.5);c.strokeStyle=COZY.green;c.lineWidth=1.6;c.beginPath();c.roundRect(x-10,y-18,20,17,8.5);c.stroke();
+  c.beginPath();c.moveTo(x-3,y-1.5);c.lineTo(x,y+3.5);c.lineTo(x+3,y-1.5);c.fillStyle='#fff9ec';c.fill();c.beginPath();c.moveTo(x-3.4,y-.8);c.lineTo(x,y+3.5);c.lineTo(x+3.4,y-.8);c.stroke();
+  const hy=y-10;c.fillStyle='#e8748f';c.beginPath();c.moveTo(x,hy+4.5);c.bezierCurveTo(x-7,hy,x-4.5,hy-5.5,x,hy-2.2);c.bezierCurveTo(x+4.5,hy-5.5,x+7,hy,x,hy+4.5);c.fill();
+  ellipse(c,x-2.2,hy-1.8,1,.8,'#ffd6df');
+}
 let LABELS=true; /* KMC-ADD ux v1: canvas labels hidden when zoomed on phones */
 function plaque(c,label,x,y) {
   if(!LABELS)return;
@@ -1878,7 +1949,7 @@ class ManorWorld {
       g.letterSpacing='3px';text(g,'EAST WING',124,368,9,'#7a5a2e','Georgia');g.letterSpacing='0px';
       rooms.forEach((x,i)=>room(g,x,201+i,GUESTS.find(g=>g.room===String(201+i))));
       for(const x of rooms)windowLight(g,x);
-      roomFloor(g,{x:60,y:479,w:369,h:268},'#e8d8b6','THE GRAND FOYER');
+      if(COZY_FOYER){cozyFloor(g,{x:60,y:479,w:369,h:268},'THE GRAND FOYER');cozyRug(g,245,606,150,44);}else roomFloor(g,{x:60,y:479,w:369,h:268},'#e8d8b6','THE GRAND FOYER');
       roomFloor(g,{x:478,y:479,w:334,h:268},'#d5dbc2','SERVICE KITCHEN');
       rect(g,398,439,100,98,'#e4d5b5');rect(g,802,440,74,99,'#d7d9bd');
       rect(g,171,507,148,34,AN.walnut,14);rect(g,176,507,138,25,'#f3e9cf',11);stroke(g,174,512,142,28,AN.gold,2,11);
@@ -1888,7 +1959,8 @@ class ManorWorld {
       ellipse(g,173,678,43,37,'#ad9c77');ellipse(g,173,675,35,29,'#c8dbba');ellipse(g,173,673,27,22,'#9ab7a1');
       ellipse(g,173,669,17,13,'#d7c9a1');rect(g,169,646,8,25,'#b6a278');ellipse(g,173,646,15,6,'#d6bf8a');ellipse(g,173,643,11,4,'#b6d0b2');
       rect(g,77,575,58,50,'#a37f6b',8);rect(g,82,582,48,33,'#c7a587',6);rect(g,91,581,12,30,'#d6be9a',4);
-      for(const p of [[81,500,1.1],[389,521,1.2],[358,705,1.3],[80,722,1],[483,714,1]])plant(g,...p);
+      for(const p of [[81,COZY_FOYER?540:500,1.1],[389,521,1.2],COZY_FOYER?[410,716,1.2]:[358,705,1.3],[80,722,1],[483,714,1]])plant(g,...p);
+      if(COZY_FOYER)cozyTea(g,364,700);
       rect(g,504,539,106,52,'#9ba788',3);rect(g,508,539,98,42,'#f4eddb',3);stroke(g,514,544,86,31,'#c2c9b0');
       for(let i=0;i<3;i++){ellipse(g,527+i*27,561,10,7,'#c4aa70');ellipse(g,527+i*27,560,7,5,'#f4ecd6');}
       rect(g,724,581,67,64,'#869b7b',3);rect(g,728,584,59,56,'#d8ddc5',2);
@@ -1900,7 +1972,8 @@ class ManorWorld {
     c.drawImage(this.layer,0,0,W,H);
     /* Delores lives behind the front desk: drawn every frame (so she blinks, swishes and smiles), with the desk cut out so it stays in front of her. */
     {const del=castLook('delores'),p=s.player;if(Math.hypot(p.x-300,p.y-512)<110){racCheer(del);racCheer(playerLook().recipe);}
-      c.save();c.beginPath();c.rect(0,0,W,H);c.roundRect(171,507,148,34,14);c.clip('evenodd');drawPerson(c,300,512,{cast:'delores'},0,'down',false,1.05);c.restore();}
+      c.save();c.beginPath();c.rect(0,0,W,H);c.roundRect(171,507,148,34,14);c.clip('evenodd');drawPerson(c,300,512,{cast:'delores'},0,'down',false,1.05);c.restore();
+      if(COZY_FOYER&&Math.hypot(p.x-300,p.y-512)<110)heartBubble(c,316,462,time,calm);}
     if(!calm){c.strokeStyle='#e7ecc877';c.lineWidth=1;c.beginPath();c.ellipse(173,673,25+Math.sin(time/700)*3,18,0,0,Math.PI*2);c.stroke();}
     garden(c,s,time,calm);plaque(c,'Conservatory',1042,651);
     this.options.drawExtras?.(c,time,calm); /* KMC-ADD clues v1 */
@@ -1946,6 +2019,7 @@ let memoryBook=createMemoryBook(),memoryStorageOK=true;
 let settings={sound:false,narration:false,motion:matchMedia('(prefers-reduced-motion: reduce)').matches,large:false,quick:false};
 let festivalActive=false,festivalPosition={x:640,y:664};
 const lobbyView={elapsed:0,last:null,line:''};
+if(COZY_FOYER)$('lobby-chatter').classList.add('cozy');
 const festivalPlayback={context:null,gain:null,source:null,track:null,offset:0,started:0,playing:false,waiting:false,premiere:false,token:0,volume:.3,buffers:new Map};
 try{const saved=JSON.parse(localStorage.getItem(SAVE)||'null');if(validState(saved))resume=saved;const savedSettings=JSON.parse(localStorage.getItem(SETTINGS)||'null');if(savedSettings)for(const k of Object.keys(settings))if(typeof savedSettings[k]==='boolean')settings[k]=savedSettings[k];}catch{storageOK=false;}
 try{memoryBook=normaliseMemoryBook(JSON.parse(localStorage.getItem(MEMORIES)||'null'));}catch{memoryStorageOK=false;}
@@ -4571,6 +4645,8 @@ drawLobbyScene=function(c){
   plant(c,366,637,1.12);
   ellipse(c,366,610,17,4,'#b58a53');rect(c,355,598,22,13,'#cba76b',4);rect(c,355,607,22,3,'#866479');
   for(const p of chatActors(now)){c.save();c.globalAlpha=p.alpha;drawPerson(c,p.x,p.y,p.person,p.step,p.dir,false,1.2);c.restore();}
+  /* COZY FOYER v1: once you have listened to this pair, they glow with a little heart each while they sit and chat. */
+  if(COZY_FOYER&&chatMove.phase==='here'&&chatHeard(chatNow()))for(const [i,seat] of LOBBY_SCENE.actors.entries())heartBubble(c,seat.x+(i?24:-24),seat.y-30,now,settings.motion,i*1.7);
 };
 updateLobbyOverlay=function(time,view){
   const box=$('lobby-chatter'),button=$('lobby-bubble');
