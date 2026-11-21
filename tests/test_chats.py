@@ -46,7 +46,7 @@ class Chats(base.Growth):
     def test_01_scripts_are_short_kind_and_match_in_both_languages(self):
         text = self.c()['text']
         en, es = text['en']['list'], text['es']['list']
-        self.assertGreaterEqual(len(en), 13)
+        self.assertEqual(len(en), 19)
         self.assertEqual([c['id'] for c in en], [c['id'] for c in es])
         for a, b in zip(en, es):
             self.assertEqual([l[0] for l in a['lines']], [l[0] for l in b['lines']], a['id'])
@@ -62,36 +62,84 @@ class Chats(base.Growth):
         for word in ('opossum', 'zarigüeya', 'INFP', '4w5', 'vampire', 'alien', 'monster', 'Room 13'):
             self.assertNotIn(word, words, 'Traits are shown, never named')
 
+    def test_04_all_six_ai_jokes_are_localized_and_butler_thoughts_appear(self):
+        text = self.c()['text']
+        expected = {'robot-terms', 'beta-romance', 'counselor-conspiracy',
+                    'romance-update', 'subscription-marriage', 'wifi-ex'}
+        for language in ('en', 'es'):
+            entries = [c for c in text[language]['list'] if c['id'] in expected]
+            self.assertEqual({c['id'] for c in entries}, expected)
+            self.assertTrue(all(c.get('thought') for c in entries))
+        language = self.lang
+        index = next(i for i, c in enumerate(text[language]['list']) if c['id'] == 'robot-terms')
+        self.page.evaluate("""index => localStorage.setItem('mapachez_chats_v1',
+            JSON.stringify({version:1,next:index,heard:[],bye:0}))""", index)
+        self.page.reload()
+        self.enter_manor()
+        self.page.evaluate('window.chatTest.listen()')
+        self.choose('Seguir escuchando' if language == 'es' else 'Keep listening')
+        thought = self.page.locator('.chat-thought').inner_text()
+        self.assertIn('mayordomo' if language == 'es' else 'Butler thought', thought)
+
+    def test_05_replacement_jokes_have_clear_punchlines_and_preserve_the_story(self):
+        text = self.c()['text']
+        original = {'email','bells','toast','time','sunday','muffin',
+                    'inbox','blankets','circle','tuesday','photo','duchess'}
+        for lang in ('en','es'):
+            chats = text[lang]['list']
+            self.assertEqual(chats[0]['id'], 'blankets')
+            self.assertEqual(chats[-1]['id'], 'letter')
+            self.assertTrue(chats[-1].get('memory'))
+            for chat in chats:
+                if chat['id'] in original:
+                    self.assertTrue(chat.get('thought'), chat['id'])
+        english = {x['id']:x for x in text['en']['list']}
+        self.assertIn('Margaret needs to know', english['bells']['lines'][-1][1])
+        self.assertIn('DNA test', english['email']['lines'][-1][1])
+        self.assertIn('seven videos', english['inbox']['lines'][-1][1])
+
+        # The original memory-book mystery remains functional despite its new position.
+        story_index = len(text[self.lang]['list'])-1
+        self.page.evaluate("""index => localStorage.setItem('mapachez_chats_v1',
+            JSON.stringify({version:1,next:index,heard:[],bye:0}))""", story_index)
+        self.page.reload()
+        self.enter_manor()
+        self.page.evaluate('window.chatTest.listen()')
+        self.choose('Seguir escuchando' if self.lang == 'es' else 'Keep listening')
+        self.assertTrue(self.c()['fern'], 'Story clue should still unlock its memory')
+        self.assertIn('letter', self.c()['chats']['heard'])
+
     def test_02_hearing_a_chat_fades_the_bubble_and_sends_the_pair_off(self):
         self.enter_manor()
         self.assertIn('lobby-conversation', self.c()['extras'])
         self.page.evaluate('window.chatTest.listen()')
-        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'A letter sealed in gold')
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'The secret to a peaceful marriage')
         self.assertEqual(self.page.locator('.chat-lines li').count(), 3)
         self.choose('Keep listening')
         body = self.page.locator('#modal-body').inner_text()
-        self.assertIn('The same one, twice.', body)
-        self.assertIn('the same note', body)
-        self.assertTrue(self.c()['fern'], 'The letter chat still fills the Memory Book page')
+        self.assertIn('very comfortable sofa', body)
+        self.assertIn('Butler thought', body)
+        self.assertFalse(self.c()['fern'], 'Ordinary jokes should not mark the mystery heard')
         self.assertIn('listening-ear', self.c()['pins'])
         self.choose('Return to your evening')
         self.page.wait_for_function('window.chatTest.phase !== "here"')
         self.assertNotIn('lobby-conversation', self.c()['extras'], 'Nobody to listen to while the chairs are empty')
         toast = self.page.locator('#toast').inner_text()
-        self.assertIn('Overheard: 1 of 15', toast)
-        self.assertIn('Zinnia Starling, getting up: “Sorry, I have a video meeting that really could have been an email.”', toast)
+        self.assertIn(f'Overheard: 1 of {len(self.c()["text"]["en"]["list"])}', toast)
+        self.assertIn('Mrs. Calder, getting up: “Sorry, I have a video meeting that really could have been an email.”', toast)
         saved = json.loads(self.page.evaluate("localStorage.getItem('mapachez_chats_v1')"))
-        self.assertEqual((saved['next'], saved['heard'], saved['bye']), (1, ['letter'], 1))
+        self.assertEqual((saved['next'], saved['heard'], saved['bye']), (1, ['blankets'], 1))
         self.page.wait_for_function('document.getElementById("lobby-chatter").hidden')
         # A new pair settles in after the chairs have been empty a while.
         self.page.evaluate('window.chatTest.skip(40000)')
         self.page.wait_for_function('window.chatTest.phase === "here"', timeout=8000)
         self.page.evaluate('window.chatTest.listen()')
-        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Could have been an email')
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), "We're like a family")
 
     def test_03_every_pair_takes_a_turn_and_earns_all_ears(self):
         self.enter_manor()
-        for n in range(15):
+        total = len(self.c()['text']['en']['list'])
+        for n in range(total):
             self.page.evaluate('window.chatTest.listen()')
             self.choose('Keep listening')
             self.choose('Return to your evening')
@@ -99,8 +147,8 @@ class Chats(base.Growth):
             self.page.evaluate('window.chatTest.skip(40000)')
             self.page.wait_for_function('window.chatTest.phase === "here"', timeout=8000)
         c = self.c()
-        self.assertEqual(len(c['chats']['heard']), 15)
-        self.assertEqual(c['chats']['bye'], 15, 'Every pair says a tired little goodbye')
+        self.assertEqual(len(c['chats']['heard']), total)
+        self.assertEqual(c['chats']['bye'], total, 'Every pair says a tired little goodbye')
         self.assertEqual(c['chats']['next'], 0, 'The chairs start over with the first pair')
         self.assertIn('all-ears', c['pins'])
 
@@ -122,12 +170,12 @@ class ChatsSpanish(Chats):
     def test_02_hearing_a_chat_fades_the_bubble_and_sends_the_pair_off(self):
         self.enter_manor()
         self.page.evaluate('window.chatTest.listen()')
-        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'Una carta con sello dorado')
+        self.assertEqual(self.page.locator('#modal-heading').inner_text(), 'El secreto de un matrimonio feliz')
         self.choose('Seguir escuchando')
-        self.assertIn('La misma, dos veces.', self.page.locator('#modal-body').inner_text())
+        self.assertIn('sofá muy cómodo', self.page.locator('#modal-body').inner_text())
         self.choose('Volver a tu noche')
         self.page.wait_for_function('window.chatTest.phase !== "here"')
-        self.assertIn('Escuchadas: 1 de 15', self.page.locator('#toast').inner_text())
+        self.assertIn(f'Escuchadas: 1 de {len(self.c()["text"]["es"]["list"])}', self.page.locator('#toast').inner_text())
         self.assertIn('podría haber sido un correo', self.page.locator('#toast').inner_text())
 
 

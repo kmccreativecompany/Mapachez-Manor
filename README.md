@@ -82,3 +82,4 @@ Every guest moment (but one tender one) has a clearly silly extra choice and a
 funny line from the guest when you get it right. Running gags unfold between
 guests, Delores closes each quick shift with a one-liner, and a new comment card
 arrives each day. See [comedy notes](docs/comedy.md).
+
