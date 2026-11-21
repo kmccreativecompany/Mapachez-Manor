@@ -1458,8 +1458,16 @@ function savePlayerChoice(v){playerChoice=v;try{localStorage.setItem(PLAYER_KEY,
 function playerSkins(kind){return kind==='human'?[...CAST_FUNSKIN.slice(0,6),...CAST_SKIN]:kind==='fae'?[...CAST_FAE,...CAST_FUNSKIN.slice(6)]:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
 function playerRaccoon(coat,fur){const b=castLook('player',{color:coat});if(!fur)return b;const k=coat+fur;if(playerRaccoon.k!==k){playerRaccoon.k=k;playerRaccoon.r={...b,fur};}return playerRaccoon.r;}
 function playerRecipe(coat){
-  const v=playerChoice;if(!v||v.kind==='raccoon')return playerRaccoon(coat,v&&v.fur);
-  const k=JSON.stringify(v)+coat;if(playerRecipe.k!==k){playerRecipe.k=k;playerRecipe.r=castMake({...v,color:coat,outfit:'vest',extra2:''});}return playerRecipe.r;
+  const v=playerChoice;if(!v||!v.mix&&v.kind==='raccoon')return playerRaccoon(coat,v&&v.fur);
+  const key=JSON.stringify(v)+coat;
+  if(playerRecipe.k!==key){
+    playerRecipe.k=key;
+    const mix=!!v.mix;
+    playerRecipe.r=castMake({...v,kind:mix?(v.surface==='metal'?'construct':'human'):v.kind,
+      ghost:mix&&v.surface==='ghostly'?1:v.ghost||0,
+      color:coat,outfit:'vest',extra:mix?'':v.extra,extra2:''});
+  }
+  return playerRecipe.r;
 }
 /* Pronouns are optional and stay on this device (never in score codes or team reports).
    Pick several, type your own, or skip: skipping means "they" in English and no gendered words in Spanish. */
@@ -1476,39 +1484,128 @@ function deloresWelcome(){
   if(profile.lang==='es')return 'Delores, al conserje de noche: “Cuida de '+p.es+'. Lleva el abrigo impecable.”';
   return 'Delores, to the night porter: “Look after '+p.en[1]+'. '+cap(p.en[2])+' coat is very well pressed.”';
 }
-function randomPlayer(kind){
-  const pick=a=>a[Math.floor(Math.random()*a.length)],k=kind||pick(PLAYER_KINDS)[0];
-  return {kind:k,body:pick(['round','tall','blob','wiggly']),eyes:pick([1,2,3]),extra:PLAYER_EXTRAS[k]?pick(PLAYER_EXTRAS[k]):'',hairdo:pick(CAST_OPTIONS.hairdo),skin:pick(playerSkins(k)),hair:pick(CAST_OPTIONS.hair)};
+/* CHARACTER CREATOR MIX v1: Every feature is optional and independent.
+   "Species" is not a player-facing category; existing character saves remain readable. */
+const MIX_SKINS=[...CAST_SKIN,'#f6c8ac','#cce7db','#d2c5f2','#b7dce5','#aad1a0','#eee2d3','#c0bec3'];
+const MIX_HAIR_TYPES=['1a','1b','1c','2a','2b','2c','3a','3b','3c','4a','4b','4c'];
+const MIX_COVERS=['none','hijab','scarf','wrap','turban','kufi','bandana'];
+const MIX_SURFACES={skin:['smooth','freckles'],fur:['short','fluffy','curly','shaggy'],feathers:['soft','layered'],scales:['fine','plated'],metal:['polished','brushed'],ghostly:['soft']};
+function mixDefault(previous){
+  if(previous&&previous.mix)return {...previous};
+  const old=previous||{};
+  return {mix:true,kind:'human',body:'round',eyes:2,skin:old.skin||'#ecc09f',
+    hair:old.hair||'#6b4a32',hairdo:old.kind==='raccoon'?'bald':old.hairdo||'long',
+    hairPattern:'2b',headwear:'none',headwearColor:'#77536f',
+    surface:old.kind==='raccoon'?'fur':'skin',texture:old.kind==='raccoon'?'fluffy':'smooth',
+    ears:old.kind==='raccoon'?'round':'human',horns:'none',antlers:'none',antennae:'none',
+    wings:'none',tail:old.kind==='raccoon'?'raccoon':'none',markings:'none',
+    pronouns:old.pronouns||[],own:old.own||''};
+}
+function mixRecipe(v,coat){
+  return castMake({...v,kind:v.surface==='metal'?'construct':'human',
+    ghost:v.surface==='ghostly'?1:0,extra:'',extra2:'',color:coat,outfit:'vest'});
+}
+function randomPlayer(){
+  const pick=a=>a[Math.floor(Math.random()*a.length)],r=mixDefault();
+  r.body=pick(['round','tall','blob','wiggly']);r.eyes=pick([1,2,3]);
+  r.surface=pick(Object.keys(MIX_SURFACES));r.texture=pick(MIX_SURFACES[r.surface]);
+  r.ears=pick(['human','cat','rabbit','pointed','floppy','round']);
+  r.horns=pick(['none','none','short','curled']);
+  r.antlers=pick(['none','none','branch','fork']);
+  r.antennae=pick(['none','none','orbs']);
+  r.wings=pick(['none','none','feather','butterfly','bat']);
+  r.tail=pick(['none','none','raccoon','fox','cat','lizard','feather']);
+  r.hairPattern=pick(MIX_HAIR_TYPES);
+  r.hairdo=r.hairPattern[0]>='3'?'curly':'long';
+  r.headwear=pick(['none','none','none','hijab','scarf','wrap','turban']);
+  r.skin=pick(MIX_SKINS);r.hair=pick([...CAST_HAIR,...CAST_BRIGHT]);
+  return r;
 }
 function openPlayerPicker(){
-  let v={...(playerChoice||{kind:'raccoon'})};
-  const cycle=(f,list)=>{v[f]=list[(list.indexOf(v[f])+1)%list.length];draw();};
+  let v=mixDefault(playerChoice),tab='body';
+  const T=(x)=>esc(t(x));
   function draw(){
-    const k=v.kind,parts=[];
-    if(k==='monster'||k==='alien')parts.push(['body','Shape',CAST_OPTIONS.body],['eyes','Eyes',[1,2,3]]);
-    if(k==='human'||k==='fae')parts.push(['hairdo','Hair',CAST_OPTIONS.hairdo],['hair','Hair colour',CAST_OPTIONS.hair]);
-    if(PLAYER_EXTRAS[k])parts.push(['extra',k==='fae'?'Magic':'Extra',PLAYER_EXTRAS[k]]);
-    const chip=(on,label,attr)=>'<button class="'+(on?'primary-button':'secondary-button')+'" style="flex:0 0 auto;padding:8px 12px" '+attr+(on?' aria-pressed="true"':'')+'>'+esc(t(label))+'</button>',es=profile.lang==='es',pro=v.pronouns||[];
-    openModal(titleHTML(t('Who are you tonight?'),t('YOUR LOOK'))+
-      '<div style="display:flex;justify-content:center"><canvas id="pp-view" width="320" height="260" style="width:160px;height:130px" aria-hidden="true"></canvas></div>'+
-      '<p class="scene-context" style="text-align:center">'+esc(t('Pick anything. You can change it any time from the title screen.'))+'</p>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+PLAYER_KINDS.map(([id,l])=>chip(v.kind===id,l,'data-kind="'+id+'"')).join('')+'</div>'+
-      (k==='raccoon'?'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+['',...CAST_RACFUR].map(c=>'<button data-fur="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+((v.fur||'')===c?'#4b2f1c':'#fff')+';background:'+(c||'#a29eab')+'"></button>').join('')+'</div>':'<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+parts.map(([f,l])=>chip(false,t(l)+' ↻','data-cycle="'+f+'"')).join('')+'</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+playerSkins(k).map(c=>'<button data-skin="'+c+'" aria-label="'+esc(t('Colour'))+'" style="flex:0 0 32px;width:32px;height:32px;min-height:0;max-height:32px;padding:0;border-radius:50%;border:2px solid '+(v.skin===c?'#4b2f1c':'#fff')+';background:'+c+'"></button>').join('')+'</div>')+
-      '<h3 style="text-align:center;margin:22px 0 4px;font:normal 18px Georgia,serif">'+esc(t('What should guests call you? Optional.'))+'</h3>'+
-      '<p style="text-align:center;margin:0;font-size:13px;color:#5a6655">'+esc(t('Pick any, or none. Skip it and everyone says “they”.'))+'</p>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin:14px 0">'+Object.entries(PRONOUNS).map(([id,p])=>chip(pro.includes(id),es?p[1]:p[0],'data-pro="'+id+'"')).join('')+
-      '<input id="pp-own" maxlength="24" autocomplete="off" aria-label="'+esc(t('Your own words'))+'" placeholder="'+esc(t('Type your own, like xe/xem'))+'" value="'+esc(v.own||'')+'" style="flex:1 1 180px;max-width:240px;padding:9px 12px;border:1px solid #cbd0bb;border-radius:5px;font:inherit"></div>'+
-      '<div class="action-row" style="justify-content:center">'+chip(false,'🎲 Randomize','id="pp-random"')+'<button id="pp-done" class="primary-button" style="flex:0 0 auto">'+esc(t('That’s me'))+'</button></div>');
-    const c=$('pp-view').getContext('2d');c.scale(2,2);
-    drawBeing(c,80,104,v.kind==='raccoon'?playerRaccoon(currentLook().coat,v.fur):castMake({...v,color:currentLook().coat,outfit:'vest',extra2:''}),1e-6,'down',false,2.5);
-    const body=$('pp-view').closest('dialog')||document;
-    body.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{const id=b.dataset.kind;v={...(id==='raccoon'?{kind:id}:{...randomPlayer(id),...(v.kind===id?v:{})}),pronouns:v.pronouns,own:v.own};draw();});
-    body.querySelectorAll('[data-cycle]').forEach(b=>b.onclick=()=>{const f=b.dataset.cycle,p=parts.find(x=>x[0]===f);cycle(f,p[2]);});
-    body.querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{v.skin=b.dataset.skin;draw();});
-    body.querySelectorAll('[data-fur]').forEach(b=>b.onclick=()=>{v.fur=b.dataset.fur||undefined;draw();});
-    body.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();});
-    $('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24).trim();};
+    const modal=document.getElementById('pp-mix');
+    const pro=v.pronouns||[];
+    const chip=(field,value,label)=>{
+      const on=String(v[field]||'none')===String(value);
+      return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
+        '" aria-pressed="'+on+'">'+T(label)+'</button>';
+    };
+    const group=(name,buttons)=>'<fieldset class="pp-group"><legend>'+T(name)+'</legend><div class="pp-options">'+buttons+'</div></fieldset>';
+    const opts=(field,values)=>values.map(a=>chip(field,a[0],a[1])).join('');
+    const colorGroup=(field,colors,title)=>group(title,colors.map(c=>{
+      const chosen=v[field]===c;
+      return '<button class="pp-swatch'+(chosen?' picked':'')+'" data-opt="'+field+'" data-value="'+c+
+        '" aria-pressed="'+chosen+'" aria-label="'+T(title)+' '+c+'" title="'+c+
+        '" style="background:'+c+'"></button>';
+    }).join(''));
+    let fields='';
+    if(tab==='body'){
+      fields+=group('Body shape',opts('body',[['round','● Round'],['tall','▯ Tall'],['blob','◕ Soft'],['wiggly','♧ Petite']]));
+      fields+=group('Eyes for everyone',opts('eyes',[[1,'◉ One eye'],[2,'◉ ◉ Two eyes'],[3,'◉ ◉ ◉ Three eyes']]));
+      fields+=colorGroup('skin',MIX_SKINS,'Body color');
+      fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical']]));
+    }
+    if(tab==='hair'){
+      fields+=group('Hair texture',opts('hairPattern',MIX_HAIR_TYPES.map(h=>[h,h.toUpperCase()])).concat('')+
+        chip('hairdo','bald','Bald / shaved')+
+        chip('hairdo','short','Short cut')+
+        chip('hairdo','bun','Bun / updo'));
+      fields+=group('Head coverings',opts('headwear',MIX_COVERS.map(x=>[x,{none:'None',hijab:'Hijab',scarf:'Scarf',wrap:'Headwrap',turban:'Turban',kufi:'Kufi',bandana:'Bandana'}[x]])));
+      fields+=colorGroup('hair',[...CAST_HAIR,...CAST_BRIGHT],'Hair color');
+      fields+=colorGroup('headwearColor',['#77536f','#254c41','#d6b66e','#e0d2c4','#38415a','#9a6072','#583547'],'Head covering color');
+      fields+='<p class="pp-hint">Hair textures 1A to 4C describe strand pattern, not identity. Head coverings are available with every body and feature.</p>';
+    }
+    if(tab==='features'){
+      fields+=group('Ears',opts('ears',[['human','Small'],['pointed','Pointed'],['cat','Cat-like'],['rabbit','Long'],['floppy','Floppy'],['round','Round']]));
+      fields+=group('Horns',opts('horns',[['none','None'],['short','Short'],['curled','Curled']]));
+      fields+=group('Antlers',opts('antlers',[['none','None'],['branch','Branching'],['fork','Forked']]));
+      fields+=group('Antennae',opts('antennae',[['none','None'],['orbs','Glowing bulbs']]));
+      fields+=group('Wings',opts('wings',[['none','None'],['feather','Feathered'],['butterfly','Butterfly'],['bat','Bat']]));
+      fields+=group('Tail',opts('tail',[['none','None'],['raccoon','Striped'],['fox','Fluffy'],['cat','Curved'],['lizard','Reptilian'],['feather','Plumed']]));
+    }
+    if(tab==='surface'){
+      fields+=group('Surface',opts('surface',[['skin','Smooth skin'],['fur','Fur'],['feathers','Feathers'],['scales','Scales'],['metal','Metal'],['ghostly','Ghostly']]));
+      fields+=group('Surface pattern',opts('texture',(MIX_SURFACES[v.surface]||['smooth']).map(x=>[x,x[0].toUpperCase()+x.slice(1)])));
+      fields+=group('Markings',opts('markings',[['none','None'],['spots','Spots'],['stripes','Stripes'],['freckles','Freckles']]));
+      fields+=colorGroup('skin',MIX_SKINS,'Surface color');
+      fields+='<p class="pp-hint">Any eye count, hairstyle, wings or tail can be paired with any surface.</p>';
+    }
+    if(tab==='profile'){
+      fields+=group('Optional pronouns',Object.entries(PRONOUNS).map(([id,p])=>'<button type="button" class="pp-choice'+(pro.includes(id)?' picked':'')+
+        '" data-pro="'+id+'" aria-pressed="'+pro.includes(id)+'">'+T(profile.lang==='es'?p[1]:p[0])+'</button>').join(''));
+      fields+='<label class="pp-label" for="pp-own">'+T('Your own words (optional)')+'</label><input id="pp-own" maxlength="24" autocomplete="off" placeholder="xe/xem" value="'+esc(v.own||'')+'">';
+      fields+='<p class="pp-hint">You can leave this blank. Pronouns stay on your device.</p>';
+    }
+    const tabs=[['body','Body & Eyes'],['hair','Hair & Coverings'],['features','Ears & Extras'],['surface','Surface'],['profile','About Me']];
+    const html=titleHTML(t('Create your character'),t('MIX & MATCH'))+
+      '<section id="pp-mix">'+
+      '<style>#pp-mix{color:#40352f}#pp-mix .pp-tabs,#pp-mix .pp-options{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}#pp-mix button{cursor:pointer}#pp-mix .pp-tab,#pp-mix .pp-choice{border:1px solid #ac9076;border-radius:9px;padding:9px 11px;background:#fff6e8;color:#432b36;font:600 14px Georgia,serif;min-height:42px}#pp-mix .picked{background:#773d50!important;color:#fff8ec!important;border-color:#773d50!important;box-shadow:inset 0 0 0 1px #e6c899}#pp-mix .pp-tabs{position:sticky;top:0;background:#f8f0df;padding:8px 0;z-index:2}#pp-mix .pp-group{border:1px solid #d4c0a0;border-radius:10px;margin:10px 0;padding:12px}#pp-mix legend{font:600 17px Georgia,serif;color:#65394b;padding:0 8px}#pp-mix .pp-preview{display:flex;justify-content:center;align-items:end;gap:8px;padding:8px 0;background:#f6ecdf;border-radius:12px}#pp-mix .pp-preview canvas{image-rendering:pixelated}#pp-mix .pp-label{display:block;margin:8px 0;font-weight:600}#pp-mix input{padding:11px;border-radius:8px;border:1px solid #ac9076;width:100%;max-width:260px}#pp-mix .pp-swatch{width:36px;height:36px;min-height:36px;border:2px solid #fff;border-radius:9px;outline:1px solid #b5a18e}#pp-mix .pp-hint{text-align:center;font-size:13px;color:#685c50}#pp-mix .pp-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}#pp-mix .pp-actions button{padding:12px 18px;min-height:44px}</style>'+
+      '<p class="pp-hint">No species categories. Pick any combination of shapes, eyes, textures, wings and tails.</p>'+
+      '<div class="pp-preview"><canvas id="pp-side" width="90" height="145" aria-label="Side view"></canvas><canvas id="pp-view" width="160" height="160" role="img" aria-label="Live character preview"></canvas><canvas id="pp-back" width="90" height="145" aria-label="Back view"></canvas></div>'+
+      '<div class="pp-tabs" role="tablist">'+tabs.map(([id,name])=>'<button class="pp-tab'+(tab===id?' picked':'')+'" data-tab="'+id+'" role="tab" aria-selected="'+(tab===id)+'">'+T(name)+'</button>').join('')+'</div>'+
+      fields+'<div class="pp-actions"><button class="secondary-button" id="pp-random">🎲 '+T('Surprise me')+'</button><button class="primary-button" id="pp-done">♥ '+T('Save my look')+'</button></div></section>';
+    openModal(html);
+    const looks=mixRecipe(v,currentLook().coat);
+    for(const [id,dir,x,y,scale] of [['pp-view','down',80,126,2.5],['pp-side','right',45,109,1.6],['pp-back','up',45,109,1.6]]){
+      const g=$(id).getContext('2d');g.clearRect(0,0,g.canvas.width,g.canvas.height);
+      drawBeing(g,x,y,looks,0,dir,false,scale);
+    }
+    const root=$('pp-mix');
+    root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;draw();});
+    root.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{
+      const field=b.dataset.opt,value=b.dataset.value;
+      v[field]=field==='eyes'?Number(value):value;
+      if(field==='surface'){v.texture=MIX_SURFACES[value][0];}
+      if(field==='hairPattern'){v.hairdo=value[0]>='3'?'curly':'long';}
+      if(field==='hairdo'&&value!=='bald')v.hairPattern='';
+      draw();
+    });
+    root.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{
+      const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();
+    });
+    if($('pp-own'))$('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24);};
     $('pp-random').onclick=()=>{v={...randomPlayer(),pronouns:v.pronouns,own:v.own};draw();};
     $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(deloresWelcome());};
   }
