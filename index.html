@@ -386,7 +386,7 @@ body.large-text .fun-night p,body.large-text .fun-remember,body.large-text .fun-
       <p class="chapter-label">CHAPTER ONE</p>
       <h2>The Midnight Rehearsal</h2>
       <p class="title-copy">A quiet hotel. Three unfinished stories.<br>Some nights are worth staying up for.</p>
-      <div class="title-actions"><button id="begin" class="primary-button">Begin your night <svg><use href="#arrow"/></svg></button><button id="title-quick" class="glass-button" aria-keyshortcuts="Q">✨ Quick shift · 3 min</button><button id="continue" class="glass-button" hidden>Continue your evening</button><button id="explore-festival" class="glass-button">Explore the festival <svg><use href="#arrow"/></svg></button><button id="title-training" class="glass-button">Training desk</button><button id="title-memories" class="glass-button" aria-keyshortcuts="M">Memory Book</button></div>
+      <div class="title-actions"><button id="begin" class="primary-button">Begin your night <svg><use href="#arrow"/></svg></button><button id="title-who" class="glass-button" type="button" aria-haspopup="dialog">🎨 Character Creator</button><button id="title-quick" class="glass-button" aria-keyshortcuts="Q">✨ Quick shift · 3 min</button><button id="continue" class="glass-button" hidden>Continue your evening</button><button id="explore-festival" class="glass-button">Explore the festival <svg><use href="#arrow"/></svg></button><button id="title-training" class="glass-button">Training desk</button><button id="title-memories" class="glass-button" aria-keyshortcuts="M">Memory Book</button></div>
       <p class="title-foot">Explore. Listen. Leave things a little better.</p>
     </div>
     <div class="title-bottom"><span>ONE STORY SHIFT · PLAY AT YOUR PACE</span><span>Original world &amp; characters · Silver Key Games</span></div>
@@ -1508,6 +1508,8 @@ function mixDefault(previous){
     surface:old.kind==='raccoon'?'fur':'skin',texture:old.kind==='raccoon'?'fluffy':'smooth',
     ears:old.kind==='raccoon'?'round':'human',horns:'none',antlers:'none',antennae:'none',
     wings:'none',tail:old.kind==='raccoon'?'raccoon':'none',markings:'none',
+    facialHair:'none',facialHairColor:old.hair||'#6b4a32',glasses:'none',glassesColor:'#c9a45c',
+    mobility:'none',chairColor:'#7a394a',tailColor:'#73b7ae',
     pronouns:old.pronouns||[],own:old.own||''};
 }
 function mixRecipe(v,coat){
@@ -1528,6 +1530,10 @@ function randomPlayer(){
   r.hairdo=r.hairPattern[0]>='3'?'curly':'long';
   r.headwear=pick(['none','none','none','hijab','scarf','wrap','turban']);
   r.skin=pick(MIX_SKINS);r.hair=pick([...CAST_HAIR,...CAST_BRIGHT]);
+  r.facialHair=pick(['none','none','none','short-beard','mustache','goatee','stubble','handlebar']);r.facialHairColor=r.hair;
+  r.glasses=pick(['none','none','none','round']);r.glassesColor=pick(['#c9a45c','#2b2433','#c2c7cc']);
+  r.mobility=pick(['none','none','none','wheelchair']);r.chairColor=pick(['#7a394a','#245143','#243d65','#e6d1b0']);
+  if(Math.random()<.15)r.tail='mermaid';r.tailColor=pick(['#73b7ae','#9a8ecb','#df9fa9','#80a4d2']);
   return r;
 }
 /* Small code-drawn pixel thumbnails for the creator, no image downloads. */
@@ -1565,6 +1571,15 @@ function mixThumbnail(canvas){
     else if(value==='bald')P(5,6,15,7,'#ebc2a1');
     else if(value[0]==='3'||value[0]==='4')for(const x of [4,7,10,13,16,19])P(x,6+x%2,3,4,col);
     else if(value[0]==='2')for(const x of [5,10,15])P(x,5+x%3,4,3,col);
+  }else if(field==='facialHair'){
+    P(5,8,14,12,'#edc7a6');const f=value==='none'?'#edc7a6':ink;
+    if(value.includes('beard')||value==='goatee')P(8,17,9,5,f);
+    if(value==='mustache'||value==='handlebar'||value==='goatee')P(8,16,9,2,f);
+    if(value==='stubble'||value==='sideburns'||value==='mutton')for(const x of [6,17])P(x,14,2,6,f);
+  }else if(field==='glasses'){
+    if(value==='round'){for(const x of [4,14]){P(x,9,7,1,gold);P(x,15,7,1,gold);P(x,10,1,5,gold);P(x+6,10,1,5,gold);}P(11,11,3,1,gold);}
+  }else if(field==='mobility'){
+    if(value==='wheelchair'){P(4,8,14,8,'#7a394a');P(2,17,7,7,ink);P(4,19,3,3,gold);P(17,17,5,5,ink);}
   }else if(field==='surface'||field==='texture'){
     P(4,4,16,16,'#ddbb9c');for(let x=6;x<19;x+=4)for(let y=6;y<19;y+=4){
       if(value==='fur'||value==='fluffy'||value==='shaggy'||value==='curly')P(x,y,2,2,fur);
@@ -1582,7 +1597,7 @@ function openPlayerPicker(){
     const pro=v.pronouns||[];
     const chip=(field,value,label)=>{
       const on=String(v[field]||'none')===String(value);
-      const icon=['eyes','ears','horns','antlers','antennae','wings','tail','hairPattern','hairdo','headwear','surface','texture'].includes(field)
+      const icon=['eyes','ears','horns','antlers','antennae','wings','tail','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
         ?'<canvas class="pp-icon" width="24" height="24" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
       return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
         '" aria-pressed="'+on+'">'+icon+T(label)+'</button>';
@@ -1612,13 +1627,26 @@ function openPlayerPicker(){
       fields+=colorGroup('headwearColor',['#77536f','#254c41','#d6b66e','#e0d2c4','#38415a','#9a6072','#583547'],'Head covering color');
       fields+='<p class="pp-hint">Hair textures 1A to 4C describe strand pattern, not identity. Head coverings are available with every body and feature.</p>';
     }
+    if(tab==='face'){
+      fields+=group('Facial hair',opts('facialHair',[['none','None'],['stubble','Stubble'],['mustache','Classic mustache'],['handlebar','Handlebar'],['goatee','Goatee'],['short-beard','Short beard'],['full-beard','Full beard'],['long-beard','Long beard'],['sideburns','Sideburns'],['mutton','Mutton chops'],['whiskers','Whiskers']]));
+      fields+=colorGroup('facialHairColor',[...CAST_HAIR,'#b9aa9f','#e2d1a7',...CAST_BRIGHT.slice(0,5)],'Facial hair color');
+      fields+=group('Glasses',opts('glasses',[['none','No glasses'],['round','Round glasses']]));
+      fields+=colorGroup('glassesColor',['#c9a45c','#2b2433','#c2c7cc'],'Glasses frame');
+      fields+='<p class="pp-hint">One round glasses design, automatically fitted to one, two or three eyes. Facial hair is available to everyone.</p>';
+    }
     if(tab==='features'){
       fields+=group('Ears',opts('ears',[['human','Small'],['pointed','Pointed'],['cat','Cat-like'],['rabbit','Long'],['floppy','Floppy'],['round','Round']]));
       fields+=group('Horns',opts('horns',[['none','None'],['short','Short'],['curled','Curled']]));
       fields+=group('Antlers',opts('antlers',[['none','None'],['branch','Branching'],['fork','Forked']]));
       fields+=group('Antennae',opts('antennae',[['none','None'],['orbs','Glowing bulbs']]));
       fields+=group('Wings',opts('wings',[['none','None'],['feather','Feathered'],['butterfly','Butterfly'],['bat','Bat']]));
-      fields+=group('Tail',opts('tail',[['none','None'],['raccoon','Striped'],['fox','Fluffy'],['cat','Curved'],['lizard','Reptilian'],['feather','Plumed']]));
+      fields+=group('Tail',opts('tail',[['none','None'],['raccoon','Striped'],['fox','Fluffy'],['cat','Curved'],['lizard','Reptilian'],['feather','Plumed'],['mermaid','Mermaid fin'],['mermaid','Mermaid fin']]));
+    }
+    if(tab==='mobility'){
+      fields+=group('Mobility',opts('mobility',[['none','On foot / Tail / Float'],['wheelchair','Classic manual wheelchair']]));
+      fields+=colorGroup('chairColor',['#7a394a','#245143','#243d65','#e6d1b0'],'Wheelchair seat color');
+      fields+=colorGroup('tailColor',['#73b7ae','#9a8ecb','#df9fa9','#80a4d2'],'Mermaid tail color');
+      fields+='<p class="pp-hint">One classic chair design with burgundy seating and brass wheels. Available to any character, with tail support when needed.</p>';
     }
     if(tab==='surface'){
       fields+=group('Surface',opts('surface',[['skin','Smooth skin'],['fur','Fur'],['feathers','Feathers'],['scales','Scales'],['metal','Metal'],['ghostly','Ghostly']]));
@@ -1633,7 +1661,7 @@ function openPlayerPicker(){
       fields+='<label class="pp-label" for="pp-own">'+T('Your own words (optional)')+'</label><input id="pp-own" maxlength="24" autocomplete="off" placeholder="xe/xem" value="'+esc(v.own||'')+'">';
       fields+='<p class="pp-hint">You can leave this blank. Pronouns stay on your device.</p>';
     }
-    const tabs=[['body','Body & Eyes'],['hair','Hair & Coverings'],['features','Ears & Extras'],['surface','Surface'],['profile','About Me']];
+    const tabs=[['body','Body & Eyes'],['hair','Hair & Coverings'],['face','Face & Glasses'],['features','Ears & Extras'],['surface','Surface'],['mobility','Tail & Mobility'],['profile','About Me']];
     const html=titleHTML(t('Create your character'),t('MIX & MATCH'))+
       '<section id="pp-mix">'+
       '<style>#pp-mix{color:#40352f}#pp-mix .pp-tabs,#pp-mix .pp-options{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}#pp-mix button{cursor:pointer}#pp-mix .pp-tab,#pp-mix .pp-choice{border:1px solid #ac9076;border-radius:9px;padding:9px 11px;background:#fff6e8;color:#432b36;font:600 14px Georgia,serif;min-height:42px}#pp-mix .pp-choice{display:inline-flex;align-items:center;gap:5px}#pp-mix .pp-icon{width:30px;height:30px;image-rendering:pixelated}#pp-mix .picked{background:#773d50!important;color:#fff8ec!important;border-color:#773d50!important;box-shadow:inset 0 0 0 1px #e6c899}#pp-mix .pp-tabs{position:sticky;top:0;background:#f8f0df;padding:8px 0;z-index:2}#pp-mix .pp-group{border:1px solid #d4c0a0;border-radius:10px;margin:10px 0;padding:12px}#pp-mix legend{font:600 17px Georgia,serif;color:#65394b;padding:0 8px}#pp-mix .pp-preview{display:flex;justify-content:center;align-items:end;gap:8px;padding:8px 0;background:#f6ecdf;border-radius:12px}#pp-mix .pp-preview canvas{image-rendering:pixelated}#pp-mix .pp-label{display:block;margin:8px 0;font-weight:600}#pp-mix input{padding:11px;border-radius:8px;border:1px solid #ac9076;width:100%;max-width:260px}#pp-mix .pp-swatch{width:36px;height:36px;min-height:36px;border:2px solid #fff;border-radius:9px;outline:1px solid #b5a18e}#pp-mix .pp-hint{text-align:center;font-size:13px;color:#685c50}#pp-mix .pp-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0}#pp-mix .pp-actions button{padding:12px 18px;min-height:44px}</style>'+
@@ -3410,8 +3438,8 @@ Object.assign(WORDS.es||{},{'Who are you?':'¿Quién eres?','Who are you tonight
  'Raccoon':'Mapache','Person':'Persona','Fae folk':'Hada','Monster':'Monstruo','Alien':'Extraterrestre','Robot':'Robot','Shape':'Forma','Eyes':'Ojos','Hair':'Pelo','Hair colour':'Color de pelo','Magic':'Magia','Extra':'Detalle','Colour':'Color',
  '🎲 Randomize':'🎲 Al azar','That’s me':'Soy yo','What should guests call you? Optional.':'¿Cómo quieres que te nombren? Es opcional.','Pick any, or none. Skip it and everyone says “they”.':'Elige los que quieras, o ninguno. Si lo dejas en blanco, nadie usará un género para ti.',
  'Your own words':'Tus propias palabras','Type your own, like xe/xem':'Escribe los tuyos'});
-{const b=document.createElement('button');b.id='title-who';b.className='glass-button';b.textContent=t('Who are you?');$('title-memories')?.after(b);b.onclick=openPlayerPicker;
- const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent=t('Who are you?');return r;};}
+{const b=$('title-who');b.onclick=openPlayerPicker;
+ const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent='🎨 '+t('Character Creator');return r;};}
 const castInteract=interact;interact=function(id){if(festivalActive&&muffinInteract(id))return;return castInteract.apply(this,arguments);};
 $('title-quick').onclick=startQuickShift;
 addEventListener('keydown',e=>{
