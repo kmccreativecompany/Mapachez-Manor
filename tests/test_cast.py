@@ -76,7 +76,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 76_000, 'The pixel kit, modular options, facial hair, eyewear and mobility should stay under 76 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 100_000, 'The offline sprite kit and full-screen creator should stay under 100 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -147,7 +147,7 @@ class Cast(unittest.TestCase):
         self.page.locator('[data-opt="ears"][data-value="rabbit"]').click()
         self.page.locator('[data-opt="wings"][data-value="butterfly"]').click()
         self.page.locator('[data-opt="tail"][data-value="raccoon"]').click()
-        self.page.locator('[data-tab="surface"]').click()
+        self.page.locator('[data-tab="body"]').click()
         self.page.locator('[data-opt="surface"][data-value="scales"]').click()
         self.page.locator('[data-opt="texture"][data-value="plated"]').click()
         self.page.locator('[data-tab="hair"]').click()
@@ -217,6 +217,32 @@ class Cast(unittest.TestCase):
                        {'glasses':'round','eyes':3}, {'tail':'mermaid'},
                        {'mobility':'wheelchair'}, {'tail':'mermaid','mobility':'wheelchair'}):
             self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', option), base, option)
+
+    def test_09b_creator_has_five_tabs_and_distinct_hair_thumbnails(self):
+        """The refreshed creator keeps a preview visible and shows twelve distinct hair images."""
+        self.page.locator('#title-who').click()
+        self.page.wait_for_selector('#pp-mix')
+        self.assertEqual(self.page.locator('.pp-tab').count(), 5)
+        self.assertEqual(self.page.locator('.pp-stage #pp-view').count(), 1)
+        self.assertEqual(self.page.locator('.pp-angles canvas').count(), 2)
+        self.assertTrue(self.page.locator('.pp-panel').is_visible())
+        self.page.locator('[data-tab="hair"]').click()
+        options = self.page.locator('canvas[data-icon^="hairPattern:"]')
+        self.assertEqual(options.count(), 12)
+        pixels = options.evaluate_all('(all) => all.map(c => c.toDataURL())')
+        self.assertEqual(len(set(pixels)), 12, '1A through 4C must look different')
+        self.assertEqual(self.page.locator('.pp-tab').count(), 5)
+        self.page.locator('[data-opt="hairPattern"][data-value="4c"]').click()
+        self.assertEqual(self.page.locator('[data-opt="hairPattern"][data-value="4c"]').get_attribute('aria-pressed'), 'true')
+        self.assertTrue(self.page.locator('#pp-view').is_visible())
+        self.page.locator('[data-tab="face"]').click()
+        self.assertTrue(self.page.locator('[data-opt="facialHair"][data-value="mustache"]').is_visible())
+        self.assertTrue(self.page.locator('[data-pro="they"]').is_visible())
+        self.page.locator('[data-tab="body"]').click()
+        self.assertTrue(self.page.locator('[data-opt="surface"][data-value="scales"]').is_visible())
+        self.page.locator('[data-tab="mobility"]').click()
+        self.assertTrue(self.page.locator('[data-opt="tail"][data-value="mermaid"]').is_visible())
+        self.assertTrue(self.page.locator('[data-opt="mobility"][data-value="wheelchair"]').is_visible())
 
     def test_10_standing_characters_are_cached_and_cheap(self):
         ms = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');c.canvas.width=1280;c.canvas.height=800;const d=window.castTest.drawPerson;

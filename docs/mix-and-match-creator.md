@@ -53,3 +53,20 @@ For browser verification run `CHROMIUM_PATH=/usr/bin/chromium python tests/test_
 The live GitHub Pages landing screen contains a persistent **🎨 Character Creator** button next to **Begin your night**. Selecting it opens the five original customization tabs plus **Face & Glasses** and **Tail & Mobility**. Save with **Save my look**. Facial hair, glasses, mermaid fins and a single manual wheelchair render in the shared 32 x 44 sprites in the game, including chair-wheel changes as the character moves.
 
 A wheelchair is an independent mobility selection and never automatically assigned based on tail or appearance. The wheelchair is one consistent pixel-art manual model, not six themed models. Mermaid tails work with or without the chair. These are compact sprite approximations of the larger design concept illustration.
+
+## Refined character studio (November 21, 2026)
+
+The creator is now designed as a **large two-column studio**, still in the same offline, single-file HTML game.
+
+- The **left column** is a large, continually visible pixel-art character preview with smaller side and back views. It remains visible while the right-side choices scroll.
+- **Five navigation tabs** replace the former seven: **Body**, **Hair**, **Face**, **Features** and **Mobility**.
+- No options were removed: surface and markings moved under Body; pronouns moved under Face; tail choices moved under Mobility.
+- Each **1A to 4C** selection now has its own 40 × 40 code-drawn miniature portrait. Straight, wavy, curly and coily strand patterns vary in both the selection icon and the existing 32 × 44 in-game sprite.
+- Hair coverings and bald/short/updo styles have enlarged, more recognizable pixel icons.
+- The options pane scrolls independently on wide screens; the preview stays visible. On small screens the preview compresses into a fixed header above horizontally scrollable tabs and a scrollable option panel.
+- The buttons are at least 44 px high, with a visible selection state and focus outline. The creator preserves the option-pane scroll position and restores keyboard focus after an option update.
+- Existing saves, story cast, other gameplay, and the local-storage save key are unchanged.
+
+### Verification and caveats
+
+The developer checked JavaScript syntax, independently generated 12 different hair sprites and 12 distinct hair thumbnails, and exercised all five tab states in a simulated DOM environment. Browser-based layout inspection, keyboard/touch testing, and the Playwright regression suite remain to be run before publishing. 32 × 44 character sprites remain intentionally stylized and simpler than the original high-resolution concept artwork.
