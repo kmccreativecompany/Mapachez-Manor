@@ -2,7 +2,7 @@
 
 ## What changed
 
-The title-screen **Who are you?** entry opens a playable, offline character creator with tabs for **Body & Eyes**, **Hair & Coverings**, **Ears & Extras**, **Surface** and **About Me**. There is no species selection, and no category labels for a character's identity.
+The title-screen **Character Creator** button opens a playable, offline character creator with tabs for **Body & Eyes**, **Hair & Coverings**, **Face & Glasses**, **Ears & Extras**, **Surface**, **Tail & Mobility**, and **About Me**. There is no species selection, and no category labels for a character's identity.
 
 The panels show code-drawn pixel thumbnails and a front, side and back live preview. Choose the pieces independently, use **Surprise me** for a random combination, then **Save my look**. Your character appears in the manor using the existing 32 x 44 pixel-art renderer.
 
@@ -17,11 +17,14 @@ The panels show code-drawn pixel thumbnails and a front, side and back live prev
 | Ears | Small, pointed, cat-like, long/rabbit, floppy, round |
 | Other head features | Short or curled horns, antlers, paired antennae |
 | Back features | Feathered, butterfly or bat wings |
-| Tail | None, striped, fluffy, curved, reptilian or plumed |
+| Tail | None, striped, fluffy, curved, reptilian, plumed or mermaid fin |
 | Surface | Smooth skin, fur, feathers, scales, metal, ghostly |
 | Texture | Several options per surface, including short/fluffy/curly/shaggy fur, layered feathers and plated scales |
 | Markings | Spots, stripes, freckles and eye mask |
 | Colors | Body, hair and covering palettes |
+| Facial hair | None, stubble, mustache, handlebar, goatee, several beard styles, sideburns, mutton chops or whiskers; independent color |
+| Glasses | One small round frame, off/on; gold, black or silver; drawn for 1, 2 or 3 eyes |
+| Mobility | One classic manual wheelchair, optional for any character, burgundy seat by default, selectable seat color and mermaid-tail support |
 | Identity | Optional, locally saved pronouns and custom words |
 
 No category determines whether other features are available: for instance, a smooth-skinned character can have antlers, wings and three eyes. The player can change any combination later.
@@ -44,3 +47,9 @@ There are no bitmap assets or downloaded image dependencies. The icon previews a
 The developer validated both inline JavaScript blocks for parsing. The pure `pxPaint` function rendered 960 combinations across four directions and produced distinct 1-, 2- and 3-eye sprites for both ordinary and mechanical looks, with no exceptions. Browser regression tests in `tests/test_cast.py` have been updated for mixed saves and independent feature combinations, but have **not been executed in Playwright** yet.
 
 For browser verification run `CHROMIUM_PATH=/usr/bin/chromium python tests/test_cast.py` from the repository root with Playwright installed, in a fresh test profile. Confirm preview changes, saving, refreshing, character drawing while walking, keyboard/touch usability, ghost alpha, and no console errors.
+
+## Website access and added controls
+
+The live GitHub Pages landing screen contains a persistent **🎨 Character Creator** button next to **Begin your night**. Selecting it opens the five original customization tabs plus **Face & Glasses** and **Tail & Mobility**. Save with **Save my look**. Facial hair, glasses, mermaid fins and a single manual wheelchair render in the shared 32 x 44 sprites in the game, including chair-wheel changes as the character moves.
+
+A wheelchair is an independent mobility selection and never automatically assigned based on tail or appearance. The wheelchair is one consistent pixel-art manual model, not six themed models. Mermaid tails work with or without the chair. These are compact sprite approximations of the larger design concept illustration.
