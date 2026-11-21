@@ -11046,6 +11046,16 @@ body.hms-split #canvas-wrap{position:fixed;z-index:41;left:0;right:0;top:0;botto
 body.reduce-motion #modal.modal.split{animation:none}
 @media(max-width:899px){#modal.modal.split{width:100%}.split-tag{font-size:11px;left:8px;padding:4px 10px}}
 `;document.head.append(st);}
+/* From the title screen, the desk computer buttons walk into the manor first (your saved evening,
+   or a new one when there's none), so the drawer always opens with the manor above it. */
+function splitFromTitle(){
+  if(!titleVisible)return openHms();
+  if(modal.open)closeModal();
+  if(resume&&resume.phase==='playing')enterGame(structuredClone(resume));
+  else{enterGame(createState());save();}
+  requestAnimationFrame(()=>openHms());
+}
+for(const id of ['hms-title','title-training']){const b=$(id);if(b)b.onclick=splitFromTitle;}
 /* ==== end SPLIT v1 ==== */
 
 

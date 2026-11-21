@@ -125,10 +125,24 @@ class Split(hbase.Hms):
         self.ev("openModal('<h2 id=\"modal-heading\">Hi</h2>')")
         self.assertFalse(self.ev("modal.classList.contains('split')"))
 
-    def test_06_title_screen_hms_stays_a_normal_window(self):
+    def test_06_title_screen_hms_walks_into_the_manor_and_opens_the_drawer(self):
         self.page.locator('#hms-title').click()
         self.page.wait_for_selector('#hms-next-go')
-        self.assertFalse(self.ev('split.on'))
+        self.page.wait_for_timeout(150)
+        self.assertTrue(self.ev('split.on'))
+        self.assertTrue(self.ev('!titleVisible'))
+        self.assertTrue(self.page.locator('#split-tag').is_visible())
+        self.shot('08-from-title.png')
+
+    def test_07_title_screen_hms_keeps_a_saved_evening(self):
+        self.enter_manor()
+        self.ev("state.flags.splitMarker=true;save()")
+        self.page.locator('#home').click()
+        self.page.wait_for_timeout(200)
+        self.page.locator('#hms-title').click()
+        self.page.wait_for_selector('#hms-next-go')
+        self.assertTrue(self.ev('split.on'))
+        self.assertTrue(self.ev('state.flags.splitMarker===true'), 'The saved evening is continued, not replaced')
 
 
 class PhoneSplit(Split):
