@@ -19,7 +19,7 @@ Object.defineProperty(window,'sitcomTest',{get:()=>({
  growthAnswers:growth.answers
 })});
 """
-base.TEST_HTML = base.TEST_HTML.replace('\\n})();\\n</script>', '\\n' + INSPECTOR + '\\n})();\\n</script>')
+base.TEST_HTML = base.TEST_HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
 
 
 class StaffSitcom(base.Growth):
