@@ -10688,15 +10688,17 @@ try{const v=JSON.parse(localStorage.getItem(STAFF_SITCOM_KEY)||'null');
 if(v&&v.version===1&&Array.isArray(v.heard))staffSitcomHeard=[...new Set(v.heard.filter(id=>STAFF_SITCOM.en.episodes.some(e=>e.id===id)))];}catch{}
 const staffWords=()=>STAFF_SITCOM[profile.lang]||STAFF_SITCOM.en;
 function staffSitcomStore(){try{localStorage.setItem(STAFF_SITCOM_KEY,JSON.stringify({version:1,heard:staffSitcomHeard}));}catch{}}
+let staffLastEpisodeIndex=-1;
 function staffNextMomentIndex(){
  const episodes=staffWords().episodes;
  const unseen=episodes.findIndex(ep=>!staffSitcomHeard.includes(ep.id));
- return unseen>=0?unseen:staffSitcomHeard.length%episodes.length;
+ return unseen>=0?unseen:(staffLastEpisodeIndex+1)%episodes.length;
 }
 function openStaffMoment(){openStaffSitcomScene(staffNextMomentIndex(),false);}
 function openStaffSitcomScene(index,full=false){
  const t=staffWords(),ep=t.episodes[index];
  if(!ep)return desk();
+ staffLastEpisodeIndex=index;
  const li=([who,line])=>'<li><b>'+esc(who)+'</b>'+esc('“'+line+'”')+'</li>';
  const dialogue=xs=>'<ol class="staff-sitcom-lines">'+xs.map(li).join('')+'</ol>';
  openModal(titleHTML(ep.title,ep.place)+dialogue(ep.lines.slice(0,3))+
