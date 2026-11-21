@@ -37,6 +37,9 @@ class Cozy(base.Growth):
         self.assertEqual(border, '3px')
         self.assertEqual(self.errors, [])
 
+    def test_cozy_07_beige_floor_kept(self):
+        self.assertIn("rect(c,r.x,r.y,r.w,r.h,'#e8d8b6');c.fillStyle=floorTile();", BLOCK)
+
     def test_cozy_05_no_weather_or_network_added(self):
         self.assertNotIn('MapachezWeather', BLOCK)
         self.assertEqual(self.requests, [])

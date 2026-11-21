@@ -5,7 +5,7 @@ Pinks and lavenders are small accents only. Everything is drawn in code; there a
 
 ## What changed in the foyer
 
-- **Patterned floor:** a soft sage-and-cream checker with a tiny lily bud and gold dot where the tiles meet.
+- **Floor:** the original beige floor stays (the person preferred it to the checker that was tried first).
 - **Wallpaper band** along the north wall: manor green with cream lily buds, a gold trim, and two arched windows with bowed pink curtains and a lavender scalloped top.
 - **Rounded rug** in front of the desk: lavender rim, cream centre, a green vine and pink dots.
 - **Tea corner** by the lobby chairs: a round table with a scalloped pink cloth, a sage teapot, two cups and a lily in a bud vase.
@@ -21,6 +21,6 @@ Only the hearts are drawn each frame, and only near the desk or the chatting pai
 
 Add `?cozy=0` to the address to see the old foyer. Pictures: `docs/screenshots/cozy/`.
 
-Characters were left as they are for this test: the chibi kit is shared by every scene, so making them rounder belongs in its own change if this look is kept.
+Characters stay as they are. A minimal, rounder build was tried and the person preferred the original chibis.
 
 Tests: `python tests/test_cozy.py`.

@@ -1676,16 +1676,11 @@ function roomFloor(c,r,color,label) {
   if(LABELS){c.letterSpacing='2px';text(c,label,r.x+r.w/2,r.y+r.h-16,10,'#7a6a43','Georgia');c.letterSpacing='0px';}
 }
 /* COZY FOYER v1 (test room): the Grand Foyer only. Still Art Nouveau and still manor green; pinks and lavenders are small accents.
-   Borrowed construction ideas: a repeating patterned floor, a patterned wallpaper band with bowed curtains, soft rounded shapes,
+   Borrowed construction ideas: the original beige floor, a patterned wallpaper band with bowed curtains, soft rounded shapes,
    a tea corner, and a little heart bubble when someone is happy. All painted once into the cached map layer except the hearts.
    Add ?cozy=0 to the address to see the old foyer for comparison. */
 const COZY_FOYER=!/[?&]cozy=0\b/.test(location.search);
 const COZY={sage:'#c4d6b3',cream:'#f3ead2',green:'#2f5f4a',greenDk:'#24503e',pink:'#e7a9b8',pinkDk:'#c98597',lav:'#b9a9d8',lavLt:'#e9e2f5'};
-function cozyFloorTile(){return anTile('cozyfloor',48,(g,s)=>{const h=s/2;
-  g.fillStyle=COZY.cream;g.fillRect(0,0,s,s);g.fillStyle=COZY.sage;g.fillRect(0,0,h,h);g.fillRect(h,h,h,h);
-  /* a tiny four-petal lily-bud where the tiles meet, and a gold dot at each centre */
-  for(const [x,y] of [[0,0],[s,0],[0,s],[s,s],[h,h]]){g.fillStyle='#ffffffb0';for(let i=0;i<4;i++){g.beginPath();g.ellipse(x+Math.cos(i*Math.PI/2)*3.4,y+Math.sin(i*Math.PI/2)*3.4,3.2,1.7,i*Math.PI/2,0,Math.PI*2);g.fill();}g.fillStyle='#c9a45c';g.beginPath();g.arc(x,y,1.5,0,Math.PI*2);g.fill();}
-  g.strokeStyle='#8fa98c40';g.lineWidth=1;g.strokeRect(.5,.5,s-1,s-1);});}
 function cozyPaperTile(){return anTile('cozypaper',24,(g,s)=>{
   g.fillStyle=COZY.green;g.fillRect(0,0,s,s);
   g.strokeStyle='#9cc08c88';g.lineWidth=1;g.beginPath();g.moveTo(0,s*.75);g.bezierCurveTo(s*.3,s*.3,s*.7,s*1.05,s,s*.6);g.stroke();
@@ -1694,7 +1689,7 @@ function cozyPaperTile(){return anTile('cozypaper',24,(g,s)=>{
 function cozyFloor(c,r,label){
   rect(c,r.x-5,r.y-4,r.w+10,r.h+10,AN.walnut,6);
   c.save();c.beginPath();c.roundRect(r.x,r.y,r.w,r.h,4);c.clip();
-  c.fillStyle=cozyFloorTile();c.fillRect(r.x,r.y,r.w,r.h);
+  rect(c,r.x,r.y,r.w,r.h,'#e8d8b6');c.fillStyle=floorTile();c.fillRect(r.x,r.y,r.w,r.h); /* the person kept the original beige floor */
   const cx=r.x+r.w/2,cy=r.y+r.h*.45,warm=c.createRadialGradient(cx,cy,10,cx,cy,Math.max(r.w,r.h)*.75);warm.addColorStop(0,'rgba(255,244,214,.28)');warm.addColorStop(.6,'rgba(255,240,200,0)');warm.addColorStop(1,'rgba(40,60,40,.14)');c.fillStyle=warm;c.fillRect(r.x,r.y,r.w,r.h);
   /* wallpaper band along the north wall, gold trim, and two bowed-curtain windows */
   const top=r.y,bandH=26;c.fillStyle=cozyPaperTile();c.fillRect(r.x,top,r.w,bandH);
