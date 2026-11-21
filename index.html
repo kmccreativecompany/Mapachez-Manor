@@ -1097,6 +1097,7 @@ const CAST_CACHE=new Map(),CAST_TAU=Math.PI*2;
    This metadata is deliberately never printed in player-facing dialogue. */
 const CAST_ORIGIN_KINDS=['human','monster','alien','fae','raccoon'];
 function castOriginFromKey(key){
+  if(['delores','delores-family'].includes(String(key).toLowerCase()))return 'raccoon';
   let h=2166136261;
   for(const ch of String(key))h=Math.imul(h^ch.charCodeAt(0),16777619);
   return CAST_ORIGIN_KINDS[(h>>>0)%CAST_ORIGIN_KINDS.length];
@@ -1148,6 +1149,7 @@ function castLook(key,base={}){
     const familySignature=heritageKey?castLineageSignature(heritageKey):null;
     r.mix=true;
     r.originKind=originKind;
+    r.originSpecies=heritageKey?'shared:'+heritageKey:'general:'+originKind;
     r.form=form;
     r.kind=form==='robot'?'construct':originKind;
     r.eyes=pick([1,2,2,3]);
