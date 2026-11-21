@@ -22,6 +22,7 @@ Object.defineProperty(window,'castTest',{get:()=>({
  look:(k,b)=>castLook(k,b||{}),drawPerson,muffin,spot:()=>muffinSpot(0),points:()=>world.options.extras().map(p=>p.id),
  interact:id=>interact(id),player:()=>playerLook().recipe,festival:festivalActive
 })});
+window.mixPixels=(opts)=>pxPaint(castMake({mix:true,kind:'human',eyes:2,hairdo:'bald',skin:'#ecc09f',hair:'#4a3a5c',color:'#3f6f66',extra:'',extra2:'',...opts}),'down',false,0).join('|');
 window.castTestOptions=()=>CAST_OPTIONS;window.deloresWelcomeTest=()=>deloresWelcome();window.profileTestLang=l=>{profile.lang=l;};window.castTestDraw=(c,ch,d)=>drawBeing(c,40,40,castMake(ch),1,d,false,1);
 """
 TEST_HTML = HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
@@ -75,7 +76,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 48_500, 'The pixel kit, player picker and cute raccoon moods should stay under 48.5 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 68_000, 'The modular pixel kit, character creator and raccoon moods should stay under 68 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -136,22 +137,56 @@ class Cast(unittest.TestCase):
             self.assertTrue(70 <= spot['x'] <= 1210 and 200 <= spot['y'] <= 750, spot)
 
 
-    def test_07_player_picks_what_they_are_and_it_sticks(self):
-        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon', 'Existing players stay raccoons')
+    def test_07_mix_and_match_persists_after_reload(self):
+        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon',
+                         'Existing saves keep their existing character until edited')
         self.page.locator('#title-who').click()
-        self.page.wait_for_selector('#pp-view')
-        self.page.locator('[data-kind="alien"]').click()
-        self.page.locator('[data-cycle="eyes"]').click()
-        self.page.locator('#pp-random').click()
-        self.page.locator('[data-kind="fae"]').click()
+        self.page.wait_for_selector('#pp-mix')
+        self.page.locator('[data-opt="eyes"][data-value="3"]').click()
+        self.page.locator('[data-tab="features"]').click()
+        self.page.locator('[data-opt="ears"][data-value="rabbit"]').click()
+        self.page.locator('[data-opt="wings"][data-value="butterfly"]').click()
+        self.page.locator('[data-opt="tail"][data-value="raccoon"]').click()
+        self.page.locator('[data-tab="surface"]').click()
+        self.page.locator('[data-opt="surface"][data-value="scales"]').click()
+        self.page.locator('[data-opt="texture"][data-value="plated"]').click()
+        self.page.locator('[data-tab="hair"]').click()
+        self.page.locator('[data-opt="hairPattern"][data-value="4c"]').click()
+        self.page.locator('[data-opt="headwear"][data-value="hijab"]').click()
         self.page.locator('#pp-done').click()
-        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'fae')
+        def check():
+            v = self.page.evaluate('window.castTest.player()')
+            self.assertTrue(v['mix'])
+            self.assertEqual(v['eyes'], 3)
+            self.assertEqual(v['ears'], 'rabbit')
+            self.assertEqual(v['wings'], 'butterfly')
+            self.assertEqual(v['tail'], 'raccoon')
+            self.assertEqual(v['surface'], 'scales')
+            self.assertEqual(v['texture'], 'plated')
+            self.assertEqual(v['hairPattern'], '4c')
+            self.assertEqual(v['headwear'], 'hijab')
+        check()
         self.page.reload()
-        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'fae', 'The choice is saved')
+        check()
         self.page.locator('#title-who').click()
-        self.page.locator('[data-kind="raccoon"]').click()
+        self.page.locator('#pp-random').click()
         self.page.locator('#pp-done').click()
-        self.assertEqual(self.page.evaluate('window.castTest.player().kind'), 'raccoon')
+        self.assertTrue(self.page.evaluate('window.castTest.player().mix'))
+
+    def test_08_mix_eye_count_for_all_surfaces_and_faces(self):
+        for kind in ['human', 'construct']:
+            faces = [self.page.evaluate('window.mixPixels(opts)', {'kind': kind, 'eyes': eyes})
+                     for eyes in [1, 2, 3]]
+            self.assertEqual(len(set(faces)), 3, kind + ' should support 1, 2, or 3 distinct eyes')
+        base = self.page.evaluate('window.mixPixels({})')
+        for opts in [
+            {'ears': 'rabbit'}, {'horns': 'short'}, {'antlers': 'branch'},
+            {'antennae': 'orbs'}, {'wings': 'butterfly'}, {'tail': 'raccoon'},
+            {'surface': 'scales', 'texture': 'plated'},
+            {'hairPattern': '4c', 'hairdo': 'curly'},
+            {'headwear': 'hijab'}, {'markings': 'freckles'}
+        ]:
+            self.assertNotEqual(self.page.evaluate('window.mixPixels(opts)', opts), base, opts)
 
     def test_10_standing_characters_are_cached_and_cheap(self):
         ms = self.page.evaluate("""(()=>{const c=document.createElement('canvas').getContext('2d');c.canvas.width=1280;c.canvas.height=800;const d=window.castTest.drawPerson;
