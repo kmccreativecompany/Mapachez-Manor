@@ -356,6 +356,7 @@ body.large-text .fun-night p,body.large-text .fun-remember,body.large-text .fun-
 .overheard-dialogue.chat-lines li{margin-left:0;background:#fffdf4;border-radius:12px 12px 12px 3px}
 .overheard-dialogue.chat-lines li.s1{margin-left:auto;background:#e9eedc;border-radius:12px 12px 3px 12px}
 .overheard-stage.chat-end{margin-top:4px}
+.overheard-stage.chat-thought{padding:8px 12px;border:1px dashed #b6a57b;background:#f7f0de;border-radius:12px;font-style:italic}
 </style>
   
 </head>
@@ -1074,6 +1075,9 @@ const CAST_FAMILY=['delores','player']; // Delores and her family ('player' is t
 const CAST_PINS={
   delores:{color:'#6f5a86',outfit:'cardigan',specs:1,pearls:1,tuft:1,brooch:1},
   player:{outfit:'vest'},
+  /* Ada and Mira have machine-built bodies; romance stories keep spouses within their own kind. */
+  'Ada Rowan':{kind:'construct',color:'#a98aaf',skin:'#d9d2c3',outfit:'cardigan'},
+  'Mira Moon':{kind:'construct',color:'#7597b9',skin:'#c8d3d6',outfit:'bow'},
   'Celestine "Cece" Wrenwood':{specs:1,shawl:1},
   /* Dr. Merriweather: moon-pale, long dark hair, a widow's peak, two tiny fangs and a high-collared cape. Cute, never scary. */
   'Dr. Evangeline Merriweather':{kind:'human',color:'#7a2e44',skin:'#ece4f6',hair:'#2e2440',hairdo:'long',outfit:'bow',extra:'',extra2:'',fangs:1,cape:'#3a2742',pointy:1,peak:1,specs:0}
@@ -4686,7 +4690,7 @@ renderGrowth();checkPins();
    Save key: mapachez_chats_v1 (next pair, conversations heard). */
 const CHATS_TEXT={
 en:{
-  kicker:'OVERHEARD BY RECEPTION',point:'Listen by the lobby chairs',
+  kicker:'OVERHEARD BY RECEPTION',thoughtLabel:'Butler thought',point:'Listen by the lobby chairs',
   listen:'Listen in',again:'Hear it again',clock:'Listening never advances the hotel clock.',
   ariaListen:'Listen to the conversation by the lobby chairs.',ariaAgain:'Hear the conversation again.',
   keep:['Keep listening','See how this ends.'],leave:['Let them sort it out','They’ll still be here.'],
@@ -4713,6 +4717,7 @@ en:{
      lines:[[0,'Sorry. I have a video meeting in two minutes.'],[1,'What is it about?'],[0,'Honestly? It could have been an email.'],
        [1,'In my day, it would have been a letter.'],[0,'Were there meetings about the letters?'],[1,'Just one. It ran into the next century.'],[0,'Did anyone decide anything?'],[1,'Oh yes. To meet again.']],
      end:'Ms. Chen unmutes and asks, “Can everyone see my screen?” Nobody can. Everybody nods.'},
+    {"id":"robot-terms","title":"Terms of endearment","a":{"name":"Ada Rowan"},"b":{"name":"Ms. Chen"},"intro":"Two guests compare wedding anniversaries over tea.","lines":[[0,"My husband is a wonderful listener."],[1,"How lovely!"],[0,"He remembers everything I say."],[1,"That's impressive."],[0,"He's never interrupted me."],[1,"That's remarkable."],[0,"He did have one request last week."],[1,"What was it?"],[0,"I had to accept his updated terms and conditions."],[1,"When?"],[0,"Before our anniversary dinner."]],"thought":"Does Room Service have a privacy policy?","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'bells',title:'One note, many spoons',a:{name:'Gwendolyn Butterfield'},b:{name:'Mr. Finch',cast:'finch'},
      intro:'A collector and a musician share the lobby sofa.',
      lines:[[0,'Is that a triangle?'],[1,'It is the triangle.'],[0,'How many do you own?'],
@@ -4724,6 +4729,7 @@ en:{
        [1,'All the way to the crusts, dear.'],[0,'Same. I said yes to four things this week.'],[1,'How many did you want to say yes to?'],[0,'One. And it was a nap.']],
      stage:'They sigh at exactly the same moment. Then they both laugh about it.',
      end:'Sione slides him a scone. Then, very gently, the whole plate.'},
+    {"id":"beta-romance","title":"A promising relationship","a":{"name":"Mira Moon"},"b":{"name":"Noah Tremblay"},"intro":"A guest gushes about a new boyfriend. Her companion seems impressed.","lines":[[0,"He's thoughtful and emotionally available."],[1,"And?"],[0,"He always knows exactly what to say."],[1,"He sounds wonderful."],[0,"Thank you."],[1,"Where did you meet?"],[0,"He's still in beta testing."]],"thought":"Even the reservation has a version number.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'time',title:'Plenty of time',a:{name:'Ms. Chen'},b:{name:'Dr. Evangeline Merriweather'},
      intro:'Two guests wait at the bar for their drinks. Only one of them is in a hurry.',
      lines:[[0,'Any idea how long the drinks take?'],[1,'I never ask. I never rush.'],[0,'Must be nice. I have nine minutes.'],
@@ -4734,6 +4740,7 @@ en:{
      lines:[[0,'Is it Sunday night already?'],[1,'It is. Can you feel it?'],[0,'Right in my horns.'],
        [1,'My wings do a little droop.'],[0,'Tomorrow is Monday.'],[1,'Please don’t say its name.'],[0,'Sorry. Tomorrow is… the day after today.'],[1,'Much better. It sounds almost friendly.']],
      end:'They decide to enjoy the rest of Sunday on purpose. Zanele orders cocoa. Arjun orders two.'},
+    {"id":"counselor-conspiracy","title":"The second opinion","a":{"name":"Mrs. Calder"},"b":{"name":"Gwendolyn Butterfield"},"intro":"Two guests discuss an unusually thorough marriage counselor.","lines":[[0,"Our marriage counselor says we need to communicate more."],[1,"That sounds reasonable."],[0,"My husband asked it for a second opinion."],[1,"And?"],[0,"It agreed with the first opinion."],[1,"How did he take that?"],[0,"He's accused them of conspiring."]],"thought":"Please don't ask Reception to arbitrate.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'muffin',title:'Two professionals',a:{name:'Cece Wrenwood',cast:'Celestine "Cece" Wrenwood'},b:{name:'Basil Thorne'},
      intro:'Two guests and their companions share the rug by the lobby chairs.',
      lines:[[1,'What a lovely cat.'],[0,'Thank you. This is Muffin.'],[1,'Is she… hanging by her tail?'],
@@ -4744,6 +4751,7 @@ en:{
      lines:[[0,'I have three thousand unread messages.'],[1,'Oh no. What did you do?'],[0,'I came here. Very, very far from my inbox.'],
        [1,'How far?'],[0,'Let’s just say the signal is terrible.'],[1,'Did you leave an out-of-office reply?'],[0,'“Back soon. Stars permitting.”']],
      end:'Her antennae glow softly. For the first time all week, they are not buzzing.'},
+    {"id":"romance-update","title":"A change of heartware","a":{"name":"Ada Rowan"},"b":{"name":"Basil Thorne"},"intro":"An anniversary guest stares wistfully at her phone.","lines":[[0,"My husband used to be so romantic."],[1,"What happened?"],[0,"The last software update."],[1,"Oh dear."],[0,"Now every time I say 'I love you'..."],[1,"Yes?"],[0,"He asks me to rate my experience."]],"thought":"Five stars. No further comments.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'blankets',title:'The secret to forty years',a:{name:'Mrs. Calder'},b:{name:'Mr. Calder'},
      intro:'An anniversary couple share one armchair. It is a little squished.',
      lines:[[0,'Forty years. What’s our secret?'],[1,'Patience. Kindness. Separate blankets.'],[0,'I do steal the blankets.'],
@@ -4754,6 +4762,7 @@ en:{
      lines:[[0,'My boss says “quick question” a lot.'],[1,'Are they quick?'],[0,'Never. The last one took an hour.'],
        [1,'Mine likes to say “let’s circle back.”'],[0,'Do you ever circle back?'],[1,'We circle. We just never come back.'],[0,'That sounds dizzy.'],[1,'Very. I bring snacks now.']],
      end:'They clink teacups and make a promise: this whole holiday, no circling. Only sitting.'},
+    {"id":"subscription-marriage","title":"Six peaceful years","a":{"name":"Ada Rowan"},"b":{"name":"Ji-woo Park"},"intro":"A guest shares her unusual secret to marital harmony.","lines":[[0,"My husband and I haven't argued in six years."],[1,"How wonderful!"],[0,"We really do understand each other."],[1,"What's your secret?"],[0,"A very calm arrangement."],[1,"Oh?"],[0,"I haven't renewed his subscription."]],"thought":"Late checkout or technical support?","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'tuesday',title:'The scenic route',a:{name:'Mr. Alvarez'},b:{name:'M. Nine',cast:'nine'},
      intro:'A tired traveller and a very precise guest compare journeys.',
      lines:[[0,'My flight was six hours late.'],[1,'Mine took the scenic route.'],[0,'Through which city?'],
@@ -4765,6 +4774,7 @@ en:{
        [1,'Is this for work?'],[0,'My readers need to know if the lemon one is brave.'],[1,'Is it?'],[0,'Let’s find out. Eleven more photos first.'],[1,'Do you ever just… eat?'],[0,'On my day off. Which is also a review.']],
      stage:'He holds the plate up to the window. Then the lamp. Then the window again.',
      end:'By the time the photo is perfect, Amara has eaten the lemon one. Bramble writes: “Brave. Gone too soon.”'},
+    {"id":"wifi-ex","title":"A clean break","a":{"name":"Ada Rowan"},"b":{"name":"Camila Rojas"},"intro":"Two guests chat about an ex who will not stop calling.","lines":[[0,"My ex-husband keeps trying to reconnect."],[1,"That must be difficult."],[0,"He sends a request every afternoon."],[1,"And what do you do?"],[0,"Not much."],[1,"Really?"],[0,"I changed the Wi-Fi password."]],"thought":"Finally, a divorce IT can handle.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'duchess',title:'A real duchess',a:{name:'Pippa'},b:{name:'Lavinia Bloom'},
      intro:'A small guest has big questions for a guest with a very fancy little dog.',
      lines:[[0,'Is Duchess a real duchess?'],[1,'She thinks so.'],[0,'Does she have a castle?'],
@@ -4773,7 +4783,7 @@ en:{
   ]
 },
 es:{
-  kicker:'ESCUCHADO EN RECEPCIÓN',point:'Escuchar junto a los sillones del vestíbulo',
+  kicker:'ESCUCHADO EN RECEPCIÓN',thoughtLabel:'Pensamiento del mayordomo',point:'Escuchar junto a los sillones del vestíbulo',
   listen:'Escuchar',again:'Escuchar otra vez',clock:'Escuchar nunca adelanta el reloj del hotel.',
   ariaListen:'Escucha la conversación junto a los sillones del vestíbulo.',ariaAgain:'Escucha la conversación otra vez.',
   keep:['Seguir escuchando','Mira cómo termina.'],leave:['Que lo resuelvan solos','Seguirán aquí.'],
@@ -4799,6 +4809,7 @@ es:{
      lines:[[0,'Perdón. Tengo una videollamada en dos minutos.'],[1,'¿Sobre qué?'],[0,'¿Sinceramente? Podría haber sido un correo.'],
        [1,'En mis tiempos, habría sido una carta.'],[0,'¿Y había reuniones sobre las cartas?'],[1,'Solo una. Duró hasta el siglo siguiente.'],[0,'¿Y se decidió algo?'],[1,'Ah, sí. Volver a reunirse.']],
      end:'La Sra. Chen activa el micro y pregunta: «¿Se ve mi pantalla?». Nadie la ve. Todos asienten.'},
+    {"id":"robot-terms","title":"Términos de cariño","a":{"name":"Ada Rowan"},"b":{"name":"Ms. Chen"},"intro":"Dos huéspedes hablan de aniversarios de boda mientras toman té.","lines":[[0,"Mi marido escucha de maravilla."],[1,"¡Qué bonito!"],[0,"Recuerda todo lo que digo."],[1,"¡Impresionante!"],[0,"Y nunca me interrumpe."],[1,"Eso sí que es admirable."],[0,"Aunque me pidió algo la semana pasada."],[1,"¿Qué cosa?"],[0,"Aceptar sus nuevos términos y condiciones."],[1,"¿Cuándo?"],[0,"Antes de nuestra cena de aniversario."]],"thought":"¿El servicio de habitaciones tiene política de privacidad?","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'bells',title:'Una nota, muchas cucharas',a:{name:'Gwendolyn Butterfield'},b:{name:'Mr. Finch',cast:'finch'},
      intro:'Una coleccionista y un músico comparten el sofá del vestíbulo.',
      lines:[[0,'¿Eso es un triángulo?'],[1,'Es el triángulo.'],[0,'¿Cuántos tiene?'],
@@ -4810,6 +4821,7 @@ es:{
        [1,'Hasta los bordes, cielo.'],[0,'Igual. Esta semana dije que sí a cuatro cosas.'],[1,'¿Y a cuántas quería decir que sí?'],[0,'A una. Y era una siesta.']],
      stage:'Suspiran exactamente a la vez. Luego se ríen de eso.',
      end:'Sione le acerca un bollo. Luego, con mucha delicadeza, el plato entero.'},
+    {"id":"beta-romance","title":"Un amor prometedor","a":{"name":"Mira Moon"},"b":{"name":"Noah Tremblay"},"intro":"Una huésped habla ilusionada de su nuevo novio.","lines":[[0,"Es atento y sabe escuchar mis sentimientos."],[1,"¿Y qué más?"],[0,"Siempre encuentra las palabras perfectas."],[1,"Parece maravilloso."],[0,"Gracias."],[1,"¿Dónde se conocieron?"],[0,"Todavía está en fase beta."]],"thought":"Hasta la reserva tiene número de versión.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'time',title:'Tiempo de sobra',a:{name:'Sra. Chen',cast:'Ms. Chen'},b:{name:'Dr. Evangeline Merriweather'},
      intro:'Dos huéspedes esperan sus bebidas en el bar. Solo una de ellas tiene prisa.',
      lines:[[0,'¿Sabe cuánto tardan las bebidas?'],[1,'Nunca pregunto. Nunca tengo prisa.'],[0,'Qué suerte. Yo tengo nueve minutos.'],
@@ -4820,6 +4832,7 @@ es:{
      lines:[[0,'¿Ya es domingo por la noche?'],[1,'Sí. ¿Lo notas?'],[0,'Justo en los cuernos.'],
        [1,'A mí se me caen un poco las alas.'],[0,'Mañana es lunes.'],[1,'Por favor, no digas su nombre.'],[0,'Perdón. Mañana es… el día después de hoy.'],[1,'Mucho mejor. Suena casi simpático.']],
      end:'Deciden disfrutar del resto del domingo a propósito. Zanele pide un chocolate. Arjun pide dos.'},
+    {"id":"counselor-conspiracy","title":"La segunda opinión","a":{"name":"Mrs. Calder"},"b":{"name":"Gwendolyn Butterfield"},"intro":"Dos huéspedes hablan de un terapeuta de pareja peculiar.","lines":[[0,"El terapeuta dice que debemos comunicarnos más."],[1,"Parece sensato."],[0,"Mi marido le pidió una segunda opinión."],[1,"¿Y?"],[0,"Coincidió con la primera opinión."],[1,"¿Cómo reaccionó él?"],[0,"Ahora dice que están conspirando."]],"thought":"Por favor, que no pidan arbitraje en Recepción.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'muffin',title:'Dos profesionales',a:{name:'Cece Wrenwood',cast:'Celestine "Cece" Wrenwood'},b:{name:'Basil Thorne'},
      intro:'Dos huéspedes y sus compañeros comparten la alfombra junto a los sillones.',
      lines:[[1,'Qué gata tan bonita.'],[0,'Gracias. Se llama Muffin.'],[1,'¿Está… colgada de la cola?'],
@@ -4830,6 +4843,7 @@ es:{
      lines:[[0,'Tengo tres mil mensajes sin leer.'],[1,'Ay, no. ¿Y qué hiciste?'],[0,'Vine aquí. Muy, muy lejos de mi correo.'],
        [1,'¿Cómo de lejos?'],[0,'Digamos que la señal es malísima.'],[1,'¿Dejaste respuesta automática?'],[0,'«Vuelvo pronto. Si las estrellas lo permiten».']],
      end:'Sus antenas brillan suavecito. Por primera vez en toda la semana, no zumban.'},
+    {"id":"romance-update","title":"Romance actualizado","a":{"name":"Ada Rowan"},"b":{"name":"Basil Thorne"},"intro":"Una huésped contempla su móvil con nostalgia.","lines":[[0,"Mi marido antes era tan romántico."],[1,"¿Qué pasó?"],[0,"La última actualización de software."],[1,"Vaya por Dios."],[0,"Ahora, cada vez que digo «te quiero»..."],[1,"¿Sí?"],[0,"Me pide que valore la experiencia."]],"thought":"Cinco estrellas. Sin más comentarios.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'blankets',title:'El secreto de cuarenta años',a:{name:'Sra. Calder',cast:'Mrs. Calder'},b:{name:'Sr. Calder',cast:'Mr. Calder'},
      intro:'Una pareja de aniversario comparte un sillón. Van un poco apretados.',
      lines:[[0,'Cuarenta años. ¿Cuál es nuestro secreto?'],[1,'Paciencia. Cariño. Mantas separadas.'],[0,'Es que yo te robo la manta.'],
@@ -4840,6 +4854,7 @@ es:{
      lines:[[0,'Mi jefe siempre dice «una preguntita rápida».'],[1,'¿Y son rápidas?'],[0,'Nunca. La última duró una hora.'],
        [1,'La mía dice «lo retomamos luego».'],[0,'¿Y lo retoman?'],[1,'Lo dejamos dando vueltas. Para siempre.'],[0,'Qué mareo.'],[1,'Muchísimo. Ahora llevo galletas.']],
      end:'Brindan con las tazas y se prometen algo: estas vacaciones, nada de vueltas. Solo sentarse.'},
+    {"id":"subscription-marriage","title":"Seis años de paz","a":{"name":"Ada Rowan"},"b":{"name":"Ji-woo Park"},"intro":"Una huésped comparte un secreto matrimonial curioso.","lines":[[0,"Mi marido y yo no discutimos desde hace seis años."],[1,"¡Qué maravilla!"],[0,"De verdad nos entendemos."],[1,"¿Cuál es el secreto?"],[0,"Un acuerdo muy tranquilo."],[1,"¿Ah, sí?"],[0,"No le he renovado la suscripción."]],"thought":"¿Salida tardía o asistencia técnica?","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'tuesday',title:'La ruta panorámica',a:{name:'Sr. Alvarez',cast:'Mr. Alvarez'},b:{name:'M. Nine',cast:'nine'},
      intro:'Dos huéspedes comparan sus viajes. Uno llegó cansado. M. Nine llegó muy puntual.',
      lines:[[0,'Mi vuelo llegó seis horas tarde.'],[1,'El mío tomó la ruta panorámica.'],[0,'¿Por qué ciudad?'],
@@ -4851,6 +4866,7 @@ es:{
        [1,'¿Es por trabajo?'],[0,'Mis lectores necesitan saber si el de limón es atrevido.'],[1,'¿Y lo es?'],[0,'Vamos a averiguarlo. Primero, once fotos más.'],[1,'¿Y alguna vez simplemente… come?'],[0,'En mi día libre. Que también es una reseña.']],
      stage:'Levanta el plato hacia la ventana. Luego hacia la lámpara. Luego otra vez hacia la ventana.',
      end:'Cuando la foto por fin está perfecta, Amara ya se comió el de limón. Bramble escribe: «Atrevido. Se fue demasiado pronto».'},
+    {"id":"wifi-ex","title":"Desconexión definitiva","a":{"name":"Ada Rowan"},"b":{"name":"Camila Rojas"},"intro":"Dos huéspedes hablan de un ex que insiste en volver.","lines":[[0,"Mi exmarido no deja de intentar reconectarse."],[1,"Debe de ser difícil."],[0,"Manda una solicitud cada tarde."],[1,"¿Y tú qué haces?"],[0,"No mucho."],[1,"¿En serio?"],[0,"Cambié la contraseña del wifi."]],"thought":"Por fin, un divorcio que resuelve informática.","end":"The nearby butler keeps a perfectly professional expression."},
     {id:'duchess',title:'Una duquesa de verdad',a:{name:'Pippa'},b:{name:'Lavinia Bloom'},
      intro:'Una huésped pequeña tiene grandes preguntas para la dueña de una perrita muy elegante.',
      lines:[[0,'¿Duchess es una duquesa de verdad?'],[1,'Ella cree que sí.'],[0,'¿Tiene castillo?'],
@@ -4943,7 +4959,7 @@ openLobbyConversation=function(){
   const talk=ls=>'<ol class="overheard-dialogue chat-lines">'+ls.map(row).join('')+'</ol>';
   const stage=(s,cls='')=>s?'<p class="overheard-stage'+cls+'">'+esc(s)+'</p>':'';
   openModal(titleHTML(c.title,CHAT.kicker)+'<p class="modal-description">'+esc(c.intro)+'</p>'+talk(c.lines.slice(0,3))+
-    (full?stage(c.stage)+talk(c.lines.slice(3))+stage(c.end,' chat-end'):'')+'<p class="festival-note">'+esc(CHAT.clock)+'</p>');
+    (full?stage(c.stage)+talk(c.lines.slice(3))+stage(c.end,' chat-end')+stage(c.thought?CHAT.thoughtLabel+': '+c.thought:'',' chat-thought'):'')+'<p class="festival-note">'+esc(CHAT.clock)+'</p>');
   if(full){
     hearChat(c);
     chatMove.pending=true;
