@@ -1247,6 +1247,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
   /* TRUE SIDE VIEW (creator characters): a real profile, facing right (left is mirrored).
      One eye near the front, a little nose past the outline, mouth at the front, an ear in the
      middle of the head and hair over the back of the head. */
+  let preHair=null;
   function sideFace(hy,eyes){
     const ex=blink?'neutral':r.expression||'neutral',brow=T(hair,-.2);
     const spots=eyes===1?[[19,hy,4]]:eyes===3?[[18,hy-3,2],[21,hy+1,2]]:[[21,hy,2]];
@@ -1273,8 +1274,38 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(x<=13||y<=hy-4)P(x,y,(x+y)%5===0?hairDk:hair,hair);}
     /* Clear the face's front edge so the nose and mouth sit on the outline, not under a lock of hair. */
     if(!bald)for(let y=hy-3;y<=hy+22;y++)for(let x=y>hy+6?22:20;x<W;x++){const i=y*W+x;if(mat[i]!==hair&&![hair,hairDk,hairLt].includes(col[i]))continue;
-      const dx=(x+.5-16.5)/9.8,dy=(y+.5-(hy-1))/8.8;if(dx*dx+dy*dy<=1)P(x,y,skin,skin);else col[i]=mat[i]=null;}
-    if(r.ears==='human'||!r.ears)if(!bald||true){E(14,hy+2,1.7,2.3,skin,skin);P(14,hy+2,T(skin,-.18),skin);}
+      const dx=(x+.5-16.5)/9.8,dy=(y+.5-(hy-1))/8.8;if(dx*dx+dy*dy<=1)P(x,y,skin,skin);else{col[i]=preHair?preHair[0][i]:null;mat[i]=preHair?preHair[1][i]:null;}}
+    /* Profile hair that hangs naturally: a soft fringe edge and sideburn, then medium and long hair
+       falls in one continuous curtain over the ear and down the back. Only the Mullet is short on
+       top with a separate long tail at the back. */
+    const fam=r.hairStyle||'',modern=MIX_HAIR_FAMILIES.some(f=>f.id===fam),len=r.hairLength||'medium';
+    const tip=MIX_HAIR_LENGTH_TIPS[len]||27,mullet=fam==='mullet';
+    const drape=!bald&&modern&&!mullet&&len!=='short';
+    if(!bald){for(let x=13;x<=24;x++){const edge=hy-4+(x<=15?3:x<=17?1:x>=23?-1:0);
+        for(let y=hy-9;y<=edge;y++){const i=y*W+x;if(mat[i]===skin)P(x,y,hair,hair);}}
+      if(!mullet)R(15,hy-1,1,3,hair,hair);}
+    if(drape){
+      for(let y=hy-2;y<=tip;y++){
+        const head=y<=hy+5,xr=head?16:y<=hy+8?15:14;
+        const xl=head?Math.max(5,Math.ceil(16.5-9.8*Math.sqrt(Math.max(0,1-((y+.5-(hy-1))/8.8)**2)))-1):5+(y>=tip-1?1:0);
+        for(let x=xl;x<=xr;x++){const i=y*W+x;if(mat[i]===K||mat[i]===iris||mat[i]===white)continue;
+          let c=hair;
+          if(fam==='straight'&&(x===8||x===12))c=hairDk;
+          else if(fam==='waves'&&x===8+Math.round(Math.sin(y*.7)*1.2))c=hairDk;
+          else if(fam==='locs'&&y%3===0)c=hairDk;
+          else if(fam==='twists'&&(x+y)%2===0&&x%3!==2)c=hairLt;
+          else if((fam==='curls'||fam==='coils')&&(x*3+y*5)%(fam==='coils'?5:8)===0)c=hairDk;
+          P(x,y,c,hair);}
+        if((fam==='curls'||fam==='coils')&&y%3===0&&y>hy)E(5,y,1.8,1.8,hair,hair);
+      }
+      R(9,hy-6,4,1,hairLt,hair);
+    }
+    if(mullet){
+      /* Deliberate mullet: cropped top and sides, ear showing, a long tail at the back. */
+      const end=Math.min(37,tip+4);
+      for(let y=hy+3;y<=end;y++)R(y>=end-1?6:5,y,y<=hy+6?8:7,1,(y%4===0?hairDk:hair),hair);
+    }
+    if((r.ears==='human'||!r.ears)&&!drape){E(14,hy+2,1.7,2.3,skin,skin);P(14,hy+2,T(skin,-.18),skin);}
     if(r.specs){R(20,hy-1,4,1,gold);R(20,hy+3,4,1,gold);P(20,hy,gold);P(23,hy,gold);R(14,hy,6,1,gold);}
   }
   /* Creator mouths: a separate choice so faces mix freely with any eyes. */
@@ -1368,6 +1399,12 @@ function pxPaint(r,dir,blink,frame,mood=''){
           mass(x+dx,y,rad,rad);
           if((Math.min(x,33-x)+y)%3===0)ink(x+dx,y,hairLt);
         }
+      }else if(kind==='mullet'){
+        /* Mullet: short and spiky on top and at the sides, long at the back (the length picks the tail). */
+        mass(16.5,hy-6,9.5,4.6);
+        if(!back){R(10,hy-7,13,2,hair,hair);for(const x of [11,14,17,20,23])P(x,hy-11,hair,hair);R(12,hy-8,9,1,hairLt,hair);}
+        for(const x of [7,25])R(x,hy-3,2,4,hair,hair);
+        if(back){const tail=Math.min(37,end+4);R(9,hy+4,15,tail-hy-4,hair,hair);for(let y=hy+6;y<tail;y+=4)R(10,y,13,1,hairDk,hair);}
       }else if(kind==='locs'){
         /* Locs: thick ropes with soft bands (segments), rounded tips, and partings on the crown. */
         const xs=back?[6,10,14,18,22,26]:[6,9,22,25];
@@ -1546,8 +1583,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const longBack=(hy)=>{
     if(mix&&MIX_HAIR_FAMILIES.some(st=>st.id===r.hairStyle)){
       if(back)return;
-      const end=MIX_HAIR_LENGTH_TIPS[r.hairLength]||MIX_HAIR_LENGTH_TIPS.medium;
-      if(end>24)for(const side of [-1,1]){
+      const end=r.hairStyle==='mullet'?Math.min(37,(MIX_HAIR_LENGTH_TIPS[r.hairLength]||27)+4):MIX_HAIR_LENGTH_TIPS[r.hairLength]||MIX_HAIR_LENGTH_TIPS.medium;
+      if(end>24)for(const side of fx?[-1]:[-1,1]){
         const x=side<0?6:25;
         for(let y=hy+1;y<=end;y++){
           const wobble=['waves','curls','coils'].includes(r.hairStyle)
@@ -1708,6 +1745,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(type==='wolf')mirror([[7,7],[7,8],[8,6],[8,7],[8,8],[9,7],[9,8],[10,8]],hair,hair);
     if(r.pointy||fae||goat||type==='imp'||alien&&bit(2))ears(hy,true);else if(type!=='wolf'&&type!=='wraps')ears(hy,false);
     E(16.5,hy,9.8,8.8,headCol,headCol);
+    preHair=mix&&fx?[col.slice(),mat.slice()]:null;
     if(type==='human'||fae)hairDo(hy);
     else if(back)E(16.5,hy,9.8,8.8,type==='wraps'?'#efe6d2':type==='wolf'?hair:T(skin,-.08));
     if(r.peak&&!back){P(16,hy-3,hair);P(17,hy-3,hair);P(16,hy-2,hair);}
@@ -2029,7 +2067,8 @@ const MIX_HAIR_FAMILIES=[
 {id:'curls',label:'Curls',texture:'3b'},
 {id:'coils',label:'Coils',texture:'4b'},
 {id:'locs',label:'Locs',texture:'4b'},
-{id:'twists',label:'Twists',texture:'4a'}
+{id:'twists',label:'Twists',texture:'4a'},
+{id:'mullet',label:'Mullet',texture:'2a'}
 ];
 const MIX_HAIR_LENGTHS=[['short','Short'],['medium','Medium'],['long','Long']];
 /* Hair lengths get their own Spanish words: plain 'Short' and 'Long' already mean horns and ears. */
@@ -4228,7 +4267,7 @@ Object.assign(WORDS.es||{},{'Who are you?':'¿Quién eres?','Who are you tonight
 {const b=$('title-who');b.onclick=openPlayerPicker;
  const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent='🎨 '+t('Character Creator');return r;};}
 /* Creator words added with the hair and face polish. */
-Object.assign(WORDS.es||{},{"Hair length": "Largo del pelo", "Hair style": "Peinado", "Straight": "Liso", "Waves": "Ondas", "Curls": "Rizos", "Coils": "Afro", "Locs": "Rastas", "Twists": "Twists", "Optional strand texture": "Textura del pelo (opcional)", "Every style has short, medium, and long lengths. Locs and twists have distinct shapes. Head coverings are separate.": "Cada peinado viene corto, medio o largo. Las rastas y los twists tienen su propia forma. Lo que llevas en la cabeza va aparte.", "Silky straight": "Liso sedoso", "Straight volume": "Liso con volumen", "Full straight": "Liso abundante", "Loose waves": "Ondas sueltas", "Soft waves": "Ondas suaves", "Deep waves": "Ondas marcadas", "Wide curls": "Rizos amplios", "Spring curls": "Rizos en espiral", "Tight curls": "Rizos cerrados", "Soft coils": "Afro suave", "Dense coils": "Afro denso", "Tiny coils": "Afro muy fino", "Mouth": "Boca", "Soft smile": "Sonrisa suave", "Big smile": "Gran sonrisa", "Grin": "Sonrisa amplia", "Little “oh”": "Una “o” pequeña", "Cat smile": "Sonrisa gatuna", "Sleepy": "Con sueño", "Wink": "Guiño"});
+Object.assign(WORDS.es||{},{"Hair length": "Largo del pelo", "Hair style": "Peinado", "Straight": "Liso", "Waves": "Ondas", "Curls": "Rizos", "Coils": "Afro", "Locs": "Rastas", "Twists": "Twists", "Mullet": "Mullet", "Optional strand texture": "Textura del pelo (opcional)", "Every style has short, medium, and long lengths. Locs and twists have distinct shapes. Head coverings are separate.": "Cada peinado viene corto, medio o largo. Las rastas y los twists tienen su propia forma. Lo que llevas en la cabeza va aparte.", "Silky straight": "Liso sedoso", "Straight volume": "Liso con volumen", "Full straight": "Liso abundante", "Loose waves": "Ondas sueltas", "Soft waves": "Ondas suaves", "Deep waves": "Ondas marcadas", "Wide curls": "Rizos amplios", "Spring curls": "Rizos en espiral", "Tight curls": "Rizos cerrados", "Soft coils": "Afro suave", "Dense coils": "Afro denso", "Tiny coils": "Afro muy fino", "Mouth": "Boca", "Soft smile": "Sonrisa suave", "Big smile": "Gran sonrisa", "Grin": "Sonrisa amplia", "Little “oh”": "Una “o” pequeña", "Cat smile": "Sonrisa gatuna", "Sleepy": "Con sueño", "Wink": "Guiño"});
 const castInteract=interact;interact=function(id){if(festivalActive&&muffinInteract(id))return;return castInteract.apply(this,arguments);};
 $('title-quick').onclick=startQuickShift;
 addEventListener('keydown',e=>{

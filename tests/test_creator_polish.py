@@ -101,6 +101,18 @@ class Polish(base.Cast):
         for word in ('Length', 'Medium', 'Straight', 'Waves'):
             self.assertNotIn(word, text)
 
+    def test_09_side_view_hair_is_one_curtain_not_a_mullet(self):
+        # Medium and long hair covers the ear in profile; only the Mullet shows the ear with a separate tail.
+        for family in ('straight', 'waves', 'curls', 'coils', 'locs', 'twists'):
+            for length in ('medium', 'long'):
+                side = self.px({'hairStyle': family, 'hairLength': length}, 'right')
+                self.assertNotEqual(self.at(side, 14, 19), self.px({'hairdo': 'bald', 'hairStyle': ''}, 'right')[19 * 32 + 14],
+                                    f'{family} {length}: hair should fall over the ear')
+        mullet = self.px({'hairStyle': 'mullet', 'hairLength': 'long'}, 'right')
+        bald = self.px({'hairdo': 'bald', 'hairStyle': ''}, 'right')
+        self.assertEqual(self.at(mullet, 14, 19), self.at(bald, 14, 19), 'the mullet shows the ear')
+        self.assertIsNotNone(self.at(mullet, 6, 30), 'with a long tail at the back')
+
     def test_08_texture_fold_stays_open(self):
         self.page.locator('#title-who').click()
         self.page.locator('button[data-tab="hair"]').click()
