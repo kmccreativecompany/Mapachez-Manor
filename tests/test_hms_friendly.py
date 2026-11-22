@@ -41,7 +41,7 @@ class Friendly(hbase.Hms):
         self.assertTrue(self.page.get_by_role('button', name='Explore on my own').is_visible())
         self.page.locator('#hms-next-go').click()
         self.page.wait_for_selector('#hms-say')
-        self.assertIn('HMS LESSON 1', self.page.locator('#modal-body').inner_text().upper())
+        self.assertIn('DESK COMPUTER LESSON 1', self.page.locator('#modal-body').inner_text().upper())
 
     def test_02_next_step_moves_on_after_the_lessons(self):
         self.page.evaluate('window.hmsTest.lessonsDone()')

@@ -48,7 +48,7 @@ class Star(base.Growth):
         st = self.s()
         self.assertIn('amara', st['star']['lt']['noted'])
         self.assertEqual(st['joy']['tips'], tips + 1)
-        self.assertIn('Saved to the HMS notes', self.page.locator('#lt-res').inner_text())
+        self.assertIn('Saved to the guest notes', self.page.locator('#lt-res').inner_text())
         # The very first time, the player gets to see the payoff straight away.
         self.page.locator('#lt-actions button', has_text='a week later').click()
         self.page.locator('#lt-peek').click()

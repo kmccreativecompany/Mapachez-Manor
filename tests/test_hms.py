@@ -54,7 +54,7 @@ class Hms(base.Growth):
 
     def test_01_title_button_opens_the_desk_computer_with_lessons_games_and_a_login_pin(self):
         btn = self.page.locator('#hms-title')
-        self.assertIn('Learn the HMS', btn.inner_text())
+        self.assertIn('Learn the Hotel Management System', btn.inner_text())
         btn.click()
         self.page.wait_for_selector('#hms-next-go')
         text = self.page.locator('#modal-body').inner_text()
@@ -129,7 +129,7 @@ class Hms(base.Growth):
     def test_06_guessing_is_fine_but_looking_is_better_and_misses_come_back(self):
         self.page.evaluate("hmsTest.ask('allergy')")
         self.page.locator('.choices .choice', has_text='sesame').click()
-        self.assertIn('peek in the HMS first', self.page.locator('.gm-result.ok').inner_text())
+        self.assertIn('peek on the desk computer first', self.page.locator('.gm-result.ok').inner_text())
         self.page.evaluate("hmsTest.ask('charge')")
         self.page.locator('.choices .choice', has_text='just a fee').click()
         self.assertIn('Garden tea for two', self.page.locator('.gm-result.miss').inner_text())
@@ -177,7 +177,7 @@ class Hms(base.Growth):
                 self.page.locator('.hms-peek button').click()
                 self.assertIn('GUEST RECORD', self.page.locator('.hms-mini').inner_text().upper())
                 self.answer(best=True)
-                self.assertIn('+1 tip for checking the HMS first', self.page.locator('.gm-result').inner_text())
+                self.assertIn('+1 tip for checking the desk computer first', self.page.locator('.gm-result').inner_text())
                 self.page.wait_for_function("hmsTest.pins.includes('hms-peek')")
                 return
             self.answer(best=True)
