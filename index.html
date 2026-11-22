@@ -1255,6 +1255,72 @@ function pxPaint(r,dir,blink,frame,mood=''){
       for(let y=a;y<=b;y+=Math.max(3,Math.round(rad*1.6)))
         mass(x+Math.round(Math.sin(y*.55+x)*1.2),y,rad,rad);
     };
+    const modern=MIX_HAIR_FAMILIES.find(f=>f.id===st);
+    if(modern){
+      const kind=modern.id;
+      const length=MIX_HAIR_LENGTH_TIPS[r.hairLength]?r.hairLength:'medium';
+      const end=MIX_HAIR_LENGTH_TIPS[length],short=length==='short';
+      const ink=(x,y,c)=>P(x,y,c,hair,'hair');
+      /* Hair respects the small chibi face; short ends at the ears,
+         medium at the shoulders, long above the feet. */
+      mass(16.5,hy-4,kind==='coils'?11:10.2,kind==='coils'?8:7.2);
+      if(!back)E(16.5,hy+.8,8.6,7,skin,skin);
+      const sides=back?[7,10,13,19,22,25]:[7,10,23,26];
+      if(kind==='straight'){
+        if(short){
+          mass(16.5,hy-6,9,4.7);
+          if(!back){R(10,hy-7,11,2,hair,hair);R(9,hy-5,5,2,hair,hair);
+            for(const x of [11,16,21])ink(x,hy-8,hairLt);}
+          for(const x of [7,25])R(x,hy-2,2,5,hair,hair);
+        }else{
+          for(const x of back?[7,24]:[6,24]){
+            R(x,hy-2,3,end-hy+3,hair,hair);
+            for(let y=hy+1;y<end-1;y+=5)ink(x+1,y,hairLt);
+          }
+          if(!back){R(10,hy-7,13,2,hair,hair);R(10,hy-5,6,1,hairLt,hair);}
+        }
+      }else if(kind==='waves'){
+        if(!back){R(11,hy-8,10,2,hair,hair);ink(13,hy-8,hairLt);}
+        for(const x of back?[7,12,20,25]:[7,9,24,26]){
+          for(let y=hy-3;y<=end;y+=2){
+            const dx=Math.round(Math.sin(y*.65+x*.3)*1.4);
+            mass(x+dx,y,2.4,2);
+            if(y%6===0)ink(x+dx,y,hairLt);
+          }
+        }
+      }else if(kind==='curls'||kind==='coils'){
+        const tight=kind==='coils',rad=tight?1.85:2.7,step=tight?3:4;
+        if(tight)mass(16.5,hy-8,11,5);
+        for(let y=hy-9;y<=hy-5;y+=step)for(let x=8;x<=25;x+=tight?3:5)
+          mass(x+(y%2),y,rad,rad);
+        for(const x of sides)for(let y=hy-3;y<=end;y+=step){
+          const dx=Math.round(Math.sin(x*.51+y*.47));
+          mass(x+dx,y,rad,rad);
+          if((x+y)%3===0)ink(x+dx,y,hairLt);
+        }
+      }else if(kind==='locs'||kind==='twists'){
+        /* Locs are chunky ropes. Twists are paired crossing strands. */
+        const xs=back?[7,11,15,19,23,26]:[7,10,23,26];
+        if(!back)R(11,hy-8,11,2,hair,hair);
+        xs.forEach((x,i)=>{
+          const start=hy-4+(i%2),finish=end-(i%3===0?1:0);
+          if(kind==='locs'){
+            R(x,start,3,finish-start+1,hair,hair);
+            for(let y=start+2;y<finish;y+=5)ink(x+1,y,hairLt);
+            mass(x+1,finish,1.5,1.5);
+          }else{
+            R(x,start,2,finish-start+1,hair,hair);
+            for(let y=start+1;y<finish;y+=2){
+              ink(x+(y%4===0?0:1),y,hairLt);
+              if(y%4===0)ink(x+1,y,hairDk);
+            }
+            mass(x+.5,finish,1.2,1.2);
+          }
+        });
+      }
+      for(const x of [12,17,22])ink(x,hy-9,hairLt);
+      return;
+    }
     const detailStrands=()=>{
       /* Shade only existing hair pixels, so eyes and skin stay clear.
          Each curl family reads differently even with a tiny 32px sprite. */
@@ -1349,7 +1415,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
     detailStrands();
   };
   const hairDo=(hy)=>{const hd=r.hairdo;if(hd==='bald')return;
-    if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){styledHair(hy);return;}
+    if(mix&&(MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)||
+               MIX_HAIR_FAMILIES.some(st=>st.id===r.hairStyle))){styledHair(hy);return;}
     if(back){E(16.5,hy,10.6,9.6,hair);if(hd==='long')R(6,hy,21,14,hair);if(hd==='bun')E(16.5,hy-10,3.6,3.2,hair);return;}
     E(16.5,hy-1.5,10.6,8.6,hair);E(16.5,hy+1.5,8.6,6.6,skin,skin);
     const drop=[1,2,1,0,1,2,2,1,0,1,2,1,0,1,2,1,1];for(let x=8;x<=24;x++)R(x,hy-6,1,3+drop[x-8],hair);
@@ -1395,6 +1462,19 @@ function pxPaint(r,dir,blink,frame,mood=''){
     for(const [x,y] of [[11,-7],[12,-8],[13,-8],[14,-8],[20,-8],[21,-7],[9,-4],[10,-5],[22,-5],[7,1],[7,2],[26,2]])P(x,hy+y,hairLt,hair);
   };
   const longBack=(hy)=>{
+    if(mix&&MIX_HAIR_FAMILIES.some(st=>st.id===r.hairStyle)){
+      if(back)return;
+      const end=MIX_HAIR_LENGTH_TIPS[r.hairLength]||MIX_HAIR_LENGTH_TIPS.medium;
+      if(end>24)for(const side of [-1,1]){
+        const x=side<0?6:25;
+        for(let y=hy+1;y<=end;y++){
+          const wobble=['waves','curls','coils'].includes(r.hairStyle)
+            ?Math.round(Math.sin(y*.67)*1.2):0;
+          R(x+wobble,y,r.hairStyle==='locs'?3:2,1,hair,hair);
+        }
+      }
+      return;
+    }
     if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){
       if(back)return;
       const st=r.hairStyle;
@@ -1811,6 +1891,17 @@ const MIX_HAIR_TIPS=Object.freeze({
   'soft-waves':27, 'shoulder-straight':26,
   'long-waves':32, 'long-curls':32
 });
+/* Six hairstyle families and three true lengths. Prior saves retain vintage IDs. */
+const MIX_HAIR_FAMILIES=[
+{id:'straight',label:'Straight',texture:'1b'},
+{id:'waves',label:'Waves',texture:'2b'},
+{id:'curls',label:'Curls',texture:'3b'},
+{id:'coils',label:'Coils',texture:'4b'},
+{id:'locs',label:'Locs',texture:'4b'},
+{id:'twists',label:'Twists',texture:'4a'}
+];
+const MIX_HAIR_LENGTHS=[['short','Short'],['medium','Medium'],['long','Long']];
+const MIX_HAIR_LENGTH_TIPS=Object.freeze({short:21,medium:27,long:33});
 const MIX_HAIR_LABELS={"1a":"Silky straight","1b":"Straight volume","1c":"Full straight","2a":"Loose waves","2b":"Soft waves","2c":"Deep waves","3a":"Wide curls","3b":"Spring curls","3c":"Tight curls","4a":"Soft coils","4b":"Dense coils","4c":"Tiny coils"};
 const MIX_COVERS=['none','hijab','scarf','wrap','turban','kufi','bandana'];
 const MIX_SURFACES={skin:['smooth','freckles'],fur:['short','fluffy','curly','shaggy'],feathers:['soft','layered'],scales:['fine','plated'],metal:['polished','brushed'],ghostly:['soft']};
@@ -1819,7 +1910,7 @@ function mixDefault(previous){
   const old=previous||{};
   return {mix:true,kind:'human',body:'round',eyes:2,skin:old.skin||'#ecc09f',
     hair:old.hair||'#6b4a32',hairdo:old.kind==='raccoon'?'bald':old.hairdo||'long',
-    hairPattern:'2b',hairStyle:old.kind==='raccoon'||old.hairdo==='bald'?'':'soft-waves',headwear:'none',headwearColor:'#77536f',
+    hairPattern:'2b',hairStyle:old.kind==='raccoon'||old.hairdo==='bald'?'':'waves',hairLength:'medium',headwear:'none',headwearColor:'#77536f',
     surface:old.kind==='raccoon'?'fur':'skin',texture:old.kind==='raccoon'?'fluffy':'smooth',
     ears:old.kind==='raccoon'?'round':'human',horns:'none',antlers:'none',antennae:'none',
     wings:'none',tail:old.kind==='raccoon'?'raccoon':'none',markings:'none',
@@ -1842,8 +1933,9 @@ function randomPlayer(){
   r.antennae=pick(['none','none','orbs']);
   r.wings=pick(['none','none','feather','butterfly','bat']);
   r.tail=pick(['none','none','raccoon','fox','cat','lizard','feather']);
-  r.hairStyle=pick(MIX_HAIR_STYLES).id;
-  r.hairPattern=MIX_HAIR_STYLES.find(style=>style.id===r.hairStyle).texture;
+  r.hairStyle=pick(MIX_HAIR_FAMILIES).id;
+  r.hairLength=pick(MIX_HAIR_LENGTHS)[0];
+  r.hairPattern=MIX_HAIR_FAMILIES.find(style=>style.id===r.hairStyle).texture;
   r.hairdo='long';
   r.headwear=pick(['none','none','none','hijab','scarf','wrap','turban']);
   r.skin=pick(MIX_SKINS);r.hair=pick([...CAST_HAIR,...CAST_BRIGHT]);
@@ -1861,9 +1953,10 @@ function mixThumbnail(canvas,selected){
   c.clearRect(0,0,canvas.width,canvas.height);c.imageSmoothingEnabled=false;
   if(field==='hairStyle'){
     /* The option thumbnail uses the same renderer and pixel grid as the game character. */
-    const spec=MIX_HAIR_STYLES.find(st=>st.id===value);
+    const spec=MIX_HAIR_FAMILIES.find(st=>st.id===value)||MIX_HAIR_STYLES.find(st=>st.id===value);
     if(!spec)return;
     const recipe=mixRecipe({...mixDefault(),hairStyle:spec.id,hairdo:'long',
+      hairLength:selected?.hairLength||'medium',
       hairPattern:spec.texture,hair:selected?.hair||'#523144',
       skin:selected?.skin||'#e9bd9b',headwear:'none',mobility:'none'},'#62465a');
     const pixels=pxPaint(recipe,'down',false,0),image=c.createImageData(40,40);
@@ -2013,12 +2106,14 @@ function openPlayerPicker(){
       fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical']]));
     }
     if(tab==='hair'){
-      fields+=group('Hairstyle',opts('hairStyle',MIX_HAIR_STYLES.map(style=>[style.id,style.label]))+chip('hairdo','bald','Bald / shaved'));
-      fields+=group('Strand texture',opts('hairPattern',MIX_HAIR_TYPES.map(h=>[h,MIX_HAIR_LABELS[h]])));
+      fields+=group('Length',opts('hairLength',MIX_HAIR_LENGTHS));
+      fields+=group('Style',opts('hairStyle',MIX_HAIR_FAMILIES.map(style=>[style.id,style.label]))+chip('hairdo','bald','Bald / shaved'));
+      fields+='<details class="pp-group pp-hair-details"><summary>'+T('Optional strand texture')+'</summary><div class="pp-options">'+
+        opts('hairPattern',MIX_HAIR_TYPES.map(h=>[h,MIX_HAIR_LABELS[h]]))+'</div></details>';
       fields+=group('Head coverings',opts('headwear',MIX_COVERS.map(x=>[x,{none:'None',hijab:'Hijab',scarf:'Scarf',wrap:'Headwrap',turban:'Turban',kufi:'Kufi',bandana:'Bandana'}[x]])));
       fields+=colorGroup('hair',[...CAST_HAIR,...CAST_BRIGHT],'Hair color');
       fields+=colorGroup('headwearColor',['#77536f','#254c41','#d6b66e','#e0d2c4','#38415a','#9a6072','#583547'],'Head covering color');
-      fields+='<p class="pp-hint">'+T('Choose a hairstyle, then refine the texture. Head coverings are available for every character.')+'</p>';
+      fields+='<p class="pp-hint">'+T('Every style has short, medium, and long lengths. Locs and twists have distinct shapes. Head coverings are separate.')+'</p>';
     }
     if(tab==='face'){
       fields+=group('Facial hair',opts('facialHair',[['none','None'],['stubble','Stubble'],['mustache','Classic mustache'],['handlebar','Handlebar'],['goatee','Goatee'],['short-beard','Short beard'],['full-beard','Full beard'],['long-beard','Long beard'],['sideburns','Sideburns'],['mutton','Mutton chops'],['whiskers','Whiskers']]));
@@ -2155,7 +2250,20 @@ function openPlayerPicker(){
       v[field]=field==='eyes'?Number(value):value;
       if(field==='surface'){v.texture=MIX_SURFACES[value][0];}
       if(field==='texture'&&value==='freckles'){v.markings='freckles';}
-      if(field==='hairStyle'){const style=MIX_HAIR_STYLES.find(item=>item.id===value);if(style){v.hairPattern=style.texture;v.hairdo='long';}}
+      if(field==='hairStyle'){const style=MIX_HAIR_FAMILIES.find(item=>item.id===value)||
+        MIX_HAIR_STYLES.find(item=>item.id===value);
+        if(style){v.hairPattern=style.texture;v.hairdo='long';v.hairLength=v.hairLength||'medium';}}
+      if(field==='hairLength'){
+        if(!MIX_HAIR_FAMILIES.some(item=>item.id===v.hairStyle)){
+          const old={'sleek-bob':'straight','shoulder-straight':'straight',
+            'soft-waves':'waves','wavy-bob':'waves','long-waves':'waves',
+            'long-curls':'curls','curly-bob':'curls','cloud-curls':'coils',
+            'high-puff':'coils','soft-pixie':'straight','close-crop':'straight',
+            'low-bun':'straight'};
+          v.hairStyle=old[v.hairStyle]||'straight';
+        }
+        v.hairdo='long';
+      }
       if(field==='hairPattern'&&!v.hairStyle)v.hairdo=value[0]>='3'?'curly':'long';
       if(field==='hairdo'){v.hairStyle='';if(value!=='bald')v.hairPattern='';}
       draw();
