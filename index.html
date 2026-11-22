@@ -2214,7 +2214,7 @@ function mixThumbnail(canvas,selected){
   }else{P(8,6,8,9,fur);P(6,15,12,6,gold);}
 }
 function openPlayerPicker(){
-  let v=mixDefault(playerChoice),tab='body';
+  let v=mixDefault(playerChoice),tab='body',ppTextureOpen=false;
   const T=(x)=>esc(t(x));
   function draw(){
     const modal=document.getElementById('pp-mix');
@@ -2245,7 +2245,7 @@ function openPlayerPicker(){
     if(tab==='hair'){
       fields+=group('Hair length',opts('hairLength',MIX_HAIR_LENGTHS.map(([id,label])=>[id,profile.lang==='es'?MIX_HAIR_LENGTHS_ES[id]:label])));
       fields+=group('Hair style',opts('hairStyle',MIX_HAIR_FAMILIES.map(style=>[style.id,style.label]))+chip('hairdo','bald','Bald / shaved'));
-      fields+='<details class="pp-group pp-hair-details"><summary>'+T('Optional strand texture')+'</summary><div class="pp-options">'+
+      fields+='<details class="pp-group pp-hair-details"'+(ppTextureOpen?' open':'')+'><summary>'+T('Optional strand texture')+'</summary><div class="pp-options">'+
         opts('hairPattern',MIX_HAIR_TYPES.map(h=>[h,MIX_HAIR_LABELS[h]]))+'</div></details>';
       fields+=group('Head coverings',opts('headwear',MIX_COVERS.map(x=>[x,{none:'None',hijab:'Hijab',scarf:'Scarf',wrap:'Headwrap',turban:'Turban',kufi:'Kufi',bandana:'Bandana'}[x]])));
       fields+=colorGroup('hair',[...CAST_HAIR,...CAST_BRIGHT],'Hair color');
@@ -2367,13 +2367,14 @@ function openPlayerPicker(){
     if(priorFields&&priorTab===tab)$('pp-fields').scrollTop=priorScroll;
     /* Every change is kept right away, so closing with X or Esc never loses the look (and never leaves a raccoon). */
     if(ppReady)savePlayerChoice(v);
+    root.querySelector('.pp-hair-details')?.addEventListener('toggle',e=>{ppTextureOpen=e.target.open;});
     root.querySelectorAll('canvas[data-icon]').forEach(canvas=>mixThumbnail(canvas,v));
     if(priorFields&&(focusField||focusTab))requestAnimationFrame(()=>{
       const all=[...root.querySelectorAll('[data-opt],[data-tab]')];
       const next=all.find(el=>focusField?el.dataset.opt===focusField&&el.dataset.value===focusValue:el.dataset.tab===focusTab);
       next?.focus({preventScroll:true});
     });
-    root.querySelectorAll('[data-tab]').forEach(b=>{
+    root.querySelectorAll('button[data-tab]').forEach(b=>{
       b.onclick=()=>{tab=b.dataset.tab;draw();};
       b.onkeydown=e=>{
         const keys=['ArrowRight','ArrowLeft','Home','End'];

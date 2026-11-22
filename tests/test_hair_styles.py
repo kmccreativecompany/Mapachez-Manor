@@ -86,7 +86,7 @@ class HairStyles(base.Cast):
 
     def test_05_no_player_body_shape_choices(self):
         self.page.locator('#title-who').click()
-        self.page.locator('[data-tab="body"]').click()
+        self.page.locator('button[data-tab="body"]').click()
         self.assertEqual(self.page.locator('[data-opt="body"]').count(), 0)
         self.assertNotIn('Body shape', self.page.locator('#pp-mix').inner_text())
         self.assertEqual(self.page.locator('[data-opt="eyes"]').count(), 3)
@@ -177,10 +177,14 @@ class HairStyles(base.Cast):
     def test_12_face_pixels_never_hidden_by_hair(self):
         # Compare to a bald version with identical face, color and expression.
         # A clear face opening must survive all styles, lengths and side views.
+        # Side views are a true profile: the face is at the front, hair covers the back of the head.
+        points={'down':((14,15),(16,19),(14,21),(19,21),(17,22)),
+                'right':((21,18),(22,19),(20,22),(24,20)),
+                'left':((10,18),(9,19),(11,22),(7,20))}
         for direction in ('down','left','right'):
             for family in ('straight','waves','curls','coils','locs','twists'):
                 for length in ('short','medium','long'):
-                    for x,y in ((14,15),(16,19),(14,21),(19,21),(17,22)):
+                    for x,y in points[direction]:
                         args={'hairStyle':family,'hairLength':length}
                         hair = self.page.evaluate(
                             '(p)=>window.hairTest.pixelAt(p.opts,p.dir,p.x,p.y)',

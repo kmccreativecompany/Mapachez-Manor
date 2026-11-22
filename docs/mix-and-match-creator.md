@@ -74,3 +74,14 @@ The developer checked JavaScript syntax, independently generated 12 different ha
 ## Hair polish follow-up: simplified body controls
 
 The **Body** tab retains eye counts, color, surfaces, markings and expression choices, but removes **Round, Tall, Soft and Petite** shape buttons. **Surprise me** uses the standard player body silhouette rather than randomly changing height or body type. Existing saved player looks and story NPC shapes are left untouched. These changes are on PR #57 and must be reviewed before merging.
+
+## Creator polish (2026-11-22)
+
+- **Keeps your look on close:** every change is saved right away, so closing with X or Esc never leaves a raccoon.
+- **Eye expressions change the eyes:** Neutral, Happy (smiling arcs), Surprised (wide round eyes), Skeptical (one narrowed eye), Sleepy and Wink. Thumbnails show a face close-up.
+- **Mouth** is its own choice: Soft smile, Big smile, Grin, Little "oh", Cat smile.
+- **True side view:** the Side preview (and walking left or right) is a real profile: one eye at the front, a small nose, the mouth at the front, an ear mid-head and hair over the back of the head.
+- **Head coverings frame the face:** the hijab, scarf, headwrap, turban and bandana never cover the eyes, nose or mouth. A hijab covers all hair.
+- **Fur, feathers and scales** read at sprite size: fur has outline tufts, strand flicks and a pale muzzle; feathers have rows of scallops, cheek tufts and a crest when bald; scales have small overlapping arcs (plated: bold tiles). The face stays clean.
+- **Spanish:** all new hair and face words are translated (hair lengths use their own words: Corto, Medio, Largo).
+- Named characters, Delores and the raccoons are unchanged.

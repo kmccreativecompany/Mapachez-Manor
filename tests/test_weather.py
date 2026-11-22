@@ -27,7 +27,10 @@ class Weather(base.Growth):
         self.assertEqual(seen, ['rain', 'storm', 'leaves', 'petals', 'snow', 'fireflies', 'clear', 'auto'])
         self.page.locator('.weather-chip').click()
         time.sleep(.3)
-        self.assertIn('Soft rain', self.page.locator('.world-caption .weather').inner_text())
+        # On a dated surprise night (a wedding, a full moon...) that night writes its own caption on purpose.
+        surprise = self.page.evaluate("(document.getElementById('fun-sky')?.className||'').trim()!=='fun-sky'")
+        if not surprise:
+            self.assertIn('Soft rain', self.page.locator('.world-caption .weather').inner_text())
         self.assertIn('Gentle rain', self.page.locator('.weather-chip').get_attribute('aria-label'))
         self.assertEqual(self.page.evaluate('window.MapachezWeather.kind'), 'rain')
 

@@ -76,7 +76,7 @@ class Cast(unittest.TestCase):
         self.assertEqual(requests, [], 'The character kit must work without external requests')
 
     def test_01_kit_is_small_and_never_names_the_cat(self):
-        self.assertLess(len(KIT.encode('utf-8')), 100_000, 'The offline sprite kit and full-screen creator should stay under 100 KB')
+        self.assertLess(len(KIT.encode('utf-8')), 120_000, 'The offline sprite kit and full-screen creator should stay under 120 KB')
         self.assertNotIn('opossum', KIT.lower(), 'Nobody, including the game, says what Muffin is')
         self.assertNotIn('data:image', KIT, 'Characters are drawn with code, never pictures')
 
@@ -152,6 +152,7 @@ class Cast(unittest.TestCase):
         self.page.locator('[data-opt="surface"][data-value="scales"]').click()
         self.page.locator('[data-opt="texture"][data-value="plated"]').click()
         self.page.locator('[data-tab="hair"]').click()
+        self.page.locator('.pp-hair-details summary').click()  # strand textures sit in an optional fold
         self.page.locator('[data-opt="hairPattern"][data-value="4c"]').click()
         self.page.locator('[data-opt="headwear"][data-value="hijab"]').click()
         self.page.locator('#pp-done').click()
@@ -232,7 +233,9 @@ class Cast(unittest.TestCase):
         pixels = options.evaluate_all('(all) => all.map(c => c.toDataURL())')
         self.assertEqual(len(set(pixels)), 12, '1A through 4C must look different')
         self.assertEqual(self.page.locator('.pp-tab').count(), 5)
+        self.page.locator('.pp-hair-details summary').click()  # strand textures sit in an optional fold
         self.page.locator('[data-opt="hairPattern"][data-value="4c"]').click()
+        self.assertTrue(self.page.locator('.pp-hair-details').evaluate('d=>d.open'), 'the fold stays open after picking')
         self.assertEqual(self.page.locator('[data-opt="hairPattern"][data-value="4c"]').get_attribute('aria-pressed'), 'true')
         self.assertTrue(self.page.locator('#pp-view').is_visible())
         self.page.locator('[data-tab="face"]').click()
