@@ -56,7 +56,7 @@ class Course(base.Growth):
     def test_02_every_lesson_teaches_how_and_why_and_says_every_hms_differs(self):
         self.page.evaluate('courseTest.mod(1)')
         text = self.page.locator('#modal-body').inner_text()
-        self.assertIn('Every hotel picks its own HMS', text)
+        self.assertIn('Every hotel picks its own hotel management system', text)
         self.assertIn('Why it matters', text)
         self.assertEqual(self.page.locator('.co-path li').count(), 8)
         self.page.locator('#co-choices .choice', has_text='Finding the booking').click()

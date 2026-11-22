@@ -103,7 +103,7 @@ class Knock(base.Growth):
         self.page.wait_for_selector('.ci-card')
         card = self.page.locator('.ci-card')
         self.assertIn('Before the keys', card.inner_text())
-        self.assertIn('Every HMS looks a little different', card.inner_text())
+        self.assertIn('Every hotel management system looks a little different', card.inner_text())
         self.assertTrue(self.page.locator('.ci-keys').is_disabled())
         self.assertNotIn('201', self.k()['knock']['checked'].get('juniper', ''))
         # Saving the number without its area code is a gentle miss.

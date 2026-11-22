@@ -96,7 +96,7 @@ class Phone(base.Growth):
         self.assertLess(box['y'], 120)
 
     def test_05_training_doors_open_the_manor_desk_computer(self):
-        self.assertFalse(self.page.locator('#title-training').is_visible(), 'Title keeps one desk button: Learn the HMS')
+        self.assertFalse(self.page.locator('#title-training').is_visible(), 'Title keeps one desk button: Learn the Hotel Management System')
         self.enter_manor()
         self.page.locator('#training-button').click()
         self.page.wait_for_selector('#hms-next-go')
