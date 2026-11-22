@@ -1183,6 +1183,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const tinyEye=(x,y)=>{if(blink){R(x,y+2,3,1,K);return;}S(['KKK','DWD','ILI'],x,y,{K,D:T(iris,-.35),I:iris,L:T(iris,.4),W:white});};
   const face=(hy,eyes=2,mouth=bit(4)?1:0,blushCol='#f78aa6')=>{const o=fx;
     /* Small, readable faces: 2-3 pixel eyes and a tiny mouth. Keep rare eye counts. */
+    if(CAST_STORYBOOK&&mix&&fx){sideFace(hy,eyes);return;}
     if(CAST_STORYBOOK){
       const ex=mix&&!blink?r.expression||'neutral':'neutral';
       if(ex!=='neutral'&&mixEyes(hy,eyes,o,ex)){}
@@ -1230,8 +1231,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
   };
   /* Creator eye expressions: they change the EYES themselves (shape and lids), not the mouth.
      happy = smiling arcs, surprised = wide round eyes, skeptical = one lid lowered, sleepy = soft half-closed lids. */
-  function mixEyes(hy,eyes,o,ex){
-    const spots=eyes===1?[[14,hy,4]]:eyes===3?[[10,hy+1,2],[16,hy-2,2],[22,hy+1,2]]:[[11,hy,2],[20,hy,2]];
+  function mixEyes(hy,eyes,o,ex,side){
+    const spots=side?side:eyes===1?[[14,hy,4]]:eyes===3?[[10,hy+1,2],[16,hy-2,2],[22,hy+1,2]]:[[11,hy,2],[20,hy,2]];
     spots.forEach(([x,y,w],n)=>{x+=o;
       if(ex==='happy'){if(w===4){P(x-1,y+3,K);P(x,y+2,K);P(x+1,y+1,K);P(x+2,y+1,K);P(x+3,y+2,K);P(x+4,y+3,K);P(x,y+3,K);P(x+3,y+3,K);}else{P(x-1,y+2,K);R(x,y+1,w,1,K);P(x+w,y+2,K);}}
       else if(ex==='sleepy'){R(x-1,y+1,w+2,1,K);R(x,y+2,w,1,T(skin,-.18),skin);}
@@ -1242,6 +1243,33 @@ function pxPaint(r,dir,blink,frame,mood=''){
       else{R(x,y,w,3,K);P(x,y,white);if(mix)P(x+1,y+1,iris);}
     });
     return true;
+  }
+  /* TRUE SIDE VIEW (creator characters): a real profile, facing right (left is mirrored).
+     One eye near the front, a little nose past the outline, mouth at the front, an ear in the
+     middle of the head and hair over the back of the head. */
+  function sideFace(hy,eyes){
+    const ex=blink?'neutral':r.expression||'neutral',brow=T(hair,-.2);
+    const spots=eyes===1?[[19,hy,4]]:eyes===3?[[18,hy-3,2],[21,hy+1,2]]:[[21,hy,2]];
+    if(blink)for(const [x,y,w] of spots)R(x,y+2,w,1,K);
+    else if(ex!=='neutral')mixEyes(hy,eyes,0,ex==='wink'?'happy':ex,spots);
+    else for(const [x,y,w] of spots){R(x,y,w,3,K);P(x,y,white);P(x+w-1,y+1,iris);}
+    if(eyes!==1)R(21,hy-(ex==='surprised'?5:4),3,1,brow);
+    P(25,hy+2,skin,skin);P(25,hy+3,skin,skin);P(26,hy+3,skin,skin);
+    P(21,hy+4,T(skin,.22),skin);
+    const m=r.mouth||'soft',mc='#70444b';
+    if(m==='oh'){R(21,hy+5,2,2,mc);}else if(m==='grin'){R(20,hy+6,3,1,mc);P(21,hy+5,white);}
+    else if(m==='smile'||m==='cat'){P(20,hy+5,mc);R(21,hy+6,2,1,mc);}else R(21,hy+6,2,1,mc);
+    if(r.fangs)P(22,hy+7,white);
+    const bald=r.hairdo==='bald'||r.headwear&&r.headwear!=='none';
+    if(!bald)for(let y=hy-10;y<=hy+6;y++)for(let x=6;x<=26;x++){
+      const dx=(x+.5-16.5)/9.8,dy=(y+.5-(hy-1))/8.8;if(dx*dx+dy*dy>1)continue;
+      const i=y*W+x;if(mat[i]!==skin)continue;
+      if(x<=13||y<=hy-4)P(x,y,(x+y)%5===0?hairDk:hair,hair);}
+    /* Clear the face's front edge so the nose and mouth sit on the outline, not under a lock of hair. */
+    if(!bald)for(let y=hy-3;y<=hy+22;y++)for(let x=y>hy+6?22:20;x<W;x++){const i=y*W+x;if(mat[i]!==hair&&![hair,hairDk,hairLt].includes(col[i]))continue;
+      const dx=(x+.5-16.5)/9.8,dy=(y+.5-(hy-1))/8.8;if(dx*dx+dy*dy<=1)P(x,y,skin,skin);else col[i]=mat[i]=null;}
+    if(r.ears==='human'||!r.ears)if(!bald||true){E(14,hy+2,1.7,2.3,skin,skin);P(14,hy+2,T(skin,-.18),skin);}
+    if(r.specs){R(20,hy-1,4,1,gold);R(20,hy+3,4,1,gold);P(20,hy,gold);P(23,hy,gold);R(14,hy,6,1,gold);}
   }
   /* Creator mouths: a separate choice so faces mix freely with any eyes. */
   function mixMouth(my,o){const m=r.mouth,mc='#70444b',in_='#b5545f';
@@ -1695,7 +1723,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
       for(let y=7;y<34;y++)for(let x=4;x<29;x++){if(!onBody(x,y)||faceOpen(x,y))continue;
         if(texture==='curly'){if((x*5+y*3)%9===0){P(x,y,dk,color);if(onBody(x+1,y))P(x+1,y,dk,color);if(onBody(x,y+1))P(x,y+1,lt,color);}}
         else if((x*3+y*5)%(texture==='short'?13:9)===0){P(x,y,dk,color);if(onBody(x+(x<16?-1:1),y+1))P(x+(x<16?-1:1),y+1,dk,color);if(texture==='shaggy'&&onBody(x,y+2))P(x,y+2,dk2,color);}}
-      if(!back){for(let y=21;y<=24;y++)for(let x=12;x<=21;x++)if(((x+.5-16.5-fx)/4.6)**2+((y+.5-22.5)/2.2)**2<=1&&onBody(x+fx,y))P(x+fx,y,lt,color);}
+      if(!back){const mx=fx?20:16.5,mr=fx?3.4:4.6;for(let y=21;y<=24;y++)for(let x=10;x<=26;x++)if(((x+.5-mx)/mr)**2+((y+.5-22.5)/2.2)**2<=1&&onBody(x,y))P(x,y,lt,color);}
     }else if(surf==='feathers'){
       const step=texture==='layered'?3:4;
       for(let row=0,y=8;y<34;y+=3,row++)for(let x=4+(row%2?step>>1:0);x<29;x+=step){
@@ -1760,7 +1788,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
       for(let y=Math.floor(cy-ry);y<=cy+ry;y++)for(let x=Math.floor(cx-rx);x<=cx+rx;x++){const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry;
         if(dx*dx+dy*dy<=1&&x>=0&&y>=0&&x<W&&y<H){const i=y*W+x;col[i]=c0[i];mat[i]=m0[i];}}};};
     if(cover==='hijab'||cover==='scarf'){
-      const open=keepFace(16.5+fx,19.5,7.4,6.6),dk=T(hc,-.22),lt=T(hc,.22);
+      const open=keepFace(fx?20.5:16.5,19.5,fx?6.6:7.4,6.6),dk=T(hc,-.22),lt=T(hc,.22);
       E(16.5,13,11.5,10.5,hc,'wrap');
       if(cover==='hijab'){E(16.5,25.5,9.5,3.2,hc,'wrap');R(6,19,5,8,hc,'wrap');R(22,19,5,8,hc,'wrap');}
       else{R(6,19,4,11,hc,'wrap');R(23,19,4,11,hc,'wrap');}
@@ -1806,7 +1834,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(r.glasses==='round'){
         const frameColor=r.glassesColor||'#c9a45c';
         const n=r.eyes===1?1:r.eyes===3?3:2;
-        const lens=n===1?[[14,16]]:n===3?[[9,17],[15,13],[21,17]]:[[9,16],[19,16]];
+        const side=dir==='left'||dir==='right';
+        const lens=side?(n===1?[[18,16]]:n===3?[[17,13],[20,17]]:[[20,16]]):n===1?[[14,16]]:n===3?[[9,17],[15,13],[21,17]]:[[9,16],[19,16]];
         for(const [x,y] of lens){
           /* Soft-cornered round frames, not solid rectangles. */
           R(x+1,y,3,1,frameColor,'glasses');
@@ -1815,8 +1844,9 @@ function pxPaint(r,dir,blink,frame,mood=''){
           R(x+4,y+1,1,4,frameColor,'glasses');
           P(x+1,y+1,T(frameColor,.18),'glasses');
         }
-        if(n===2)R(14,18,5,1,frameColor,'glasses');
-        if(n===1){R(19,19,4,1,frameColor,'glasses');R(5,19,9,1,frameColor,'glasses');}
+        if(side)R(12,18,lens[lens.length-1][0]-12,1,frameColor,'glasses');
+        else if(n===2)R(14,18,5,1,frameColor,'glasses');
+        if(side){}else if(n===1){R(19,19,4,1,frameColor,'glasses');R(5,19,9,1,frameColor,'glasses');}
         if(n===3){P(14,18,frameColor,'glasses');P(20,18,frameColor,'glasses');}
       }
     }
