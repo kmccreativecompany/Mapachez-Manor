@@ -13,6 +13,7 @@ Object.defineProperty(window,'hairTest',{get:()=>({
  families:MIX_HAIR_FAMILIES,
  lengths:MIX_HAIR_LENGTHS,
  defaultLook:()=>mixDefault(),
+ pixelAt:(opts,dir,x,y)=>pxPaint(mixRecipe({...mixDefault(),...opts,headwear:'none'},'#62465a'),dir,false,0)[y*32+x],
  tips:MIX_HAIR_TIPS,
  look:(opts,dir)=>pxPaint(mixRecipe({...mixDefault(),...opts,headwear:'none'},'#62465a'),dir||'down',false,0).join('|'),
  pixels:(id,dir)=>pxPaint(mixRecipe({...mixDefault(),hairStyle:id,hairdo:'long',
@@ -171,6 +172,39 @@ class HairStyles(base.Cast):
         self.page.locator('#pp-done').click()
         self.assertEqual(self.page.evaluate('window.castTest.player().hairStyle'),'coils')
         self.assertEqual(self.page.evaluate('window.castTest.player().hairLength'),'short')
+
+
+    def test_12_face_pixels_never_hidden_by_hair(self):
+        # Compare to a bald version with identical face, color and expression.
+        # A clear face opening must survive all styles, lengths and side views.
+        for direction in ('down','left','right'):
+            for family in ('straight','waves','curls','coils','locs','twists'):
+                for length in ('short','medium','long'):
+                    for x,y in ((14,15),(16,19),(14,21),(19,21),(17,22)):
+                        args={'hairStyle':family,'hairLength':length}
+                        hair = self.page.evaluate(
+                            '(p)=>window.hairTest.pixelAt(p.opts,p.dir,p.x,p.y)',
+                            {'opts':args,'dir':direction,'x':x,'y':y})
+                        bare = self.page.evaluate(
+                            '(p)=>window.hairTest.pixelAt({...p.opts,hairdo:"bald"},p.dir,p.x,p.y)',
+                            {'opts':args,'dir':direction,'x':x,'y':y})
+                        self.assertEqual(hair,bare,
+                          f'{family} {length} {direction} obscures face at {x},{y}')
+
+    def test_13_back_of_head_is_completely_hair_covered(self):
+        # The old renderer left skin showing at the nape, especially in short cuts.
+        for family in ('straight','waves','curls','coils','locs','twists'):
+            for length in ('short','medium','long'):
+                args={'hairStyle':family,'hairLength':length}
+                for x,y in ((16,22),(16,24),(14,23),(20,23)):
+                    hair = self.page.evaluate(
+                        '(p)=>window.hairTest.pixelAt(p.opts,"up",p.x,p.y)',
+                        {'opts':args,'x':x,'y':y})
+                    bare = self.page.evaluate(
+                        '(p)=>window.hairTest.pixelAt({...p.opts,hairdo:"bald"},"up",p.x,p.y)',
+                        {'opts':args,'x':x,'y':y})
+                    self.assertNotEqual(hair,bare,
+                      f'{family} {length} has exposed scalp at {x},{y}')
 
 
 for name in dir(base.Cast):
