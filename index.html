@@ -2709,6 +2709,47 @@ function hdRope(c,hair,x,y0,y1,w,kind,sway=0){
     }
   }
 }
+/* Sectioned roots sweep back from the forehead. Length hangs behind the neck. */
+function hdSectionedHair(c,r,view,behind){
+  const loc=r.hairStyle==='locs',hair=r.hair,tip=HD_TIPS[r.hairLength]||27;
+  const side=view==='side',back=view==='back';
+  const rootShade=hdTone(hair,-.27),width=loc?2.8:2.05;
+  const count=loc?9:12;
+  if(behind||back){
+    // Stagger the nape layers, with a broad, rounded hem in all three lengths.
+    const start=side?2.8:2.6,end=side?15.4:30.2;
+    for(let i=0;i<count;i++){
+      const t=i/(count-1),x=start+(end-start)*t;
+      const outer=Math.abs(t*2-1);
+      const y=tip+2-outer*3.6+(i%3)*.55;
+      hdRope(c,i%3===0?rootShade:hair,x,12+outer*1.6,y,width,r.hairStyle,i*.7);
+    }
+    if(behind)return;
+  }
+  // An offset part and overlapping curved rows model the crown in profile as well as head-on.
+  const outline=back?[[3,16],[4,9],[8,4.5],[15,2.7],[23,3.6],[28,7],[30,13],[29,21],[25,24],[8,24],[3.7,20]]:
+    side?[[3.8,18],[4,11],[7,6],[13,3.1],[20,3.5],[24.5,6.4],[25.7,10.4],[21,11.1],[18,13],[15,17],[12,20],[6,20]]:
+    [[3.6,17],[4.2,10],[8,5],[14.4,3],[20,3.1],[26,5.8],[29.4,11],[29.3,17],[26.1,16],[23.6,12.2],[19,10.7],[14.5,10.3],[10,12],[7,16.5]];
+  c.save();c.beginPath();hdPath(c,outline);c.fillStyle=rootShade;c.fill();c.clip();
+  for(let i=0;i<(loc?8:11);i++){
+    const t=i/(loc?7:10);
+    const start=side?[17+t*10,2+t*8]:[18+t*1.8,1+t*10];
+    for(const sign of side?[-1]:[-1,1]){
+      const reach=side?17:sign<0?17:12;
+      const mid=[start[0]+sign*reach*.55,start[1]+.7+t];
+      const end=[start[0]+sign*reach,start[1]+7+t*(back?10:5)];
+      const points=[start,mid,end];
+      hdLine(c,points,hdTone(hair,-.42),width+.42);
+      hdLine(c,points,hair,width);
+      if(loc)hdLine(c,[[mid[0]-sign*1.8,mid[1]-.55],[mid[0],mid[1]-.4],[mid[0]+sign*1.4,mid[1]+.1]],hdTone(hair,.26),.38);
+      else for(let j=1;j<6;j++){
+        const u=j/6,x=mid[0]+(end[0]-mid[0])*u,y=mid[1]+(end[1]-mid[1])*u*u;
+        hdLine(c,[[x-.5*sign,y+.48],[x,y],[x+.5*sign,y-.42]],hdTone(hair,.29),.38);
+      }
+    }
+  }
+  c.restore();
+}
 /* Hair behind the body. */
 function hdHairBack(c,r,view){
   const fam=r.hairStyle,hair=r.hair,tip=HD_TIPS[r.hairLength]||27,v=HD_VOL[fam]||0,edge=hdTone(hair,-.45);
@@ -2716,6 +2757,7 @@ function hdHairBack(c,r,view){
   if(fam==='mullet'){const end=Math.min(31,tip+4);
     if(view==='front'){c.fillStyle=hdHairShade(c,hair,18,end);c.beginPath();hdPath(c,[[10,18],[23,18],[23.6,end-3],[21,end],[16.5,end-1.2],[12,end],[9.4,end-3]]);c.fill();c.strokeStyle=edge;c.lineWidth=.45;c.stroke();}
     return;}
+  if(fam==='locs'||fam==='twists')return hdSectionedHair(c,r,view,true);
   if(tip<=20)return;
   if(view==='side')return;
   if(fam==='locs'||fam==='twists'){
@@ -2731,6 +2773,7 @@ function hdHairFront(c,r,view){
   const fam=r.hairStyle,hair=r.hair,len=r.hairLength||'medium',tip=HD_TIPS[len]||27,v=HD_VOL[fam]||0;
   const dk=hdTone(hair,-.32),lt=hdTone(hair,.36),edge=hdTone(hair,-.46);
   const ropes=fam==='locs'||fam==='twists',mullet=fam==='mullet';
+  if(ropes)return hdSectionedHair(c,r,view,false);
   if(view==='side')return hdHairSide(c,r);
   if(view==='back')return hdHairBackView(c,r);
   const side=mullet?17:ropes?16.5:tip,short=side<=20;
