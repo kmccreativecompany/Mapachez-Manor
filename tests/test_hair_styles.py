@@ -40,10 +40,10 @@ class HairStyles(base.Cast):
         self.page.locator('#title-who').click()
         self.page.locator('[data-tab="hair"]').click()
         options = self.page.locator('canvas[data-icon^="hairStyle:"]')
-        self.assertEqual(options.count(), 6)
+        self.assertEqual(options.count(), 7)
         self.assertEqual(self.page.locator('[data-opt="hairLength"]').count(), 3)
         images = options.evaluate_all('(cs)=>cs.map(c=>c.toDataURL())')
-        self.assertEqual(len(set(images)), 6)
+        self.assertEqual(len(set(images)), 7)
         before = self.page.locator('#pp-view').evaluate('(c)=>c.toDataURL()')
         self.page.locator('[data-opt="hairStyle"][data-value="locs"]').click()
         after = self.page.locator('#pp-view').evaluate('(c)=>c.toDataURL()')
@@ -77,7 +77,7 @@ class HairStyles(base.Cast):
         self.page.set_viewport_size({'width':390,'height':844})
         self.page.locator('#title-who').click()
         self.page.locator('[data-tab="hair"]').click()
-        self.assertEqual(self.page.locator('[data-opt="hairStyle"]').count(), 6)
+        self.assertEqual(self.page.locator('[data-opt="hairStyle"]').count(), 7)
         self.assertEqual(self.page.locator('[data-opt="hairLength"]').count(), 3)
         self.assertLessEqual(self.page.evaluate('document.documentElement.scrollWidth'),390)
         self.page.locator('[data-opt="hairStyle"][data-value="curls"]').click()
@@ -86,7 +86,7 @@ class HairStyles(base.Cast):
 
     def test_05_no_player_body_shape_choices(self):
         self.page.locator('#title-who').click()
-        self.page.locator('[data-tab="body"]').click()
+        self.page.locator('button[data-tab="body"]').click()
         self.assertEqual(self.page.locator('[data-opt="body"]').count(), 0)
         self.assertNotIn('Body shape', self.page.locator('#pp-mix').inner_text())
         self.assertEqual(self.page.locator('[data-opt="eyes"]').count(), 3)
@@ -135,7 +135,7 @@ class HairStyles(base.Cast):
     def test_09_six_families_and_three_different_lengths(self):
         families = self.page.evaluate('window.hairTest.families.map(s=>s.id)')
         lengths = self.page.evaluate('window.hairTest.lengths.map(s=>s[0])')
-        self.assertEqual(families, ['straight','waves','curls','coils','locs','twists'])
+        self.assertEqual(families, ['straight','waves','curls','coils','locs','twists','mullet'])
         self.assertEqual(lengths, ['short','medium','long'])
         for direction in ('down','left','right','up'):
             for family in families:
@@ -177,10 +177,14 @@ class HairStyles(base.Cast):
     def test_12_face_pixels_never_hidden_by_hair(self):
         # Compare to a bald version with identical face, color and expression.
         # A clear face opening must survive all styles, lengths and side views.
+        # Side views are a true profile: the face is at the front, hair covers the back of the head.
+        points={'down':((14,15),(16,19),(14,21),(19,21),(17,22)),
+                'right':((21,18),(22,19),(20,22),(24,20)),
+                'left':((10,18),(9,19),(11,22),(7,20))}
         for direction in ('down','left','right'):
-            for family in ('straight','waves','curls','coils','locs','twists'):
+            for family in ('straight','waves','curls','coils','locs','twists','mullet'):
                 for length in ('short','medium','long'):
-                    for x,y in ((14,15),(16,19),(14,21),(19,21),(17,22)):
+                    for x,y in points[direction]:
                         args={'hairStyle':family,'hairLength':length}
                         hair = self.page.evaluate(
                             '(p)=>window.hairTest.pixelAt(p.opts,p.dir,p.x,p.y)',

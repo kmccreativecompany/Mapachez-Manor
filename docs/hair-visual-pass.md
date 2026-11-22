@@ -1,5 +1,13 @@
 # Hair silhouette refresh (review branch)
 
+> **Current state (2026-11-22):** the picker shows **6 styles** (Straight, Waves, Curls, Coils, Locs, Twists),
+> each in **Short, Medium and Long**. The twelve style IDs below are the earlier pass; they still load from
+> older saves but are no longer shown as buttons. Strand textures (1A–4C) sit in an optional fold.
+> Locs are thick banded ropes with crown partings; twists are thin two-strand zigzag ropes, and short twists
+> stand up. Short curls are a round halo, short coils a compact dome, short waves flip out at the ends.
+> Highlights are placed symmetrically so hair no longer looks lopsided. Robot (metal) characters wear the
+> same six styles as a hair cap on the screen head.
+
 ## Creative direction
 The character creator's hair should read at real **32 x 44 pixel sprite** size: recognizable silhouettes first, tidy highlight clusters second. A hairstyle is a cut/shape; a separate **Strand texture** control adjusts straight, wavy, curly or coily detail. Player-facing choices use friendly names rather than a numeric texture code.
 
