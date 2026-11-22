@@ -1330,7 +1330,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
         if(short){
           mass(16.5,hy-6,9,4.7);
           if(!back){R(10,hy-7,11,2,hair,hair);R(9,hy-5,5,2,hair,hair);
-            for(const x of [11,16,21])ink(x,hy-8,hairLt);}
+            R(12,hy-8,9,1,hairLt,hair);}
           for(const x of [7,25])R(x,hy-2,2,5,hair,hair);
         }else{
           for(const x of back?[7,24]:[6,24]){
@@ -1340,7 +1340,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
           if(!back){R(10,hy-7,13,2,hair,hair);R(10,hy-5,6,1,hairLt,hair);}
         }
       }else if(kind==='waves'){
-        if(!back){R(11,hy-8,10,2,hair,hair);ink(13,hy-8,hairLt);}
+        if(!back){R(11,hy-8,10,2,hair,hair);ink(13,hy-8,hairLt);ink(20,hy-8,hairLt);}
+        if(short)for(const s of [-1,1]){const x=s<0?6:27;mass(x+s,end-1,2,1.6);mass(x+s*2,end-3,1.4,1.4);}
         for(const x of back?[7,12,20,25]:[7,9,24,26]){
           for(let y=hy-3;y<=end;y+=2){
             const dx=Math.round(Math.sin(y*.65+x*.3)*1.4);
@@ -1351,34 +1352,37 @@ function pxPaint(r,dir,blink,frame,mood=''){
       }else if(kind==='curls'||kind==='coils'){
         const tight=kind==='coils',rad=tight?1.85:2.7,step=tight?3:4;
         if(tight)mass(16.5,hy-8,11,5);
+        if(short&&tight){mass(16.5,hy-6,12,8.5);for(let y=hy-13;y<=hy-2;y+=2)for(let x=6;x<=27;x+=2)ink(x+(y%4?1:0),y,hairDk);}
+        if(short&&!tight)for(let a=0;a<=8;a++){const t=Math.PI*(1+a/8),cx=16.5+Math.cos(t)*10.5,cy=hy-2+Math.sin(t)*9;
+          mass(cx,cy,2.6,2.6);ink(Math.round(cx-1),Math.round(cy-1),hairLt);ink(Math.round(33-cx),Math.round(cy-1),hairLt);}
         for(let y=hy-9;y<=hy-5;y+=step)for(let x=8;x<=25;x+=tight?3:5)
           mass(x+(y%2),y,rad,rad);
         for(const x of sides)for(let y=hy-3;y<=end;y+=step){
           const dx=Math.round(Math.sin(x*.51+y*.47));
           mass(x+dx,y,rad,rad);
-          if((x+y)%3===0)ink(x+dx,y,hairLt);
+          if((Math.min(x,33-x)+y)%3===0)ink(x+dx,y,hairLt);
         }
-      }else if(kind==='locs'||kind==='twists'){
-        /* Locs are chunky ropes. Twists are paired crossing strands. */
-        const xs=back?[7,11,15,19,23,26]:[7,10,23,26];
-        if(!back)R(11,hy-8,11,2,hair,hair);
+      }else if(kind==='locs'){
+        /* Locs: thick ropes with soft bands (segments), rounded tips, and partings on the crown. */
+        const xs=back?[6,10,14,18,22,26]:[6,9,22,25];
+        if(!back){R(10,hy-8,13,2,hair,hair);for(const x of [10,14,19,23])R(x,hy-7,2,3,hair,hair);}
+        for(const x of [12,16,17,21])for(let y=hy-11;y<=hy-7;y+=2)ink(x,y,hairDk);
         xs.forEach((x,i)=>{
-          const start=hy-4+(i%2),finish=end-(i%3===0?1:0);
-          if(kind==='locs'){
-            R(x,start,3,finish-start+1,hair,hair);
-            for(let y=start+2;y<finish;y+=5)ink(x+1,y,hairLt);
-            mass(x+1,finish,1.5,1.5);
-          }else{
-            R(x,start,2,finish-start+1,hair,hair);
-            for(let y=start+1;y<finish;y+=2){
-              ink(x+(y%4===0?0:1),y,hairLt);
-              if(y%4===0)ink(x+1,y,hairDk);
-            }
-            mass(x+.5,finish,1.2,1.2);
-          }
+          const start=hy-4,finish=end-(i%2);
+          R(x,start,3,finish-start+1,hair,hair);
+          for(let y=start+2;y<finish;y+=3){R(x,y,3,1,hairDk,hair);ink(x+1,y-1,hairLt);}
+          mass(x+1,finish,1.6,1.5);
         });
+      }else if(kind==='twists'){
+        /* Twists: thin two-strand ropes with a crossing zigzag; short twists stand up on top. */
+        const xs=back?[6,9,12,15,18,21,24,27]:[6,8,24,26];
+        const twist=(x,a,b)=>{for(let y=a;y<=b;y++){P(x,y,hair,hair);P(x+1,y,hair,hair);ink(x+(y%2),y,hairLt);if(y%2===0)ink(x+1,y,hairDk);}};
+        if(!back)R(10,hy-8,13,2,hair,hair);
+        for(let x=9;x<=24;x+=3)twist(x,hy-11,hy-7);
+        if(short)for(const x of [9,12,15,18,21,24])twist(x,hy-14+(Math.abs(x-16.5)>5?2:0),hy-10);
+        xs.forEach((x,i)=>{const finish=end-(i%2);twist(x,hy-4,finish);P(x+(finish%2),finish+1,hairDk,hair);});
       }
-      for(const x of [12,17,22])ink(x,hy-9,hairLt);
+      for(const x of [12,16,17,21])ink(x,hy-9,hairLt);
       return;
     }
     const detailStrands=()=>{
@@ -1657,6 +1661,20 @@ function pxPaint(r,dir,blink,frame,mood=''){
     R(16,1,1,5,mDk);E(16.5,1.5,1.6,1.6,'#ffd98a');
     R(7,6,19,16,m);for(const [x,y] of [[7,6],[25,6],[7,21],[25,21]])P(x,y,null);col[6*W+7]=col[6*W+25]=col[21*W+7]=col[21*W+25]=null;mat[6*W+7]=mat[6*W+25]=mat[21*W+7]=mat[21*W+25]=null;
     R(5,11,2,5,brass);R(26,11,2,5,brass);
+    /* Creator robots can wear any hairstyle too: a hair cap on the screen head, with the family's shape. */
+    if(mix&&r.hairStyle&&r.hairdo!=='bald'&&(!r.headwear||r.headwear==='none')){
+      const fam=r.hairStyle,len=MIX_HAIR_LENGTH_TIPS[r.hairLength]||27,hc=r.hair,hd=T(hc,-.35),hl=T(hc,.3);
+      E(16.5,6,10.5,4,hc,hc);
+      if(fam==='curls'||fam==='coils')for(let x=7;x<=26;x+=fam==='coils'?2:4)E(x,4,fam==='coils'?1.6:2.4,fam==='coils'?1.6:2.4,hc,hc);
+      const drop=len>21;
+      for(const x of back?[6,10,14,18,22,26]:[5,27]){if(!drop&&!back)continue;
+        const bottom=back?Math.min(len,24):len;
+        if(fam==='locs'){R(x-1,8,3,bottom-8,hc,hc);for(let y=10;y<bottom;y+=3)R(x-1,y,3,1,hd,hc);}
+        else if(fam==='twists'){for(let y=8;y<bottom;y++){P(x,y,y%2?hl:hc,hc);P(x+1,y,y%2?hc:hd,hc);}}
+        else if(fam==='curls'||fam==='coils'){for(let y=9;y<bottom;y+=3)E(x,y,1.9,1.9,hc,hc);}
+        else R(x-1,8,2+(fam==='waves'?1:0),bottom-8,hc,hc);}
+      R(11,3,9,1,hl,hc);
+    }
     if(!back){const o=fx;R(9+o,9,15,10,'#2b2a36','scr');
       if(mix){const xs=r.eyes===1?[15]:r.eyes===3?[10,16,22]:[11,20];
         for(const x of xs){const y=xs.length===3&&x===16?11:13;R(x+o,y,3,blink?1:2,'#ffe3a1');if(!blink)P(x+o,y,white);}R(15+o,17,3,1,'#ffe3a1');
