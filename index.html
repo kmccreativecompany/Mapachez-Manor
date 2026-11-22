@@ -1708,12 +1708,26 @@ function pxPaint(r,dir,blink,frame,mood=''){
     }
     if(r.antennae&&r.antennae!=='none')for(const x of [13,20]){for(let j=0;j<5;j++)P(x,7-j,'#536b64','antenna');E(x,2,1.6,1.6,'#eacb76','antenna');}
     const cover=r.headwear||'none',hc=r.headwearColor||'#77536f';
+    /* Coverings frame the face and never paint over it: the face opening (eyes, brows,
+       nose, mouth, cheeks) is restored exactly as it was drawn. */
+    const keepFace=(cx,cy,rx,ry)=>{const c0=col.slice(),m0=mat.slice();return ()=>{if(back)return;
+      for(let y=Math.floor(cy-ry);y<=cy+ry;y++)for(let x=Math.floor(cx-rx);x<=cx+rx;x++){const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry;
+        if(dx*dx+dy*dy<=1&&x>=0&&y>=0&&x<W&&y<H){const i=y*W+x;col[i]=c0[i];mat[i]=m0[i];}}};};
     if(cover==='hijab'||cover==='scarf'){
-      E(16.5,11,11,9,hc,'wrap');if(!back)E(16.5,16,8,6,color,color);
-      R(6,19,4,13,hc,'wrap');R(23,19,4,13,hc,'wrap');
-    }else if(cover==='turban'||cover==='wrap'){E(16.5,8,11,6,hc,'wrap');R(8,8,18,3,T(hc,-.2),'wrap');}
+      const open=keepFace(16.5+fx,19.5,7.4,6.6),dk=T(hc,-.22),lt=T(hc,.22);
+      E(16.5,13,11.5,10.5,hc,'wrap');
+      if(cover==='hijab'){E(16.5,25.5,9.5,3.2,hc,'wrap');R(6,19,5,8,hc,'wrap');R(22,19,5,8,hc,'wrap');}
+      else{R(6,19,4,11,hc,'wrap');R(23,19,4,11,hc,'wrap');}
+      open();
+      if(!back){for(let y=13;y<=26;y++)for(let x=6;x<=27;x++){const i=y*W+x,j=y*W+x+(x<16?1:-1);
+          if(mat[i]==='wrap'&&mat[j]!=='wrap'&&mat[j]!=null)P(x,y,dk,'wrap');}
+        P(10,6,lt,'wrap');P(11,5,lt,'wrap');P(12,5,lt,'wrap');
+}
+      /* A hijab covers the hair completely: no strands peek out at the sides or the back. */
+      if(cover==='hijab')for(let i=0;i<W*34;i++)if(mat[i]===hair)col[i]=mat[i]=null;
+    }else if(cover==='turban'||cover==='wrap'){const open=keepFace(16.5+fx,19,8,6.4);E(16.5,8,11,6,hc,'wrap');R(8,8,18,3,T(hc,-.2),'wrap');open();}
     else if(cover==='kufi'){R(9,5,16,8,hc,'wrap');}
-    else if(cover==='bandana'){R(7,9,20,4,hc,'wrap');}
+    else if(cover==='bandana'){const open=keepFace(16.5+fx,19,8,6.4);R(7,9,20,4,hc,'wrap');open();}
   }
   /* Creator-only facial hair, one round spectacle design, mermaid tail, and
      one classic wheelchair. The pinned story cast is unaffected. */
@@ -1918,6 +1932,8 @@ const MIX_HAIR_FAMILIES=[
 {id:'twists',label:'Twists',texture:'4a'}
 ];
 const MIX_HAIR_LENGTHS=[['short','Short'],['medium','Medium'],['long','Long']];
+/* Hair lengths get their own Spanish words: plain 'Short' and 'Long' already mean horns and ears. */
+const MIX_HAIR_LENGTHS_ES={short:'Corto',medium:'Medio',long:'Largo'};
 const MIX_HAIR_LENGTH_TIPS=Object.freeze({short:21,medium:27,long:33});
 const MIX_HAIR_LABELS={"1a":"Silky straight","1b":"Straight volume","1c":"Full straight","2a":"Loose waves","2b":"Soft waves","2c":"Deep waves","3a":"Wide curls","3b":"Spring curls","3c":"Tight curls","4a":"Soft coils","4b":"Dense coils","4c":"Tiny coils"};
 const MIX_COVERS=['none','hijab','scarf','wrap','turban','kufi','bandana'];
@@ -2123,8 +2139,8 @@ function openPlayerPicker(){
       fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical']]));
     }
     if(tab==='hair'){
-      fields+=group('Length',opts('hairLength',MIX_HAIR_LENGTHS));
-      fields+=group('Style',opts('hairStyle',MIX_HAIR_FAMILIES.map(style=>[style.id,style.label]))+chip('hairdo','bald','Bald / shaved'));
+      fields+=group('Hair length',opts('hairLength',MIX_HAIR_LENGTHS.map(([id,label])=>[id,profile.lang==='es'?MIX_HAIR_LENGTHS_ES[id]:label])));
+      fields+=group('Hair style',opts('hairStyle',MIX_HAIR_FAMILIES.map(style=>[style.id,style.label]))+chip('hairdo','bald','Bald / shaved'));
       fields+='<details class="pp-group pp-hair-details"><summary>'+T('Optional strand texture')+'</summary><div class="pp-options">'+
         opts('hairPattern',MIX_HAIR_TYPES.map(h=>[h,MIX_HAIR_LABELS[h]]))+'</div></details>';
       fields+=group('Head coverings',opts('headwear',MIX_COVERS.map(x=>[x,{none:'None',hijab:'Hijab',scarf:'Scarf',wrap:'Headwrap',turban:'Turban',kufi:'Kufi',bandana:'Bandana'}[x]])));
@@ -2245,6 +2261,8 @@ function openPlayerPicker(){
     }
     const root=$('pp-mix');
     if(priorFields&&priorTab===tab)$('pp-fields').scrollTop=priorScroll;
+    /* Every change is kept right away, so closing with X or Esc never loses the look (and never leaves a raccoon). */
+    if(ppReady)savePlayerChoice(v);
     root.querySelectorAll('canvas[data-icon]').forEach(canvas=>mixThumbnail(canvas,v));
     if(priorFields&&(focusField||focusTab))requestAnimationFrame(()=>{
       const all=[...root.querySelectorAll('[data-opt],[data-tab]')];
@@ -2288,11 +2306,12 @@ function openPlayerPicker(){
     root.querySelectorAll('[data-pro]').forEach(b=>b.onclick=()=>{
       const id=b.dataset.pro;v.pronouns=pro.includes(id)?pro.filter(x=>x!==id):[...pro,id];draw();
     });
-    if($('pp-own'))$('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24);};
+    if($('pp-own'))$('pp-own').oninput=e=>{v.own=e.target.value.replace(/[<>]/g,'').slice(0,24);savePlayerChoice(v);};
     $('pp-random').onclick=()=>{v={...randomPlayer(),pronouns:v.pronouns,own:v.own};draw();};
     $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(deloresWelcome());};
   }
-  draw();
+  let ppReady=false;
+  draw();ppReady=true;
 }
 /* MUFFIN v1: Cece's cat. A cat according to her owner, and that is the end of the matter.
    Muffin keeps her own little life in the Festival Garden, whatever the player is doing. Where she is
@@ -4097,6 +4116,8 @@ Object.assign(WORDS.es||{},{'Who are you?':'¿Quién eres?','Who are you tonight
  'Your own words':'Tus propias palabras','Type your own, like xe/xem':'Escribe los tuyos'});
 {const b=$('title-who');b.onclick=openPlayerPicker;
  const castTitle=translateTitle;translateTitle=function(){const r=castTitle.apply(this,arguments);b.textContent='🎨 '+t('Character Creator');return r;};}
+/* Creator words added with the hair and face polish. */
+Object.assign(WORDS.es||{},{"Hair length": "Largo del pelo", "Hair style": "Peinado", "Straight": "Liso", "Waves": "Ondas", "Curls": "Rizos", "Coils": "Afro", "Locs": "Rastas", "Twists": "Twists", "Optional strand texture": "Textura del pelo (opcional)", "Every style has short, medium, and long lengths. Locs and twists have distinct shapes. Head coverings are separate.": "Cada peinado viene corto, medio o largo. Las rastas y los twists tienen su propia forma. Lo que llevas en la cabeza va aparte.", "Silky straight": "Liso sedoso", "Straight volume": "Liso con volumen", "Full straight": "Liso abundante", "Loose waves": "Ondas sueltas", "Soft waves": "Ondas suaves", "Deep waves": "Ondas marcadas", "Wide curls": "Rizos amplios", "Spring curls": "Rizos en espiral", "Tight curls": "Rizos cerrados", "Soft coils": "Afro suave", "Dense coils": "Afro denso", "Tiny coils": "Afro muy fino", "Mouth": "Boca", "Soft smile": "Sonrisa suave", "Big smile": "Gran sonrisa", "Grin": "Sonrisa amplia", "Little “oh”": "Una “o” pequeña", "Cat smile": "Sonrisa gatuna", "Sleepy": "Con sueño", "Wink": "Guiño"});
 const castInteract=interact;interact=function(id){if(festivalActive&&muffinInteract(id))return;return castInteract.apply(this,arguments);};
 $('title-quick').onclick=startQuickShift;
 addEventListener('keydown',e=>{
