@@ -1187,6 +1187,26 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(eyes===1){R(14+o,hy,4,3,K);if(!blink)P(15+o,hy,white);}
       else if(eyes===3){for(const [x,y] of [[10,hy+1],[16,hy-2],[22,hy+1]]){R(x+o,y,2,blink?1:2,K);if(!blink)P(x+o,y,white);}}
       else{for(const x of [11,20]){R(x+o,hy,2,blink?1:3,K);if(!blink)P(x+o,hy,white);}}
+      if(mix){
+        /* Pixel-scale polish: iris glints, expressive brows, nose and warm
+           cheek light. Keep these markings inside the face, not the hair. */
+        const brow=T(hair,-.20),nose=T(skin,-.26);
+        if(!blink){
+          if(eyes===1){P(16+o,hy+1,iris);P(15+o,hy,white);}
+          else if(eyes===3){
+            for(const [x,y] of [[10,hy+1],[16,hy-2],[22,hy+1]]){
+              P(x+o,y,white);P(x+o,y+1,iris);
+            }
+          }else for(const x of [11,20]){P(x+o,hy,white);P(x+1+o,hy+1,iris);}
+        }
+        if(eyes===2){
+          R(11+o,hy-4,2,1,brow);R(20+o,hy-4,2,1,brow);
+          if(r.expression==='skeptical')P(11+o,hy-5,brow);
+        }else if(eyes===1)R(15+o,hy-4,3,1,brow);
+        P(16+o,hy+3,nose,skin);
+        P(10+o,hy+4,T(skin,.22),skin);
+        P(23+o,hy+4,T(skin,.22),skin);
+      }
       R(15+o,hy+6,3,1,'#70444b');
       if(r.fangs){P(15+o,hy+7,white);P(18+o,hy+7,white);}
       if(r.tooth)P(17+o,hy+7,white);
@@ -1235,6 +1255,42 @@ function pxPaint(r,dir,blink,frame,mood=''){
       for(let y=a;y<=b;y+=Math.max(3,Math.round(rad*1.6)))
         mass(x+Math.round(Math.sin(y*.55+x)*1.2),y,rad,rad);
     };
+    const detailStrands=()=>{
+      /* Shade only existing hair pixels, so eyes and skin stay clear.
+         Each curl family reads differently even with a tiny 32px sprite. */
+      const tip=MIX_HAIR_TIPS[st];
+      const ink=(x,y,c)=>P(x,y,c,hair,'hair');
+      if(st==='close-crop'){
+        for(const x of [12,16,20])ink(x,hy-6,hairLt);
+        return;
+      }
+      if(st==='high-puff'||st==='cloud-curls'){
+        for(const [x,y] of [[11,-11],[16,-13],[21,-11],[8,-7],[24,-7]])
+          ink(x,hy+y,hairLt);
+        return;
+      }
+      if(st==='soft-pixie'){
+        for(const [x,y] of [[10,-7],[14,-8],[20,-8],[24,-6]])ink(x,hy+y,hairLt);
+        return;
+      }
+      for(const x of [12,18,22]){
+        ink(x,hy-8,hairLt);
+        if(type==='1')ink(x,hy-7,hairLt);
+      }
+      if(tip)for(const side of [-1,1]){
+        const x=side<0?8:25;
+        const step=type==='1'?6:type==='2'?5:4;
+        for(let y=hy+2;y<tip;y+=step){
+          const wave=type==='2'?Math.round(Math.sin(y*.7+side)*1):0;
+          ink(x+wave,y,((y+side)&1)?hairLt:hairDk);
+        }
+        ink(x,tip-2,hairLt);
+      }
+      if(type==='3'||type==='4'){
+        for(const [x,y] of [[8,-7],[12,-10],[17,-11],[22,-10],[26,-6]])
+          ink(x,hy+y,hairLt);
+      }
+    };
     if(back){
       mass(16.5,hy-3,9.6,7.7);
       if(st==='high-puff'){mass(16.5,hy-11,7.2,5.8);R(14,hy-7,5,2,hairDk,hair);}
@@ -1245,6 +1301,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
       else if(st==='sleek-bob'||st==='shoulder-straight'){const end=MIX_HAIR_TIPS[st];R(7,hy,19,end-hy,hair,hair);for(const x of [10,16,23])R(x,hy+2,1,end-hy-4,hairDk,hair);}
       else if(st==='soft-pixie'){mass(16.5,hy-7,10,4.5);}
       else if(st==='close-crop'){mass(16.5,hy-5,9,5);}
+      detailStrands();
       return;
     }
     if(st==='cloud-curls')mass(16.5,hy-5,12.6,9.4);
@@ -1288,11 +1345,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
       mass(16.5,hy-5,9,5);mass(27,hy+5,3,3.8);
       for(const x of [10,14,19,22])P(x,hy-8,hairLt,hair,'hair');
     }
-    /* Strand pattern is subtle, never allowed to erase a silhouette or face. */
-    if(type==='1'){for(const x of [12,18,23])P(x,hy-8,hairLt,hair,'hair');}
-    if(type==='2'){for(const x of [9,13,21,25])P(x,hy-7+(x%3),hairLt,hair,'hair');}
-    if(type==='3'||type==='4')for(let x=9;x<=25;x+=type==='4'?3:4)
-      P(x,hy-9+((x%3)?1:0),hairLt,hair,'hair');
+    /* Texture and shine respect existing pixel material, even on side views. */
+    detailStrands();
   };
   const hairDo=(hy)=>{const hd=r.hairdo;if(hd==='bald')return;
     if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){styledHair(hy);return;}
@@ -1521,12 +1575,36 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(r.expression==='skeptical'){R(10,12,5,1,'#4c3845','brow');}
     const ears=r.ears||'human';
     if(ears!=='human')for(const side of [-1,1]){const x=side<0?7:25;
-      if(ears==='rabbit'){E(x,5,2.7,6.3,color,'ear');R(x,3,1,5,'#e5a5a8','ear');}
-      if(ears==='cat'||ears==='pointed'){E(x,8,3,5,color,'ear');P(x,7,'#e5a5a8','ear');}
-      if(ears==='round')E(x,12,3.5,3.5,color,'ear');
-      if(ears==='floppy')E(x+side*2,15,3,6,color,'ear');
+      if(ears==='rabbit'){
+        E(x,5,2.7,6.3,color,'ear');
+        R(x,2,1,6,T(color,-.24),'ear');
+        P(x+side,4,T(color,.28),'ear');
+      }
+      if(ears==='cat'){
+        E(x,9,3.2,4,color,'ear');
+        P(x+side,5,color,'ear');P(x+side,6,color,'ear');
+        P(x,8,T(color,-.27),'ear');
+      }
+      if(ears==='pointed'){
+        E(x,9,2.9,5,color,'ear');
+        P(x+side,5,color,'ear');P(x+side,7,T(color,-.23),'ear');
+      }
+      if(ears==='round'){E(x,12,3.5,3.5,color,'ear');E(x,12,1.6,1.6,T(color,-.21),'ear');}
+      if(ears==='floppy'){
+        E(x+side*2,15,3,6,color,'ear');
+        P(x+side*2,18,T(color,-.24),'ear');
+        P(x+side,12,T(color,.18),'ear');
+      }
     }
-    if(r.horns&&r.horns!=='none')for(const side of [-1,1]){const x=side<0?12:21;for(let j=0;j<5;j++)P(x+side*(j>>1),7-j,r.horns==='curled'?'#cba75d':'#eee0ba','horn');}
+    if(r.horns&&r.horns!=='none')for(const side of [-1,1]){
+      const x=side<0?12:21,curved=r.horns==='curled';
+      for(let j=0;j<5;j++){
+        const px=x+side*(j>>1),py=7-j;
+        P(px,py,curved?'#bd9151':'#eee0ba','horn');
+        if(j<3)P(px-side,py,T(curved?'#bd9151':'#eee0ba',.28),'horn');
+      }
+      if(curved){P(x+side*2,2,'#bd9151','horn');P(x+side,2,'#e6c588','horn');}
+    }
     if(r.antlers&&r.antlers!=='none')for(const side of [-1,1]){const x=side<0?9:23;
       for(let j=0;j<7;j++)P(x+side*(j>>1),8-j,'#a17c50','antler');
       for(let j=0;j<3;j++)P(x+side*(2+j),4-j,'#a17c50','antler');
@@ -1573,8 +1651,12 @@ function pxPaint(r,dir,blink,frame,mood=''){
         const n=r.eyes===1?1:r.eyes===3?3:2;
         const lens=n===1?[[14,16]]:n===3?[[9,17],[15,13],[21,17]]:[[9,16],[19,16]];
         for(const [x,y] of lens){
-          R(x,y,5,1,frameColor,'glasses');R(x,y+5,5,1,frameColor,'glasses');
-          R(x,y+1,1,4,frameColor,'glasses');R(x+4,y+1,1,4,frameColor,'glasses');
+          /* Soft-cornered round frames, not solid rectangles. */
+          R(x+1,y,3,1,frameColor,'glasses');
+          R(x+1,y+5,3,1,frameColor,'glasses');
+          R(x,y+1,1,4,frameColor,'glasses');
+          R(x+4,y+1,1,4,frameColor,'glasses');
+          P(x+1,y+1,T(frameColor,.18),'glasses');
         }
         if(n===2)R(14,18,5,1,frameColor,'glasses');
         if(n===1){R(19,19,4,1,frameColor,'glasses');R(5,19,9,1,frameColor,'glasses');}
