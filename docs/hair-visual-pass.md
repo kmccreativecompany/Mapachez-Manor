@@ -35,3 +35,11 @@ All twelve are available in this first graphics pass, not only the hero six. Ori
 The new in-world `pxPaint` renderer was exercised independently for all twelve styles in **front, left, right and back** directions, and all twelve yielded unique full-sprite pixel signatures for each view. Legacy and bald rendering still worked, and both inline game scripts passed JavaScript syntax parsing.
 
 See `tests/test_hair_styles.py` for browser checks of thumbnails, live preview, saving, mobile use and existing-save compatibility. The browser Playwright suite has **not been run** as part of this branch: reviewers should run `python tests/test_hair_styles.py` and `python tests/test_cast.py` before merging.
+
+## Creator simplification
+
+The Body tab no longer offers Tall, Soft, Petite or Round shape selections. Randomized player looks use one consistent base body, while previously saved looks retain their saved proportions and named NPCs remain untouched. This keeps attention on hair, expressions, colors and fantasy features.
+
+## Revised length rules
+
+Bob lengths end at or just below the jaw (about sprite row 23–25). Shoulder-length styles end around row 30–31. Long styles reach approximately row 37–38. Behind-the-body hair is now drawn in separate side locks rather than a solid torso-width block, while 40×40 thumbnails crop to the head and shoulders to make length easier to judge.
