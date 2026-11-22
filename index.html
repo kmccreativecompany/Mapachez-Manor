@@ -1254,12 +1254,18 @@ function pxPaint(r,dir,blink,frame,mood=''){
     else if(ex!=='neutral')mixEyes(hy,eyes,0,ex==='wink'?'happy':ex,spots);
     else for(const [x,y,w] of spots){R(x,y,w,3,K);P(x,y,white);P(x+w-1,y+1,iris);}
     if(eyes!==1)R(21,hy-(ex==='surprised'?5:4),3,1,brow);
-    P(25,hy+2,skin,skin);P(25,hy+3,skin,skin);P(26,hy+3,skin,skin);
-    P(21,hy+4,T(skin,.22),skin);
+    P(25,hy+2,skin,skin);P(26,hy+2,skin,skin);P(25,hy+3,skin,skin);
+    P(20,hy+4,'#f3a3b5',skin);
     const m=r.mouth||'soft',mc='#70444b';
-    if(m==='oh'){R(21,hy+5,2,2,mc);}else if(m==='grin'){R(20,hy+6,3,1,mc);P(21,hy+5,white);}
-    else if(m==='smile'||m==='cat'){P(20,hy+5,mc);R(21,hy+6,2,1,mc);}else R(21,hy+6,2,1,mc);
-    if(r.fangs)P(22,hy+7,white);
+    /* Mouth sits inside the cheek, under the nose: small and tidy. */
+    if(m==='oh'){R(22,hy+4,2,2,mc);P(22,hy+4,'#b5545f');}
+    else if(m==='grin'){R(22,hy+4,2,1,white);R(22,hy+5,2,1,mc);P(24,hy+4,mc);P(21,hy+4,mc);}
+    else if(m==='smile'||m==='cat'){P(21,hy+4,mc);R(22,hy+5,2,1,mc);P(24,hy+4,mc);}
+    else R(22,hy+5,2,1,mc);
+    if(r.fangs)P(23,hy+6,white);
+    /* A small rounded chin and jaw line so the profile reads as a face. */
+    R(19,hy+6,5,1,skin,skin);R(20,hy+7,3,1,skin,skin);P(24,hy+5,skin,skin);
+    R(16,hy+7,4,1,T(skin,-.2),skin);P(19,hy+8,T(skin,-.2),skin);R(20,hy+8,2,1,T(skin,-.2),skin);
     const bald=r.hairdo==='bald'||r.headwear&&r.headwear!=='none';
     if(!bald)for(let y=hy-10;y<=hy+6;y++)for(let x=6;x<=26;x++){
       const dx=(x+.5-16.5)/9.8,dy=(y+.5-(hy-1))/8.8;if(dx*dx+dy*dy>1)continue;
