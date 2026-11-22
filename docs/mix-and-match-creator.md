@@ -11,7 +11,7 @@ The panels show code-drawn pixel thumbnails and a front, side and back live prev
 | Area | Supported choices |
 | --- | --- |
 | Eyes | 1, 2 or 3 for any created body, including metal |
-| Body | Round, tall, soft, petite (subtle sprite silhouette variations) |
+| Body | One consistent player body silhouette; no height or body-type selection |
 | Hair | 1A through 4C, bald, short, bun / updo; broad straight, wavy, curly and coily appearances |
 | Head coverings | Hijab, scarf, headwrap, turban, kufi, bandana |
 | Ears | Small, pointed, cat-like, long/rabbit, floppy, round |
@@ -27,7 +27,7 @@ The panels show code-drawn pixel thumbnails and a front, side and back live prev
 | Mobility | One classic manual wheelchair, optional for any character, burgundy seat by default, selectable seat color and mermaid-tail support |
 | Identity | Optional, locally saved pronouns and custom words |
 
-No category determines whether other features are available: for instance, a smooth-skinned character can have antlers, wings and three eyes. The player can change any combination later.
+No category determines whether other features are available: for instance, a smooth-skinned character can have antlers, wings and three eyes. The player can change all visible customization options later; body-shape categories are no longer shown.
 
 ## Existing saves and named characters
 
@@ -38,7 +38,7 @@ No category determines whether other features are available: for instance, a smo
 
 ## Visual scope and limitations
 
-This is a **functional first-pass pixel renderer**, not a pixel-perfect import of the concept poster. Texture grades such as 1A / 1B / 1C are subtle at 32 x 44 pixels. Some overlapping accessories may obscure each other when deliberately combined. Body silhouette variations are modest because collision footprints remain unchanged. Voice and detailed full-body pattern layering are future work.
+This is a **functional first-pass pixel renderer**, not a pixel-perfect import of the concept poster. Texture grades such as 1A / 1B / 1C are subtle at 32 x 44 pixels. Some overlapping accessories may obscure each other when deliberately combined. The player creator does not expose body-shape options, keeping the game character's proportions consistent. Previously saved character proportions are preserved for compatibility. Voice and detailed full-body pattern layering are future work.
 
 There are no bitmap assets or downloaded image dependencies. The icon previews are drawn with Canvas, as are the game characters. The design keeps the warm, cozy and whimsical style, while identities remain part of the story rather than visible classification labels.
 
@@ -70,3 +70,7 @@ The creator is now designed as a **large two-column studio**, still in the same 
 ### Verification and caveats
 
 The developer checked JavaScript syntax, independently generated 12 different hair sprites and 12 distinct hair thumbnails, and exercised all five tab states in a simulated DOM environment. Browser-based layout inspection, keyboard/touch testing, and the Playwright regression suite remain to be run before publishing. 32 × 44 character sprites remain intentionally stylized and simpler than the original high-resolution concept artwork.
+
+## Hair polish follow-up: simplified body controls
+
+The **Body** tab retains eye counts, color, surfaces, markings and expression choices, but removes **Round, Tall, Soft and Petite** shape buttons. **Surprise me** uses the standard player body silhouette rather than randomly changing height or body type. Existing saved player looks and story NPC shapes are left untouched. These changes are on PR #57 and must be reviewed before merging.
