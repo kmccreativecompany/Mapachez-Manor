@@ -11,7 +11,12 @@ import test_cast as base
 INSPECTOR = """
 Object.defineProperty(window,'polishTest',{get:()=>({
  px:(opts,dir)=>pxPaint(mixRecipe({...mixDefault(),headwear:'none',...opts},'#62465a'),dir||'down',false,0),
- player:()=>playerChoice
+ player:()=>playerChoice,
+ hd:(opts,dir)=>{const r=mixRecipe({...mixDefault(),headwear:'none',...opts},'#62465a');if(!hdWanted(r))return null;
+   const o=pxSpriteHD(r,dir||'down',false,0,4),d=o.getContext('2d').getImageData(0,0,o.width,o.height).data,px=pxPaint(r,dir||'down',false,0);
+   const at=(x,y)=>{const i=((y*4+2)*o.width+x*4+2)*4;return '#'+[d[i],d[i+1],d[i+2]].map(v=>v.toString(16).padStart(2,'0')).join('');};
+   return {eye:at(11,18),eye2:at(20,18),mouth:at(16,23),sum:Array.from(d.filter((_,i)=>i%7===0)).reduce((a,b)=>a+b,0)};},
+ hdCast:()=>[hdWanted(castLook('delores',{})),hdWanted(mixRecipe({...mixDefault(),hairdo:'bald',hairStyle:''},'#62465a'))]
 })});
 """
 base.TEST_HTML = base.TEST_HTML.replace('\n})();\n</script>', '\n' + INSPECTOR + '\n})();\n</script>')
@@ -112,6 +117,23 @@ class Polish(base.Cast):
         bald = self.px({'hairdo': 'bald', 'hairStyle': ''}, 'right')
         self.assertEqual(self.at(mullet, 14, 19), self.at(bald, 14, 19), 'the mullet shows the ear')
         self.assertIsNotNone(self.at(mullet, 6, 30), 'with a long tail at the back')
+
+    def test_10_add_ons_are_detailed_and_keep_the_face_clear(self):
+        self.assertEqual(self.page.evaluate('window.polishTest.hdCast()'), [False, False], 'named cast and plain looks stay pixel art')
+        bare = self.page.evaluate("window.polishTest.px({hairdo:'bald',hairStyle:''})")
+        looks = set()
+        for opts in [{'hairStyle': f, 'hairLength': l} for f in ('straight', 'waves', 'curls', 'coils', 'locs', 'twists', 'mullet') for l in ('short', 'medium', 'long')] + [
+                {'hairdo': 'bald', 'hairStyle': '', 'surface': s, 'texture': t} for s, t in (('fur', 'fluffy'), ('feathers', 'soft'), ('scales', 'fine'))] + [
+                {'hairdo': 'bald', 'hairStyle': '', 'ears': 'cat', 'wings': 'bat', 'tail': 'fox', 'horns': 'curled'}]:
+            hd = self.page.evaluate('(o)=>window.polishTest.hd(o)', opts)
+            self.assertIsNotNone(hd, f'{opts} should be drawn in detail')
+            self.assertEqual(hd['eye'], K, f'{opts}: the eyes stay visible')
+            self.assertEqual(hd['eye2'], K, f'{opts}: the eyes stay visible')
+            looks.add(hd['sum'])
+        # The mullet's length is its tail at the back, so it shows from the side.
+        self.assertEqual(len(looks), 24, 'every style, length and add-on looks different')
+        tails = {self.page.evaluate("(l)=>window.polishTest.hd({hairStyle:'mullet',hairLength:l},'right').sum", l) for l in ('short', 'medium', 'long')}
+        self.assertEqual(len(tails), 3)
 
     def test_08_texture_fold_stays_open(self):
         self.page.locator('#title-who').click()
