@@ -1260,7 +1260,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
       const kind=modern.id;
       const length=MIX_HAIR_LENGTH_TIPS[r.hairLength]?r.hairLength:'medium';
       const end=MIX_HAIR_LENGTH_TIPS[length],short=length==='short';
-      const ink=(x,y,c)=>P(x,y,c,hair,'hair');
+      const ink=(x,y,c)=>P(x,y,c,hair,hair);
       /* Hair respects the small chibi face; short ends at the ears,
          medium at the shoulders, long above the feet. */
       mass(16.5,hy-4,kind==='coils'?11:10.2,kind==='coils'?8:7.2);
@@ -1325,7 +1325,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
       /* Shade only existing hair pixels, so eyes and skin stay clear.
          Each curl family reads differently even with a tiny 32px sprite. */
       const tip=MIX_HAIR_TIPS[st];
-      const ink=(x,y,c)=>P(x,y,c,hair,'hair');
+      const ink=(x,y,c)=>P(x,y,c,hair,hair);
       if(st==='close-crop'){
         for(const x of [12,16,20])ink(x,hy-6,hairLt);
         return;
