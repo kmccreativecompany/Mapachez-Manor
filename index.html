@@ -2711,44 +2711,64 @@ function hdRope(c,hair,x,y0,y1,w,kind,sway=0){
 }
 /* Sectioned roots sweep back from the forehead. Length hangs behind the neck. */
 function hdSectionedHair(c,r,view,behind){
-  const loc=r.hairStyle==='locs',hair=r.hair,tip=HD_TIPS[r.hairLength]||27;
-  const side=view==='side',back=view==='back';
-  const rootShade=hdTone(hair,-.27),width=loc?2.8:2.05;
-  const count=loc?9:12;
-  if(behind||back){
-    // Stagger the nape layers, with a broad, rounded hem in all three lengths.
-    const start=side?2.8:2.6,end=side?15.4:30.2;
-    for(let i=0;i<count;i++){
-      const t=i/(count-1),x=start+(end-start)*t;
-      const outer=Math.abs(t*2-1);
-      const y=tip+2-outer*3.6+(i%3)*.55;
-      hdRope(c,i%3===0?rootShade:hair,x,12+outer*1.6,y,width,r.hairStyle,i*.7);
+  const twist=r.hairStyle==='twists',side=view==='side',back=view==='back';
+  const hair=r.hair,tip=HD_TIPS[r.hairLength]||27;
+  const dark=hdTone(hair,-.32),glint=hdTone(hair,twist ? .16:.12);
+  // Sweep a tapered strand along a curved centerline, including its rounded end.
+  function strand(points,width,phase){
+    const left=[],right=[],ridge=[];
+    for(let i=0;i<=32;i++){
+      const t=i/32,u=1-t,[a,b,d,e]=points;
+      const x=u*u*u*a[0]+3*u*u*t*b[0]+3*u*t*t*d[0]+t*t*t*e[0];
+      const y=u*u*u*a[1]+3*u*u*t*b[1]+3*u*t*t*d[1]+t*t*t*e[1];
+      const dx=u*u*(b[0]-a[0])+2*u*t*(d[0]-b[0])+t*t*(e[0]-d[0]);
+      const dy=u*u*(b[1]-a[1])+2*u*t*(d[1]-b[1])+t*t*(e[1]-d[1]);
+      const norm=Math.hypot(dx,dy)||1,nx=-dy/norm,ny=dx/norm;
+      const wave=Math.sin(phase+t*(twist?24:6));
+      const radius=width*(1-.26*t)*(twist ? .86+.14*wave:1+.05*wave)*
+        Math.min(1,Math.sqrt((1-t)*20),.65+t*6);
+      left.push([x+nx*radius,y+ny*radius]);right.push([x-nx*radius,y-ny*radius]);
+      const offset=radius*(twist ? .58*wave:-.4);
+      ridge.push([x+nx*offset,y+ny*offset]);
     }
-    if(behind)return;
+    c.beginPath();hdPath(c,[...left,...right.reverse()]);c.fillStyle=hair;c.fill();
+    c.strokeStyle=dark;c.lineWidth=.22;c.stroke();
+    hdLine(c,ridge.slice(3,29),glint,twist ? .37:.28);
   }
-  // An offset part and overlapping curved rows model the crown in profile as well as head-on.
-  const outline=back?[[3,16],[4,9],[8,4.5],[15,2.7],[23,3.6],[28,7],[30,13],[29,21],[25,24],[8,24],[3.7,20]]:
-    side?[[3.8,18],[4,11],[7,6],[13,3.1],[20,3.5],[24.5,6.4],[25.7,10.4],[21,11.1],[18,13],[15,17],[12,20],[6,20]]:
-    [[3.6,17],[4.2,10],[8,5],[14.4,3],[20,3.1],[26,5.8],[29.4,11],[29.3,17],[26.1,16],[23.6,12.2],[19,10.7],[14.5,10.3],[10,12],[7,16.5]];
-  c.save();c.beginPath();hdPath(c,outline);c.fillStyle=rootShade;c.fill();c.clip();
-  for(let i=0;i<(loc?8:11);i++){
-    const t=i/(loc?7:10);
-    const start=side?[17+t*10,2+t*8]:[18+t*1.8,1+t*10];
-    for(const sign of side?[-1]:[-1,1]){
-      const reach=side?17:sign<0?17:12;
-      const mid=[start[0]+sign*reach*.55,start[1]+.7+t];
-      const end=[start[0]+sign*reach,start[1]+7+t*(back?10:5)];
-      const points=[start,mid,end];
-      hdLine(c,points,hdTone(hair,-.42),width+.42);
-      hdLine(c,points,hair,width);
-      if(loc)hdLine(c,[[mid[0]-sign*1.8,mid[1]-.55],[mid[0],mid[1]-.4],[mid[0]+sign*1.4,mid[1]+.1]],hdTone(hair,.26),.38);
-      else for(let j=1;j<6;j++){
-        const u=j/6,x=mid[0]+(end[0]-mid[0])*u,y=mid[1]+(end[1]-mid[1])*u*u;
-        hdLine(c,[[x-.5*sign,y+.48],[x,y],[x+.5*sign,y-.42]],hdTone(hair,.29),.38);
-      }
+  // Locs form a layered bob. Twists gather high and fall from one off-centre puff.
+  if(behind){
+    for(let i=0;i<10;i++){
+      const t=i/9,base=side?9:16,spread=side?7:13;
+      const x=base+(2*t-1)*spread;
+      const end=tip-2.7*Math.abs(2*t-1)+1.5*Math.sin(i*2.3);
+      strand([[base+(t-.5)*8,7],[x,7],[x+(t-.5)*3,end-7],[x,end]],twist?1.3:1.85,i);
+    }
+    return;
+  }
+  const crown=[[4.8,16],[4.3,11],[7.8,6.1],[13,4],[20,3.8],[25.5,6.2],[28.2,11],[28,16],[25,back?23:15],[20,back?24:10.8],[13,back?24:10.4],[8,back?23:15]];
+  c.beginPath();hdPath(c,crown);c.fillStyle=dark;c.fill();
+  if(twist){
+    // Lift the twists from the hairline up into the knot. Their curved seams follow that sweep.
+    const knot=side?11:14;
+    for(let i=0;i<12;i++){
+      const t=i/11,x=5.1+22*t,edge=Math.abs(2*t-1);
+      const y=back?23-edge*2:side?19-8*t:10.8+6*edge*edge;
+      strand([[x,y],[x+(t-.5)*2,y-5],[knot+(t-.5)*11,2],[knot+(t-.5)*4,3.5]],1.4,i*.8);
+    }
+    for(let i=0;i<7;i++){
+      const t=i/6,x=knot-7+t*14;
+      strand([[knot,4],[x-3,1.3],[x+2,1.1],[x,5.5+(i%3)*.7]],1.6,i);
+    }
+  }else{
+    // Stagger roots and lengths, with shorter crown pieces lifted above the eyebrows.
+    for(let i=0;i<11;i++){
+      const t=i/10,x=4.5+23*t,edge=Math.abs(2*t-1);
+      const y=back?tip-2+1.6*Math.sin(i*1.9):side?tip-(tip-9)*t*t:
+        9.5+(tip-9.5)*Math.pow(edge,3.6)+.7*Math.sin(i*2);
+      const root=13+t*7;
+      strand([[root,4.2+Math.sin(i)*.65],[x,2.2+3*edge],[x-2.5,6+(y-6)*.45],[x-1.2+.7*Math.sin(i),y]],1.7+.25*Math.sin(i*1.8),i);
     }
   }
-  c.restore();
 }
 /* Hair behind the body. */
 function hdHairBack(c,r,view){
