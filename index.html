@@ -2144,16 +2144,8 @@ function mixThumbnail(canvas,selected){
       hairLength:selected?.hairLength||'medium',
       hairPattern:spec.texture,hair:selected?.hair||'#523144',
       skin:selected?.skin||'#e9bd9b',headwear:'none',mobility:'none'},'#62465a');
-    const pixels=pxPaint(recipe,'down',false,0),image=c.createImageData(40,40);
-    /* Close-up of the same sprite: crown to shoulders. No misleading tiny full-body figure. */
-    for(let y=0;y<40;y++)for(let x=0;x<40;x++){
-      const sx=Math.min(31,3+Math.floor(x*27/40));
-      const sy=Math.min(43,Math.floor(y*33/40));
-      const h=pixels[sy*32+sx];if(!h)continue;
-      const rgb=pxRGB(h),i=(y*40+x)*4;
-      image.data[i]=rgb[0];image.data[i+1]=rgb[1];image.data[i+2]=rgb[2];image.data[i+3]=255;
-    }
-    c.putImageData(image,0,0);
+    const sprite=pxSpriteHD(recipe,'down',false,0,4);
+    c.imageSmoothingEnabled=true;c.drawImage(sprite,3*4,0,27*4,33*4,0,0,40,40);
     return;
   }
   if(field==='hairPattern'||field==='hairdo'||field==='headwear'){
@@ -2245,10 +2237,9 @@ function mixThumbnail(canvas,selected){
     else if(value[0]==='3'||value[0]==='4')for(const x of [4,7,10,13,16,19])P(x,6+x%2,3,4,col);
     else if(value[0]==='2')for(const x of [5,10,15])P(x,5+x%3,4,3,col);
   }else if(field==='facialHair'){
-    P(5,8,14,12,'#edc7a6');const f=value==='none'?'#edc7a6':ink;
-    if(value.includes('beard')||value==='goatee')P(8,17,9,5,f);
-    if(value==='mustache'||value==='handlebar'||value==='goatee')P(8,16,9,2,f);
-    if(value==='stubble'||value==='sideburns'||value==='mutton')for(const x of [6,17])P(x,14,2,6,f);
+    const recipe=mixRecipe({...mixDefault(),...selected,facialHair:value,headwear:'none',glasses:'none'},'#62465a');
+    const sprite=pxSpriteHD(recipe,'down',false,0,4);
+    c.imageSmoothingEnabled=true;c.drawImage(sprite,4*4,13*4,25*4,24*4,0,0,canvas.width,canvas.height);
   }else if(field==='glasses'){
     if(value==='round'){for(const x of [4,14]){P(x,9,7,1,gold);P(x,15,7,1,gold);P(x,10,1,5,gold);P(x+6,10,1,5,gold);}P(11,11,3,1,gold);}
   }else if(field==='mobility'){
@@ -2270,7 +2261,7 @@ function openPlayerPicker(){
     const pro=v.pronouns||[];
     const chip=(field,value,label)=>{
       const on=String(v[field]||'none')===String(value);
-      const portrait=['hairStyle','hairPattern','hairdo','headwear','expression','mouth'].includes(field);
+      const portrait=['hairStyle','hairPattern','hairdo','headwear','expression','mouth','facialHair'].includes(field);
       const icon=['expression','mouth','eyes','ears','horns','antlers','antennae','wings','tail','hairStyle','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
         ?'<canvas class="pp-icon'+(portrait?' pp-hair-icon':'')+'" width="'+(portrait?40:24)+'" height="'+(portrait?40:24)+'" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
       return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
@@ -2628,11 +2619,13 @@ function hdPlan(r){
   const wings=['feather','butterfly','bat'].includes(r.wings)?r.wings:'';
   const horns=r.horns&&r.horns!=='none'?r.horns:'',antlers=r.antlers&&r.antlers!=='none'?r.antlers:'',antennae=r.antennae&&r.antennae!=='none'?r.antennae:'';
   const base={...r};
+  const facial=!!r.facialHair&&r.facialHair!=='none';
+  if(facial)base.facialHair='none';
   if(hair){base.hairStyle='';base.hairdo='bald';}
   if(surface){base.surface='skin';base.texture='smooth';}
   if(ears)base.ears='human';if(tail)base.tail='none';if(wings)base.wings='none';
   if(horns)base.horns='none';if(antlers)base.antlers='none';if(antennae)base.antennae='none';
-  p={base,hair,surface,ears,tail,wings,horns,antlers,antennae,cover,any:hair||surface||ears||tail||wings||horns||antlers||antennae};
+  p={base,hair,surface,ears,tail,wings,horns,antlers,antennae,cover,facial,any:facial||hair||surface||ears||tail||wings||horns||antlers||antennae};
   HD_BASE.set(r,p);return p;
 }
 function hdWanted(r){return !!(r&&r.mix&&hdPlan(r).any);}
@@ -2650,7 +2643,8 @@ function pxSpriteHD(r,dir,blink,frame,K){
     ly={back:layer(c=>{if(behind){hdWings(c,r,p,view);hdTail(c,r,p,view);}
         if(p.cover&&view!=='back'){hdEars(c,r,p,view);hdHorns(c,r,p,view);}
         if(p.hair)hdHairBack(c,r,view);if(p.surface==='fur')hdFluff(c,r,view);}),
-      front:layer(c=>{if(!behind){hdWings(c,r,p,view);hdTail(c,r,p,view);}
+      front:layer(c=>{if(p.facial)hdFacialHair(c,r,view);
+        if(!behind){hdWings(c,r,p,view);hdTail(c,r,p,view);}
         if(!p.cover||view==='back'){hdEars(c,r,p,view);hdHorns(c,r,p,view);}
         if(p.surface==='feathers'&&!p.hair&&!p.cover&&(r.hairdo==='bald'||!r.hairStyle))hdCrest(c,r,view);
         if(p.hair){c.save();c.setTransform(1,0,0,1,0,0);const L=hdLayer(W,H),l=L.getContext('2d');l.scale(K,K);hdHairFront(l,r,view);hdCutFace(l,view);c.drawImage(L,0,0);c.restore();}})};
@@ -2686,13 +2680,95 @@ function hdCurlMarks(c,hair,x0,x1,y0,y1,step,rad){
 }
 /* A loc or twist rope, from (x,y0) to the tip, with a gentle sway. */
 function hdRope(c,hair,x,y0,y1,w,kind,sway=0){
-  const dk=hdTone(hair,-.36),lt=hdTone(hair,.3),pts=[];
-  for(let y=y0;y<=y1;y+=1.5)pts.push([x+Math.sin(y*.35+sway)*.45,y]);
-  hdLine(c,pts,hdTone(hair,-.42),w+.55);hdLine(c,pts,hair,w);
-  if(kind==='locs'){for(let y=y0+1.6;y<y1-.6;y+=2.1){const xx=x+Math.sin(y*.35+sway)*.45;hdLine(c,[[xx-w/2+.15,y],[xx,y+.35],[xx+w/2-.15,y]],dk,.3);}
-    hdLine(c,pts.map(([a,b])=>[a-w*.22,b]),lt,.3);}
-  else{for(let y=y0+.6;y<y1-.3;y+=1.3){const xx=x+Math.sin(y*.35+sway)*.45;hdLine(c,[[xx-w/2+.1,y],[xx+w/2-.1,y+.9]],dk,.28);hdLine(c,[[xx-w/2+.25,y+.15],[xx+.1,y+.55]],lt,.25);}}
-  c.fillStyle=hdTone(hair,-.1);c.beginPath();c.arc(pts[pts.length-1][0],y1+.2,w*.42,0,Math.PI*2);c.fill();
+  const loc=kind==='locs',shadow=hdTone(hair,-.38),light=hdTone(hair,loc ? .22 : .33);
+  const tip=y1+.65*Math.sin(sway*2.1+x),height=tip-y0;
+  const center=t=>x+.58*Math.sin(t*3+sway)+.18*Math.sin(t*7+sway*.7);
+  if(loc){
+    const left=[],right=[],highlight=[];
+    for(let i=0;i<=10;i++){
+      const t=i/10,y=y0+t*height;
+      const radius=w*(.52+.06*Math.sin(t*8+sway)-.09*t);
+      left.push([center(t)-radius,y]);right.push([center(t)+radius,y]);
+      if(i>1&&i<8)highlight.push([center(t)-radius*.46,y]);
+    }
+    c.beginPath();hdPath(c,[...left,[center(1),tip+w*.39],...right.reverse(),[center(0),y0-w*.25]]);
+    c.fillStyle=hair;c.fill();c.strokeStyle=shadow;c.lineWidth=.37;c.stroke();
+    hdLine(c,highlight,light,.33);
+    return;
+  }
+  // Draw each half turn with its far strand first so the two lobes visibly cross.
+  const turns=Math.max(2,Math.round(height/(w*1.8)));
+  for(let i=0;i<turns;i++){
+    const t=i/turns,u=(i+1)/turns,mid=(t+u)/2;
+    const spread=w*(.32-.12*mid),width=w*(.78-.26*mid);
+    for(const side of [-1,1]){
+      const bend=side*(i%2?-1:1);
+      const strand=[[center(t),y0+t*height],[center(mid)+bend*spread,y0+mid*height],[center(u),y0+u*height]];
+      hdLine(c,strand,shadow,width+.28);
+      hdLine(c,strand,side===1?light:hair,width);
+    }
+  }
+}
+/* Sectioned roots sweep back from the forehead. Length hangs behind the neck. */
+function hdSectionedHair(c,r,view,behind){
+  const twist=r.hairStyle==='twists',side=view==='side',back=view==='back';
+  const hair=r.hair,tip=HD_TIPS[r.hairLength]||27;
+  const dark=hdTone(hair,-.32),glint=hdTone(hair,twist ? .16:.12);
+  // Sweep a tapered strand along a curved centerline, including its rounded end.
+  function strand(points,width,phase){
+    const left=[],right=[],ridge=[];
+    for(let i=0;i<=32;i++){
+      const t=i/32,u=1-t,[a,b,d,e]=points;
+      const x=u*u*u*a[0]+3*u*u*t*b[0]+3*u*t*t*d[0]+t*t*t*e[0];
+      const y=u*u*u*a[1]+3*u*u*t*b[1]+3*u*t*t*d[1]+t*t*t*e[1];
+      const dx=u*u*(b[0]-a[0])+2*u*t*(d[0]-b[0])+t*t*(e[0]-d[0]);
+      const dy=u*u*(b[1]-a[1])+2*u*t*(d[1]-b[1])+t*t*(e[1]-d[1]);
+      const norm=Math.hypot(dx,dy)||1,nx=-dy/norm,ny=dx/norm;
+      const wave=Math.sin(phase+t*(twist?24:6));
+      const radius=width*(1-.26*t)*(twist ? .86+.14*wave:1+.05*wave)*
+        Math.min(1,Math.sqrt((1-t)*20),.65+t*6);
+      left.push([x+nx*radius,y+ny*radius]);right.push([x-nx*radius,y-ny*radius]);
+      const offset=radius*(twist ? .58*wave:-.4);
+      ridge.push([x+nx*offset,y+ny*offset]);
+    }
+    c.beginPath();hdPath(c,[...left,...right.reverse()]);c.fillStyle=hair;c.fill();
+    c.strokeStyle=dark;c.lineWidth=.22;c.stroke();
+    hdLine(c,ridge.slice(3,29),glint,twist ? .37:.28);
+  }
+  // Locs form a layered bob. Twists gather high and fall from one off-centre puff.
+  if(behind){
+    for(let i=0;i<10;i++){
+      const t=i/9,base=side?9:16,spread=side?7:13;
+      const x=base+(2*t-1)*spread;
+      const end=tip-2.7*Math.abs(2*t-1)+1.5*Math.sin(i*2.3);
+      strand([[base+(t-.5)*8,7],[x,7],[x+(t-.5)*3,end-7],[x,end]],twist?1.3:1.85,i);
+    }
+    return;
+  }
+  const crown=[[4.8,16],[4.3,11],[7.8,6.1],[13,4],[20,3.8],[25.5,6.2],[28.2,11],[28,16],[25,back?23:15],[20,back?24:10.8],[13,back?24:10.4],[8,back?23:15]];
+  c.beginPath();hdPath(c,crown);c.fillStyle=dark;c.fill();
+  if(twist){
+    // Lift the twists from the hairline up into the knot. Their curved seams follow that sweep.
+    const knot=side?11:14;
+    for(let i=0;i<12;i++){
+      const t=i/11,x=5.1+22*t,edge=Math.abs(2*t-1);
+      const y=back?23-edge*2:side?19-8*t:10.8+6*edge*edge;
+      strand([[x,y],[x+(t-.5)*2,y-5],[knot+(t-.5)*11,2],[knot+(t-.5)*4,3.5]],1.4,i*.8);
+    }
+    for(let i=0;i<7;i++){
+      const t=i/6,x=knot-7+t*14;
+      strand([[knot,4],[x-3,1.3],[x+2,1.1],[x,5.5+(i%3)*.7]],1.6,i);
+    }
+  }else{
+    // Stagger roots and lengths, with shorter crown pieces lifted above the eyebrows.
+    for(let i=0;i<11;i++){
+      const t=i/10,x=4.5+23*t,edge=Math.abs(2*t-1);
+      const y=back?tip-2+1.6*Math.sin(i*1.9):side?tip-(tip-9)*t*t:
+        9.5+(tip-9.5)*Math.pow(edge,3.6)+.7*Math.sin(i*2);
+      const root=13+t*7;
+      strand([[root,4.2+Math.sin(i)*.65],[x,2.2+3*edge],[x-2.5,6+(y-6)*.45],[x-1.2+.7*Math.sin(i),y]],1.7+.25*Math.sin(i*1.8),i);
+    }
+  }
 }
 /* Hair behind the body. */
 function hdHairBack(c,r,view){
@@ -2701,6 +2777,7 @@ function hdHairBack(c,r,view){
   if(fam==='mullet'){const end=Math.min(31,tip+4);
     if(view==='front'){c.fillStyle=hdHairShade(c,hair,18,end);c.beginPath();hdPath(c,[[10,18],[23,18],[23.6,end-3],[21,end],[16.5,end-1.2],[12,end],[9.4,end-3]]);c.fill();c.strokeStyle=edge;c.lineWidth=.45;c.stroke();}
     return;}
+  if(fam==='locs'||fam==='twists')return hdSectionedHair(c,r,view,true);
   if(tip<=20)return;
   if(view==='side')return;
   if(fam==='locs'||fam==='twists'){
@@ -2716,6 +2793,7 @@ function hdHairFront(c,r,view){
   const fam=r.hairStyle,hair=r.hair,len=r.hairLength||'medium',tip=HD_TIPS[len]||27,v=HD_VOL[fam]||0;
   const dk=hdTone(hair,-.32),lt=hdTone(hair,.36),edge=hdTone(hair,-.46);
   const ropes=fam==='locs'||fam==='twists',mullet=fam==='mullet';
+  if(ropes)return hdSectionedHair(c,r,view,false);
   if(view==='side')return hdHairSide(c,r);
   if(view==='back')return hdHairBackView(c,r);
   const side=mullet?17:ropes?16.5:tip,short=side<=20;
@@ -2767,7 +2845,7 @@ function hdHairFront(c,r,view){
   if(ropes){
     const w=fam==='locs'?2:1.45,xs=fam==='locs'?[5.6,7.7]:[5.4,6.9,8.4];
     for(const s of [-1,1])xs.forEach((x,i)=>hdRope(c,hair,s<0?x:33-x,12.5+i*.4,tip-(i%2),w,fam,i+s));
-    if(fam==='twists'&&len==='short')for(let x=9;x<=24;x+=2.5)hdRope(c,hair,x,2.4+Math.abs(x-16.5)*.25,7,1.3,'twists',x);
+
   }
   if(mullet)for(const s of [-1,1]){const x=s<0?6.1:26.9;hdLine(c,[[x,11],[x-s*.5,14.5],[x+s*.3,17]],dk,.3);}
 }
@@ -2796,7 +2874,7 @@ function hdHairSide(c,r){
     for(let a=0;a<=10;a++){const t=Math.PI*(1.05+a/10*.85);b.push([15.5+Math.cos(t)*(10.4+v*.7),15+Math.sin(t)*(10+v*.8)]);}
     for(let y=16;y<=end-.5;y+=rr*1.8)b.push([5-v*.7,y]);hdBumps(c,b,rr,hair,edge);}
   if(ropes){const w=fam==='locs'?2:1.45;for(const [x,i] of [[6,0],[8.3,1],[10.6,0],[12.8,1],[15,0]].slice(0,fam==='locs'?4:5))hdRope(c,hair,x,12+i*.5,tip-i,w,fam,x);
-    if(fam==='twists'&&len==='short')for(let x=10;x<=21;x+=2.5)hdRope(c,hair,x,2.6,7,1.3,'twists',x);}
+}
 }
 /* Back view: the hair covers the whole back of the head and falls down the back. */
 function hdHairBackView(c,r){
@@ -2816,8 +2894,8 @@ function hdHairBackView(c,r){
   if(fam==='curls'||fam==='coils'){const rr=fam==='coils'?1.05:1.45,b=[];
     for(let a=0;a<=14;a++){const t=Math.PI*(1.02+a/14*.96);b.push([16.5+Math.cos(t)*(10.6+v*.7),15.2+Math.sin(t)*(10.2+v*.8)]);}
     for(let x=6;x<=27;x+=rr*1.8)b.push([x,end]);hdBumps(c,b,rr,hair,edge);}
-  if(ropes){const w=fam==='locs'?2:1.45;for(let x=6.2,i=0;x<=27;x+=fam==='locs'?2.3:1.75,i++)hdRope(c,hair,x,12,tip-(i%2),w,fam,x);
-    if(fam==='twists'&&len==='short')for(let x=9;x<=24;x+=2.5)hdRope(c,hair,x,2.4+Math.abs(x-16.5)*.25,7,1.3,'twists',x);}
+  if(ropes){const w=fam==='locs'?2:1.45;for(let x=6.2,i=0;x<=27;x+=fam==='locs'?2.45:1.88,i++)hdRope(c,hair,x,6.2+Math.abs(x-16.5)*.57,tip-(i%3)*.6,w,fam,x);
+}
 }
 
 /* ---------- Coats: fur, feathers and scales over the skin, never over the face. ---------- */
@@ -2922,6 +3000,58 @@ function hdHorns(c,r,p,view){
 }
 
 /* ---------- Wings and tails. ---------- */
+/* Curves follow the jaw, leaving space between the upper lip and chin for the mouth. */
+function hdFacialHair(c,r,view){
+  const style=r.facialHair;
+  if(!style||style==='none'||view==='back')return;
+  const side=view==='side',color=r.facialHairColor||r.hair||'#60473b';
+  const light=hdTone(color,.23),shade=hdTone(color,-.22);
+  c.save();
+  c.translate(side?21.5:16.5,23);
+  if(side)c.scale(.72,1);
+  const stroke=(path,ink,width)=>{
+    c.strokeStyle=ink;c.lineWidth=width;c.lineCap='round';c.lineJoin='round';
+    c.stroke(new Path2D(path));
+  };
+  const fill=path=>{c.fillStyle=color;c.fill(new Path2D(path));};
+  if(style==='stubble'){
+    for(const [x,y] of [[-6,0],[-5,2],[-3.7,3.4],[-2,4.1],[0,4.5],[2,4.1],[4,3.3],[5.6,1.5]]){
+      if(side&&x>2)continue;
+      stroke('M'+x+' '+y+'l.23 -.5',shade,.5);
+    }
+  }
+  if(style==='sideburns'||style==='mutton'){
+    const length=style==='mutton'?5:2;
+    for(const sign of side?[-1]:[-1,1]){
+      c.save();c.scale(sign,1);
+      fill('M7 -4 Q8 -1 7 2 Q6 '+length+' 3 '+length+' Q5 1 5.6 -3 Z');
+      stroke('M6.8 -2 Q7 .4 5.8 1.8',light,.35);c.restore();
+    }
+  }
+  if(style==='whiskers'){
+    for(const sign of side?[1]:[-1,1]){
+      c.save();c.scale(sign,1);
+      stroke('M4 -.3 Q7 -1 11 -1.8 M4.5 .7 Q8 .4 11.6 1 M4.4 1.6 Q8 2.3 10.8 3.8',shade,.46);
+      c.restore();
+    }
+  }
+  if(style.includes('beard')||style==='goatee'){
+    const depth=style==='long-beard'?11:style==='full-beard'?7.5:4.8;
+    c.save();if(style==='goatee')c.scale(.47,1);
+    fill('M-7 -1 Q-6 2 -2.5 2.5 Q0 3.6 2.5 2.5 Q5 2 6.8 -.8 Q7 4 3.8 '+(depth-1)+' Q1 '+depth+' 0 '+(depth+.8)+' Q-7 '+(depth-1)+' -7 -1Z');
+    stroke('M-4.6 2.7 Q-4 4 -2.4 '+(depth-.8)+' M.8 3.8 Q1 4.4 .4 '+(depth-.4),light,.43);
+    c.restore();
+  }
+  if(['mustache','handlebar','goatee','short-beard','full-beard','long-beard'].includes(style)){
+    for(const sign of side?[-1]:[-1,1]){
+      c.save();c.scale(sign,1);
+      fill('M0 -.6 Q1.4 -2.1 3.2 -1 Q4.6 -.2 5.4 -.5 Q3.5 1.3 1.6 .2 Q.7 -.4 0 .2Z');
+      if(style==='handlebar')stroke('M3.5 -.2 Q6.8 1.1 6.1 -2.1',color,.88);
+      c.restore();
+    }
+  }
+  c.restore();
+}
 function hdWings(c,r,p,view){
   const w=p.wings;if(!w)return;
   const sides=view==='side'?[-1]:[-1,1],by=25;
