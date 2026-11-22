@@ -11,6 +11,7 @@ INSPECTOR = """
 Object.defineProperty(window,'hairTest',{get:()=>({
  styles:MIX_HAIR_STYLES,
  tips:MIX_HAIR_TIPS,
+ look:(opts,dir)=>pxPaint(mixRecipe({...mixDefault(),...opts,headwear:'none'},'#62465a'),dir||'down',false,0).join('|'),
  pixels:(id,dir)=>pxPaint(mixRecipe({...mixDefault(),hairStyle:id,hairdo:'long',
    hairPattern:(MIX_HAIR_STYLES.find(s=>s.id===id)||{}).texture||'2b',
    headwear:'none'},'#62465a'),dir,false,0).join('|'),
@@ -97,6 +98,28 @@ class HairStyles(base.Cast):
                              'Shoulder hair must not fall down the torso')
         self.assertLessEqual(max(tips.values()), 33,
                              'Long styles must stop above the feet')
+
+
+    def test_07_refined_features_remain_visually_distinct(self):
+        pairs = [
+            ({'ears':'cat'},{'ears':'pointed'}),
+            ({'ears':'rabbit'},{'ears':'floppy'}),
+            ({'horns':'short'},{'horns':'curled'}),
+            ({'glasses':'none'},{'glasses':'round'}),
+            ({'eyes':1},{'eyes':3}),
+        ]
+        for first, second in pairs:
+            a = self.page.evaluate('(x)=>window.hairTest.look(x)', first)
+            b = self.page.evaluate('(x)=>window.hairTest.look(x)', second)
+            self.assertNotEqual(a, b, f'{first} and {second} look identical')
+
+    def test_08_detail_preserves_all_hair_views(self):
+        for direction in ('down','left','right','up'):
+            drawings = self.page.evaluate(
+                '(d)=>window.hairTest.styles.map(s=>window.hairTest.pixels(s.id,d))',
+                direction)
+            self.assertEqual(len(set(drawings)), 12,
+                             f'New detail flattened styles in {direction}')
 
 
 for name in dir(base.Cast):
