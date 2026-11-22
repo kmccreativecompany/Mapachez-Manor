@@ -12,6 +12,7 @@ Object.defineProperty(window,'hairTest',{get:()=>({
  styles:MIX_HAIR_STYLES,
  families:MIX_HAIR_FAMILIES,
  lengths:MIX_HAIR_LENGTHS,
+ defaultLook:()=>mixDefault(),
  tips:MIX_HAIR_TIPS,
  look:(opts,dir)=>pxPaint(mixRecipe({...mixDefault(),...opts,headwear:'none'},'#62465a'),dir||'down',false,0).join('|'),
  pixels:(id,dir)=>pxPaint(mixRecipe({...mixDefault(),hairStyle:id,hairdo:'long',
@@ -162,7 +163,7 @@ class HairStyles(base.Cast):
         self.page.locator('[data-tab="hair"]').click()
         # A saved vintage style can be migrated by changing length.
         self.page.evaluate(
-            "localStorage.setItem('mapachez_player_v1',JSON.stringify({...JSON.parse(localStorage.getItem('mapachez_player_v1')||'{}'),hairStyle:'high-puff',mix:true}))")
+            "localStorage.setItem('mapachez_player_v1',JSON.stringify({...window.hairTest.defaultLook(),hairStyle:'high-puff'}))")
         self.page.reload()
         self.page.locator('#title-who').click()
         self.page.locator('[data-tab="hair"]').click()
