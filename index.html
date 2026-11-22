@@ -2144,16 +2144,8 @@ function mixThumbnail(canvas,selected){
       hairLength:selected?.hairLength||'medium',
       hairPattern:spec.texture,hair:selected?.hair||'#523144',
       skin:selected?.skin||'#e9bd9b',headwear:'none',mobility:'none'},'#62465a');
-    const pixels=pxPaint(recipe,'down',false,0),image=c.createImageData(40,40);
-    /* Close-up of the same sprite: crown to shoulders. No misleading tiny full-body figure. */
-    for(let y=0;y<40;y++)for(let x=0;x<40;x++){
-      const sx=Math.min(31,3+Math.floor(x*27/40));
-      const sy=Math.min(43,Math.floor(y*33/40));
-      const h=pixels[sy*32+sx];if(!h)continue;
-      const rgb=pxRGB(h),i=(y*40+x)*4;
-      image.data[i]=rgb[0];image.data[i+1]=rgb[1];image.data[i+2]=rgb[2];image.data[i+3]=255;
-    }
-    c.putImageData(image,0,0);
+    const sprite=pxSpriteHD(recipe,'down',false,0,4);
+    c.imageSmoothingEnabled=true;c.drawImage(sprite,3*4,0,27*4,33*4,0,0,40,40);
     return;
   }
   if(field==='hairPattern'||field==='hairdo'||field==='headwear'){
@@ -2245,10 +2237,9 @@ function mixThumbnail(canvas,selected){
     else if(value[0]==='3'||value[0]==='4')for(const x of [4,7,10,13,16,19])P(x,6+x%2,3,4,col);
     else if(value[0]==='2')for(const x of [5,10,15])P(x,5+x%3,4,3,col);
   }else if(field==='facialHair'){
-    P(5,8,14,12,'#edc7a6');const f=value==='none'?'#edc7a6':ink;
-    if(value.includes('beard')||value==='goatee')P(8,17,9,5,f);
-    if(value==='mustache'||value==='handlebar'||value==='goatee')P(8,16,9,2,f);
-    if(value==='stubble'||value==='sideburns'||value==='mutton')for(const x of [6,17])P(x,14,2,6,f);
+    const recipe=mixRecipe({...mixDefault(),...selected,facialHair:value,headwear:'none',glasses:'none'},'#62465a');
+    const sprite=pxSpriteHD(recipe,'down',false,0,4);
+    c.imageSmoothingEnabled=true;c.drawImage(sprite,4*4,13*4,25*4,24*4,0,0,canvas.width,canvas.height);
   }else if(field==='glasses'){
     if(value==='round'){for(const x of [4,14]){P(x,9,7,1,gold);P(x,15,7,1,gold);P(x,10,1,5,gold);P(x+6,10,1,5,gold);}P(11,11,3,1,gold);}
   }else if(field==='mobility'){
@@ -2270,7 +2261,7 @@ function openPlayerPicker(){
     const pro=v.pronouns||[];
     const chip=(field,value,label)=>{
       const on=String(v[field]||'none')===String(value);
-      const portrait=['hairStyle','hairPattern','hairdo','headwear','expression','mouth'].includes(field);
+      const portrait=['hairStyle','hairPattern','hairdo','headwear','expression','mouth','facialHair'].includes(field);
       const icon=['expression','mouth','eyes','ears','horns','antlers','antennae','wings','tail','hairStyle','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
         ?'<canvas class="pp-icon'+(portrait?' pp-hair-icon':'')+'" width="'+(portrait?40:24)+'" height="'+(portrait?40:24)+'" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
       return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
@@ -2628,11 +2619,13 @@ function hdPlan(r){
   const wings=['feather','butterfly','bat'].includes(r.wings)?r.wings:'';
   const horns=r.horns&&r.horns!=='none'?r.horns:'',antlers=r.antlers&&r.antlers!=='none'?r.antlers:'',antennae=r.antennae&&r.antennae!=='none'?r.antennae:'';
   const base={...r};
+  const facial=!!r.facialHair&&r.facialHair!=='none';
+  if(facial)base.facialHair='none';
   if(hair){base.hairStyle='';base.hairdo='bald';}
   if(surface){base.surface='skin';base.texture='smooth';}
   if(ears)base.ears='human';if(tail)base.tail='none';if(wings)base.wings='none';
   if(horns)base.horns='none';if(antlers)base.antlers='none';if(antennae)base.antennae='none';
-  p={base,hair,surface,ears,tail,wings,horns,antlers,antennae,cover,any:hair||surface||ears||tail||wings||horns||antlers||antennae};
+  p={base,hair,surface,ears,tail,wings,horns,antlers,antennae,cover,facial,any:facial||hair||surface||ears||tail||wings||horns||antlers||antennae};
   HD_BASE.set(r,p);return p;
 }
 function hdWanted(r){return !!(r&&r.mix&&hdPlan(r).any);}
@@ -2650,7 +2643,8 @@ function pxSpriteHD(r,dir,blink,frame,K){
     ly={back:layer(c=>{if(behind){hdWings(c,r,p,view);hdTail(c,r,p,view);}
         if(p.cover&&view!=='back'){hdEars(c,r,p,view);hdHorns(c,r,p,view);}
         if(p.hair)hdHairBack(c,r,view);if(p.surface==='fur')hdFluff(c,r,view);}),
-      front:layer(c=>{if(!behind){hdWings(c,r,p,view);hdTail(c,r,p,view);}
+      front:layer(c=>{if(p.facial)hdFacialHair(c,r,view);
+        if(!behind){hdWings(c,r,p,view);hdTail(c,r,p,view);}
         if(!p.cover||view==='back'){hdEars(c,r,p,view);hdHorns(c,r,p,view);}
         if(p.surface==='feathers'&&!p.hair&&!p.cover&&(r.hairdo==='bald'||!r.hairStyle))hdCrest(c,r,view);
         if(p.hair){c.save();c.setTransform(1,0,0,1,0,0);const L=hdLayer(W,H),l=L.getContext('2d');l.scale(K,K);hdHairFront(l,r,view);hdCutFace(l,view);c.drawImage(L,0,0);c.restore();}})};
@@ -2922,6 +2916,58 @@ function hdHorns(c,r,p,view){
 }
 
 /* ---------- Wings and tails. ---------- */
+/* Curves follow the jaw, leaving space between the upper lip and chin for the mouth. */
+function hdFacialHair(c,r,view){
+  const style=r.facialHair;
+  if(!style||style==='none'||view==='back')return;
+  const side=view==='side',color=r.facialHairColor||r.hair||'#60473b';
+  const light=hdTone(color,.23),shade=hdTone(color,-.22);
+  c.save();
+  c.translate(side?21.5:16.5,23);
+  if(side)c.scale(.72,1);
+  const stroke=(path,ink,width)=>{
+    c.strokeStyle=ink;c.lineWidth=width;c.lineCap='round';c.lineJoin='round';
+    c.stroke(new Path2D(path));
+  };
+  const fill=path=>{c.fillStyle=color;c.fill(new Path2D(path));};
+  if(style==='stubble'){
+    for(const [x,y] of [[-6,0],[-5,2],[-3.7,3.4],[-2,4.1],[0,4.5],[2,4.1],[4,3.3],[5.6,1.5]]){
+      if(side&&x>2)continue;
+      stroke('M'+x+' '+y+'l.23 -.5',shade,.5);
+    }
+  }
+  if(style==='sideburns'||style==='mutton'){
+    const length=style==='mutton'?5:2;
+    for(const sign of side?[-1]:[-1,1]){
+      c.save();c.scale(sign,1);
+      fill('M7 -4 Q8 -1 7 2 Q6 '+length+' 3 '+length+' Q5 1 5.6 -3 Z');
+      stroke('M6.8 -2 Q7 .4 5.8 1.8',light,.35);c.restore();
+    }
+  }
+  if(style==='whiskers'){
+    for(const sign of side?[1]:[-1,1]){
+      c.save();c.scale(sign,1);
+      stroke('M4 -.3 Q7 -1 11 -1.8 M4.5 .7 Q8 .4 11.6 1 M4.4 1.6 Q8 2.3 10.8 3.8',shade,.46);
+      c.restore();
+    }
+  }
+  if(style.includes('beard')||style==='goatee'){
+    const depth=style==='long-beard'?11:style==='full-beard'?7.5:4.8;
+    c.save();if(style==='goatee')c.scale(.47,1);
+    fill('M-7 -1 Q-6 2 -2.5 2.5 Q0 3.6 2.5 2.5 Q5 2 6.8 -.8 Q7 4 3.8 '+(depth-1)+' Q1 '+depth+' 0 '+(depth+.8)+' Q-7 '+(depth-1)+' -7 -1Z');
+    stroke('M-4.6 2.7 Q-4 4 -2.4 '+(depth-.8)+' M.8 3.8 Q1 4.4 .4 '+(depth-.4),light,.43);
+    c.restore();
+  }
+  if(['mustache','handlebar','goatee','short-beard','full-beard','long-beard'].includes(style)){
+    for(const sign of side?[-1]:[-1,1]){
+      c.save();c.scale(sign,1);
+      fill('M0 -.6 Q1.4 -2.1 3.2 -1 Q4.6 -.2 5.4 -.5 Q3.5 1.3 1.6 .2 Q.7 -.4 0 .2Z');
+      if(style==='handlebar')stroke('M3.5 -.2 Q6.8 1.1 6.1 -2.1',color,.88);
+      c.restore();
+    }
+  }
+  c.restore();
+}
 function hdWings(c,r,p,view){
   const w=p.wings;if(!w)return;
   const sides=view==='side'?[-1]:[-1,1],by=25;
