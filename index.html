@@ -1682,14 +1682,36 @@ function pxPaint(r,dir,blink,frame,mood=''){
   /* Modular head additions, coverings and textures. Existing cast recipes are unchanged. */
   if(mix){
     const color=r.skin||'#d39b74',surf=r.surface||'skin',texture=r.texture||'smooth';
-    if(surf!=='skin'&&surf!=='ghostly')for(let y=8;y<34;y++)for(let x=5;x<28;x++){
-      const i=y*W+x;if(mat[i]!==color)continue;
-      if(surf==='scales'&&((x+y)%5===0||texture==='plated'&&x%4===0))P(x,y,T(color,-.2),color);
-      else if(surf==='feathers'&&(x+y)%4===0)P(x,y,T(color,.28),color);
-      else if(surf==='fur'&&(x*3+y)%7===0)P(x,y,T(color,texture==='curly'?-.2:.25),color);
-      else if(surf==='metal'&&(x+y)%10===0)P(x,y,'#f3e8bc',color);
-    }
-    if(surf==='fur'&&(texture==='fluffy'||texture==='shaggy'))for(const [x,y] of [[6,13],[5,17],[6,21],[26,13],[27,17],[26,21]])P(x,y,color,color);
+    /* SURFACES v2: each reads at a glance at sprite size.
+       Fur = soft tufts on the outline, strand flicks and a pale muzzle. Feathers = rows of round
+       scallops, cheek tufts and a little crest. Scales = small overlapping arcs with a shine dot
+       (plated: bold tiles). The face stays clean so eyes and mouth are always easy to see. */
+    const faceOpen=(x,y)=>!back&&((x+.5-16.5-fx)/7)**2+((y+.5-20)/5.2)**2<=1;
+    const onBody=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&mat[y*W+x]===color;
+    const dk=T(color,-.24),dk2=T(color,-.36),lt=T(color,.3);
+    if(surf==='fur'){
+      const tufts=texture==='short'?[]:texture==='shaggy'?[[6,12],[5,15],[5,18],[6,21],[27,12],[28,15],[28,18],[27,21],[11,7],[15,6],[19,6],[23,7]]:[[6,13],[5,17],[6,21],[27,13],[28,17],[27,21],[13,7],[20,7]];
+      for(const [x,y] of tufts){P(x,y,color,color);P(x+(x<16?-1:1),y+1,color,color);P(x+(x<16?-1:x>16?1:0),y,dk,color);}
+      for(let y=7;y<34;y++)for(let x=4;x<29;x++){if(!onBody(x,y)||faceOpen(x,y))continue;
+        if(texture==='curly'){if((x*5+y*3)%9===0){P(x,y,dk,color);if(onBody(x+1,y))P(x+1,y,dk,color);if(onBody(x,y+1))P(x,y+1,lt,color);}}
+        else if((x*3+y*5)%(texture==='short'?13:9)===0){P(x,y,dk,color);if(onBody(x+(x<16?-1:1),y+1))P(x+(x<16?-1:1),y+1,dk,color);if(texture==='shaggy'&&onBody(x,y+2))P(x,y+2,dk2,color);}}
+      if(!back){for(let y=21;y<=24;y++)for(let x=12;x<=21;x++)if(((x+.5-16.5-fx)/4.6)**2+((y+.5-22.5)/2.2)**2<=1&&onBody(x+fx,y))P(x+fx,y,lt,color);}
+    }else if(surf==='feathers'){
+      const step=texture==='layered'?3:4;
+      for(let row=0,y=8;y<34;y+=3,row++)for(let x=4+(row%2?step>>1:0);x<29;x+=step){
+        if(!onBody(x+1,y+1)||faceOpen(x+1,y+1))continue;
+        P(x,y,dk,color);P(x+1,y+1,dk,color);if(step>3)P(x+2,y+1,dk,color);P(x+step-1,y,dk,color);P(x+1,y,lt,color);}
+      if(!back){for(const s of [-1,1]){const x=s<0?6:27;P(x,18,color,color);P(x+s,19,color,color);P(x+s,20,dk,color);P(x,20,color,color);P(x+s*2,20,lt,color);}}
+      if(r.hairdo==='bald'||!r.hairStyle&&r.hairdo==='bald')for(const [x,y,c] of [[15,6,lt],[16,5,lt],[16,6,color],[17,4,color],[17,5,dk],[18,6,dk],[14,7,color]])P(x,y,c,'crest');
+    }else if(surf==='scales'){
+      if(texture==='plated'){for(let row=0,y=8;y<34;y+=4,row++)for(let x=5+(row%2?2:0);x<29;x+=4){
+          for(let k=0;k<4;k++){if(onBody(x+k,y)&&!faceOpen(x+k,y))P(x+k,y,dk2,color);if(onBody(x,y+k)&&!faceOpen(x,y+k))P(x,y+k,dk2,color);}
+          if(onBody(x+1,y+1)&&!faceOpen(x+1,y+1))P(x+1,y+1,lt,color);}}
+      else for(let row=0,y=8;y<34;y+=2,row++)for(let x=4+(row%2?1:0);x<29;x+=3){
+        if(!onBody(x+1,y+1)||faceOpen(x+1,y+1))continue;
+        P(x,y,dk,color);P(x+1,y+1,dk,color);P(x+2,y,dk,color);if((x+row)%2===0)P(x+1,y,lt,color);}
+      if(!back)for(const x of [9,24])P(x+fx,21,dk,color);
+    }else if(surf==='metal'){for(let y=8;y<34;y++)for(let x=5;x<28;x++)if(onBody(x,y)&&(x+y)%10===0)P(x,y,'#f3e8bc',color);}
     if(r.markings==='freckles')for(const x of [10,12,21,23])P(x,21,T(color,-.35),'mark');
     if(r.markings==='spots')for(const [x,y] of [[8,13],[25,13],[9,23],[24,23]])E(x,y,1.5,1.5,T(color,-.34),'mark');
     if(r.markings==='stripes')for(const x of [8,10,22,24])R(x,18,1,4,T(color,-.35),'mark');
