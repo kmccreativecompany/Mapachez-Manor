@@ -1184,14 +1184,16 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const face=(hy,eyes=2,mouth=bit(4)?1:0,blushCol='#f78aa6')=>{const o=fx;
     /* Small, readable faces: 2-3 pixel eyes and a tiny mouth. Keep rare eye counts. */
     if(CAST_STORYBOOK){
-      if(eyes===1){R(14+o,hy,4,3,K);if(!blink)P(15+o,hy,white);}
+      const ex=mix&&!blink?r.expression||'neutral':'neutral';
+      if(ex!=='neutral'&&mixEyes(hy,eyes,o,ex)){}
+      else if(eyes===1){R(14+o,hy,4,3,K);if(!blink)P(15+o,hy,white);}
       else if(eyes===3){for(const [x,y] of [[10,hy+1],[16,hy-2],[22,hy+1]]){R(x+o,y,2,blink?1:2,K);if(!blink)P(x+o,y,white);}}
       else{for(const x of [11,20]){R(x+o,hy,2,blink?1:3,K);if(!blink)P(x+o,hy,white);}}
       if(mix){
         /* Pixel-scale polish: iris glints, expressive brows, nose and warm
            cheek light. Keep these markings inside the face, not the hair. */
         const brow=T(hair,-.20),nose=T(skin,-.26);
-        if(!blink){
+        if(!blink&&(r.expression||'neutral')==='neutral'){
           if(eyes===1){P(16+o,hy+1,iris);P(15+o,hy,white);}
           else if(eyes===3){
             for(const [x,y] of [[10,hy+1],[16,hy-2],[22,hy+1]]){
@@ -1199,15 +1201,17 @@ function pxPaint(r,dir,blink,frame,mood=''){
             }
           }else for(const x of [11,20]){P(x+o,hy,white);P(x+1+o,hy+1,iris);}
         }
+        const exb=r.expression||'neutral';
         if(eyes===2){
-          R(11+o,hy-4,2,1,brow);R(20+o,hy-4,2,1,brow);
-          if(r.expression==='skeptical')P(11+o,hy-5,brow);
-        }else if(eyes===1)R(15+o,hy-4,3,1,brow);
+          if(exb==='surprised'){R(11+o,hy-5,2,1,brow);R(20+o,hy-5,2,1,brow);}
+          else if(exb==='skeptical'){R(10+o,hy-3,3,1,brow);R(20+o,hy-5,2,1,brow);P(22+o,hy-4,brow);}
+          else{R(11+o,hy-4,2,1,brow);R(20+o,hy-4,2,1,brow);}
+        }else if(eyes===1)R(15+o,hy-(exb==='surprised'?5:4),3,1,brow);
         P(16+o,hy+3,nose,skin);
         P(10+o,hy+4,T(skin,.22),skin);
         P(23+o,hy+4,T(skin,.22),skin);
       }
-      R(15+o,hy+6,3,1,'#70444b');
+      if(mix&&r.mouth&&r.mouth!=='soft')mixMouth(hy+6,o);else R(15+o,hy+6,3,1,'#70444b');
       if(r.fangs){P(15+o,hy+7,white);P(18+o,hy+7,white);}
       if(r.tooth)P(17+o,hy+7,white);
       for(const bx of [8,24])P(bx+o,hy+5,T(skin,.16));
@@ -1224,6 +1228,29 @@ function pxPaint(r,dir,blink,frame,mood=''){
     for(const bx of [7,23]){R(bx+o,my-2,3,2,blushCol);P(bx+o,my-2,'#ffd0dc');}
     if(r.specs){for(const sx of [9,17]){R(sx+1+o,hy-3,5,1,gold);R(sx+1+o,hy+4,5,1,gold);R(sx+o,hy-2,1,6,gold);R(sx+6+o,hy-2,1,6,gold);}P(16+o,hy-1,gold);}
   };
+  /* Creator eye expressions: they change the EYES themselves (shape and lids), not the mouth.
+     happy = smiling arcs, surprised = wide round eyes, skeptical = one lid lowered, sleepy = soft half-closed lids. */
+  function mixEyes(hy,eyes,o,ex){
+    const spots=eyes===1?[[14,hy,4]]:eyes===3?[[10,hy+1,2],[16,hy-2,2],[22,hy+1,2]]:[[11,hy,2],[20,hy,2]];
+    spots.forEach(([x,y,w],n)=>{x+=o;
+      if(ex==='happy'){if(w===4){P(x-1,y+3,K);P(x,y+2,K);P(x+1,y+1,K);P(x+2,y+1,K);P(x+3,y+2,K);P(x+4,y+3,K);P(x,y+3,K);P(x+3,y+3,K);}else{P(x-1,y+2,K);R(x,y+1,w,1,K);P(x+w,y+2,K);}}
+      else if(ex==='sleepy'){R(x-1,y+1,w+2,1,K);R(x,y+2,w,1,T(skin,-.18),skin);}
+      else if(ex==='surprised'||ex==='skeptical'&&n>0&&eyes!==1){/* round, wide open */
+        R(x,y-1,w,1,K);R(x-1,y,w+2,w===4?3:2,K);R(x,y+(w===4?3:2),w,1,K);P(x,y,white);P(x+w-1,y+(w===4?2:1),iris);if(w===4)P(x+1,y,white);}
+      else if(ex==='skeptical'){/* one narrowed eye with a low lid */R(x-1,y,w+2,1,T(skin,-.3),skin);R(x-1,y+1,w+2,1,K);R(x,y+2,w,1,K);P(x+w-1,y+2,iris);}
+      else if(ex==='wink'&&n===spots.length-1&&eyes!==1){P(x-1,y+1,K);R(x,y+2,w,1,K);P(x+w,y+1,K);}
+      else{R(x,y,w,3,K);P(x,y,white);if(mix)P(x+1,y+1,iris);}
+    });
+    return true;
+  }
+  /* Creator mouths: a separate choice so faces mix freely with any eyes. */
+  function mixMouth(my,o){const m=r.mouth,mc='#70444b',in_='#b5545f';
+    if(m==='smile'){P(14+o,my-1,mc);R(15+o,my,3,1,mc);P(18+o,my-1,mc);}
+    else if(m==='grin'){R(14+o,my-1,5,1,mc);R(15+o,my,3,1,in_);P(15+o,my-1,white);P(17+o,my-1,white);P(14+o,my,mc);P(18+o,my,mc);R(15+o,my+1,3,1,mc);}
+    else if(m==='oh'){R(15+o,my-1,3,3,mc);P(16+o,my,in_);}
+    else if(m==='cat'){P(14+o,my,mc);P(15+o,my+1,mc);P(16+o,my,mc);P(17+o,my+1,mc);P(18+o,my,mc);}
+    else R(15+o,my,3,1,mc);
+  }
   /* Shared chibi body: torso, arms, legs and shoes, with the outfit on top. */
   const legs=(legCol,shoe,hoof)=>{const l=frame===1?-1:0,rr=frame===3?-1:0;
     R(13,33,3,5+l,legCol);R(17,33,3,5+rr,legCol);shade.add(legCol);
@@ -1667,9 +1694,6 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(r.markings==='spots')for(const [x,y] of [[8,13],[25,13],[9,23],[24,23]])E(x,y,1.5,1.5,T(color,-.34),'mark');
     if(r.markings==='stripes')for(const x of [8,10,22,24])R(x,18,1,4,T(color,-.35),'mark');
     if(r.markings==='mask'){E(12,17,5,3.5,T(color,-.55),'mark');E(21,17,5,3.5,T(color,-.55),'mark');}
-    if(r.expression==='happy'){R(15,22,3,1,'#874953','mouth');P(16,23,'#874953','mouth');}
-    if(r.expression==='surprised'){R(16,21,2,3,'#874953','mouth');}
-    if(r.expression==='skeptical'){R(10,12,5,1,'#4c3845','brow');}
     const ears=r.ears||'human';
     if(ears!=='human')for(const side of [-1,1]){const x=side<0?7:25;
       if(ears==='rabbit'){
@@ -1984,6 +2008,15 @@ function mixThumbnail(canvas,selected){
   const P=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
   const ink='#4b3546',gold='#c89e60',rose='#c88891',fur='#b18a68',blue='#a5cada';
   c.clearRect(0,0,canvas.width,canvas.height);c.imageSmoothingEnabled=false;
+  if(field==='expression'||field==='mouth'){
+    /* Face close-up from the real sprite, so each choice shows exactly what changes. */
+    const recipe=mixRecipe({...mixDefault(),...(selected||{}),[field]:value,headwear:'none',mobility:'none',glasses:'none',facialHair:'none'},'#62465a');
+    const pixels=pxPaint(recipe,'down',false,0),image=c.createImageData(40,40);
+    for(let y=0;y<40;y++)for(let x=0;x<40;x++){
+      const h=pixels[((field==='mouth'?14:10)+(y>>1))*32+6+(x>>1)];if(!h)continue;
+      const rgb=pxRGB(h),i=(y*40+x)*4;image.data[i]=rgb[0];image.data[i+1]=rgb[1];image.data[i+2]=rgb[2];image.data[i+3]=255;}
+    c.putImageData(image,0,0);return;
+  }
   if(field==='hairStyle'){
     /* The option thumbnail uses the same renderer and pixel grid as the game character. */
     const spec=MIX_HAIR_FAMILIES.find(st=>st.id===value)||MIX_HAIR_STYLES.find(st=>st.id===value);
@@ -2118,8 +2151,8 @@ function openPlayerPicker(){
     const pro=v.pronouns||[];
     const chip=(field,value,label)=>{
       const on=String(v[field]||'none')===String(value);
-      const portrait=['hairStyle','hairPattern','hairdo','headwear'].includes(field);
-      const icon=['eyes','ears','horns','antlers','antennae','wings','tail','hairStyle','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
+      const portrait=['hairStyle','hairPattern','hairdo','headwear','expression','mouth'].includes(field);
+      const icon=['expression','mouth','eyes','ears','horns','antlers','antennae','wings','tail','hairStyle','hairPattern','hairdo','headwear','surface','texture','facialHair','glasses','mobility'].includes(field)
         ?'<canvas class="pp-icon'+(portrait?' pp-hair-icon':'')+'" width="'+(portrait?40:24)+'" height="'+(portrait?40:24)+'" data-icon="'+field+':'+esc(String(value))+'" aria-hidden="true"></canvas>':'';
       return '<button type="button" class="pp-choice'+(on?' picked':'')+'" data-opt="'+field+'" data-value="'+esc(String(value))+
         '" aria-pressed="'+on+'">'+icon+T(label)+'</button>';
@@ -2136,7 +2169,8 @@ function openPlayerPicker(){
     if(tab==='body'){
       fields+=group('Eyes for everyone',opts('eyes',[[1,'◉ One eye'],[2,'◉ ◉ Two eyes'],[3,'◉ ◉ ◉ Three eyes']]));
       fields+=colorGroup('skin',MIX_SKINS,'Body color');
-      fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical']]));
+      fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical'],['sleepy','Sleepy'],['wink','Wink']]));
+      fields+=group('Mouth',opts('mouth',[['soft','Soft smile'],['smile','Big smile'],['grin','Grin'],['oh','Little “oh”'],['cat','Cat smile']]));
     }
     if(tab==='hair'){
       fields+=group('Hair length',opts('hairLength',MIX_HAIR_LENGTHS.map(([id,label])=>[id,profile.lang==='es'?MIX_HAIR_LENGTHS_ES[id]:label])));
