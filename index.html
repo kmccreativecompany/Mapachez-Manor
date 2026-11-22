@@ -1749,7 +1749,8 @@ function mixRecipe(v,coat){
 }
 function randomPlayer(){
   const pick=a=>a[Math.floor(Math.random()*a.length)],r=mixDefault();
-  r.body=pick(['round','tall','blob','wiggly']);r.eyes=pick([1,2,3]);
+  /* The player creator has one consistent body silhouette; legacy saves retain their stored body. */
+  r.body='round';r.eyes=pick([1,2,3]);
   r.surface=pick(Object.keys(MIX_SURFACES));r.texture=pick(MIX_SURFACES[r.surface]);
   r.ears=pick(['human','cat','rabbit','pointed','floppy','round']);
   r.horns=pick(['none','none','short','curled']);
@@ -1923,7 +1924,6 @@ function openPlayerPicker(){
     }).join(''));
     let fields='';
     if(tab==='body'){
-      fields+=group('Body shape',opts('body',[['round','● Round'],['tall','▯ Tall'],['blob','◕ Soft'],['wiggly','♧ Petite']]));
       fields+=group('Eyes for everyone',opts('eyes',[[1,'◉ One eye'],[2,'◉ ◉ Two eyes'],[3,'◉ ◉ ◉ Three eyes']]));
       fields+=colorGroup('skin',MIX_SKINS,'Body color');
       fields+=group('Eye expressions',opts('expression',[['neutral','Neutral'],['happy','Happy'],['surprised','Surprised'],['skeptical','Skeptical']]));
