@@ -72,6 +72,17 @@ class HairStyles(base.Cast):
         self.assertTrue(self.page.locator('#pp-view').is_visible())
 
 
+    def test_05_no_player_body_shape_choices(self):
+        self.page.locator('#title-who').click()
+        self.page.locator('[data-tab="body"]').click()
+        self.assertEqual(self.page.locator('[data-opt="body"]').count(), 0)
+        self.assertNotIn('Body shape', self.page.locator('#pp-mix').inner_text())
+        self.assertEqual(self.page.locator('[data-opt="eyes"]').count(), 3)
+        self.page.locator('#pp-random').click()
+        self.page.locator('#pp-done').click()
+        self.assertEqual(self.page.evaluate('window.castTest.player().body'), 'round')
+
+
 for name in dir(base.Cast):
     if name.startswith('test_') and name not in HairStyles.__dict__:
         setattr(HairStyles,name,None)
