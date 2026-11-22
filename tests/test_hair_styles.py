@@ -10,6 +10,7 @@ import test_cast as base
 INSPECTOR = """
 Object.defineProperty(window,'hairTest',{get:()=>({
  styles:MIX_HAIR_STYLES,
+ tips:MIX_HAIR_TIPS,
  pixels:(id,dir)=>pxPaint(mixRecipe({...mixDefault(),hairStyle:id,hairdo:'long',
    hairPattern:(MIX_HAIR_STYLES.find(s=>s.id===id)||{}).texture||'2b',
    headwear:'none'},'#62465a'),dir,false,0).join('|'),
@@ -81,6 +82,21 @@ class HairStyles(base.Cast):
         self.page.locator('#pp-random').click()
         self.page.locator('#pp-done').click()
         self.assertEqual(self.page.evaluate('window.castTest.player().body'), 'round')
+
+
+    def test_06_style_lengths_match_hair_names(self):
+        tips = self.page.evaluate('window.hairTest.tips')
+        names = dict(self.page.evaluate(
+            'window.hairTest.styles.map(s=>[s.id,s.label])'))
+        self.assertEqual(names['shoulder-straight'], 'Shoulder Straight')
+        self.assertLess(tips['sleek-bob'], tips['shoulder-straight'])
+        self.assertLess(tips['wavy-bob'], tips['soft-waves'])
+        self.assertLess(tips['curly-bob'], tips['long-curls'])
+        self.assertLess(tips['soft-waves'], tips['long-waves'])
+        self.assertLessEqual(tips['shoulder-straight'], 26,
+                             'Shoulder hair must not fall down the torso')
+        self.assertLessEqual(max(tips.values()), 33,
+                             'Long styles must stop above the feet')
 
 
 for name in dir(base.Cast):
