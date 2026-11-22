@@ -1263,6 +1263,11 @@ function pxPaint(r,dir,blink,frame,mood=''){
       const ink=(x,y,c)=>P(x,y,c,hair,hair);
       /* Hair respects the small chibi face; short ends at the ears,
          medium at the shoulders, long above the feet. */
+      if(back){
+        /* Fill the ENTIRE existing head oval first. The former raised
+           crown left a skin-colored bald patch on the nape in back view. */
+        E(16.5,hy,9.8,8.8,hair,hair);
+      }
       mass(16.5,hy-4,kind==='coils'?11:10.2,kind==='coils'?8:7.2);
       if(!back)E(16.5,hy+.8,8.6,7,skin,skin);
       const sides=back?[7,10,13,19,22,25]:[7,10,23,26];
@@ -1358,6 +1363,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
       }
     };
     if(back){
+      /* Keep older saved styles covered at the nape, too. */
+      E(16.5,hy,9.8,8.8,hair,hair);
       mass(16.5,hy-3,9.6,7.7);
       if(st==='high-puff'){mass(16.5,hy-11,7.2,5.8);R(14,hy-7,5,2,hairDk,hair);}
       else if(st==='low-bun'){mass(16.5,hy+8,6,4.6);mass(16.5,hy+8,2.8,2.5,hairDk);}
@@ -1416,7 +1423,17 @@ function pxPaint(r,dir,blink,frame,mood=''){
   };
   const hairDo=(hy)=>{const hd=r.hairdo;if(hd==='bald')return;
     if(mix&&(MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)||
-               MIX_HAIR_FAMILIES.some(st=>st.id===r.hairStyle))){styledHair(hy);return;}
+               MIX_HAIR_FAMILIES.some(st=>st.id===r.hairStyle))){
+      styledHair(hy);
+      if(!back){
+        /* Last hair pass: restore the full face oval AFTER every lock,
+           curl, twist and highlight. Face details are drawn afterward.
+           This keeps the forehead, eyes, cheeks and mouth unobscured
+           in front and both side views without flattening the hair. */
+        E(16.5,hy+.8,8.6,7,skin,skin);
+      }
+      return;
+    }
     if(back){E(16.5,hy,10.6,9.6,hair);if(hd==='long')R(6,hy,21,14,hair);if(hd==='bun')E(16.5,hy-10,3.6,3.2,hair);return;}
     E(16.5,hy-1.5,10.6,8.6,hair);E(16.5,hy+1.5,8.6,6.6,skin,skin);
     const drop=[1,2,1,0,1,2,2,1,0,1,2,1,0,1,2,1,1];for(let x=8;x<=24;x++)R(x,hy-6,1,3+drop[x-8],hair);
