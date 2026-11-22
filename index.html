@@ -1240,9 +1240,9 @@ function pxPaint(r,dir,blink,frame,mood=''){
       if(st==='high-puff'){mass(16.5,hy-11,7.2,5.8);R(14,hy-7,5,2,hairDk,hair);}
       else if(st==='low-bun'){mass(16.5,hy+8,6,4.6);mass(16.5,hy+8,2.8,2.5,hairDk);}
       else if(st==='cloud-curls'){mass(16.5,hy-5,12.8,9.4);for(const x of [5,9,16,23,28])mass(x,hy-8-(x%3),3.1,3.2);}
-      else if(st==='long-curls'||st==='curly-bob'){const end=st==='long-curls'?36:24;for(const x of [7,11,15,20,25])curls(x,hy-4,end,st==='long-curls'?2.8:2.4);}
-      else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){const end=st==='wavy-bob'?24:st==='long-waves'?38:30;for(const x of [7,11,15,20,25])lock(x,hy-4,end,2.5,x*.24);}
-      else if(st==='sleek-bob'||st==='shoulder-straight'){const end=st==='sleek-bob'?24:31;R(7,hy,19,end-hy,hair,hair);for(const x of [10,16,23])R(x,hy+2,1,end-hy-4,hairDk,hair);}
+      else if(st==='long-curls'||st==='curly-bob'){const end=MIX_HAIR_TIPS[st];for(const x of [7,11,15,20,25])curls(x,hy-4,end,st==='long-curls'?2.8:2.4);}
+      else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){const end=MIX_HAIR_TIPS[st];for(const x of [7,11,15,20,25])lock(x,hy-4,end,2.5,x*.24);}
+      else if(st==='sleek-bob'||st==='shoulder-straight'){const end=MIX_HAIR_TIPS[st];R(7,hy,19,end-hy,hair,hair);for(const x of [10,16,23])R(x,hy+2,1,end-hy-4,hairDk,hair);}
       else if(st==='soft-pixie'){mass(16.5,hy-7,10,4.5);}
       else if(st==='close-crop'){mass(16.5,hy-5,9,5);}
       return;
@@ -1261,19 +1261,19 @@ function pxPaint(r,dir,blink,frame,mood=''){
       mass(7,hy,2.8,4.3);mass(26,hy-1,2.2,3.1);
       for(const x of [10,14,20])P(x+part,hy-8,hairLt,hair,'hair');
     }else if(st==='sleek-bob'||st==='shoulder-straight'){
-      const end=st==='sleek-bob'?23:31;
+      const end=MIX_HAIR_TIPS[st];
       R(6,hy-3,3,end-hy+4,hair,hair);R(24,hy-3,3,end-hy+4,hair,hair);
       R(7,end,3,2,hair,hair);R(23,end,4,2,hair,hair);
       R(10,hy-7,7,2,hair,hair);R(11,hy-5,4,1,hairLt,hair);
       for(const x of [7,25])R(x,hy+3,1,end-hy-4,hairDk,hair);
     }else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){
-      const end=st==='wavy-bob'?24:st==='long-waves'?38:30;
+      const end=MIX_HAIR_TIPS[st];
       lock(7,hy-4,end,2.8,0);lock(25,hy-4,end,2.8,2.1);
       lock(9,hy+1,end-2,1.9,1);lock(23,hy+1,end-2,1.9,3);
       R(11,hy-7,9,2,hair,hair);
       for(const [x,y] of [[8,-4],[13,-8],[22,-7],[25,2],[7,9]])P(x,hy+y,hairLt,hair,'hair');
     }else if(st==='long-curls'||st==='curly-bob'){
-      const end=st==='long-curls'?36:23,rad=st==='long-curls'?2.9:2.5;
+      const end=MIX_HAIR_TIPS[st],rad=st==='long-curls'?2.9:2.5;
       for(const x of [7,10,24,27])curls(x,hy-5,end,rad);
       for(const [x,y] of [[8,-9],[12,-10],[16,-10],[20,-10],[24,-9],[6,-4],[27,-3]])mass(x,hy+y,2.8,2.8);
       for(const x of [8,12,24])P(x,hy-9,hairLt,hair,'hair');
@@ -1344,12 +1344,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
     if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){
       if(back)return;
       const st=r.hairStyle;
-      const ends={
-        'sleek-bob':24,'wavy-bob':25,'curly-bob':25,
-        'soft-waves':30,'shoulder-straight':31,
-        'long-waves':38,'long-curls':37
-      };
-      const end=ends[st]||0;
+      const end=MIX_HAIR_TIPS[st]||0;
       if(end){
         /* Back layer is BEHIND the body. Never fill the whole torso like a wig curtain. */
         for(const side of [-1,1]){
@@ -1726,7 +1721,14 @@ function deloresWelcome(){
 const MIX_SKINS=[...CAST_SKIN,'#f6c8ac','#cce7db','#d2c5f2','#b7dce5','#aad1a0','#eee2d3','#c0bec3'];
 const MIX_HAIR_TYPES=['1a','1b','1c','2a','2b','2c','3a','3b','3c','4a','4b','4c'];
 /* HAIR POLISH v1: hairstyle is independent of texture; old saves remain unchanged. */
-const MIX_HAIR_STYLES=[{"id":"sleek-bob","label":"Sleek Bob","texture":"1b"},{"id":"soft-waves","label":"Soft Waves","texture":"2b"},{"id":"long-curls","label":"Long Curls","texture":"3b"},{"id":"cloud-curls","label":"Cloud Curls","texture":"4b"},{"id":"high-puff","label":"High Puff","texture":"4c"},{"id":"soft-pixie","label":"Soft Pixie","texture":"1c"},{"id":"close-crop","label":"Close Crop","texture":"4a"},{"id":"wavy-bob","label":"Wavy Bob","texture":"2c"},{"id":"curly-bob","label":"Curly Bob","texture":"3c"},{"id":"shoulder-straight","label":"Shoulder Length","texture":"1a"},{"id":"long-waves","label":"Long Waves","texture":"2a"},{"id":"low-bun","label":"Low Bun","texture":"1b"}];
+const MIX_HAIR_STYLES=[{"id":"sleek-bob","label":"Sleek Bob","texture":"1b"},{"id":"soft-waves","label":"Soft Waves","texture":"2b"},{"id":"long-curls","label":"Long Curls","texture":"3b"},{"id":"cloud-curls","label":"Cloud Curls","texture":"4b"},{"id":"high-puff","label":"High Puff","texture":"4c"},{"id":"soft-pixie","label":"Soft Pixie","texture":"1c"},{"id":"close-crop","label":"Close Crop","texture":"4a"},{"id":"wavy-bob","label":"Wavy Bob","texture":"2c"},{"id":"curly-bob","label":"Curly Bob","texture":"3c"},{"id":"shoulder-straight","label":"Shoulder Straight","texture":"1a"},{"id":"long-waves","label":"Long Waves","texture":"2a"},{"id":"low-bun","label":"Low Bun","texture":"1b"}];
+/* Hair endpoints in the 40px sprite: chin/bob ~22-24, shoulders ~26,
+   upper torso ~27, and long hair ~32. Reuse for front, side and back views. */
+const MIX_HAIR_TIPS=Object.freeze({
+  'sleek-bob':22, 'wavy-bob':23, 'curly-bob':22,
+  'soft-waves':27, 'shoulder-straight':26,
+  'long-waves':32, 'long-curls':32
+});
 const MIX_HAIR_LABELS={"1a":"Silky straight","1b":"Straight volume","1c":"Full straight","2a":"Loose waves","2b":"Soft waves","2c":"Deep waves","3a":"Wide curls","3b":"Spring curls","3c":"Tight curls","4a":"Soft coils","4b":"Dense coils","4c":"Tiny coils"};
 const MIX_COVERS=['none','hijab','scarf','wrap','turban','kufi','bandana'];
 const MIX_SURFACES={skin:['smooth','freckles'],fur:['short','fluffy','curly','shaggy'],feathers:['soft','layered'],scales:['fine','plated'],metal:['polished','brushed'],ghostly:['soft']};
