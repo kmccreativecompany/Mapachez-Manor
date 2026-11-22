@@ -1237,12 +1237,12 @@ function pxPaint(r,dir,blink,frame,mood=''){
     };
     if(back){
       mass(16.5,hy-3,9.6,7.7);
-      if(st==='high-puff'){mass(16.5,hy-12,7.5,5.1);R(14,hy-8,5,3,hairDk,hair);}
+      if(st==='high-puff'){mass(16.5,hy-11,7.2,5.8);R(14,hy-7,5,2,hairDk,hair);}
       else if(st==='low-bun'){mass(16.5,hy+8,6,4.6);mass(16.5,hy+8,2.8,2.5,hairDk);}
       else if(st==='cloud-curls'){mass(16.5,hy-5,12.8,9.4);for(const x of [5,9,16,23,28])mass(x,hy-8-(x%3),3.1,3.2);}
-      else if(st==='long-curls'||st==='curly-bob'){const end=st==='long-curls'?36:29;for(const x of [7,11,15,20,25])curls(x,hy-4,end,st==='long-curls'?2.8:2.4);}
-      else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){const end=st==='wavy-bob'?29:st==='long-waves'?38:34;for(const x of [7,11,15,20,25])lock(x,hy-4,end,2.5,x*.24);}
-      else if(st==='sleek-bob'||st==='shoulder-straight'){const end=st==='sleek-bob'?29:35;R(7,hy,19,end-hy,hair,hair);for(const x of [10,16,23])R(x,hy+2,1,end-hy-4,hairDk,hair);}
+      else if(st==='long-curls'||st==='curly-bob'){const end=st==='long-curls'?36:24;for(const x of [7,11,15,20,25])curls(x,hy-4,end,st==='long-curls'?2.8:2.4);}
+      else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){const end=st==='wavy-bob'?24:st==='long-waves'?38:30;for(const x of [7,11,15,20,25])lock(x,hy-4,end,2.5,x*.24);}
+      else if(st==='sleek-bob'||st==='shoulder-straight'){const end=st==='sleek-bob'?24:31;R(7,hy,19,end-hy,hair,hair);for(const x of [10,16,23])R(x,hy+2,1,end-hy-4,hairDk,hair);}
       else if(st==='soft-pixie'){mass(16.5,hy-7,10,4.5);}
       else if(st==='close-crop'){mass(16.5,hy-5,9,5);}
       return;
@@ -1261,19 +1261,19 @@ function pxPaint(r,dir,blink,frame,mood=''){
       mass(7,hy,2.8,4.3);mass(26,hy-1,2.2,3.1);
       for(const x of [10,14,20])P(x+part,hy-8,hairLt,hair,'hair');
     }else if(st==='sleek-bob'||st==='shoulder-straight'){
-      const end=st==='sleek-bob'?28:34;
+      const end=st==='sleek-bob'?23:31;
       R(6,hy-3,3,end-hy+4,hair,hair);R(24,hy-3,3,end-hy+4,hair,hair);
       R(7,end,3,2,hair,hair);R(23,end,4,2,hair,hair);
       R(10,hy-7,7,2,hair,hair);R(11,hy-5,4,1,hairLt,hair);
       for(const x of [7,25])R(x,hy+3,1,end-hy-4,hairDk,hair);
     }else if(st==='soft-waves'||st==='wavy-bob'||st==='long-waves'){
-      const end=st==='wavy-bob'?28:st==='long-waves'?38:34;
+      const end=st==='wavy-bob'?24:st==='long-waves'?38:30;
       lock(7,hy-4,end,2.8,0);lock(25,hy-4,end,2.8,2.1);
       lock(9,hy+1,end-2,1.9,1);lock(23,hy+1,end-2,1.9,3);
       R(11,hy-7,9,2,hair,hair);
       for(const [x,y] of [[8,-4],[13,-8],[22,-7],[25,2],[7,9]])P(x,hy+y,hairLt,hair,'hair');
     }else if(st==='long-curls'||st==='curly-bob'){
-      const end=st==='long-curls'?36:28,rad=st==='long-curls'?2.9:2.5;
+      const end=st==='long-curls'?36:23,rad=st==='long-curls'?2.9:2.5;
       for(const x of [7,10,24,27])curls(x,hy-5,end,rad);
       for(const [x,y] of [[8,-9],[12,-10],[16,-10],[20,-10],[24,-9],[6,-4],[27,-3]])mass(x,hy+y,2.8,2.8);
       for(const x of [8,12,24])P(x,hy-9,hairLt,hair,'hair');
@@ -1281,8 +1281,8 @@ function pxPaint(r,dir,blink,frame,mood=''){
       for(const [x,y] of [[5,-6],[10,-12],[17,-14],[24,-12],[28,-6],[5,0],[28,0],[6,6],[27,6]])mass(x,hy+y,3.2,3.2);
       for(const [x,y] of [[10,-10],[15,-12],[21,-11],[7,-5],[25,-4]])P(x,hy+y,hairLt,hair,'hair');
     }else if(st==='high-puff'){
-      mass(16.5,hy-12,7.7,5.1);
-      for(const [x,y] of [[10,-14],[14,-17],[19,-17],[24,-14],[9,-11],[24,-11]])mass(x,hy+y,2.5,2.4);
+      mass(16.5,hy-11,7.2,5.8);
+      for(const [x,y] of [[10,-12],[14,-14],[19,-14],[23,-12],[10,-9],[23,-9]])mass(x,hy+y,2.3,2.3);
       R(12,hy-5,9,2,hairDk,hair);P(15,hy-14,hairLt,hair,'hair');
     }else if(st==='low-bun'){
       mass(16.5,hy-5,9,5);mass(27,hy+5,3,3.8);
@@ -1343,12 +1343,24 @@ function pxPaint(r,dir,blink,frame,mood=''){
   const longBack=(hy)=>{
     if(mix&&MIX_HAIR_STYLES.some(st=>st.id===r.hairStyle)){
       if(back)return;
-      const st=r.hairStyle,end=st==='long-waves'?39:st==='long-curls'?37:
-        st==='soft-waves'||st==='shoulder-straight'?34:
-        st==='wavy-bob'||st==='curly-bob'||st==='sleek-bob'?29:0;
-      if(end){R(7,hy+2,19,end-hy-1,hair,hair);
-        if(st.includes('waves')||st.includes('curls')||st==='wavy-bob'||st==='curly-bob')
-          for(let y=hy+7;y<end;y+=4){P(6+y%3,y,hair,hair);P(27-y%3,y,hair,hair);}
+      const st=r.hairStyle;
+      const ends={
+        'sleek-bob':24,'wavy-bob':25,'curly-bob':25,
+        'soft-waves':30,'shoulder-straight':31,
+        'long-waves':38,'long-curls':37
+      };
+      const end=ends[st]||0;
+      if(end){
+        /* Back layer is BEHIND the body. Never fill the whole torso like a wig curtain. */
+        for(const side of [-1,1]){
+          const x=side<0?7:23;
+          const width=st.includes('curls')?4:3;
+          R(x,hy, width,Math.max(1,end-hy),hair,hair);
+          if(st.includes('waves')||st.includes('curls'))
+            for(let y=hy+7;y<=end;y+=4)
+              E(x+1+(side<0?-.5:.5),y,2.6,2.4,hair,hair);
+          else R(x,end-1,width+1,2,hair,hair);
+        }
       }
       return;
     }
@@ -1723,7 +1735,7 @@ function mixDefault(previous){
   const old=previous||{};
   return {mix:true,kind:'human',body:'round',eyes:2,skin:old.skin||'#ecc09f',
     hair:old.hair||'#6b4a32',hairdo:old.kind==='raccoon'?'bald':old.hairdo||'long',
-    hairPattern:'2b',hairStyle:'soft-waves',headwear:'none',headwearColor:'#77536f',
+    hairPattern:'2b',hairStyle:old.kind==='raccoon'||old.hairdo==='bald'?'':'soft-waves',headwear:'none',headwearColor:'#77536f',
     surface:old.kind==='raccoon'?'fur':'skin',texture:old.kind==='raccoon'?'fluffy':'smooth',
     ears:old.kind==='raccoon'?'round':'human',horns:'none',antlers:'none',antennae:'none',
     wings:'none',tail:old.kind==='raccoon'?'raccoon':'none',markings:'none',
@@ -1757,7 +1769,7 @@ function randomPlayer(){
   return r;
 }
 /* Small code-drawn pixel thumbnails for the creator, no image downloads. */
-function mixThumbnail(canvas){
+function mixThumbnail(canvas,selected){
   const [field,value]=canvas.dataset.icon.split(':'),c=canvas.getContext('2d');
   const P=(x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
   const ink='#4b3546',gold='#c89e60',rose='#c88891',fur='#b18a68',blue='#a5cada';
@@ -1767,11 +1779,15 @@ function mixThumbnail(canvas){
     const spec=MIX_HAIR_STYLES.find(st=>st.id===value);
     if(!spec)return;
     const recipe=mixRecipe({...mixDefault(),hairStyle:spec.id,hairdo:'long',
-      hairPattern:spec.texture,hair:'#523144',skin:'#e9bd9b',headwear:'none'},'#62465a');
+      hairPattern:spec.texture,hair:selected?.hair||'#523144',
+      skin:selected?.skin||'#e9bd9b',headwear:'none',mobility:'none'},'#62465a');
     const pixels=pxPaint(recipe,'down',false,0),image=c.createImageData(40,40);
-    for(let y=0;y<38;y++)for(let x=0;x<32;x++){
-      const h=pixels[y*32+x];if(!h)continue;
-      const rgb=pxRGB(h),i=((y+1)*40+(x+4))*4;
+    /* Close-up of the same sprite: crown to shoulders. No misleading tiny full-body figure. */
+    for(let y=0;y<40;y++)for(let x=0;x<40;x++){
+      const sx=Math.min(31,3+Math.floor(x*27/40));
+      const sy=Math.min(43,Math.floor(y*33/40));
+      const h=pixels[sy*32+sx];if(!h)continue;
+      const rgb=pxRGB(h),i=(y*40+x)*4;
       image.data[i]=rgb[0];image.data[i+1]=rgb[1];image.data[i+2]=rgb[2];image.data[i+3]=255;
     }
     c.putImageData(image,0,0);
@@ -2033,7 +2049,7 @@ function openPlayerPicker(){
     }
     const root=$('pp-mix');
     if(priorFields&&priorTab===tab)$('pp-fields').scrollTop=priorScroll;
-    root.querySelectorAll('canvas[data-icon]').forEach(mixThumbnail);
+    root.querySelectorAll('canvas[data-icon]').forEach(canvas=>mixThumbnail(canvas,v));
     if(priorFields&&(focusField||focusTab))requestAnimationFrame(()=>{
       const all=[...root.querySelectorAll('[data-opt],[data-tab]')];
       const next=all.find(el=>focusField?el.dataset.opt===focusField&&el.dataset.value===focusValue:el.dataset.tab===focusTab);
