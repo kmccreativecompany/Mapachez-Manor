@@ -78,6 +78,12 @@ This repository does not itself start an agent or create a recurring schedule. A
 
 ## Clean comedy
 
+An optional conversation now unfolds over tea in the conservatory. Walk to the
+tea table and listen a few lines at a time, then return to your shift whenever
+you like. The seated cast and saved conversation work offline in English and
+Spanish. See [conservatory tea notes](docs/conservatory-tea.md) for controls and
+verification; the author notes contain story spoilers.
+
 Every guest moment (but one tender one) has a clearly silly extra choice and a
 funny line from the guest when you get it right. Running gags unfold between
 guests, Delores closes each quick shift with a one-liner, and a new comment card
