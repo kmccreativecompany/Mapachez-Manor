@@ -7714,7 +7714,7 @@ const pennyLeft=()=>Math.max(0,PENNY_DAILY-pennyToday().n);
 function pennyNext(){if(penny.miss&&!penny.got.includes(penny.miss))return PENNY_FACTS.find(f=>f.id===penny.miss);return PENNY_FACTS.find(f=>!penny.got.includes(f.id))||null;}
 let pennyPuffAt=-1e9;
 
-/* ---------- Penny, drawn with code: a chubby mint baby dragon on a little coin pile ---------- */
+/* ---------- Penny, drawn with code: a clearly dragon-shaped, chubby mint baby dragon ---------- */
 function drawPenny(c,x,y,k=1,time=0,calm=false,{pile=true}={}){
   c.save();c.translate(x,y);c.scale(k,k);
   /* A happy little hop every couple of seconds, with a squash when she lands. */
@@ -7725,31 +7725,43 @@ function drawPenny(c,x,y,k=1,time=0,calm=false,{pile=true}={}){
   if(pile){for(const [cx,cy,r] of [[-15,0,5.5],[-9,-2,5.5],[13,0,5.5],[17,-3,5],[-13,-5,5]]){ellipse(c,cx,cy,r,r*.55,goldD);ellipse(c,cx,cy-1,r,r*.5,gold);}
     if(!calm){const s=(time/900)%1;c.globalAlpha=1-s;text(c,'✦',14+(s*3),-10-s*6,7,'#fff6c4');c.globalAlpha=1;}}
   c.translate(0,-lift);c.scale(1/sq,sq);
-  /* tiny fluttering wings */
+  /* Back-of-head and shoulder spines give her a dragon silhouette at a glance. */
+  c.fillStyle=mintD;c.beginPath();c.moveTo(-11,-14);c.lineTo(-15,-18);c.lineTo(-8,-18);c.lineTo(-11,-22);c.lineTo(-4,-20);c.lineTo(-2,-25);c.lineTo(3,-19);c.closePath();c.fill();
+  c.fillStyle=mint;c.beginPath();c.moveTo(-10,-15);c.lineTo(-13,-18);c.lineTo(-8,-17);c.lineTo(-5,-20);c.lineTo(-3,-17);c.closePath();c.fill();
+  /* Broad bat-shaped wings with visible finger bones, instead of leaf-like fins. */
   for(const s of [-1,1]){c.save();c.translate(s*8,-12);c.rotate(s*(-.15+flap));
-    c.fillStyle=wing;c.beginPath();c.moveTo(0,0);c.quadraticCurveTo(s*10,-11,s*14,-4);c.quadraticCurveTo(s*10,-2,s*9.5,1);c.quadraticCurveTo(s*6,0,s*4,3);c.closePath();c.fill();
-    c.strokeStyle=wingD;c.lineWidth=.8;c.beginPath();c.moveTo(0,0);c.lineTo(s*9,-5);c.stroke();ellipse(c,s*6,-4,1.2,1.2,'rgba(255,255,255,.7)');c.restore();}
-  /* little tail with a heart tip, wagging */
+    c.fillStyle=wing;c.beginPath();c.moveTo(0,2);c.quadraticCurveTo(s*1,-7,s*4,-9);c.lineTo(s*8,-3);c.lineTo(s*13,-11);c.quadraticCurveTo(s*17,-8,s*15,-1);c.quadraticCurveTo(s*14,4,s*10,5);c.quadraticCurveTo(s*7,7,s*4,5);c.closePath();c.fill();
+    c.strokeStyle=wingD;c.lineWidth=.9;c.beginPath();c.moveTo(0,2);c.lineTo(s*4,-8);c.lineTo(s*8,-3);c.lineTo(s*13,-10);c.moveTo(s*4,-8);c.lineTo(s*5,4);c.moveTo(s*8,-3);c.lineTo(s*9,5);c.stroke();
+    ellipse(c,s*6,-4,1.1,1.1,'rgba(255,255,255,.78)');c.restore();}
+  /* A sturdy, tapered tail with little dorsal plates and her signature heart tip. */
   const wag=calm?0:Math.sin(time/300)*2;
-  c.strokeStyle=mintD;c.lineWidth=5;c.lineCap='round';c.beginPath();c.moveTo(5,-6);c.quadraticCurveTo(17,-3,16+wag,-12);c.stroke();
-  c.strokeStyle=mint;c.lineWidth=3.2;c.beginPath();c.moveTo(5,-6);c.quadraticCurveTo(17,-3,16+wag,-12);c.stroke();
+  c.strokeStyle=mintD;c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(5,-6);c.quadraticCurveTo(17,-3,16+wag,-12);c.stroke();
+  c.strokeStyle=mint;c.lineWidth=4.4;c.beginPath();c.moveTo(5,-6);c.quadraticCurveTo(17,-3,16+wag,-12);c.stroke();
+  for(let i=0;i<3;i++){const px=9+i*2.3,py=-5-i*1.2;c.fillStyle=i%2?mint:mintD;c.beginPath();c.moveTo(px-1.7,py);c.lineTo(px,py-3.1);c.lineTo(px+1.7,py+.2);c.closePath();c.fill();}
   const tx=16+wag,ty=-12;c.fillStyle=pink;c.beginPath();c.moveTo(tx,ty+1);c.bezierCurveTo(tx-5,ty-4,tx-2,ty-9,tx,ty-5.5);c.bezierCurveTo(tx+2,ty-9,tx+5,ty-4,tx,ty+1);c.fill();
-  /* small round body, cream belly, chubby feet with pink toe beans */
+  /* Little plated belly, chubby feet and tiny dragon claws. */
   ellipse(c,0,-8,9.5,8.5,mintD);ellipse(c,0,-8.6,9,8,mint);ellipse(c,0,-7.4,6,6,belly);
-  for(const s of [-1,1]){ellipse(c,s*5.5,-.8,4.4,3,mintD);ellipse(c,s*5.5,-1.3,4,2.6,mint);ellipse(c,s*5.5,-.8,1.4,1,pink);for(const d of [-1.8,0,1.8])ellipse(c,s*5.5+d,-2.6,.6,.5,pink);}
+  c.strokeStyle='#eadbb6';c.lineWidth=.65;for(const by of [-10,-7.8,-5.6]){c.beginPath();c.moveTo(-4.4,by);c.quadraticCurveTo(0,by+1.1,4.4,by);c.stroke();}
+  for(const s of [-1,1]){ellipse(c,s*5.5,-.8,4.4,3,mintD);ellipse(c,s*5.5,-1.3,4,2.6,mint);ellipse(c,s*5.5,-.8,1.4,1,pink);for(const d of [-1.8,0,1.8])ellipse(c,s*5.5+d,-2.6,.6,.5,pink);
+    c.fillStyle='#fff2d2';c.beginPath();c.moveTo(s*8.4,-1.8);c.lineTo(s*9.8,-1.1);c.lineTo(s*8.6,-.5);c.closePath();c.fill();}
   /* stubby arms hugging a shiny coin */
   ellipse(c,0,-7.5,4.2,4.2,goldD);ellipse(c,0,-8,3.8,3.8,gold);text(c,'$',0,-6.2,5,'#a8740e','Georgia');ellipse(c,-1.5,-9.5,1,.7,'#fff8d0');
   for(const s of [-1,1])ellipse(c,s*4.4,-8.5,2.3,2,mint);
-  /* big round head */
+  /* Big round head. Two curled ivory horns stay visible above the familiar visor. */
   const hy=-27;
   for(const s of [-1,1]){c.fillStyle='#fff0c2';c.beginPath();c.moveTo(s*6,hy-11);c.quadraticCurveTo(s*8.5,hy-19,s*10.5,hy-17);c.quadraticCurveTo(s*11,hy-12,s*11.5,hy-9);c.closePath();c.fill();}
   for(const s of [-1,1]){c.fillStyle=wing;c.beginPath();c.moveTo(s*14,hy-3);c.quadraticCurveTo(s*21,hy-5,s*19,hy+1);c.quadraticCurveTo(s*21,hy+5,s*14,hy+4);c.closePath();c.fill();}
+  for(const s of [-1,1]){c.fillStyle=mintD;c.beginPath();c.moveTo(s*5.5,hy-9);c.quadraticCurveTo(s*9,hy-15,s*8,hy-21);c.quadraticCurveTo(s*15,hy-18,s*11,hy-8);c.closePath();c.fill();
+    c.fillStyle='#fff0c2';c.beginPath();c.moveTo(s*6.3,hy-10);c.quadraticCurveTo(s*10,hy-16,s*8.7,hy-20);c.quadraticCurveTo(s*12.5,hy-17,s*10.2,hy-9);c.closePath();c.fill();}
   ellipse(c,0,hy,16.5,14,mintD);ellipse(c,0,hy-.6,16,13.4,mint);
   ellipse(c,-6,hy-8,5,2.4,'rgba(255,255,255,.35)');
   /* tiny green banker's visor, tilted just so */
   c.save();c.translate(2,hy-11.5);c.rotate(.12);
   c.fillStyle='rgba(120,220,150,.6)';c.beginPath();c.ellipse(0,1,10,3,0,0,Math.PI);c.fill();
   c.fillStyle='#3daa6e';c.fillRect(-8,-1,16,2.2);c.restore();
+  /* Soft muzzle with two tiny nostrils makes her face read as dragon, not round lizard. */
+  ellipse(c,0,hy+5.2,7.3,4.1,mintD);ellipse(c,0,hy+4.8,6.8,3.7,mint);
+  for(const s of [-1,1])ellipse(c,s*3.2,hy+4.3,.65,.9,'#438d78');
   /* huge sparkly eyes */
   const blink=!calm&&(time%4200)<120;
   for(const s of [-1,1]){const ex=s*6.6,ey=hy+.5;
@@ -7760,9 +7772,10 @@ function drawPenny(c,x,y,k=1,time=0,calm=false,{pile=true}={}){
     /* rosy blush with tiny shy lines */
     ellipse(c,s*11.3,hy+5,3.2,2,'rgba(255,130,165,.6)');
     c.strokeStyle='rgba(230,90,130,.7)';c.lineWidth=.6;for(const d of [-1.4,0,1.4]){c.beginPath();c.moveTo(s*11.3+d-.6,hy+5.8);c.lineTo(s*11.3+d+.6,hy+4.2);c.stroke();}}
-  /* tiny happy open mouth */
-  c.fillStyle='#7a2f4a';c.beginPath();c.ellipse(0,hy+7,1.9,1.6+hop*.6,0,0,Math.PI);c.fill();
+  /* Tiny happy mouth and two baby fangs, kept gentle and friendly. */
+  c.fillStyle='#7a2f4a';c.beginPath();c.ellipse(0,hy+7.1,2.1,1.55+hop*.6,0,0,Math.PI);c.fill();
   ellipse(c,0,hy+8,1.1,.6,pink);
+  c.fillStyle='#fff8e8';for(const s of [-1,1]){c.beginPath();c.moveTo(s*1.3,hy+7);c.lineTo(s*1.9,hy+7);c.lineTo(s*1.6,hy+8.2);c.closePath();c.fill();}
   c.restore();
   /* little hearts float up when she lands from a hop */
   if(!calm&&ph>.22&&ph<.6){const a=(ph-.22)/.38;c.save();c.globalAlpha=1-a;text(c,'♥',x+13*k,y-(44+a*14)*k,6*k,pink);text(c,'♥',x-15*k,y-(40+a*10)*k,4.5*k,'#ffb3c9');c.restore();}
