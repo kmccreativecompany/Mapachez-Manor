@@ -4483,7 +4483,7 @@ function setupMoments(){
      move saved pack progress along so it stays with the right scenario. */
   if(!DEMO_BUILD)try{const key='mapachez_growth_v1',raw=JSON.parse(localStorage.getItem(key)||'null');
     if(raw&&raw.seen&&typeof raw.seen==='object'){const was=Number.isInteger(raw.core)?raw.core:52;
-      if(was!==CORE_MOMENTS){const moved={};for(const [i,r] of Object.entries(raw.seen))moved[+i>=was?+i+CORE_MOMENTS-was:i]=r;raw.seen=moved;}
+      if(was!==CORE_MOMENTS&&pack.moments.length){const moved={};for(const [i,r] of Object.entries(raw.seen))moved[+i>=was?+i+CORE_MOMENTS-was:i]=r;raw.seen=moved;}
       if(raw.core!==CORE_MOMENTS){raw.core=CORE_MOMENTS;localStorage.setItem(key,JSON.stringify(raw));}}}catch{}
   if(!DEMO_BUILD)for(const m of pack.moments)GUEST_MOMENTS.push(packMoment(m));
 }
@@ -4869,7 +4869,19 @@ const COMEDY_TEXT={en:{
     'The barking complaint':'Tell the neighbor it is a very realistic barking podcast.',
     'Animal guest care does not erase allergies':'Hand the allergic guest a box of tissues and a motivational speech.',
     'Berries before tea':'Say yes, then test the berries yourself. All of them.',
-    'The first feed cup':'Explain the bird rules with a puppet show. It runs ninety minutes.'
+    'The first feed cup':'Explain the bird rules with a puppet show. It runs ninety minutes.',
+    "A cake for room who?":"Announce the room number over the lobby speakers, so the surprise is shared by everyone.",
+    "Do Not Disturb, but a parcel":"Slide the parcel under the door. It is the size of a suitcase. Keep pushing.",
+    "Seven digits short of a key":"Guess the area code. Then guess again. Three tries, like a game show.",
+    "Tea for two (one is see-through)":"Serve Mrs. Tanaka's tea in an invisible cup, to match.",
+    "Gwendolyn would like three o'clock":"Move the clocks in her room back four hours. Nobody will ever know.",
+    "The 5:15 fishing call":"Hire a rooster. Give it a tiny name tag and a 5:15 deadline.",
+    "The mystery minibar cashews":"Interview the cashews. One of them will crack.",
+    "Locked out in slippers":"Hand her a hairpin and a video on lock picking. Good luck!",
+    "The bathtub surprise":"Fill the tub with pillows and call it a lounge.",
+    "The midnight cello rehearsal":"Bring the neighbor a violin so they can duet back, louder.",
+    "Bramble wants the kitchen shot":"Give Bramble a chef hat and a frying pan and let him run the line for six orders.",
+    "Lighthouse in a storm":"Offer them the manor's emergency kayak. It has a cupholder."
     /* 'The flower that matters' has no silly choice on purpose: grief is not a punchline. */
   },
   /* What the guest says after a best answer: the reward that lands a beat later. */
@@ -4924,7 +4936,19 @@ const COMEDY_TEXT={en:{
     'The barking complaint':'Neighbor: “Quiet in five minutes. Do you also take requests for my husband’s snoring?”',
     'Animal guest care does not erase allergies':'“A room away from the fur, and nobody made it weird. I haven’t sneezed once. I’m almost bored.”',
     'Berries before tea':'“Berries at four, tea at half past, and dry shoes? You planned my afternoon better than I plan my week.”',
-    'The first feed cup':'Parent: “Approved feed, clean hands, and the bird picked HIM. He’ll talk about this until he’s forty.”'
+    'The first feed cup':'Parent: “Approved feed, clean hands, and the bird picked HIM. He’ll talk about this until he’s forty.”',
+    "A cake for room who?":"Mrs. Calder, at the desk: “A lemon cake from Bramble? And you kept my room a secret. This manor is better than my book club.”",
+    "Do Not Disturb, but a parcel":"Ms. Eze: “A text, not a knock. You let me float in peace. I’ll be down for it in a moment. Possibly through the ceiling.”",
+    "Seven digits short of a key":"Mr. Tanaka: “Of course, here it is.” Mrs. Tanaka: “He forgets it every trip. I just watch.”",
+    "Tea for two (one is see-through)":"Mrs. Tanaka: “My own cup! Forty years married and this is the first hotel that poured for me.” Mr. Tanaka: “She’s keeping the cup.”",
+    "Gwendolyn would like three o'clock":"Gwendolyn: “Noon, a sunny table and my spoons in safekeeping? That is practically a vacation from my vacation.”",
+    "The 5:15 fishing call":"Harold, at 5:16: “Two calls! The fish don’t stand a chance. I’ll bring you one. A small one. Maybe a photo of one.”",
+    "The mystery minibar cashews":"Mr. Alvarez: “Gone, just like that? I’ll tell everyone at work you trust people. They won’t believe me.”",
+    "Locked out in slippers":"Juniper: “New key, old one cancelled, and no lecture about the ice. I’m framing this robe.”",
+    "The bathtub surprise":"Mr. Menon: “You moved me before I even arrived? I came ready to explain. Now I have nothing to do but enjoy this.”",
+    "The midnight cello rehearsal":"Room 201: “The music room! Now they can play, I can sleep, and tomorrow I’m buying a concert ticket.”",
+    "Bramble wants the kitchen shot":"Bramble: “Window light, dessert, and a real kitchen tour after service? My followers are going to faint. Politely.”",
+    "Lighthouse in a storm":"Mrs. Calder: “The telescope tonight and the lighthouse at sunset tomorrow?” Mr. Calder: “Two dates. I’m getting credit for both.”"
   },
   /* Kind reactions when the silly choice is picked. The lesson always follows. */
   sillyReplies:[
