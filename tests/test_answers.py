@@ -1,6 +1,6 @@
 """Fair answers: the best answer must not be guessable from its length.
 
-Before this check, the best answer was the longest one in all 52 guest moments, so a
+Before this check, the best answer was the longest one in the original 52 guest moments, so a
 player could win by always tapping the longest choice. These tests read the moments
 straight from index.html and training/silver-key.html (no browser needed).
 
@@ -76,6 +76,22 @@ class FairAnswers(unittest.TestCase):
         for moment in MOMENTS:
             for text, _ in moment['choices']:
                 self.assertIn(json.dumps(text)[1:-1], training, text)
+
+    def test_05_helpful_words_do_not_give_the_best_answer_away(self):
+        # "ask", "confirm", "offer" and "check" used to sit in the best answer far more often than
+        # in the others, so a player could guess by spotting them. Wrong answers use them too now.
+        words = re.compile(r'\b(ask|asks|asking|confirm|confirms|offer|offers|offering|check|checks|checking)\b', re.I)
+        wins = 0.0
+        for moment in MOMENTS:
+            texts = [c[0] for c in moment['choices']]
+            picks = [k for k, t in enumerate(texts) if words.search(t)] or list(range(len(texts)))
+            wins += (best_index(moment) in picks) / len(picks)
+        self.assertLessEqual(wins, len(MOMENTS) * 0.45, f'picking answers with helpful words wins {wins:.1f} of {len(MOMENTS)}')
+
+    def test_06_the_garlic_question_talks_about_garlic(self):
+        garlic = next(m for m in MOMENTS if m['title'] == 'The garlic question')
+        for text, _ in garlic['choices']:
+            self.assertNotIn('fish', text)
 
 
 if __name__ == '__main__':
