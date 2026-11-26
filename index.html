@@ -2021,7 +2021,17 @@ function bustHTML(cls=''){return '<div class="portrait bust '+cls+'"><canvas id=
 const PLAYER_KEY='mapachez_player_v1';
 const PLAYER_KINDS=[['raccoon','Raccoon'],['human','Person'],['fae','Fae folk'],['monster','Monster'],['alien','Alien'],['construct','Robot']];
 const PLAYER_EXTRAS={fae:['wings','antlers','leaves','goat','glow'],monster:['horns','ears','fur','tail','spots'],alien:['antennae','tentacles','glow','spots']};
-let playerChoice=null;try{const v=JSON.parse(localStorage.getItem(PLAYER_KEY)||'null');if(v&&CAST_OPTIONS.kind.includes(v.kind))playerChoice=v;}catch{}
+function readPlayerChoice(raw){
+  try{
+    const choice=JSON.parse(raw);
+    return choice&&(choice.mix===true||CAST_OPTIONS.kind.includes(choice.kind))?choice:null;
+  }catch{return null;}
+}
+let playerChoice=null;
+try{playerChoice=readPlayerChoice(localStorage.getItem(PLAYER_KEY));}catch{}
+window.addEventListener('storage',event=>{
+  if(event.key===PLAYER_KEY)playerChoice=readPlayerChoice(event.newValue);
+});
 function savePlayerChoice(v){playerChoice=v;try{localStorage.setItem(PLAYER_KEY,JSON.stringify(v));}catch{}}
 function playerSkins(kind){return kind==='human'?[...CAST_FUNSKIN.slice(0,6),...CAST_SKIN]:kind==='fae'?[...CAST_FAE,...CAST_FUNSKIN.slice(6)]:kind==='alien'?CAST_COOL:kind==='construct'?['#d9d2c3','#c8d3d6','#e0c99c']:CAST_WARM;}
 function playerRaccoon(coat,fur){const b=castLook('player',{color:coat});if(!fur)return b;const k=coat+fur;if(playerRaccoon.k!==k){playerRaccoon.k=k;playerRaccoon.r={...b,fur};}return playerRaccoon.r;}
@@ -2030,10 +2040,7 @@ function playerRecipe(coat){
   const key=JSON.stringify(v)+coat;
   if(playerRecipe.k!==key){
     playerRecipe.k=key;
-    const mix=!!v.mix;
-    playerRecipe.r=castMake({...v,kind:mix?(v.surface==='metal'?'construct':'human'):v.kind,
-      ghost:mix&&v.surface==='ghostly'?1:v.ghost||0,
-      color:coat,outfit:'vest',extra:mix?'':v.extra,extra2:''});
+    playerRecipe.r=v.mix?mixRecipe(v,coat):castMake({...v,color:coat,outfit:'vest',extra2:''});
   }
   return playerRecipe.r;
 }
@@ -2407,7 +2414,7 @@ function openPlayerPicker(){
     const root=$('pp-mix');
     if(priorFields&&priorTab===tab)$('pp-fields').scrollTop=priorScroll;
     /* Every change is kept right away, so closing with X or Esc never loses the look (and never leaves a raccoon). */
-    if(ppReady)savePlayerChoice(v);
+    savePlayerChoice(v);
     root.querySelector('.pp-hair-details')?.addEventListener('toggle',e=>{ppTextureOpen=e.target.open;});
     root.querySelectorAll('canvas[data-icon]').forEach(canvas=>mixThumbnail(canvas,v));
     if(priorFields&&(focusField||focusTab))requestAnimationFrame(()=>{
@@ -2456,8 +2463,7 @@ function openPlayerPicker(){
     $('pp-random').onclick=()=>{v={...randomPlayer(),pronouns:v.pronouns,own:v.own};draw();};
     $('pp-done').onclick=()=>{savePlayerChoice(v);closeModal();toast(deloresWelcome());};
   }
-  let ppReady=false;
-  draw();ppReady=true;
+  draw();
 }
 /* MUFFIN v1: Cece's cat. A cat according to her owner, and that is the end of the matter.
    Muffin keeps her own little life in the Festival Garden, whatever the player is doing. Where she is
