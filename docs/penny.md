@@ -1,7 +1,9 @@
 # PENNY v1: Penny Puffwing, the manor's money dragon
 
-Penny is a kawaii baby dragon who keeps the manor's books: a big round head, huge sparkly eyes,
-rosy blush, tiny fluttering wings, a heart-tipped tail, pink toe beans and a little green banker's visor.
+Penny is a kawaii baby dragon who keeps the manor's books: a big round head, curled ivory horns,
+a soft dragon muzzle with nostrils, visible back spines, broad bat-shaped wings with finger bones,
+a little plated belly, tiny claws, huge sparkly eyes, rosy blush, a heart-tipped tail, pink toe beans
+and a little green banker's visor.
 She does a happy hop every couple of seconds, with little hearts when she lands.
 Dragons hoard gold; Penny hoards facts about the hotel business, and shares them one at a time.
 She lives at the end of `index.html` (`PENNY v1` block), is drawn with code only, and saves to
