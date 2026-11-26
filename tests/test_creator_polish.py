@@ -131,7 +131,7 @@ class Polish(base.Cast):
             self.assertEqual(hd['eye2'], K, f'{opts}: the eyes stay visible')
             looks.add(hd['sum'])
         # The mullet's length is its tail at the back, so it shows from the side.
-        self.assertEqual(len(looks), 24, 'every style, length and add-on looks different')
+        self.assertEqual(len(looks), 23, 'every style, length and add-on looks different (the mullet\'s three lengths match from the front)')
         tails = {self.page.evaluate("(l)=>window.polishTest.hd({hairStyle:'mullet',hairLength:l},'right').sum", l) for l in ('short', 'medium', 'long')}
         self.assertEqual(len(tails), 3)
 

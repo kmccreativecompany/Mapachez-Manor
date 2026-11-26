@@ -95,7 +95,7 @@ class Growth(unittest.TestCase):
         self.page.locator('#modal-body .gm-result .action-row .primary-button').click()
 
     def test_01_perfect_quick_shift_from_title_fills_bars_and_awards_pins(self):
-        self.assertEqual(len(self.page.evaluate('window.growthTest.moments')), 52)
+        self.assertEqual(len(self.page.evaluate('window.growthTest.moments')), 64)
         self.page.locator('#title-quick').click()
         for _ in range(5):
             self.answer(best=True)

@@ -37,7 +37,7 @@ def seeded(growth=None, profile=None, pack=None):
     return "if(!sessionStorage.getItem('seeded')){" + ''.join(parts) + "sessionStorage.setItem('seeded','1');}"
 
 
-def all_best(n=52):
+def all_best(n=64):
     return {str(i): {'best': 1, 'tries': 1, 'miss': False, 'due': 0, 'at': i + 1} for i in range(n)}
 
 
@@ -249,7 +249,7 @@ class Setup(unittest.TestCase):
         rows = page.locator('table.board tbody tr')
         self.assertEqual(rows.count(), 1)
         self.assertIn('Ana', rows.first.inner_text())
-        friend = self.open(seeded(growth={**GROWTH, 'answers': 20, 'seen': all_best(52)}, profile={'version': 1, 'mode': 'hotel', 'name': 'Luis', 'team': 'Early birds', 'role': 'house', 'lang': 'en', 'hooked': True, 'week': {'key': s['week'], 'pts': 90}}))
+        friend = self.open(seeded(growth={**GROWTH, 'answers': 20, 'seen': all_best(64)}, profile={'version': 1, 'mode': 'hotel', 'name': 'Luis', 'team': 'Early birds', 'role': 'house', 'lang': 'en', 'hooked': True, 'week': {'key': s['week'], 'pts': 90}}))
         friend_code = self.state(friend)['code']
         page.fill('#board-paste', 'from Luis: ' + friend_code + '\nand junk ' + broken)
         page.click('#board-add')

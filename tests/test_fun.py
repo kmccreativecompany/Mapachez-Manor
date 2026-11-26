@@ -69,7 +69,7 @@ class CalmNight(Fun):
         self.assertIsNone(t['tonight'])
         for pin in ['rush-hero', 'cool-head', 'lantern-glow', 'storm-keeper', 'wedding-bells', 'candlelight', 'known-by-name', 'lily-detective', 'perfect-pitch']:
             self.assertIn(pin, t['pins'])
-        self.assertEqual(len(t['guestEn']), 52)
+        self.assertEqual(len(t['guestEn']), 64)
         self.assertIsNone(self.page.evaluate("localStorage.getItem('mapachez_fun_v1')"), 'Nothing is saved before playing')
         self.page.locator('#title-quick').click()
         for n in range(5):
