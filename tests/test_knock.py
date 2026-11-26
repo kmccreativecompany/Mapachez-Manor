@@ -109,7 +109,7 @@ class Knock(base.Growth):
         # Saving the number without its area code is a gentle miss.
         self.page.locator('.ci-step .choice', has_text='Save 555-0117').click()
         self.assertIn('area code', self.page.locator('.ci-step .hms-msg').inner_text())
-        self.page.locator('.ci-step .choice', has_text='And the area code').click()
+        self.page.locator('.ci-step .choice', has_text='May I also have your area code').click()
         self.assertIn('(207) 555-0117', card.inner_text())
         self.assertIn('text guests', self.page.locator('.ci-why').inner_text())
         self.page.locator('.ci-step .choice', has_text='exmaple').click()

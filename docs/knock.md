@@ -53,7 +53,7 @@ saying why after every right answer:
 
 | Step | Right tap | Gentle misses |
 | --- | --- | --- |
-| 📱 Phone | “And the area code?” | Save the 7 digits as they are; skip it |
+| 📱 Phone | “May I also have your area code?” | Save the 7 digits as they are; skip it |
 | ✉️ Email | The address typed exactly | Two near-miss typos (read it back!) |
 | 💳 Card | Check name and date, let the HMS hold it, hand it back | Copy it on a sticky note; skip it |
 
