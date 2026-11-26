@@ -12146,6 +12146,424 @@ function openStaffSitcomScene(index,full=false){
 }
 /* ==== end STAFF SITCOM v1 ==== */
 
+/* ==== LIVING MANOR v1: daily routines, Manor Radio and little surprises ====
+   1. Routines. Eight guests keep their own little routine, each at its own time of the player's real day
+      (midnight cello, tea at nine...). Come back at another hour and someone else is up to something.
+   2. Manor Radio. A code-drawn radio in the kitchen plays pretend ads and five-star guest reviews.
+   3. Surprises. Now and then something funny happens in the manor (a duck checks in, eleven pizzas
+      for a room that does not exist). Each one is a quick, kind service choice with tips.
+   Opens after the first finished shift. Everything is written ahead of time: no network, no cost.
+   Save key: mapachez_living_v1. Tests: tests/test_living.py. Notes: docs/living.md. ==== */
+const LIV_TEXT={
+en:{
+  you:'You',youName:'{name}',
+  routineKicker:'A LITTLE MANOR ROUTINE · {time}',spotted:'New routine spotted! +2 tips',seen:'Routine {n} of {total} spotted',
+  dayTitle:'The manor’s day',dayHint:'Everyone keeps their own little routine. Come back at another time of day to catch someone else.',
+  nowTag:'now',nextUp:'Next: {time}, {place}',unknown:'Someone in {place}',back:'Back to the manor',
+  places:{kitchen:'the kitchen',conservatory:'the conservatory',corridor:'the guest corridor'},
+  routines:{
+    finch:{title:'The midnight cello',lines:[['who','I practise at midnight, because the moon is a very forgiving audience.'],['you','It sounds lovely, Mr. Finch. Would you like me to close the conservatory doors, so the music stays cozy?'],['who','Yes, please. Last week a moth applauded and I lost my place.']]},
+    vesper:{title:'Counting the windows',lines:[['who','One, two, three, four, five, six. Good. Everyone is still here.'],['you','Good evening, Lady Vesper. May I bring you anything for your walk?'],['who','No, thank you. I count them every night. Windows like to be noticed.']]},
+    vale:{title:'A song for the sunrise',lines:[['who','One quiet song for the sunrise. It only listens to the soft ones.'],['you','Good morning, Ms. Vale. Shall I open the curtains a little, so you can watch it arrive?'],['who','Please. It is always a little late, but it always comes.']]},
+    nine:{title:'The four-minute kettle',lines:[['who','Kettle on at nine. Tea steeped for four minutes. Not three. Not five.'],['you','Certainly, M. Nine. Would you like me to set a timer for you?'],['who','I already have three timers. You may be the fourth. Welcome to the team.']]},
+    gwendolyn:{title:'Lunch with the spoons',lines:[['who','This one is Reginald. This one is Pearl. The little one is just called Spoon.'],['you','They are beautiful, Ms. Butterfield. May I bring you a soft cloth to polish them?'],['who','Yes, darling. Pearl has been very dramatic all morning.']]},
+    lars:{title:'The elevator, again',lines:[['who','Today I will ride the elevator, like everybody else.'],['','The doors close. The elevator goes up. Mr. Lindqvist stays exactly where he was.'],['you','Would you like me to ride up with you tomorrow, Mr. Lindqvist? I would be happy to keep you company.'],['who','Yes, please. Same time tomorrow. I am very determined.']]},
+    merriweather:{title:'The sunset cocktail',lines:[['who','Ah, sunset. My favorite time to wake up.'],['you','Good evening, Dr. Merriweather. Your ruby-red cocktail is ready, made just the way you like it, with no garlic anywhere nearby.'],['who','You remembered. You are my favorite person who is awake at this hour.']]},
+    ngozi:{title:'Tea at nine',lines:[['who','Tea at nine. I cannot drink it, but I do love the steam.'],['you','Then may I make it extra steamy for you this evening, Ms. Eze?'],['who','Oh, you understand me. Two sugars, please. For the smell.']]}
+  },
+  radioName:'Manor Radio',radioMap:'📻 Radio',radioKicker:'📻 MANOR RADIO · SOFT HITS AND SILLY ADS',
+  radioIntro:'The little radio in the kitchen is always on, very quietly. Tonight it is playing pretend ads and real reviews from happy guests.',
+  adKind:'A word from our sponsors',reviewKind:'Guest review, read on air',youKind:'Tonight’s first review is about you',
+  next:'Next on the radio',heard:'{n} heard',pretend:'Every product on Manor Radio is pretend. Please do not try to buy plain toast.',firstToday:'First listen tonight: +2 tips',
+  youReview:'“The night clerk, {name}, remembered my name, my tea and my lucky sock. I never told anyone about the sock.”',
+  youAnon:'“The night clerk remembered my name, my tea and my lucky sock. I never told anyone about the sock.”',youFrom:'A guest from Room {room}',
+  ads:[
+    'Tired of socks that match? Try Odd Pair. Socks sold one at a time. Finding the other one is half the fun.',
+    'Meet the Snooze Butler, the alarm clock that says “no rush” and means it.',
+    'Overwhelmed by choices? Try new Plain Toast. That is it. That is the ad.',
+    'Is your fern judging you? Try Fern Pep Talks: ten minutes a day of telling your fern it is doing great. Results guaranteed, for the fern.',
+    'Inbox Calm Candles. Light one and feel, for one cozy hour, like you have replied to everyone.',
+    'Lost your keys again? Try the Key Whistle. You whistle, your keys whistle back. Warning: may cause duets.',
+    'Meeting running long? Try Five-Minute Sand, the hourglass that is honest with you.',
+    'Puddle Boots for Cats. Your cat will not wear them, but you will feel very prepared.',
+    'Cloud Nine Blankets. So soft, your ghost will finally stop borrowing yours.',
+    'Monster Mints. Fresh breath for every mouth you have, even if you have three.',
+    'The Polite Toaster. It asks how you would like your toast, and then it listens.',
+    'Long-Neck Travel Pillows, for the traveler whose neck is very long, or very many.'
+  ],
+  reviews:[
+    ['The pillow menu had eleven pillows. I tried every one. I now live here emotionally.','Room 204'],
+    ['My wife and I asked for a table for two. We got a table for two. She is a ghost. Ten out of ten.','Mr. Hiroshi Tanaka, Room 205'],
+    ['One star off only because the raccoon at the desk is more organized than I am, and I felt seen.','Room 201'],
+    ['I asked for extra towels. I got extra towels, a kind smile and a little card that said “You have got this.” I did have this.','Room 202'],
+    ['My cat Muffin loved the window seat. Nobody asked why Muffin likes to hang upside down. Pure class.','Ms. Wrenwood'],
+    ['I have three eyes, and the reading light was perfect for all of them.','Room 206'],
+    ['Breakfast was so good I wrote a poem about the jam. The jam has not written back. Still five stars.','Room 203'],
+    ['I arrived tired and grumpy. I left rested and only slightly grumpy. A huge improvement.','Room 201'],
+    ['The front desk answered my question before I finished asking it. Was it magic? No. It was listening.','Room 204'],
+    ['I floated in through the wall by mistake. Housekeeping just said “Welcome back” and fluffed my pillow.','Ms. Ngozi Eze'],
+    ['I checked out at exactly noon. The desk thanked me like they meant it. They did.','M. Nine, Room 206'],
+    ['They remembered I like my soup at the exact temperature of a warm hug. I did not know I had told them.','Room 203']
+  ],
+  reviewStars:[5,5,4,5,5,5,5,5,5,5,5,5],
+  surpriseKicker:'A LITTLE SURPRISE · {place}',surpriseToast:'✨ Something funny is happening in {place}. Take a look?',surpriseMap:'Surprise!',
+  best:'Lovely! Best answer. +3 tips',ok:'Good thinking. +1 tip',miss:'A kind try.',later:'Not right now',done:'Back to the manor',
+  surprises:{
+    minibar:{title:'The minibar heist',q:'Two tiny garden raccoons have climbed into the minibar cart in the corridor. Every snack is unwrapped. One of them is wearing a cracker as a hat.',
+      opts:[['Guide them gently back to the garden, restock the cart and log what is missing, so no guest is charged','The cart is full again, nobody’s bill is wrong, and the cracker hat goes home with its owner.'],
+            ['Restock the cart quickly and say nothing','The cart looks perfect. Next time, log it too, so housekeeping knows why the stock changed.'],
+            ['Charge the snacks to Room 203, since it is closest','Lady Vesper did not eat fourteen crackers. Never charge a guest for something they did not use.']]},
+    wedding:{title:'A surprise wedding party',q:'A wedding party of twelve bursts in, singing. The couple was married in the garden an hour ago and they would love somewhere to toast.',
+      opts:[['“Congratulations! The conservatory is yours for the next hour, and I will bring warm cider. May we keep the singing gentle, as some guests are asleep upstairs?”','They toast, they hum very softly, and the couple asks if they can come back every anniversary.'],
+            ['Say congratulations and let them sing in the foyer','Lovely for them. Room 201 now knows every verse. Give a happy group a space that protects sleeping guests.'],
+            ['Tell them the manor does not host parties','That is a little sad on their big day. A quiet room and a kind plan would have turned a no into a memory.']]},
+    pizza:{title:'Eleven pizzas for Room 207',q:'A delivery driver arrives at the kitchen door with eleven pizzas for “Room 207.” The manor only has six rooms.',
+      opts:[['“Thank you for coming. We do not have a Room 207. May I have the guest’s name, so I can call them to come down and collect it?”','It is Mr. Lindqvist’s book club. They are ghosts. They ordered pizza for the smell, and they are delighted.'],
+            ['Knock on every door to ask who ordered pizza','Very kind, but it wakes up five rooms. A name and one quiet phone call is gentler.'],
+            ['Tell the driver which room the hungriest-looking guest is in','Never share a guest’s room number. Ask for the name and contact the guest yourself.']]},
+    duck:{title:'A duck checks in',q:'A duck waddles in through the garden door, walks up to you and waits very politely. It does not have a reservation.',
+      opts:[['“Welcome! I am so sorry, we are fully booked tonight. May I walk you back to the pond? I hear the rooms there are lovely.”','The duck accepts. It leaves a review on the doorstep: one perfect feather.'],
+            ['Open the door wide and hope it understands','It understands, eventually. A friendly escort is faster, and kinder.'],
+            ['Give the duck Room 201','Room 201 already has a guest. The duck is delighted. The guest is less delighted.']]},
+    muffin:{title:'Muffin takes the elevator',q:'Muffin, Ms. Wrenwood’s “cat,” is riding the elevator up and down, looking extremely pleased with herself.',
+      opts:[['Hold the elevator, stay with Muffin, and call Ms. Wrenwood in a calm voice so she can come for her','Muffin gets a gentle ride home, and Ms. Wrenwood gets a calm phone call instead of a scare.'],
+            ['Pick Muffin up and carry her to the room yourself','Muffin is fine, but some pets do not like strangers. Call the owner first and stay close.'],
+            ['Let her ride. She looks happy','She is happy, right up until the laundry floor. Always reunite a wandering pet with its owner.']]},
+    party:{title:'The surprise party',q:'The team is hiding in the kitchen with a banner for Delores’s birthday. Delores is walking in twenty minutes early.',
+      opts:[['Ask Delores warmly if she could help you with a guest record in the office for ten minutes','She helps, the banner goes up, and Delores says she suspected nothing. She suspected everything.'],
+            ['Shout “Surprise!” right now','Delores is surprised, mostly by the empty kitchen. Half the team is still blowing up balloons.'],
+            ['Tell her there is definitely no party','Now she knows there is a party.']]},
+    suitcase:{title:'The floating suitcase',q:'A guest’s suitcase has floated up into the glass roof of the conservatory. The guest explains that it does that when it is excited about a trip.',
+      opts:[['“Certainly. I will fetch the tall ladder and a colleague from maintenance, and we will bring it to your room within ten minutes.”','It arrives in eight minutes, still humming. The guest tips you in tiny glowing coins.'],
+            ['Jump for it','You are very bouncy, but the roof is very high. A ladder, a colleague and a clear time would be safer.'],
+            ['Explain that luggage is not the manor’s responsibility','Helping is always the manor’s job. Offer a plan and a time you can keep.']]},
+    snore:{title:'A tiny trumpet',q:'A guest has fallen asleep on the conservatory sofa and is snoring like a tiny trumpet. It is two in the morning.',
+      opts:[['Bring a soft blanket, then gently ask whether they would like help finding their way to their room','They wake up smiling, thank you for the blanket and keep it for the walk upstairs.'],
+            ['Let them sleep and carry on','Kind, but checking on a sleeping guest is part of keeping everyone safe and comfortable.'],
+            ['Play the piano loudly to wake them up','They wake up, and so does everyone in Rooms 201 to 206. A gentle word works better.']]}
+  },
+  pins:{clock:['Clockwork Manor','Spot all eight daily routines in the manor.'],radio:['Loyal Listener','Listen to twelve Manor Radio segments.'],surprise:['Expect the Unexpected','Handle all eight little surprises.']}
+},
+es:{
+  you:'Tú',youName:'{name}',
+  routineKicker:'UNA PEQUEÑA RUTINA · {time}',spotted:'¡Nueva rutina descubierta! +2 propinas',seen:'Rutinas descubiertas: {n} de {total}',
+  dayTitle:'El día de la mansión',dayHint:'Cada quien tiene su pequeña rutina. Vuelve a otra hora del día para encontrar a alguien más.',
+  nowTag:'ahora',nextUp:'Después: {time}, {place}',unknown:'Alguien en {place}',back:'Volver a la mansión',
+  places:{kitchen:'la cocina',conservatory:'el invernadero',corridor:'el pasillo de huéspedes'},
+  routines:{
+    finch:{title:'El violonchelo de medianoche',lines:[['who','Practico a medianoche, porque la luna es un público muy comprensivo.'],['you','Suena precioso, señor Finch. ¿Desea que cierre las puertas del invernadero para que la música se quede acogedora?'],['who','Sí, por favor. La semana pasada una polilla aplaudió y perdí el compás.']]},
+    vesper:{title:'Contando las ventanas',lines:[['who','Una, dos, tres, cuatro, cinco, seis. Bien. Todas siguen aquí.'],['you','Buenas noches, Lady Vesper. ¿Puedo traerle algo para su paseo?'],['who','No, gracias. Las cuento cada noche. A las ventanas les gusta que alguien se fije en ellas.']]},
+    vale:{title:'Una canción para el amanecer',lines:[['who','Una canción tranquila para el amanecer. Solo escucha las suaves.'],['you','Buenos días, señora Vale. ¿Abro un poco las cortinas para que pueda verlo llegar?'],['who','Por favor. Siempre llega un poco tarde, pero siempre llega.']]},
+    nine:{title:'La tetera de cuatro minutos',lines:[['who','Tetera a las nueve. Té en infusión durante cuatro minutos. Ni tres. Ni cinco.'],['you','Por supuesto, M. Nine. ¿Desea que le ponga un temporizador?'],['who','Ya tengo tres temporizadores. Usted puede ser el cuarto. Bienvenido al equipo.']]},
+    gwendolyn:{title:'Almuerzo con las cucharas',lines:[['who','Esta es Reginald. Esta es Perla. La pequeñita se llama simplemente Cuchara.'],['you','Son preciosas, señora Butterfield. ¿Le traigo un paño suave para pulirlas?'],['who','Sí, querido. Perla ha estado muy dramática toda la mañana.']]},
+    lars:{title:'El ascensor, otra vez',lines:[['who','Hoy subiré en ascensor, como todo el mundo.'],['','Las puertas se cierran. El ascensor sube. El señor Lindqvist se queda exactamente donde estaba.'],['you','¿Desea que suba con usted mañana, señor Lindqvist? Será un placer acompañarlo.'],['who','Sí, por favor. Mañana a la misma hora. Estoy muy decidido.']]},
+    merriweather:{title:'El cóctel del atardecer',lines:[['who','Ah, el atardecer. Mi hora favorita para despertarme.'],['you','Buenas tardes, doctora Merriweather. Su cóctel rojo rubí está listo, preparado como a usted le gusta y sin nada de ajo cerca.'],['who','Se acordó. Es usted mi persona favorita de las que están despiertas a esta hora.']]},
+    ngozi:{title:'Té a las nueve',lines:[['who','Té a las nueve. No puedo beberlo, pero me encanta el vapor.'],['you','Entonces, ¿le preparo uno con mucho vapor esta noche, señora Eze?'],['who','Ay, usted me entiende. Dos de azúcar, por favor. Por el aroma.']]}
+  },
+  radioName:'Radio de la Mansión',radioMap:'📻 Radio',radioKicker:'📻 RADIO DE LA MANSIÓN · ÉXITOS SUAVES Y ANUNCIOS TONTOS',
+  radioIntro:'La radio de la cocina siempre está encendida, muy bajito. Esta noche pone anuncios de mentira y reseñas de verdad de huéspedes felices.',
+  adKind:'Unas palabras de nuestros patrocinadores',reviewKind:'Reseña de un huésped, leída al aire',youKind:'La primera reseña de esta noche habla de ti',
+  next:'Lo siguiente en la radio',heard:'{n} escuchados',pretend:'Todos los productos de la Radio de la Mansión son de mentira. Por favor, no intentes comprar Tostada Simple.',firstToday:'Primera escucha de la noche: +2 propinas',
+  youReview:'“{name}, en la recepción de noche, recordó mi nombre, mi té y mi calcetín de la suerte. Nunca le conté a nadie lo del calcetín.”',
+  youAnon:'“En la recepción de noche recordaron mi nombre, mi té y mi calcetín de la suerte. Nunca le conté a nadie lo del calcetín.”',youFrom:'Un huésped de la habitación {room}',
+  ads:[
+    '¿Cansado de calcetines que combinan? Prueba Par Impar. Calcetines vendidos de uno en uno. Encontrar el otro es la mitad de la diversión.',
+    'Te presentamos al Mayordomo Dormilón, el despertador que dice «sin prisa» y lo dice en serio.',
+    '¿Demasiadas opciones? Prueba la nueva Tostada Simple. Eso es todo. Ese es el anuncio.',
+    '¿Tu helecho te juzga? Prueba Ánimos para Helechos: diez minutos al día diciéndole a tu helecho que lo está haciendo genial. Resultados garantizados, para el helecho.',
+    'Velas Bandeja Tranquila. Enciende una y siente, durante una hora acogedora, que has respondido a todo el mundo.',
+    '¿Perdiste las llaves otra vez? Prueba el Silbato de Llaves. Tú silbas y tus llaves te responden. Atención: puede provocar dúos.',
+    '¿La reunión se alarga? Prueba Arena de Cinco Minutos, el reloj de arena que te dice la verdad.',
+    'Botas de Lluvia para Gatos. Tu gato no se las pondrá, pero tú te sentirás muy preparado.',
+    'Mantas Nube Nueve. Tan suaves que tu fantasma por fin dejará de pedirte la tuya.',
+    'Pastillas de Menta para Monstruos. Aliento fresco para cada boca que tengas, aunque tengas tres.',
+    'La Tostadora Educada. Te pregunta cómo quieres tu tostada y luego te escucha.',
+    'Almohadas de Viaje Cuello Largo, para quien tiene un cuello muy largo, o muchos.'
+  ],
+  reviews:[
+    ['El menú de almohadas tenía once almohadas. Probé todas. Ahora vivo aquí emocionalmente.','Habitación 204'],
+    ['Mi esposa y yo pedimos una mesa para dos. Nos dieron una mesa para dos. Ella es un fantasma. Diez de diez.','Sr. Hiroshi Tanaka, habitación 205'],
+    ['Le quito una estrella solo porque el mapache de recepción es más organizado que yo, y me sentí descubierto.','Habitación 201'],
+    ['Pedí toallas extra. Recibí toallas extra, una sonrisa amable y una tarjetita que decía «Tú puedes». Y sí pude.','Habitación 202'],
+    ['A mi gata Muffin le encantó el asiento de la ventana. Nadie preguntó por qué a Muffin le gusta colgarse boca abajo. Pura clase.','Sra. Wrenwood'],
+    ['Tengo tres ojos, y la luz de lectura era perfecta para los tres.','Habitación 206'],
+    ['El desayuno estaba tan rico que le escribí un poema a la mermelada. La mermelada no me ha contestado. Igual, cinco estrellas.','Habitación 203'],
+    ['Llegué cansado y gruñón. Me fui descansado y solo un poquito gruñón. Una gran mejora.','Habitación 201'],
+    ['En recepción respondieron mi pregunta antes de que terminara de hacerla. ¿Magia? No. Sabían escuchar.','Habitación 204'],
+    ['Entré flotando por la pared sin querer. Limpieza solo dijo «Bienvenida de nuevo» y me ahuecó la almohada.','Sra. Ngozi Eze'],
+    ['Salí exactamente a mediodía. En recepción me dieron las gracias como si lo sintieran. Y lo sentían.','M. Nine, habitación 206'],
+    ['Recordaron que me gusta la sopa a la temperatura exacta de un abrazo calentito. No sabía que se lo había dicho.','Habitación 203']
+  ],
+  surpriseKicker:'UNA PEQUEÑA SORPRESA · {place}',surpriseToast:'✨ Algo divertido está pasando en {place}. ¿Echas un vistazo?',surpriseMap:'¡Sorpresa!',
+  best:'¡Precioso! Mejor respuesta. +3 propinas',ok:'Bien pensado. +1 propina',miss:'Un intento amable.',later:'Ahora no',done:'Volver a la mansión',
+  surprises:{
+    minibar:{title:'El gran robo del minibar',q:'Dos mapachitos del jardín se han subido al carrito del minibar del pasillo. Todo está desenvuelto. Uno lleva una galleta salada de sombrero.',
+      opts:[['Llevarlos con cariño de vuelta al jardín, reponer el carrito y anotar lo que falta para que no se le cobre a ningún huésped','El carrito vuelve a estar lleno, ninguna cuenta está mal y el sombrero de galleta se va a casa con su dueño.'],
+            ['Reponer el carrito rápido y no decir nada','El carrito queda perfecto. La próxima vez, anótalo también, para que limpieza sepa por qué cambió el inventario.'],
+            ['Cargar los snacks a la habitación 203, que es la más cercana','Lady Vesper no se comió catorce galletas. Nunca cobres a un huésped algo que no usó.']]},
+    wedding:{title:'Una boda sorpresa',q:'Un grupo de boda de doce personas entra cantando. La pareja se casó en el jardín hace una hora y les encantaría un lugar para brindar.',
+      opts:[['«¡Felicidades! El invernadero es suyo durante la próxima hora y les traeré sidra caliente. ¿Podríamos cantar suavecito? Algunos huéspedes duermen arriba.»','Brindan, tararean muy bajito y la pareja pregunta si puede volver en cada aniversario.'],
+            ['Felicitarlos y dejar que canten en el vestíbulo','Precioso para ellos. La habitación 201 ya se sabe todas las estrofas. Da a un grupo feliz un espacio que proteja el sueño de los demás.'],
+            ['Decirles que la mansión no organiza fiestas','Es un poco triste en su gran día. Una sala tranquila y un plan amable habrían convertido un no en un recuerdo.']]},
+    pizza:{title:'Once pizzas para la habitación 207',q:'Un repartidor llega a la puerta de la cocina con once pizzas para la «habitación 207». La mansión solo tiene seis habitaciones.',
+      opts:[['«Gracias por venir. No tenemos habitación 207. ¿Me dice el nombre del huésped? Así lo llamo para que baje a recogerlas.»','Es el club de lectura del señor Lindqvist. Son fantasmas. Pidieron pizza por el olor y están encantados.'],
+            ['Llamar a cada puerta para preguntar quién pidió pizza','Muy amable, pero despierta a cinco habitaciones. Un nombre y una llamada tranquila es más delicado.'],
+            ['Decirle al repartidor en qué habitación está el huésped con más cara de hambre','Nunca compartas el número de habitación de un huésped. Pide el nombre y contacta tú al huésped.']]},
+    duck:{title:'Un pato hace el check-in',q:'Un pato entra por la puerta del jardín, se acerca a ti y espera con mucha educación. No tiene reserva.',
+      opts:[['«¡Bienvenido! Lo siento mucho, esta noche estamos completos. ¿Lo acompaño de vuelta al estanque? Dicen que las habitaciones allí son preciosas.»','El pato acepta. Deja una reseña en la puerta: una pluma perfecta.'],
+            ['Abrir bien la puerta y esperar que entienda','Al final entiende. Acompañarlo con amabilidad es más rápido, y más amable.'],
+            ['Darle al pato la habitación 201','La habitación 201 ya tiene un huésped. El pato está feliz. El huésped, no tanto.']]},
+    muffin:{title:'Muffin toma el ascensor',q:'Muffin, la «gata» de la señora Wrenwood, sube y baja en el ascensor, muy satisfecha de sí misma.',
+      opts:[['Detener el ascensor, quedarte con Muffin y llamar con calma a la señora Wrenwood para que venga por ella','Muffin vuelve a casa con calma y la señora Wrenwood recibe una llamada tranquila en lugar de un susto.'],
+            ['Tomar a Muffin en brazos y llevarla tú a la habitación','Muffin está bien, pero a algunas mascotas no les gustan los desconocidos. Llama primero a su dueña y quédate cerca.'],
+            ['Dejarla pasear. Se ve feliz','Está feliz, hasta que llega a la lavandería. Reúne siempre a una mascota perdida con su dueño.']]},
+    party:{title:'La fiesta sorpresa',q:'El equipo se esconde en la cocina con una pancarta por el cumpleaños de Delores. Delores llega veinte minutos antes.',
+      opts:[['Pedirle a Delores con cariño que te ayude diez minutos con la ficha de un huésped en la oficina','Te ayuda, la pancarta se cuelga y Delores dice que no sospechaba nada. Lo sospechaba todo.'],
+            ['Gritar «¡Sorpresa!» ahora mismo','Delores se sorprende, sobre todo por la cocina vacía. Medio equipo sigue inflando globos.'],
+            ['Decirle que definitivamente no hay ninguna fiesta','Ahora sabe que hay una fiesta.']]},
+    suitcase:{title:'La maleta flotante',q:'La maleta de un huésped ha subido flotando hasta el techo de cristal del invernadero. El huésped explica que le pasa cuando está emocionada por un viaje.',
+      opts:[['«Por supuesto. Traeré la escalera alta y a un compañero de mantenimiento, y se la llevaremos a su habitación en diez minutos.»','Llega en ocho minutos, todavía tarareando. El huésped te da propina en monedas diminutas que brillan.'],
+            ['Saltar para alcanzarla','Saltas mucho, pero el techo está muy alto. Una escalera, un compañero y una hora clara sería más seguro.'],
+            ['Explicar que el equipaje no es responsabilidad de la mansión','Ayudar siempre es trabajo de la mansión. Ofrece un plan y una hora que puedas cumplir.']]},
+    snore:{title:'Una trompetita',q:'Un huésped se quedó dormido en el sofá del invernadero y ronca como una trompetita. Son las dos de la mañana.',
+      opts:[['Traer una manta suave y luego preguntarle con delicadeza si desea ayuda para llegar a su habitación','Se despierta sonriendo, te da las gracias por la manta y se la lleva para subir.'],
+            ['Dejarlo dormir y seguir con lo tuyo','Es amable, pero ver cómo está un huésped dormido es parte de mantener a todos seguros y cómodos.'],
+            ['Tocar el piano fuerte para despertarlo','Se despierta, igual que todas las habitaciones de la 201 a la 206. Una palabra suave funciona mejor.']]}
+  },
+  pins:{clock:['Mansión de relojería','Descubre las ocho rutinas diarias de la mansión.'],radio:['Oyente fiel','Escucha doce programas de la Radio de la Mansión.'],surprise:['Espera lo inesperado','Resuelve las ocho pequeñas sorpresas.']}
+}};
+LIV_TEXT.es.reviewStars=LIV_TEXT.en.reviewStars;
+const LVT=LIV_TEXT[profile.lang==='es'?'es':'en'];
+
+/* Where things happen on the map (world coordinates). */
+const LIV_PLACES={kitchen:{x:695,y:660},conservatory:{x:900,y:620},piano:{x:1085,y:625},corridor:{x:700,y:445}};
+const LIV_SURPRISE_SPOTS={corridor:{x:600,y:445},kitchen:{x:540,y:690},conservatory:{x:965,y:700}};
+const LIV_RADIO={x:680,y:560};
+/* Each routine owns three hours of the player's real day, so a different guest is up to something every few hours. */
+const LIV_ROUTINES=[
+  {id:'finch',from:0,place:'conservatory',spot:'piano',icon:'♪',guest:'finch',es:'Sr. Finch'},
+  {id:'vesper',from:3,place:'corridor',spot:'corridor',icon:'✦',guest:'vesper',es:'Lady Vesper'},
+  {id:'vale',from:6,place:'conservatory',spot:'piano',icon:'☀',guest:'vale',es:'Sra. Vale'},
+  {id:'nine',from:9,place:'kitchen',spot:'kitchen',icon:'⏱',guest:'nine',es:'M. Nine'},
+  {id:'gwendolyn',from:12,place:'conservatory',spot:'conservatory',icon:'🥄',cast:'Gwendolyn Butterfield',en:'Ms. Butterfield',es:'Sra. Butterfield'},
+  {id:'lars',from:15,place:'corridor',spot:'corridor',icon:'↑',cast:'Mr. Lars Lindqvist',en:'Mr. Lindqvist',es:'Sr. Lindqvist'},
+  {id:'merriweather',from:18,place:'kitchen',spot:'kitchen',icon:'🍷',cast:'Dr. Evangeline Merriweather',en:'Dr. Merriweather',es:'Dra. Merriweather'},
+  {id:'ngozi',from:21,place:'kitchen',spot:'kitchen',icon:'☕',cast:'Ms. Ngozi Eze',en:'Ms. Eze',es:'Sra. Eze'}
+];
+const LIV_SURPRISES=[
+  {id:'minibar',place:'corridor',icon:'🍪'},{id:'wedding',place:'conservatory',icon:'💐'},{id:'pizza',place:'kitchen',icon:'🍕'},{id:'duck',place:'kitchen',icon:'🦆'},
+  {id:'muffin',place:'corridor',icon:'🐾'},{id:'party',place:'kitchen',icon:'🎂'},{id:'suitcase',place:'conservatory',icon:'🧳'},{id:'snore',place:'conservatory',icon:'💤'}
+];
+const LIV_PER_DAY=3,LIV_FIRST_MS=40000,LIV_GAP_MS=150000;
+
+/* ---------- Save ---------- */
+const LIV_KEY='mapachez_living_v1';
+function createLiving(){return {version:1,spotted:[],radio:0,heard:0,radioDay:'',done:[],best:0,day:'',today:0};}
+let living=createLiving();
+try{const v=JSON.parse(localStorage.getItem(LIV_KEY)||'null');if(v&&v.version===1){
+  living.spotted=Array.isArray(v.spotted)?[...new Set(v.spotted.filter(id=>LIV_ROUTINES.some(r=>r.id===id)))]:[];
+  living.done=Array.isArray(v.done)?[...new Set(v.done.filter(id=>LIV_SURPRISES.some(s=>s.id===id)))]:[];
+  for(const k of ['radio','heard','best','today'])living[k]=Math.max(0,v[k]|0);
+  living.radioDay=typeof v.radioDay==='string'?v.radioDay:'';living.day=typeof v.day==='string'?v.day:'';}}catch{}
+function storeLiving(){try{localStorage.setItem(LIV_KEY,JSON.stringify(living));}catch{}}
+
+/* ---------- When things show ---------- */
+let livHourOverride=null;
+const livHour=()=>livHourOverride!=null?livHourOverride:new Date().getHours();
+function livOpen(){return (typeof nnOpenCount!=='function'||nnOpenCount()>=1);}
+function livVisible(){return !!state&&!titleVisible&&!festivalActive&&state.phase==='playing'&&!!state.flags.briefed&&livOpen();}
+function livRoutineNow(){const h=livHour();return LIV_ROUTINES.find(r=>h>=r.from&&h<r.from+3)||LIV_ROUTINES[0];}
+function livHourText(h){
+  h=((h%24)+24)%24;
+  if(profile.lang==='es')return String(h).padStart(2,'0')+':00';
+  return (h%12||12)+' '+(h<12?'AM':'PM');
+}
+function livWho(r){return profile.lang==='es'?r.es:r.en||(r.guest?(GUESTS.find(g=>g.id===r.guest)?.name||r.guest):r.cast);}
+function livPerson(r){if(r.guest){const g=GUESTS.find(x=>x.id===r.guest);if(g)return g;}return {name:r.cast,cast:r.cast};}
+function livRoutineSpot(r){return LIV_PLACES[r.spot];}
+
+/* Surprises appear after a little time in the manor: the first after about 40 seconds, then every
+   few minutes, at most three a day. The clock only runs while the manor map is on screen. */
+let livPending=null,livClockMs=0,livNextMs=LIV_FIRST_MS,livLastTick=0;
+function livTodayCount(){if(living.day!==dayKey()){living.day=dayKey();living.today=0;}return living.today;}
+function livPickSurprise(){
+  const fresh=LIV_SURPRISES.filter(s=>!living.done.includes(s.id)),pool=fresh.length?fresh:LIV_SURPRISES;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function livSurpriseSpot(s){
+  const p=LIV_SURPRISE_SPOTS[s.place],r=livRoutineSpot(livRoutineNow());
+  return Math.hypot(p.x-r.x,p.y-r.y)<90?{x:p.x+(p.x>r.x?70:-70),y:p.y}:p;
+}
+function livSpawn(){
+  if(livPending||livTodayCount()>=LIV_PER_DAY)return null;
+  const s=livPickSurprise();livPending={...s,...livSurpriseSpot(s)};
+  toast(LVT.surpriseToast.replace('{place}',LVT.places[s.place]));sound('radio');
+  return livPending;
+}
+function livTick(time,calm){
+  if(!livVisible()){livLastTick=0;return;}
+  const now=performance.now();if(livLastTick)livClockMs+=Math.min(1000,now-livLastTick);livLastTick=now;
+  if(!livPending&&livClockMs>=livNextMs&&!document.hidden&&!modal.open)livSpawn();
+}
+
+/* ---------- Drawing (all code, no pictures) ---------- */
+function livBubble(c,x,y,label,time,calm,glow){
+  const bob=calm?0:Math.sin(time/360)*2;
+  if(glow){c.save();c.globalAlpha=.35+(calm?0:.2*Math.sin(time/260));ellipse(c,x,y-60+bob,17,17,'#f3d98a');c.restore();}
+  ellipse(c,x,y-60+bob,12,12,AN.cream);c.strokeStyle=AN.gold;c.lineWidth=1.6;c.beginPath();c.arc(x,y-60+bob,12,0,Math.PI*2);c.stroke();
+  c.textBaseline='alphabetic';text(c,label,x,y-55+bob,13,AN.forest,'Georgia');
+}
+function drawRadio(c,x,y,time,calm){
+  /* A little Art Nouveau radio: arched walnut case, gold grille, a glowing dial and two knobs. */
+  ellipse(c,x,y+12,20,4,'#123b303b');
+  c.fillStyle=AN.walnut;c.beginPath();c.moveTo(x-17,y+10);c.lineTo(x-17,y-6);c.quadraticCurveTo(x-17,y-22,x,y-23);c.quadraticCurveTo(x+17,y-22,x+17,y-6);c.lineTo(x+17,y+10);c.closePath();c.fill();
+  c.strokeStyle=AN.gold;c.lineWidth=1.4;c.stroke();
+  c.fillStyle='#e9d39a';c.beginPath();c.moveTo(x-10,y+1);c.lineTo(x-10,y-8);c.quadraticCurveTo(x-10,y-17,x,y-17);c.quadraticCurveTo(x+10,y-17,x+10,y-8);c.lineTo(x+10,y+1);c.closePath();c.fill();
+  c.strokeStyle=AN.walnutDk;c.lineWidth=1;for(let k=-6;k<=6;k+=4){c.beginPath();c.moveTo(x+k,y);c.lineTo(x+k,y-14+Math.abs(k)*.5);c.stroke();}
+  const lit=calm?.8:.6+.3*Math.sin(time/500);c.save();c.globalAlpha=lit;rect(c,x-9,y+3,12,4,'#ffd98a',2);c.restore();
+  ellipse(c,x+9,y+5,2.6,2.6,AN.gold);ellipse(c,x+14,y+5,2,2,AN.gold);
+  if(!calm){c.save();for(let k=0;k<2;k++){const p=((time/1600)+k*.5)%1;c.globalAlpha=1-p;text(c,k?'♫':'♪',x+12+k*6+Math.sin(p*6)*3,y-24-p*22,12,AN.gold,'Georgia');}c.restore();}
+  if(living.radioDay!==dayKey())livBubble(c,x,y+34,'♪',time,calm,true);
+  if(LABELS)plaque(c,LVT.radioMap,x,y+28);
+}
+function drawLiving(c,time,calm){
+  livTick(time,calm);
+  if(!livVisible())return;
+  drawRadio(c,LIV_RADIO.x,LIV_RADIO.y,time,calm);
+  const r=livRoutineNow(),p=livRoutineSpot(r),sway=calm||r.spot==='piano'?0:Math.sin(time/2400)*16,dir=calm?'down':r.spot==='piano'?'right':Math.cos(time/2400)>0?'right':'left';
+  drawPerson(c,p.x+sway,p.y,livPerson(r),0,dir,false,1.1);
+  livBubble(c,p.x+sway,p.y,r.icon,time,calm,!living.spotted.includes(r.id));
+  if(LABELS)plaque(c,livWho(r),p.x+sway,p.y+22);
+  if(livPending){
+    const s=livPending,bob=calm?0:Math.sin(time/240)*3,spin=calm?0:time/700;
+    c.save();c.globalAlpha=.5;ellipse(c,s.x,s.y+8,16,5,'#123b30');c.restore();
+    c.save();c.font='24px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif';c.textAlign='center';c.fillText(s.icon,s.x,s.y-4+bob);c.restore();
+    for(let k=0;k<4;k++){const a=spin+k*Math.PI/2;ellipse(c,s.x+Math.cos(a)*24,s.y-12+Math.sin(a)*14,2,2,'#f3d98a');}
+    ellipse(c,s.x,s.y-48+bob,11,11,'#e8b64a');c.strokeStyle=AN.cream;c.lineWidth=2;c.beginPath();c.arc(s.x,s.y-48+bob,11,0,Math.PI*2);c.stroke();
+    text(c,'!',s.x,s.y-43+bob,15,'#fff','Georgia');
+    if(LABELS)plaque(c,LVT.surpriseMap,s.x,s.y+22);
+  }
+}
+const livExtras=world.options.extras;
+world.options.extras=()=>{const list=livExtras();if(livVisible()){
+  list.push({id:'liv-radio',...LIV_RADIO,name:LVT.radioName});
+  const r=livRoutineNow();list.push({id:'liv-routine',...livRoutineSpot(r),name:livWho(r)});
+  if(livPending)list.push({id:'liv-surprise',x:livPending.x,y:livPending.y,name:LVT.surprises[livPending.id].title});}
+  return list;};
+const livDrawExtras=world.options.drawExtras;
+world.options.drawExtras=function(c,time,calm){const r=livDrawExtras?.apply(this,arguments);drawLiving(c,time,calm);return r;};
+const livInteract=interact;interact=function(id){
+  if(id==='liv-radio'){openRadio();return;}
+  if(id==='liv-routine'){openRoutine();return;}
+  if(id==='liv-surprise'){openSurprise();return;}
+  return livInteract.apply(this,arguments);};
+
+/* ---------- Routines ---------- */
+function livSpeaker(w,r){if(w==='who')return livWho(r);if(w==='you')return profile.name?profile.name.split(' ')[0]:LVT.you;return '';}
+function livLinesHTML(lines,r){return '<ol class="overheard-dialogue chat-lines liv-lines">'+lines.map(([w,l])=>w?'<li class="s'+(w==='you'?1:0)+'"><b>'+esc(livSpeaker(w,r))+'</b>“'+esc(l)+'”</li>':'<li class="liv-narr"><i>'+esc(l)+'</i></li>').join('')+'</ol>';}
+function livDayHTML(cur){
+  const i=LIV_ROUTINES.indexOf(cur);
+  return '<div class="liv-day"><b>'+esc(LVT.dayTitle)+'</b><small>'+esc(LVT.dayHint)+'</small><ol>'+LIV_ROUTINES.map((r,k)=>{
+    const seen=living.spotted.includes(r.id),now=k===i;
+    return '<li class="'+(now?'now':'')+(seen?' seen':'')+'"><span class="liv-time">'+esc(livHourText(r.from))+'</span><span>'+(seen?esc(r.icon+' '+LVT.routines[r.id].title):esc(LVT.unknown.replace('{place}',LVT.places[r.place])))+'</span>'+(now?'<em>'+esc(LVT.nowTag)+'</em>':seen?'<em>✓</em>':'')+'</li>';}).join('')+'</ol></div>';
+}
+function openRoutine(){
+  if(world)world.stop();
+  const r=livRoutineNow(),txt=LVT.routines[r.id],fresh=!living.spotted.includes(r.id);
+  if(fresh){living.spotted.push(r.id);storeLiving();hmsTip(2);}
+  const time=livHourText(r.from)+'–'+livHourText(r.from+3);
+  openModal(titleHTML(txt.title,LVT.routineKicker.replace('{time}',time))+
+    livLinesHTML(txt.lines,r)+
+    '<p class="liv-count">'+(fresh?'<b>'+esc(LVT.spotted)+'</b> · ':'')+esc(LVT.seen.replace('{n}',living.spotted.length).replace('{total}',LIV_ROUTINES.length))+'</p>'+
+    livDayHTML(r)+'<div class="action-row" id="liv-actions"></div>');
+  const b=document.createElement('button');b.className='primary-button';b.textContent=LVT.back;b.onclick=closeModal;$('liv-actions').append(b);
+  if(fresh){const [x,y]=centerOf($('liv-actions'));burst(x,y,.7);joySound('coin',1);}
+  checkPins();renderGrowth();narrativeText=body.innerText;
+}
+
+/* ---------- Manor Radio ---------- */
+function livSegments(){
+  /* ad, review, ad, review... so it never feels like all ads */
+  const out=[];for(let k=0;k<Math.max(LVT.ads.length,LVT.reviews.length);k++){if(LVT.ads[k])out.push({kind:'ad',k});if(LVT.reviews[k])out.push({kind:'review',k});}
+  return out;
+}
+function livStars(n){return '<span class="liv-stars" aria-label="'+n+' / 5">'+'★'.repeat(n)+'<i>'+'★'.repeat(5-n)+'</i></span>';}
+function livSegmentHTML(seg){
+  if(seg.kind==='you'){
+    const name=profile.name?profile.name.split(' ')[0]:'',room=201+(new Date().getDate()%6);
+    const line=name?LVT.youReview.replace('{name}',name):LVT.youAnon;
+    return '<div class="liv-seg you"><small>'+esc(LVT.youKind)+'</small>'+livStars(5)+'<p>'+esc(line)+'</p><cite>'+esc(LVT.youFrom.replace('{room}',room))+'</cite></div>';
+  }
+  if(seg.kind==='ad')return '<div class="liv-seg ad"><small>'+esc(LVT.adKind)+'</small><p>'+esc(LVT.ads[seg.k])+'</p></div>';
+  const [line,who]=LVT.reviews[seg.k];
+  return '<div class="liv-seg review"><small>'+esc(LVT.reviewKind)+'</small>'+livStars(LVT.reviewStars[seg.k]||5)+'<p>“'+esc(line)+'”</p><cite>'+esc(who)+'</cite></div>';
+}
+function openRadio(){
+  if(world)world.stop();
+  const first=living.radioDay!==dayKey();
+  let seg;
+  if(first){living.radioDay=dayKey();seg={kind:'you'};hmsTip(2);}
+  else{const list=livSegments();seg=list[living.radio%list.length];living.radio++;}
+  living.heard++;storeLiving();sound('radio');
+  openModal(titleHTML(LVT.radioName,LVT.radioKicker)+
+    '<p class="modal-description">'+esc(LVT.radioIntro)+'</p><div id="liv-seg" aria-live="polite">'+livSegmentHTML(seg)+'</div>'+
+    '<p class="liv-count">'+(first?'<b>'+esc(LVT.firstToday)+'</b> · ':'')+'<span id="liv-heard">'+esc(LVT.heard.replace('{n}',living.heard))+'</span></p>'+
+    '<p class="liv-fine">'+esc(LVT.pretend)+'</p><div class="action-row" id="liv-actions"></div>');
+  const row=$('liv-actions'),next=document.createElement('button');next.className='primary-button';next.id='liv-next';next.textContent=LVT.next;
+  next.onclick=()=>{const list=livSegments(),s=list[living.radio%list.length];living.radio++;living.heard++;storeLiving();sound('radio');
+    $('liv-seg').innerHTML=livSegmentHTML(s);$('liv-heard').textContent=LVT.heard.replace('{n}',living.heard);checkPins();narrativeText=body.innerText;};
+  const back=document.createElement('button');back.className='secondary-button';back.textContent=LVT.back;back.onclick=closeModal;
+  row.append(next,back);
+  if(first){const [x,y]=centerOf(row);burst(x,y,.6);joySound('coin',1);}
+  checkPins();renderGrowth();narrativeText=body.innerText;
+}
+
+/* ---------- Surprises ---------- */
+function openSurprise(){
+  if(!livPending)return;if(world)world.stop();
+  const s=livPending,txt=LVT.surprises[s.id];
+  openModal(titleHTML(txt.title,LVT.surpriseKicker.replace('{place}',LVT.places[s.place].toUpperCase()))+
+    '<div class="liv-surprise"><span aria-hidden="true">'+s.icon+'</span><p>'+esc(txt.q)+'</p></div><p class="ghost-res" id="liv-res" aria-live="polite" hidden></p><div class="action-row" id="liv-actions"></div>');
+  const host=choices(txt.opts.map((o,i)=>({text:o[0],run:()=>answerSurprise(s,i,host)})),'liv-'+s.id);
+  $('liv-res').before(host);
+  const later=document.createElement('button');later.className='secondary-button';later.textContent=LVT.later;later.onclick=closeModal;$('liv-actions').append(later);
+  narrativeText=body.innerText;
+}
+function answerSurprise(s,i,host){
+  host.querySelectorAll('button').forEach(b=>b.disabled=true);
+  const why=LVT.surprises[s.id].opts[i][1],res=$('liv-res');
+  livPending=null;livTodayCount();living.today++;livNextMs=livClockMs+LIV_GAP_MS;
+  if(!living.done.includes(s.id))living.done.push(s.id);
+  if(i===0){living.best++;hmsTip(3);}else if(i===1)hmsTip(1);
+  storeLiving();
+  res.hidden=false;res.className='ghost-res r'+i;
+  res.innerHTML='<b>'+esc(i===0?LVT.best:i===1?LVT.ok:LVT.miss)+'</b><br>'+esc(why);
+  if(i===0){const [x,y]=centerOf(res);burst(x,y,1,{hearts:true});joySound('coin',1);}
+  const row=$('liv-actions');row.innerHTML='';const b=document.createElement('button');b.className='primary-button';b.textContent=LVT.done;b.onclick=closeModal;row.append(b);b.focus();
+  announce(LVT.surprises[s.id].opts[i][0]);checkPins();renderGrowth();narrativeText=body.innerText;
+}
+
+const livCss=document.createElement('style');livCss.textContent=
+ '.liv-lines .liv-narr{list-style:none;text-align:center;color:#5a6655;font:italic 14px/1.5 Georgia,serif;margin:6px 0}'+
+ '.liv-count{margin:10px 0 0;font-size:13px;color:#5a6655}.liv-count b{color:#7a6331}'+
+ '.liv-day{margin:12px 0 4px;padding:12px 14px;border-radius:14px;background:#f3f6ea;border:1px solid #cdd8b8}.liv-day>b{font:normal 17px Georgia,serif;color:#1d4636}.liv-day>small{display:block;margin:3px 0 8px;font-size:12px;color:#5a6655;line-height:1.45}'+
+ '.liv-day ol{list-style:none;margin:0;padding:0;display:grid;gap:3px}.liv-day li{display:grid;grid-template-columns:58px 1fr auto;gap:8px;align-items:center;padding:5px 8px;border-radius:8px;font-size:13px;color:#7b8069}'+
+ '.liv-day li.seen{color:#1d4636}.liv-day li.now{background:#fff6dc;box-shadow:inset 3px 0 #d9b35c;color:#1d4636}.liv-day li em{font-style:normal;font-size:11px;font-weight:700;color:#7a6331;text-transform:uppercase;letter-spacing:.06em}.liv-time{font-weight:700;font-variant-numeric:tabular-nums}'+
+ '.liv-seg{margin:12px 0 4px;padding:16px 18px;border-radius:16px;background:linear-gradient(160deg,#fffaf0,#f6edd6);border:1px solid #e1c88d;box-shadow:inset 0 0 0 4px #fffdf6}.liv-seg small{display:block;font:bold 11px Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#7a6331}'+
+ '.liv-seg p{margin:8px 0 0;font:italic 19px/1.5 Georgia,serif;color:#1d4636}.liv-seg cite{display:block;margin-top:6px;font:normal 13px Arial,sans-serif;color:#5a6655}.liv-seg.ad{background:linear-gradient(160deg,#f3f6ea,#e6eed8);border-color:#b9c9a0}.liv-seg.you{background:linear-gradient(160deg,#fff6dc,#fde9b8);border-color:#e3bd62}'+
+ '.liv-stars{display:block;margin-top:6px;color:#d9a531;letter-spacing:2px;font-size:16px}.liv-stars i{font-style:normal;color:#e4dcc5}'+
+ '.liv-fine{margin:6px 0 0;font-size:11px;color:#7b8069;font-style:italic}'+
+ '.liv-surprise{display:flex;gap:14px;align-items:flex-start;margin:10px 0;padding:12px 14px;border-radius:14px;background:#fff8e6;border:1px solid #ecd59a}.liv-surprise span{font-size:34px;line-height:1}.liv-surprise p{margin:0;font:normal 17px/1.5 Georgia,serif}'+
+ '@media(max-width:520px){.liv-seg p{font-size:17px}.liv-day li{grid-template-columns:50px 1fr auto;font-size:12px}.liv-surprise p{font-size:16px}}';
+document.head.append(livCss);
+PINS.push(
+  {id:'clockwork-manor',icon:'🕰️',name:LVT.pins.clock[0],hint:LVT.pins.clock[1],test:()=>living.spotted.length>=LIV_ROUTINES.length},
+  {id:'loyal-listener',icon:'📻',name:LVT.pins.radio[0],hint:LVT.pins.radio[1],test:()=>living.heard>=12},
+  {id:'expect-unexpected',icon:'🎉',name:LVT.pins.surprise[0],hint:LVT.pins.surprise[1],test:()=>living.done.length>=LIV_SURPRISES.length}
+);
+renderGrowth();checkPins();
+/* ==== end LIVING MANOR v1 ==== */
+
 /* Opening a credential link (?cert=...) shows that certificate. Kept last, after every course registers. */
 {const d=certParse(location.search);if(d)setTimeout(()=>certView(d),0);}
 
