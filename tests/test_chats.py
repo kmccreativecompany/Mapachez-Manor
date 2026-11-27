@@ -49,8 +49,8 @@ class Chats(base.Growth):
     def test_01_scripts_are_short_kind_and_match_in_both_languages(self):
         text = self.c()['text']
         en, es = text['en']['list'], text['es']['list']
-        # 19 lobby chats, then the 2 ghost chats the ghost update adds after them.
-        self.assertEqual(len([c for c in en if c['id'] not in GHOST_CHATS]), 19)
+        # 18 lobby chats (the 'fourth husband' chat was taken out 2026-11-27: grief about husbands can be triggering), then the 2 ghost chats the ghost update adds after them.
+        self.assertEqual(len([c for c in en if c['id'] not in GHOST_CHATS]), 18)
         self.assertEqual([c['id'] for c in en if c['id'] in GHOST_CHATS], GHOST_CHATS)
         self.assertEqual([c['id'] for c in en], [c['id'] for c in es])
         for a, b in zip(en, es):

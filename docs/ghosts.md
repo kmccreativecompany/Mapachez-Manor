@@ -3,7 +3,7 @@
 ## Friendly ghosts
 Some guests at Mapachez Manor are ghosts. Nobody at the manor thinks this is unusual, and that is the joke.
 
-- **The Tanakas, Room 205.** Mr. Hiroshi Tanaka is travelling with his wife, Emiko. Emiko is a ghost.
+- **The Tanakas, Room 205.** Mr. Hiroshi Tanaka is travelling with his wife, Emiko. Emiko is a ghost. They are both raccoons (one species, as a married couple should look): Hiroshi is lavender, and Emiko is a pale, see-through raccoon.
   They drift along the guest corridor. Tap them for a little exchange between the two of them.
   Once a day there is a quick service moment. The lesson is real: every guest in a party gets the
   same care (their own key, their own warm cup, their side of the bed, a proper table for two).
