@@ -28,7 +28,6 @@ Eighteen conversations are quick, relatable social jokes. One, the gold-sealed l
 | time | A wealthy guest hasn't shopped for groceries since 1998. |
 | sunday | A newly promoted director's responsibilities are still being aligned. |
 | counselor-conspiracy | An AI marriage counselor agrees with the second opinion. |
-| muffin | A woman's fourth husband is her favorite because he can cook. |
 | inbox | A private person makes seven videos announcing her privacy. |
 | romance-update | A romantic spouse asks for a review after an update. |
 | circle | Gossip is rebranded as distributing family updates. |
