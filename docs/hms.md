@@ -134,6 +134,6 @@ In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) r
 
 ### The valet team
 
-- Day shift: valets **Kofi Mensah** and **Zara Hussein** take turns (one greets and parks, the other files the keys). **Jasper Lane** is the bellman.
+- Day shift: valets **Kofi Mensah** and **Zara Hussein** take turns with each car (the valet who greets the guest also parks the car and files the key). **Jasper Lane** is the bellman.
 - Gate security radios the guest's name ahead: **Leilani Kahale** by day, **Oskar Berg** overnight. The gate officer shows in a little radio box in the picture.
 - Overnight, butler **Theo Mbatha** does everything, and he gets to keep all the tips to himself.

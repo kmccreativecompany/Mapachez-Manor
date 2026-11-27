@@ -25,6 +25,7 @@ class Valet(fbase.Friendly):
         self.assertIn('Arrivals list', body.inner_text())
         self.assertIn('Leilani Kahale, security at the gate', self.page.locator('.va-gate').inner_text())
         self.assertIn('Kofi Mensah and Zara Hussein', body.inner_text())
+        self.assertIn('also parks the car and files the key', body.inner_text())
         self.pick('Nice ride')
         self.assertIn('too casual', body.inner_text())
         self.pick('May I get the door')
