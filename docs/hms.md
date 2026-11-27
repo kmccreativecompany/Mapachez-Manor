@@ -124,3 +124,10 @@ In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) r
 - 🕐 Practice clock starts at 1:00 PM. Standard check-in is 4 PM because housekeeping needs the day to clean and inspect. Early rooms are a bonus; past 4 PM a waiting guest is urgent.
 - Impatient guests: best answer is sorry + why + honest time. Snag: the second inspection finds a dripping faucet; update the guest first.
 - Two invented consortia: Opal Card Stays (card-member, 12 PM early check-in subject to availability, guaranteed 4 PM late check-out, welcome letter) and Compass Circle (travel-advisor network, perks when available, no guaranteed late check-out). Lesson + 3-question quiz. Tests: tests/test_luggage.py.
+
+## Valet arrival (VALET v1)
+- Map: a striped canopy (covered drive-through) and a waiting car just outside the front entrance; cars never come inside. Tap the 🚗 Valet stand to greet the next arrival.
+- Five steps with Delores's why: greet by name from the arrivals list and open the door; bags onto the cart, tagged with name + departure date (never the room number); tag the car key + matching claim ticket; introduce the guest to Jasper the bellman; after check-in, file the key in the valet drawer by room number, checked against the staff-only rooming list.
+- Overnight (11 PM to 7 AM real time, or the practice button): the butler, Theo Mbatha, does every step (valet, bellman, escort).
+- Every 6th arrival steps out of a portal with their own cart: no car, no key.
+- Tests: tests/test_valet.py.

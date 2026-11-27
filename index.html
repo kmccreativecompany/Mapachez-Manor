@@ -12539,6 +12539,243 @@ const lugInteract=interact;interact=function(id){
   if(id==='luggage'){openPracticeHotel();if(ph){ph.say=LM.hello;phRender();}setTimeout(()=>$('lg-room')?.scrollIntoView({block:'center'}),80);return;}
   return lugInteract.apply(this,arguments);};
 /* ==== end LUGGAGE v1 ==== */
+/* ==== VALET v1: a covered drive-through arrival, the bellman, tags, claim tickets and the key drawer ====
+   - On the map, the valet stand sits at the front entrance; the covered drive-through is just
+     outside (cars never come inside). Tap the stand to greet the next arrival.
+   - Five short steps, each with the why: greet by name and open the door; the bellman unloads and
+     tags bags (name + departure date, never the room number); tag the key and hand over a claim
+     ticket; introduce the guest to the bellman; after check-in, file the key in the valet drawer
+     by room number, checked against the staff-only rooming list.
+   - Once in a while a guest steps out of a portal with their own cart. No car, no key. */
+const VA_TEXT={
+ en:{
+  kicker:'Valet arrival',title:'The drive-through',mapName:'Valet · a guest is arriving',
+  arriving:'🚗 {name} is pulling into the covered drive-through.',portal:'🌀 A portal opens in the drive-through, and {name} steps out with a cart!',
+  arrivals:'Arrivals list',arrNote:'Valets check the arrivals list so they can greet guests by name.',
+  steps:['Greet the guest','Unload and tag the bags','The car key','Hand them to the bellman','File the key'],
+  step:'Step {n} of {t}',
+  q:{
+   greet:{t:'The car stops under the canopy. What do you do?',o:[
+     ['“Welcome to Mapáchez Manor, {title}. May I get the door for you?”',2,'Delores: “Perfect. You checked the arrivals list, so you greeted them by name. Being expected feels wonderful.”'],
+     ['Open the door with a smile, without a word.',1,'Delores: “Kind, but a warm welcome by name makes a guest feel expected. Say hello, then the door.”'],
+     ['“Hey! Nice ride!”',0,'Delores: “Friendly, but too casual for the front door. Full sentences and their name, every time.”']]},
+   bags:{t:'There are bags in the trunk. Who does what?',o:[
+     ['The bellman lifts the bags onto the cart and tags each one with the guest’s name and departure date.',2,'Delores: “Yes. The guest never lifts a thing. And the tag has no room number, so nobody passing by learns where they sleep.”'],
+     ['Tag each bag with the room number, so it is easy to deliver.',0,'Delores: “Never the room number. The lobby has ears, and the guest should see their room first when they walk in.”'],
+     ['Let the guest carry their own bags in.',0,'Delores: “Oh no. At the manor, bags ride the cart and guests walk in with empty hands.”']]},
+   key:{t:'The guest hands you the car key.',o:[
+     ['Tag the key, and hand the guest a claim ticket with the same number.',2,'Delores: “That is the one. The tag and the ticket match, so the right car always goes back to the right person.”'],
+     ['Drop the key into the bowl on the podium.',0,'Delores: “A bowl of keys is a mystery nobody wants. Tag it and track it.”'],
+     ['Leave the key in the car, just in case.',0,'Delores: “A car with its key inside is a car anyone can borrow. Keys stay with us, tagged.”']]},
+   keyPortal:{t:'No car, no key. Just a portal humming softly.',o:[
+     ['Smile, skip the key tag, and carry on as usual.',2,'Delores: “Exactly. Every arrival is different. The welcome stays the same.”'],
+     ['Ask where they would like the portal parked.',0,'Delores: “Portals park themselves, dear. They are very independent.”'],
+     ['Write a claim ticket for the portal.',1,'Delores: “Sweet, but there is nothing to claim. It closes on its own in a minute.”']]},
+   intro:{t:'Time to walk them inside.',o:[
+     ['“{title}, this is Jasper, our bellman. He will take you to the front desk and look after your luggage.”',2,'Delores: “Lovely. A proper introduction means the guest is never alone for a second.”'],
+     ['Point at the door: “The desk is that way.”',0,'Delores: “Pointing sends a guest off alone. Introduce them to the next person who will help.”'],
+     ['Walk away to park the car right away.',1,'Delores: “The car can wait one more minute. Hand the guest over first.”']]}},
+  checked:'Delores checked {name} into Room {r}. Now file the key.',
+  drawerH:'Valet key drawer',listH:'Rooming list · staff only',
+  listNote:'This list shows who is in every room. It stays at the valet stand and is never shown to guests.',
+  slotEmpty:'empty',fileRight:'Delores: “Filed in {r}. When {name} calls for the car, you will find the key in seconds. And you always ask for the claim ticket before handing a car back.”',
+  fileWrong:'🌱 Check the rooming list: {name} is in Room {r}.',
+  noKey:'No car key tonight. {name} came by portal, so the drawer stays as it is.',
+  done:'All done!',summary:'{name} is inside with Jasper. The bags go to the room, or to the locked luggage room if the room is not ready yet.',
+  next:'🚗 Greet the next arrival',close:'Back to the manor',
+  score:'{n} of {t} best answers',
+  shift:{night:'🌙 Overnight shift · our butler, Theo Mbatha, does every step: valet, bellman and escort.',day:'☀️ Day shift · the valet parks, and Jasper the bellman handles the bags.'},
+  swap:{night:'☀️ Practice the day shift',day:'🌙 Practice the overnight shift'},
+  stepWalk:'Walk them inside',
+  night:{
+   bags:{t:'There are bags in the trunk, and no bellman overnight.',o:[
+     ['You lift the bags onto the cart yourself and tag each one with the guest’s name and departure date.',2,'Delores: “Yes. Overnight the butler does it all, and the guest still never lifts a thing. No room number on the tags, ever.”'],
+     ['Ask the guest to wait until the day bellman arrives at 7 AM.',0,'Delores: “That is a very long wait. Overnight, the butler is the valet and the bellman too.”'],
+     ['Tag each bag with the room number, so it is easy to deliver.',0,'Delores: “Never the room number. The lobby has ears, even at midnight.”']]},
+   intro:{t:'Time to walk them inside.',o:[
+     ['“{title}, I will walk you to the front desk myself, and your luggage will come right along with us on the cart.”',2,'Delores: “Lovely. Overnight, you are the escort too, so the guest is never alone for a second.”'],
+     ['Point at the door: “The desk is that way.”',0,'Delores: “Pointing sends a guest off alone. Overnight, you walk them in yourself.”'],
+     ['Park the car first and leave the guest at the curb.',0,'Delores: “The car can wait. A guest alone at the curb at night cannot.”']]}},
+  summaryNight:'{name} is inside, and the bags came along on the cart. Overnight, the butler did every step.'
+ },
+ es:{
+  kicker:'Llegada al aparcacoches',title:'La entrada cubierta',mapName:'Aparcacoches · llega un huésped',
+  arriving:'🚗 {name} entra en la entrada cubierta.',portal:'🌀 ¡Se abre un portal en la entrada cubierta y {name} sale con un carrito!',
+  arrivals:'Lista de llegadas',arrNote:'Los aparcacoches revisan la lista de llegadas para saludar a cada huésped por su nombre.',
+  steps:['Saludar','Bajar y etiquetar las maletas','La llave del coche','Presentar al botones','Guardar la llave'],
+  step:'Paso {n} de {t}',
+  q:{
+   greet:{t:'El coche se detiene bajo el toldo. ¿Qué haces?',o:[
+     ['“Bienvenido a la Mansión Mapáchez, {title}. ¿Me permite abrirle la puerta?”',2,'Delores: “Perfecto. Revisaste la lista de llegadas y lo saludaste por su nombre. Sentirse esperado es maravilloso.”'],
+     ['Abrir la puerta con una sonrisa, sin decir nada.',1,'Delores: “Amable, pero un saludo con su nombre hace que se sienta esperado. Primero hola, luego la puerta.”'],
+     ['“¡Hola! ¡Qué cochazo!”',0,'Delores: “Simpático, pero demasiado informal para la puerta principal. Frases completas y su nombre, siempre.”']]},
+   bags:{t:'Hay maletas en el maletero. ¿Quién hace qué?',o:[
+     ['El botones sube las maletas al carrito y etiqueta cada una con el nombre del huésped y su fecha de salida.',2,'Delores: “Sí. El huésped no carga nada. Y la etiqueta no lleva número de habitación, para que nadie sepa dónde duerme.”'],
+     ['Etiquetar cada maleta con el número de habitación, para entregarla fácil.',0,'Delores: “Nunca el número de habitación. El vestíbulo tiene oídos, y el huésped debe ver su habitación al entrar.”'],
+     ['Dejar que el huésped lleve sus maletas.',0,'Delores: “Ay, no. En la mansión las maletas van en el carrito y los huéspedes entran con las manos libres.”']]},
+   key:{t:'El huésped te da la llave del coche.',o:[
+     ['Etiquetar la llave y darle al huésped un resguardo con el mismo número.',2,'Delores: “Esa es. La etiqueta y el resguardo coinciden, así que el coche correcto vuelve a la persona correcta.”'],
+     ['Echar la llave en el cuenco del atril.',0,'Delores: “Un cuenco de llaves es un misterio que nadie quiere. Etiquétala y contrólala.”'],
+     ['Dejar la llave dentro del coche, por si acaso.',0,'Delores: “Un coche con la llave dentro es un coche que cualquiera puede llevarse. Las llaves se quedan con nosotros, etiquetadas.”']]},
+   keyPortal:{t:'Ni coche ni llave. Solo un portal zumbando suavemente.',o:[
+     ['Sonreír, saltar la etiqueta de la llave y seguir como siempre.',2,'Delores: “Exacto. Cada llegada es distinta. La bienvenida es la misma.”'],
+     ['Preguntar dónde quiere aparcar el portal.',0,'Delores: “Los portales se aparcan solos, cariño. Son muy independientes.”'],
+     ['Hacer un resguardo para el portal.',1,'Delores: “Qué tierno, pero no hay nada que recoger. Se cierra solo en un minuto.”']]},
+   intro:{t:'Hora de acompañarlo adentro.',o:[
+     ['“{title}, le presento a Jasper, nuestro botones. Él le acompañará a recepción y cuidará de su equipaje.”',2,'Delores: “Precioso. Una buena presentación significa que el huésped nunca está solo ni un segundo.”'],
+     ['Señalar la puerta: “Recepción está por allí.”',0,'Delores: “Señalar deja al huésped solo. Preséntale a la siguiente persona que le ayudará.”'],
+     ['Irte a aparcar el coche de inmediato.',1,'Delores: “El coche puede esperar un minuto. Primero entrega al huésped.”']]}},
+  checked:'Delores registró a {name} en la habitación {r}. Ahora guarda la llave.',
+  drawerH:'Cajón de llaves del aparcacoches',listH:'Lista de habitaciones · solo personal',
+  listNote:'Esta lista muestra quién está en cada habitación. Se queda en el atril y nunca se enseña a los huéspedes.',
+  slotEmpty:'vacío',fileRight:'Delores: “Guardada en la {r}. Cuando {name} pida su coche, encontrarás la llave en segundos. Y siempre pide el resguardo antes de devolver un coche.”',
+  fileWrong:'🌱 Revisa la lista: {name} está en la habitación {r}.',
+  noKey:'Esta noche no hay llave. {name} llegó por un portal, así que el cajón se queda igual.',
+  done:'¡Listo!',summary:'{name} ya está dentro con Jasper. Las maletas van a la habitación, o al cuarto de equipaje cerrado si la habitación aún no está lista.',
+  next:'🚗 Recibir a la siguiente llegada',close:'Volver a la mansión',
+  score:'{n} de {t} mejores respuestas',
+  shift:{night:'🌙 Turno de noche · nuestro mayordomo, Theo Mbatha, hace cada paso: aparcacoches, botones y acompañante.',day:'☀️ Turno de día · el aparcacoches aparca y Jasper, el botones, se ocupa de las maletas.'},
+  swap:{night:'☀️ Practicar el turno de día',day:'🌙 Practicar el turno de noche'},
+  stepWalk:'Acompañarlo adentro',
+  night:{
+   bags:{t:'Hay maletas en el maletero y de noche no hay botones.',o:[
+     ['Subes tú las maletas al carrito y etiquetas cada una con el nombre del huésped y su fecha de salida.',2,'Delores: “Sí. De noche el mayordomo lo hace todo, y el huésped sigue sin cargar nada. Nunca el número de habitación en la etiqueta.”'],
+     ['Pedir al huésped que espere al botones de día, a las 7 AM.',0,'Delores: “Es una espera larguísima. De noche, el mayordomo también es aparcacoches y botones.”'],
+     ['Etiquetar cada maleta con el número de habitación.',0,'Delores: “Nunca el número de habitación. El vestíbulo tiene oídos, incluso a medianoche.”']]},
+   intro:{t:'Hora de acompañarlo adentro.',o:[
+     ['“{title}, yo mismo le acompaño a recepción, y su equipaje viene con nosotros en el carrito.”',2,'Delores: “Precioso. De noche tú también acompañas, así el huésped nunca está solo ni un segundo.”'],
+     ['Señalar la puerta: “Recepción está por allí.”',0,'Delores: “Señalar deja al huésped solo. De noche, lo acompañas tú.”'],
+     ['Aparcar primero y dejar al huésped en la acera.',0,'Delores: “El coche puede esperar. Un huésped solo en la acera de noche, no.”']]}},
+  summaryNight:'{name} ya está dentro, y las maletas vinieron en el carrito. De noche, el mayordomo hizo cada paso.'
+ }
+};
+const VA=VA_TEXT[profile.lang]||VA_TEXT.en;
+const VA_ARRIVALS=[['Amara','Okonkwo','Ms.','Sra.','#5b8fd1'],['Kenji','Morimoto','Mr.','Sr.','#c86f5a'],['Freya','Lindqvist','Ms.','Sra.','#7a9a5a'],['Diego','Quispe','Mr.','Sr.','#9279ac'],
+  ['Zainab','Yusuf','Ms.','Sra.','#d1af6b'],['Tane','Walker','Mr.','Sr.','#4a7f8c'],['Camille','Dubois','Ms.','Sra.','#b46a8e']];
+const VA_PORTAL=[['Zib','Quorra','Traveler','Viajero'],['Oona','Starling','Traveler','Viajera']];
+let va=null,vaCount=0;
+function vaRooming(){
+  const list={};for(const r of ['201','202','203','204','205','206'])list[r]=[];
+  for(const g of GUESTS)list[g.room]&&list[g.room].push(g.given||g.name);
+  return list;
+}
+function vaNew(){
+  vaCount++;
+  const portal=vaCount%6===0;
+  let first,last,title,col='';
+  if(portal){[first,last,title]=VA_PORTAL[(vaCount/6|0)%VA_PORTAL.length];if(profile.lang==='es')title=VA_PORTAL[(vaCount/6|0)%VA_PORTAL.length][3];}
+  else{const a=VA_ARRIVALS[(vaCount-1)%VA_ARRIVALS.length];[first,last]=a;title=profile.lang==='es'?a[3]:a[2];col=a[4];}
+  const rooming=vaRooming(),free=['201','205'].filter(r=>!rooming[r].length);
+  const room=free[vaCount%free.length]||'205';
+  const hr=new Date().getHours(),shift=va&&va.forceShift||(hr>=23||hr<7?'night':'day');
+  va={forceShift:va&&va.forceShift||'',shift,name:first+' '+last,title:portal?first+' '+last:title+' '+last,portal,col,room,step:0,picked:{},best:0,filed:false,say:'',rooming};
+}
+function vaOrder(){return va.portal?['greet','bags','keyPortal','intro']:['greet','bags','key','intro','file'];}
+/* The little drive-through picture. */
+function vaScene(cv){
+  if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),Wd=360,Hd=170;cv.width=Wd*dpr;cv.height=Hd*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
+  c.fillStyle='#1f3b33';c.fillRect(0,0,Wd,Hd);
+  for(let i=0;i<24;i++)ellipse(c,(i*53)%Wd,8+(i*29)%40,1,1,'#f3e3b2');
+  c.fillStyle='#4a4a46';c.fillRect(0,96,Wd,74);c.fillStyle='#e8d8b6';for(let x=8;x<Wd;x+=36)c.fillRect(x,134,18,3);
+  c.fillStyle='#e4d5b5';c.fillRect(270,40,90,90);c.fillStyle='#8a6240';c.fillRect(296,66,40,64);c.fillStyle='#f3d27a';c.fillRect(300,70,32,26);
+  c.fillStyle='#5b3b22';c.fillRect(18,34,6,72);c.fillRect(250,34,6,72);
+  for(let i=0;i<12;i++){c.fillStyle=i%2?'#c9952f':'#2c6152';c.beginPath();c.moveTo(10+i*22,24);c.lineTo(32+i*22,24);c.lineTo(32+i*22,36);c.quadraticCurveTo(21+i*22,46,10+i*22,36);c.fill();}
+  c.fillStyle='#173c1a';c.fillRect(8,18,252,7);
+  const s=va.step,order=vaOrder(),done=k=>order.indexOf(k)<s||va.filed;
+  if(va.portal){
+    const g=c.createRadialGradient(90,98,4,90,98,40);g.addColorStop(0,'#fff6ff');g.addColorStop(.4,'#b48ce8');g.addColorStop(1,'rgba(90,60,160,0)');c.fillStyle=g;c.beginPath();c.ellipse(90,98,30,42,0,0,Math.PI*2);c.fill();
+  }else{
+    const cx=70,cy=112;c.fillStyle=va.col;c.beginPath();c.roundRect(cx-50,cy-18,110,26,8);c.fill();c.beginPath();c.roundRect(cx-30,cy-36,66,22,9);c.fill();
+    c.fillStyle='#bfe0e6';c.fillRect(cx-24,cy-32,24,14);c.fillRect(cx+4,cy-32,26,14);
+    ellipse(c,cx-28,cy+9,9,9,'#1d1d1d');ellipse(c,cx+38,cy+9,9,9,'#1d1d1d');ellipse(c,cx-28,cy+9,4,4,'#9a9a9a');ellipse(c,cx+38,cy+9,4,4,'#9a9a9a');
+    ellipse(c,cx+58,cy-6,3,2.5,'#fff3b0');
+    if(done('greet')){c.fillStyle=va.col;c.save();c.translate(cx+8,cy-16);c.transform(1,0,.6,1,0,0);c.fillRect(0,0,6,24);c.restore();}
+    if(!done('bags')){c.fillStyle='#5b8fd1';c.fillRect(cx-46,cy-14,10,10);c.fillStyle='#c86f5a';c.fillRect(cx-36,cy-12,8,8);}
+  }
+  /* People: guest, valet, bellman. */
+  const guestX=done('greet')?134:va.portal?92:96;
+  drawPerson(c,guestX,118,{cast:va.name},0,'down',false,.9);
+  if(va.shift==='night'){ellipse(c,330,20,9,9,'#f6ecc8');ellipse(c,334,17,8,8,'#1f3b33');drawPerson(c,done('intro')?150:176,118,{cast:'Theo Mbatha',color:'#1d2a3a',skin:'#7a4f33',hair:'#1b1b1b'},0,'down',false,.9);}
+  else{drawPerson(c,done('intro')?250:168,118,{cast:'Valet attendant',color:'#2c6152',skin:'#e0b48f',hair:'#3a2a1d'},0,'down',false,.9);
+  drawPerson(c,done('intro')?264:206,118,{cast:'Jasper Lane'},0,'down',false,.9);}
+  /* The luggage cart, filling up. */
+  const kx=222,ky=140;c.strokeStyle='#c9952f';c.lineWidth=2;c.beginPath();c.moveTo(kx-14,ky);c.lineTo(kx+14,ky);c.moveTo(kx-14,ky);c.lineTo(kx-14,ky-18);c.quadraticCurveTo(kx,ky-26,kx+14,ky-18);c.lineTo(kx+14,ky);c.stroke();
+  ellipse(c,kx-10,ky+3,2.4,2.4,'#111');ellipse(c,kx+10,ky+3,2.4,2.4,'#111');
+  if(done('bags')){for(const [dx,w,h,col] of [[-11,9,12,'#5b8fd1'],[0,10,9,'#c86f5a']]){c.fillStyle=col;c.fillRect(kx+dx,ky-h,w,h);c.fillStyle='#fff3c4';c.fillRect(kx+dx+w-3,ky-h+1,4,4);}}
+  if(done('key')&&!va.portal){c.fillStyle='#e8c34a';c.fillRect(186,90,6,4);c.fillStyle='#fff3c4';c.fillRect(192,88,8,8);text(c,'12',196,95,6,'#23493f');}
+  plaque(c,'🚗 '+LM.valet,40,160);
+}
+function openValet(){
+  if(world)world.stop();
+  if(!va||va.done||!va.name)vaNew();
+  vaRender();
+}
+function vaRender(){
+  const order=vaOrder(),k=order[va.step],first=va.name.split(' ')[0];
+  let html=titleHTML(VA.title,VA.kicker)+'<canvas class="va-scene" id="va-scene" aria-hidden="true"></canvas>'+
+    '<p class="va-shift '+va.shift+'">'+esc(VA.shift[va.shift])+'</p>'+'<p class="va-arrive">'+esc(ht(va.portal?VA.portal:VA.arriving,{name:va.name}))+'</p>'+
+    '<ol class="va-steps">'+order.map((s,i)=>'<li class="'+(i<va.step||va.done?'done':i===va.step?'now':'')+'">'+esc(s==='intro'&&va.shift==='night'?VA.stepWalk:VA.steps[{greet:0,bags:1,key:2,keyPortal:2,intro:3,file:4}[s]])+'</li>').join('')+'</ol>'+
+    '<div id="va-body"></div><p class="hms-say va-say" id="va-say" aria-live="polite"></p><div class="action-row"><button class="secondary-button" id="va-swap" type="button">'+esc(VA.swap[va.shift])+'</button><button class="secondary-button" id="va-close" type="button">'+esc(VA.close)+'</button></div>';
+  openModal(html,true);
+  vaScene($('va-scene'));
+  $('va-close').onclick=()=>{closeModal();};
+  $('va-swap').onclick=()=>{const f=va.shift==='night'?'day':'night';vaCount--;va.forceShift=f;vaNew();joySound('pop');vaRender();};
+  $('va-say').textContent=va.say;
+  const box=$('va-body');
+  if(va.done){
+    box.innerHTML='<div class="joy-panel va-done"><b>✨ '+esc(VA.done)+' · '+esc(ht(VA.score,{n:va.best,t:order.length}))+'</b><p>'+esc(ht(va.shift==='night'?VA.summaryNight:VA.summary,{name:first}))+'</p></div>';
+    const b=document.createElement('button');b.type='button';b.className='primary-button va-next';b.textContent=VA.next;b.onclick=()=>{vaNew();vaRender();};box.append(b);
+  }else if(k==='file'){
+    const ro=va.rooming;ro[va.room]=[va.name];
+    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(ht(VA.checked,{name:va.name,r:va.room}))+'</p>'+
+      '<div class="va-file"><div><b>🗝️ '+esc(VA.drawerH)+'</b><div class="va-drawer"></div></div><div class="va-list"><b>📋 '+esc(VA.listH)+'</b><small>'+esc(VA.listNote)+'</small><ul>'+
+      Object.keys(ro).map(r=>'<li><b>'+r+'</b> '+esc(ro[r].join(', ')||'·')+'</li>').join('')+'</ul></div></div>';
+    const dr=box.querySelector('.va-drawer');
+    for(const r of Object.keys(ro)){const b=document.createElement('button');b.type='button';b.className='va-slot';b.dataset.r=r;
+      const full=r!==va.room&&ro[r].length;b.innerHTML='<b>'+r+'</b><small>'+(full?'🔑':esc(VA.slotEmpty))+'</small>';
+      b.onclick=()=>{if(r===va.room){va.filed=true;va.done=true;if(!va.fileMiss)va.best++;va.say=ht(VA.fileRight,{r,name:first});joySound('coin',1);}else{va.fileMiss=1;va.say=ht(VA.fileWrong,{name:va.name,r:va.room});joySound('boop');}vaRender();};
+      dr.append(b);}
+  }else{
+    const Q=va.shift==='night'&&VA.night[k]||VA.q[k];
+    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(Q.t)+'</p>'+(k==='greet'?'<p class="joy-hint">📋 '+esc(VA.arrivals)+': '+esc(va.name)+' · '+esc(VA.arrNote)+'</p>':'')+'<div class="va-opts"></div>';
+    const opts=box.querySelector('.va-opts'),tried=va.picked[k]||[];
+    Q.o.forEach(([t,sc,why],i)=>{const b=document.createElement('button');b.type='button';b.className='choice va-opt'+(tried.includes(i)?(sc===2?' right':' wrong'):'');b.textContent=ht(t,{title:va.title});
+      b.onclick=()=>{const first2=!(va.picked[k]||[]).length;va.picked[k]=[...(va.picked[k]||[]),i];va.say=why;
+        if(sc===2){if(first2)va.best++;va.step++;if(va.step>=order.length)va.done=true;joySound('coin',1);}else joySound('boop');vaRender();};
+      opts.append(b);});
+  }
+  narrativeText=body.innerText;
+}
+{
+  const vaExtras=world.options.extras;
+  world.options.extras=()=>{const list=vaExtras();if(state&&!festivalActive&&!titleVisible)list.push({id:'valet',x:196,y:740,name:VA.mapName});return list;};
+  const vaDraw=world.options.drawExtras;
+  world.options.drawExtras=(c,time,calm)=>{vaDraw(c,time,calm);if(festivalActive||!state)return;
+    /* The covered drive-through, just outside the entrance: a striped canopy and a car waiting. */
+    for(let i=0;i<10;i++){c.fillStyle=i%2?'#c9952f':'#2c6152';c.fillRect(176+i*12,768,12,9);}
+    c.fillStyle='#173c1a';c.fillRect(174,764,124,5);c.fillStyle='#5b3b22';c.fillRect(176,768,3,24);c.fillRect(293,768,3,24);
+    const bob=calm?0:Math.sin(time/600)*.6;c.fillStyle='#5b8fd1';c.beginPath();c.roundRect(200,780+bob,44,14,5);c.fill();c.fillStyle='#bfe0e6';c.fillRect(212,782+bob,20,5);
+    ellipse(c,244,786+bob,2,1.6,'#fff3b0');
+  };
+  const vaInteract=interact;interact=function(id){if(id==='valet'){openValet();return;}return vaInteract.apply(this,arguments);};
+}
+{const st=document.createElement('style');st.textContent=`
+.va-scene{display:block;width:100%;max-width:560px;aspect-ratio:360/170;margin:6px auto;border-radius:14px;border:2px solid #c9952f;background:#1f3b33}
+.va-arrive{margin:6px 0;font-weight:bold;color:#23493f}
+.va-shift{margin:6px 0 0;padding:6px 10px;border-radius:12px;font:13px/1.4 Arial,sans-serif}.va-shift.night{background:#e9e6f7;border:1px solid #b9b0e0;color:#2f2a56}.va-shift.day{background:#fff3c4;border:1px solid #e8c34a;color:#6b4e12}
+.va-steps{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;padding:0;list-style:none;counter-reset:va}
+.va-steps li{counter-increment:va;padding:4px 10px;border-radius:99px;border:1px solid #e0cf9e;background:#fffaf0;font:12px Arial,sans-serif;color:#6b6450}
+.va-steps li::before{content:counter(va)'. '}.va-steps li.now{border-color:#c9952f;background:#fff3c4;color:#23493f;font-weight:bold}.va-steps li.done{background:#effbe9;border-color:#6cc25a;color:#2f5d50}
+.va-q{margin:8px 0}.va-opts{display:grid;gap:6px}.va-opt.right{border-color:#6cc25a;background:#effbe9}.va-opt.wrong{border-color:#f09a74;background:#fff1ea}
+.va-say:empty{display:none}
+.va-file{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.va-drawer{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;padding:8px;border-radius:12px;background:#6b4a2e;box-shadow:inset 0 0 0 3px #4b2f1c}
+.va-slot{display:grid;justify-items:center;min-height:56px;border-radius:8px;border:1px solid #c9952f;background:#f6efe1;cursor:pointer;color:var(--ink)}.va-slot b{font:bold 16px Georgia,serif}.va-slot small{font:11px Arial,sans-serif;color:#6b6450}
+.va-list{padding:8px 10px;border-radius:12px;background:#fffdf7;border:1px dashed #b89a6a}.va-list small{display:block;font:12px Arial,sans-serif;color:#7a3d1c;margin:2px 0 4px}.va-list ul{margin:0;padding-left:0;list-style:none;line-height:1.6}.va-list li b{display:inline-block;width:38px}
+.va-next{min-height:50px;margin-top:8px}
+@media(max-width:520px){.va-file{grid-template-columns:1fr}}
+`;document.head.append(st);}
+/* ==== end VALET v1 ==== */
 /* ==== SPLIT v1: the manor and the desk computer side by side ====
    - When the desk computer (HMS) opens during play, the manor stays on screen: the HMS slides up
      as a drawer over the bottom half (centered, never wider than 860px), with the manor showing
