@@ -137,3 +137,7 @@ In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) r
 - Day shift: valets **Kofi Mensah** and **Zara Hussein** take turns with each car (the valet who greets the guest also parks the car and files the key). **Jasper Lane** is the bellman.
 - Gate security radios the guest's name ahead: **Leilani Kahale** by day, **Oskar Berg** overnight. The gate officer shows in a little radio box in the picture.
 - Overnight, butler **Theo Mbatha** does everything, and he gets to keep all the tips to himself.
+
+### Overnight arrival order (Theo)
+
+Overnight the butler follows the guest-first order: 1. greet the guest by name; 2. load the bags on the cart; 3. check them in on the system; 4. take them to their room (they step in first); 5. a short room tour of anything not obvious, if there is anything; 6. then park the car; 7. then store the key in the drawer by room number. The car waits safely under the canopy with the key in the butler's pocket until the guest is settled.

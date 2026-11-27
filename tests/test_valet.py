@@ -80,9 +80,18 @@ class Valet(fbase.Friendly):
         self.pick('7 AM')
         self.assertIn('no bellman', body.inner_text() + 'no bellman')
         self.pick('cart yourself')
-        self.pick('claim ticket')
-        self.pick('walk you to the front desk myself')
+        # The butler's own order: guest first, car last.
+        steps = self.page.locator('.va-steps li').all_inner_texts()
+        self.assertEqual([x.strip() for x in steps], ['Greet by name', 'Load the bags on the cart', 'Check them in',
+                         'Take them to their room', 'Room tour', 'Park the car', 'Store the key'])
+        self.pick('Hand over a room key now')
+        self.assertIn('Never a key before check-in', body.inner_text())
+        self.pick('Check them in on the system')
+        self.pick('let them step in first')
+        self.pick('may not be obvious')
+        self.pick('Now park the car')
         self.assertIn('Valet key drawer', body.inner_text())
+        self.assertIn('the car is parked', body.inner_text())
         self.page.locator('#va-swap').click()
         self.page.wait_for_selector('.va-shift.day')
 

@@ -12599,7 +12599,27 @@ const VA_TEXT={
      ['“{title}, I will walk you to the front desk myself, and your luggage will come right along with us on the cart.”',2,'Delores: “Lovely. Overnight, you walk the guest in yourself, so they are never alone for a second.”'],
      ['Point at the door: “The desk is that way.”',0,'Delores: “Pointing sends a guest off alone. Overnight, you walk them in yourself.”'],
      ['Park the car first and leave the guest at the curb.',0,'Delores: “The car can wait. A guest alone at the curb at night cannot.”']]}},
-  summaryNight:'{name} is inside, and the bags came along on the cart. Overnight, the butler did every step.',
+  nightSteps:{greet:'Greet by name',bags:'Load the bags on the cart',checkin:'Check them in',room:'Take them to their room',tour:'Room tour',park:'Park the car',file:'Store the key'},
+  nightChecked:'You checked {name} into Room {r}, and the car is parked. Now store the key in the drawer.',
+  summaryNightPortal:'{name} is settled in the room with the bags. Overnight, Theo did every step himself.',
+  nightQ:{
+   checkin:{t:'Inside, you step behind the front desk. Overnight, the butler is the front desk agent too.',o:[
+     ['Check them in on the system: confirm the name and ID, then the phone with area code, the email and a card on file, and make the room keys.',2,'Delores: “Yes. Same check-in as the day desk. The system needs to know who is in every room, even at 2 AM, and keys come last.”'],
+     ['Hand over a room key now, and do the paperwork in the morning.',0,'Delores: “Never a key before check-in. If the system does not know who is in the room, nobody can help them in an emergency.”'],
+     ['Ask them to wait in the lobby until the morning desk agent arrives.',0,'Delores: “Hours in a lobby chair after a long drive? Overnight, you are the desk agent. Check them in yourself.”']]},
+   room:{t:'Keys made. Time to go upstairs.',o:[
+     ['Walk them to the room with the luggage cart, open the door, and let them step in first.',2,'Delores: “Lovely. They see the room for the first time as they walk in. That is why the bag tags never show the room number.”'],
+     ['Hand them the key and point to the stairs.',0,'Delores: “Pointing sends a tired guest off alone. Overnight, you walk them up yourself.”'],
+     ['Go ahead to open the room, and send the bags up later.',0,'Delores: “Stay together. The guest, the bags and you all arrive at the room at the same time.”']]},
+   tour:{t:'You are in the room. What do you show them?',o:[
+     ['Show only what may not be obvious, if there is anything: the tricky light switch, how the shower turns on, the thermostat and the Wi‑Fi. Then ask if they need anything else.',2,'Delores: “Perfect. A short tour of the tricky things saves them a puzzled phone call at 3 AM. If the room is simple, a warm good night is enough.”'],
+     ['Explain every single thing in the room, including the pillows.',0,'Delores: “They have had a long drive. Keep it short: only what they might not figure out on their own.”'],
+     ['Say good night and leave right away.',1,'Delores: “Warm, but a quick look at anything tricky first saves them a puzzled phone call at 3 AM.”']]},
+   park:{t:'The guest is settled. The car is still waiting under the canopy.',o:[
+     ['Now park the car carefully in the guest lot, lock it, and tag the key with the room number.',2,'Delores: “Yes. The guest came first, and the car waited safely under the canopy with the key in your pocket. Now it gets parked properly.”'],
+     ['Leave the car under the canopy until morning.',0,'Delores: “That blocks the drive for the next arrival. A car is safest parked and locked.”'],
+     ['Hand the key to the guest so they can park it themselves.',0,'Delores: “At the manor, the guest never parks. You have the key, so you park it.”']]}},
+  summaryNight:'{name} is settled in the room with the bags, the car is parked, and the key is in the drawer. Overnight, Theo did every step himself.',
   fiveStar:'⭐ Five-star touches: greet the car within moments, smile and make eye contact, use the guest’s name, and offer a cold bottle of water after a long drive.'
  },
  es:{
@@ -12651,7 +12671,27 @@ const VA_TEXT={
      ['“{title}, yo mismo le acompaño a recepción, y su equipaje viene con nosotros en el carrito.”',2,'Delores: “Precioso. De noche tú también acompañas, así el huésped nunca está solo ni un segundo.”'],
      ['Señalar la puerta: “Recepción está por allí.”',0,'Delores: “Señalar deja al huésped solo. De noche, lo acompañas tú.”'],
      ['Aparcar primero y dejar al huésped en la acera.',0,'Delores: “El coche puede esperar. Un huésped solo en la acera de noche, no.”']]}},
-  summaryNight:'{name} ya está dentro, y las maletas vinieron en el carrito. De noche, el mayordomo hizo cada paso.',
+  nightSteps:{greet:'Saludar por su nombre',bags:'Cargar las maletas en el carrito',checkin:'Registrar la entrada',room:'Llevarlo a su habitación',tour:'Recorrido por la habitación',park:'Aparcar el coche',file:'Guardar la llave'},
+  nightChecked:'Registraste a {name} en la habitación {r}, y el coche está aparcado. Ahora guarda la llave en el cajón.',
+  summaryNightPortal:'{name} ya está en su habitación con las maletas. De noche, Theo hizo cada paso él mismo.',
+  nightQ:{
+   checkin:{t:'Dentro, pasas detrás de la recepción. De noche, el mayordomo también es el recepcionista.',o:[
+     ['Registra la entrada en el sistema: confirma el nombre y la identificación, luego el teléfono con código de área, el correo y una tarjeta registrada, y prepara las llaves.',2,'Delores: “Sí. El mismo registro que de día. El sistema debe saber quién está en cada habitación, incluso a las 2 de la mañana, y las llaves van al final.”'],
+     ['Entrega una llave ahora y haz el papeleo por la mañana.',0,'Delores: “Nunca una llave antes del registro. Si el sistema no sabe quién está en la habitación, nadie puede ayudar en una emergencia.”'],
+     ['Pídele que espere en el vestíbulo hasta que llegue el recepcionista de la mañana.',0,'Delores: “¿Horas en una silla tras un largo viaje? De noche, tú eres el recepcionista. Regístralo tú.”']]},
+   room:{t:'Llaves listas. Hora de subir.',o:[
+     ['Acompáñalo a la habitación con el carrito, abre la puerta y deja que entre primero.',2,'Delores: “Precioso. Ve la habitación por primera vez al entrar. Por eso las etiquetas nunca muestran el número.”'],
+     ['Dale la llave y señala la escalera.',0,'Delores: “Señalar deja solo a un huésped cansado. De noche, lo acompañas tú.”'],
+     ['Adelántate a abrir la habitación y sube las maletas después.',0,'Delores: “Vayan juntos. El huésped, las maletas y tú llegan a la vez.”']]},
+   tour:{t:'Están en la habitación. ¿Qué le muestras?',o:[
+     ['Solo lo que quizá no sea obvio, si lo hay: el interruptor difícil, cómo se abre la ducha, el termostato y el wifi. Luego pregunta si necesita algo más.',2,'Delores: “Perfecto. Un recorrido corto por lo difícil le ahorra una llamada confusa a las 3 de la mañana. Si la habitación es sencilla, basta con unas cálidas buenas noches.”'],
+     ['Explica cada cosa de la habitación, incluidas las almohadas.',0,'Delores: “Viene de un largo viaje. Breve: solo lo que quizá no descubra solo.”'],
+     ['Di buenas noches y vete enseguida.',1,'Delores: “Amable, pero mostrar antes lo difícil le ahorra una llamada confusa a las 3 de la mañana.”']]},
+   park:{t:'El huésped está instalado. El coche sigue esperando bajo el toldo.',o:[
+     ['Ahora aparca el coche con cuidado en el estacionamiento, ciérralo y etiqueta la llave con el número de habitación.',2,'Delores: “Sí. Primero el huésped, y el coche esperó seguro bajo el toldo con la llave en tu bolsillo. Ahora se aparca bien.”'],
+     ['Deja el coche bajo el toldo hasta la mañana.',0,'Delores: “Eso bloquea la entrada para la próxima llegada. Un coche está más seguro aparcado y cerrado.”'],
+     ['Dale la llave al huésped para que aparque él.',0,'Delores: “En la mansión, el huésped nunca aparca. Tienes la llave, así que aparcas tú.”']]}},
+  summaryNight:'{name} ya está en su habitación con las maletas, el coche está aparcado y la llave está en el cajón. De noche, Theo hizo cada paso él mismo.',
   fiveStar:'⭐ Detalles de cinco estrellas: recibir el coche en un momento, sonreír y mirar a los ojos, usar el nombre del huésped y ofrecer una botella de agua fría tras un largo viaje.'
  }
 };
@@ -12679,7 +12719,11 @@ function vaNew(){
 /* Who works the gate and the valet stand. Named beings, so the arrival feels like a real team. */
 const VA_TEAM={guardDay:'Leilani Kahale',guardNight:'Oskar Berg',valet:'Kofi Mensah',valet2:'Zara Hussein'};
 function vaGuard(){return va&&va.shift==='night'?VA_TEAM.guardNight:VA_TEAM.guardDay;}
-function vaOrder(){return va.portal?['greet','bags','keyPortal','intro']:['greet','bags','key','intro','file'];}
+/* Overnight, Theo follows the butler's own order: guest first, car last. */
+function vaOrder(){
+  if(va.shift==='night')return va.portal?['greet','bags','checkin','room','tour']:['greet','bags','checkin','room','tour','park','file'];
+  return va.portal?['greet','bags','keyPortal','intro']:['greet','bags','key','intro','file'];
+}
 /* The little drive-through picture. */
 function vaScene(cv){
   if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),Wd=360,Hd=170;cv.width=Wd*dpr;cv.height=Hd*dpr;const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);
@@ -12690,21 +12734,22 @@ function vaScene(cv){
   c.fillStyle='#5b3b22';c.fillRect(18,34,6,72);c.fillRect(250,34,6,72);
   for(let i=0;i<12;i++){c.fillStyle=i%2?'#c9952f':'#2c6152';c.beginPath();c.moveTo(10+i*22,24);c.lineTo(32+i*22,24);c.lineTo(32+i*22,36);c.quadraticCurveTo(21+i*22,46,10+i*22,36);c.fill();}
   c.fillStyle='#173c1a';c.fillRect(8,18,252,7);
-  const s=va.step,order=vaOrder(),done=k=>order.indexOf(k)<s||va.filed;
+  const s=va.step,order=vaOrder(),done=k=>{const i=order.indexOf(k);return i>=0&&(i<s||va.filed);};
   if(va.portal){
     const g=c.createRadialGradient(90,98,4,90,98,40);g.addColorStop(0,'#fff6ff');g.addColorStop(.4,'#b48ce8');g.addColorStop(1,'rgba(90,60,160,0)');c.fillStyle=g;c.beginPath();c.ellipse(90,98,30,42,0,0,Math.PI*2);c.fill();
   }else{
-    const cx=70,cy=112;c.fillStyle=va.col;c.beginPath();c.roundRect(cx-50,cy-18,110,26,8);c.fill();c.beginPath();c.roundRect(cx-30,cy-36,66,22,9);c.fill();
+    const cx=70,cy=112;if(!(va.shift==='night'&&done('park'))){c.fillStyle=va.col;c.beginPath();c.roundRect(cx-50,cy-18,110,26,8);c.fill();c.beginPath();c.roundRect(cx-30,cy-36,66,22,9);c.fill();
     c.fillStyle='#bfe0e6';c.fillRect(cx-24,cy-32,24,14);c.fillRect(cx+4,cy-32,26,14);
     ellipse(c,cx-28,cy+9,9,9,'#1d1d1d');ellipse(c,cx+38,cy+9,9,9,'#1d1d1d');ellipse(c,cx-28,cy+9,4,4,'#9a9a9a');ellipse(c,cx+38,cy+9,4,4,'#9a9a9a');
     ellipse(c,cx+58,cy-6,3,2.5,'#fff3b0');
     if(done('greet')){c.fillStyle=va.col;c.save();c.translate(cx+8,cy-16);c.transform(1,0,.6,1,0,0);c.fillRect(0,0,6,24);c.restore();}
-    if(!done('bags')){c.fillStyle='#5b8fd1';c.fillRect(cx-46,cy-14,10,10);c.fillStyle='#c86f5a';c.fillRect(cx-36,cy-12,8,8);}
+    if(!done('bags')){c.fillStyle='#5b8fd1';c.fillRect(cx-46,cy-14,10,10);c.fillStyle='#c86f5a';c.fillRect(cx-36,cy-12,8,8);}}
   }
   /* People: guest, valet, bellman. */
+  const inside=va.shift==='night'&&done('room');
   const guestX=done('greet')?134:va.portal?92:96;
-  drawPerson(c,guestX,118,{cast:va.name},0,'down',false,.9);
-  if(va.shift==='night'){ellipse(c,330,20,9,9,'#f6ecc8');ellipse(c,334,17,8,8,'#1f3b33');drawPerson(c,done('intro')?150:176,118,{cast:'Theo Mbatha',color:'#1d2a3a',skin:'#7a4f33',hair:'#1b1b1b'},0,'down',false,.9);}
+  if(!inside)drawPerson(c,guestX,118,{cast:va.name},0,'down',false,.9);
+  if(va.shift==='night'){ellipse(c,330,20,9,9,'#f6ecc8');ellipse(c,334,17,8,8,'#1f3b33');if(!inside||done('tour'))drawPerson(c,done('park')?300:done('tour')?96:done('greet')?150:176,118,{cast:'Theo Mbatha',color:'#1d2a3a',skin:'#7a4f33',hair:'#1b1b1b'},0,'down',false,.9);}
   else{drawPerson(c,done('intro')?250:168,118,{cast:VA_TEAM.valet,color:'#2c6152'},0,'down',false,.9);
   drawPerson(c,312,118,{cast:VA_TEAM.valet2,color:'#2c6152'},0,'down',false,.9);
   drawPerson(c,done('intro')?264:206,118,{cast:'Jasper Lane'},0,'down',false,.9);}
@@ -12715,7 +12760,7 @@ function vaScene(cv){
   /* The luggage cart, filling up. */
   const kx=222,ky=140;c.strokeStyle='#c9952f';c.lineWidth=2;c.beginPath();c.moveTo(kx-14,ky);c.lineTo(kx+14,ky);c.moveTo(kx-14,ky);c.lineTo(kx-14,ky-18);c.quadraticCurveTo(kx,ky-26,kx+14,ky-18);c.lineTo(kx+14,ky);c.stroke();
   ellipse(c,kx-10,ky+3,2.4,2.4,'#111');ellipse(c,kx+10,ky+3,2.4,2.4,'#111');
-  if(done('bags')){for(const [dx,w,h,col] of [[-11,9,12,'#5b8fd1'],[0,10,9,'#c86f5a']]){c.fillStyle=col;c.fillRect(kx+dx,ky-h,w,h);c.fillStyle='#fff3c4';c.fillRect(kx+dx+w-3,ky-h+1,4,4);}}
+  if(done('bags')&&!inside){for(const [dx,w,h,col] of [[-11,9,12,'#5b8fd1'],[0,10,9,'#c86f5a']]){c.fillStyle=col;c.fillRect(kx+dx,ky-h,w,h);c.fillStyle='#fff3c4';c.fillRect(kx+dx+w-3,ky-h+1,4,4);}}
   if(done('key')&&!va.portal){c.fillStyle='#e8c34a';c.fillRect(186,90,6,4);c.fillStyle='#fff3c4';c.fillRect(192,88,8,8);text(c,'12',196,95,6,'#23493f');}
   plaque(c,'🚗 '+LM.valet,40,160);
 }
@@ -12728,7 +12773,7 @@ function vaRender(){
   const order=vaOrder(),k=order[va.step],first=va.name.split(' ')[0];
   let html=titleHTML(VA.title,VA.kicker)+'<canvas class="va-scene" id="va-scene" aria-hidden="true"></canvas>'+
     '<p class="va-shift '+va.shift+'">'+esc(VA.shift[va.shift])+'</p>'+'<p class="va-arrive">'+esc(ht(va.portal?VA.portal:VA.arriving,{name:va.name}))+'</p>'+
-    '<ol class="va-steps">'+order.map((s,i)=>'<li class="'+(i<va.step||va.done?'done':i===va.step?'now':'')+'">'+esc(s==='intro'&&va.shift==='night'?VA.stepWalk:VA.steps[{greet:0,bags:1,key:2,keyPortal:2,intro:3,file:4}[s]])+'</li>').join('')+'</ol>'+
+    '<ol class="va-steps">'+order.map((s,i)=>'<li class="'+(i<va.step||va.done?'done':i===va.step?'now':'')+'">'+esc(va.shift==='night'?VA.nightSteps[s]:VA.steps[{greet:0,bags:1,key:2,keyPortal:2,intro:3,file:4}[s]])+'</li>').join('')+'</ol>'+
     '<div id="va-body"></div><p class="hms-say va-say" id="va-say" aria-live="polite"></p><div class="action-row"><button class="secondary-button" id="va-swap" type="button">'+esc(VA.swap[va.shift])+'</button><button class="secondary-button" id="va-close" type="button">'+esc(VA.close)+'</button></div>';
   openModal(html,true);
   vaScene($('va-scene'));
@@ -12737,11 +12782,11 @@ function vaRender(){
   $('va-say').textContent=va.say;
   const box=$('va-body');
   if(va.done){
-    box.innerHTML='<div class="joy-panel va-done"><b>✨ '+esc(VA.done)+' · '+esc(ht(VA.score,{n:va.best,t:order.length}))+'</b><p>'+esc(ht(va.shift==='night'?VA.summaryNight:VA.summary,{name:first}))+'</p><p class="va-five">'+esc(VA.fiveStar)+'</p></div>';
+    box.innerHTML='<div class="joy-panel va-done"><b>✨ '+esc(VA.done)+' · '+esc(ht(VA.score,{n:va.best,t:order.length}))+'</b><p>'+esc(ht(va.shift==='night'?(va.portal?VA.summaryNightPortal:VA.summaryNight):VA.summary,{name:first}))+'</p><p class="va-five">'+esc(VA.fiveStar)+'</p></div>';
     const b=document.createElement('button');b.type='button';b.className='primary-button va-next';b.textContent=VA.next;b.onclick=()=>{vaNew();vaRender();};box.append(b);
   }else if(k==='file'){
     const ro=va.rooming;ro[va.room]=[va.name];
-    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(ht(VA.checked,{name:va.name,r:va.room}))+'</p>'+
+    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(ht(va.shift==='night'?VA.nightChecked:VA.checked,{name:va.name,r:va.room}))+'</p>'+
       '<div class="va-file"><div><b>🗝️ '+esc(VA.drawerH)+'</b><div class="va-drawer"></div></div><div class="va-list"><b>📋 '+esc(VA.listH)+'</b><small>'+esc(VA.listNote)+'</small><ul>'+
       Object.keys(ro).map(r=>'<li><b>'+r+'</b> '+esc(ro[r].join(', ')||'·')+'</li>').join('')+'</ul></div></div>';
     const dr=box.querySelector('.va-drawer');
@@ -12750,7 +12795,7 @@ function vaRender(){
       b.onclick=()=>{if(r===va.room){va.filed=true;va.done=true;if(!va.fileMiss)va.best++;va.say=ht(VA.fileRight,{r,name:first});joySound('coin',1);}else{va.fileMiss=1;va.say=ht(VA.fileWrong,{name:va.name,r:va.room});joySound('boop');}vaRender();};
       dr.append(b);}
   }else{
-    const Q=va.shift==='night'&&VA.night[k]||VA.q[k];
+    const Q=va.shift==='night'&&(VA.nightQ[k]||VA.night[k])||VA.q[k];
     box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(Q.t)+'</p>'+(k==='greet'?'<p class="va-gate">'+esc(ht(va.portal?VA.gatePortal:VA.gate,{name:va.name,guard:vaGuard()}))+'</p><p class="joy-hint">📋 '+esc(VA.arrivals)+': '+esc(va.name)+' · '+esc(VA.arrNote)+'</p>':'')+'<div class="va-opts"></div>';
     const opts=box.querySelector('.va-opts'),tried=va.picked[k]||[];
     Q.o.forEach(([t,sc,why],i)=>{const b=document.createElement('button');b.type='button';b.className='choice va-opt'+(tried.includes(i)?(sc===2?' right':' wrong'):'');b.textContent=ht(t,{title:va.title});
