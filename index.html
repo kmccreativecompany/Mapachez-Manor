@@ -12551,12 +12551,13 @@ const VA_TEXT={
  en:{
   kicker:'Valet arrival',title:'The drive-through',mapName:'Valet · a guest is arriving',
   arriving:'🚗 {name} is pulling into the covered drive-through.',portal:'🌀 A portal opens in the drive-through, and {name} steps out with a cart!',
-  arrivals:'Arrivals list',arrNote:'Valets check the arrivals list so they can greet guests by name.',
+  arrivals:'Arrivals list',arrNote:'Security radios the name when they open the gate. The arrivals list is the backup.',
+  gate:'📻 Security at the gate: “Gate to valet. A car is coming up the drive now. The guest’s name is {name}.”',gatePortal:'📻 Security at the gate: “Gate to valet. Um. A portal just opened in the drive. The traveler says her name is {name}.”',gateWhy:'Delores: “Security radios the name ahead, so the valet can welcome every guest by name before they even open the door.”',
   steps:['Greet the guest','Unload and tag the bags','The car key','Hand them to the bellman','File the key'],
   step:'Step {n} of {t}',
   q:{
    greet:{t:'The car stops under the canopy. What do you do?',o:[
-     ['“Welcome to Mapáchez Manor, {title}. May I get the door for you?”',2,'Delores: “Perfect. You checked the arrivals list, so you greeted them by name. Being expected feels wonderful.”'],
+     ['“Good evening, {title}, and welcome to Mapáchez Manor. May I get the door for you?”',2,'Delores: “Perfect. Security radioed the name, so you greeted them by name. Being expected feels wonderful.”'],
      ['Open the door with a smile, without a word.',1,'Delores: “Kind, but a warm welcome by name makes a guest feel expected. Say hello, then the door.”'],
      ['“Hey! Nice ride!”',0,'Delores: “Friendly, but too casual for the front door. Full sentences and their name, every time.”']]},
    bags:{t:'There are bags in the trunk. Who does what?',o:[
@@ -12584,7 +12585,7 @@ const VA_TEXT={
   done:'All done!',summary:'{name} is inside with Jasper. The bags go to the room, or to the locked luggage room if the room is not ready yet.',
   next:'🚗 Greet the next arrival',close:'Back to the manor',
   score:'{n} of {t} best answers',
-  shift:{night:'🌙 Overnight shift · our butler, Theo Mbatha, does every step: valet, bellman and escort.',day:'☀️ Day shift · the valet parks, and Jasper the bellman handles the bags.'},
+  shift:{night:'🌙 Overnight shift · our butler, Theo Mbatha, does every step. Overnight he is also the valet, the bellman, the front desk agent, the concierge, the chef and everything else. He says he enjoys the variety.',day:'☀️ Day shift · the valet parks, and Jasper the bellman handles the bags.'},
   swap:{night:'☀️ Practice the day shift',day:'🌙 Practice the overnight shift'},
   stepWalk:'Walk them inside',
   night:{
@@ -12593,20 +12594,22 @@ const VA_TEXT={
      ['Ask the guest to wait until the day bellman arrives at 7 AM.',0,'Delores: “That is a very long wait. Overnight, the butler is the valet and the bellman too.”'],
      ['Tag each bag with the room number, so it is easy to deliver.',0,'Delores: “Never the room number. The lobby has ears, even at midnight.”']]},
    intro:{t:'Time to walk them inside.',o:[
-     ['“{title}, I will walk you to the front desk myself, and your luggage will come right along with us on the cart.”',2,'Delores: “Lovely. Overnight, you are the escort too, so the guest is never alone for a second.”'],
+     ['“{title}, I will walk you to the front desk myself, and your luggage will come right along with us on the cart.”',2,'Delores: “Lovely. Overnight, you walk the guest in yourself, so they are never alone for a second.”'],
      ['Point at the door: “The desk is that way.”',0,'Delores: “Pointing sends a guest off alone. Overnight, you walk them in yourself.”'],
      ['Park the car first and leave the guest at the curb.',0,'Delores: “The car can wait. A guest alone at the curb at night cannot.”']]}},
-  summaryNight:'{name} is inside, and the bags came along on the cart. Overnight, the butler did every step.'
+  summaryNight:'{name} is inside, and the bags came along on the cart. Overnight, the butler did every step.',
+  fiveStar:'⭐ Five-star touches: greet the car within moments, smile and make eye contact, use the guest’s name, and offer a cold bottle of water after a long drive.'
  },
  es:{
   kicker:'Llegada al aparcacoches',title:'La entrada cubierta',mapName:'Aparcacoches · llega un huésped',
   arriving:'🚗 {name} entra en la entrada cubierta.',portal:'🌀 ¡Se abre un portal en la entrada cubierta y {name} sale con un carrito!',
-  arrivals:'Lista de llegadas',arrNote:'Los aparcacoches revisan la lista de llegadas para saludar a cada huésped por su nombre.',
+  arrivals:'Lista de llegadas',arrNote:'Seguridad dice el nombre por radio al abrir la verja. La lista de llegadas es el respaldo.',
+  gate:'📻 Seguridad en la verja: “Verja a aparcacoches. Sube un coche por el camino. El huésped se llama {name}.”',gatePortal:'📻 Seguridad en la verja: “Verja a aparcacoches. Eh. Acaba de abrirse un portal en el camino. La viajera dice que se llama {name}.”',gateWhy:'Delores: “Seguridad avisa el nombre por radio, para que el aparcacoches dé la bienvenida a cada huésped por su nombre antes de abrir la puerta.”',
   steps:['Saludar','Bajar y etiquetar las maletas','La llave del coche','Presentar al botones','Guardar la llave'],
   step:'Paso {n} de {t}',
   q:{
    greet:{t:'El coche se detiene bajo el toldo. ¿Qué haces?',o:[
-     ['“Bienvenido a la Mansión Mapáchez, {title}. ¿Me permite abrirle la puerta?”',2,'Delores: “Perfecto. Revisaste la lista de llegadas y lo saludaste por su nombre. Sentirse esperado es maravilloso.”'],
+     ['“Buenas noches, {title}, y bienvenido a la Mansión Mapáchez. ¿Me permite abrirle la puerta?”',2,'Delores: “Perfecto. Seguridad avisó el nombre por radio y lo saludaste por su nombre. Sentirse esperado es maravilloso.”'],
      ['Abrir la puerta con una sonrisa, sin decir nada.',1,'Delores: “Amable, pero un saludo con su nombre hace que se sienta esperado. Primero hola, luego la puerta.”'],
      ['“¡Hola! ¡Qué cochazo!”',0,'Delores: “Simpático, pero demasiado informal para la puerta principal. Frases completas y su nombre, siempre.”']]},
    bags:{t:'Hay maletas en el maletero. ¿Quién hace qué?',o:[
@@ -12634,7 +12637,7 @@ const VA_TEXT={
   done:'¡Listo!',summary:'{name} ya está dentro con Jasper. Las maletas van a la habitación, o al cuarto de equipaje cerrado si la habitación aún no está lista.',
   next:'🚗 Recibir a la siguiente llegada',close:'Volver a la mansión',
   score:'{n} de {t} mejores respuestas',
-  shift:{night:'🌙 Turno de noche · nuestro mayordomo, Theo Mbatha, hace cada paso: aparcacoches, botones y acompañante.',day:'☀️ Turno de día · el aparcacoches aparca y Jasper, el botones, se ocupa de las maletas.'},
+  shift:{night:'🌙 Turno de noche · nuestro mayordomo, Theo Mbatha, hace cada paso. De noche también es aparcacoches, botones, recepcionista, conserje, chef y todo lo demás. Dice que le encanta la variedad.',day:'☀️ Turno de día · el aparcacoches aparca y Jasper, el botones, se ocupa de las maletas.'},
   swap:{night:'☀️ Practicar el turno de día',day:'🌙 Practicar el turno de noche'},
   stepWalk:'Acompañarlo adentro',
   night:{
@@ -12646,7 +12649,8 @@ const VA_TEXT={
      ['“{title}, yo mismo le acompaño a recepción, y su equipaje viene con nosotros en el carrito.”',2,'Delores: “Precioso. De noche tú también acompañas, así el huésped nunca está solo ni un segundo.”'],
      ['Señalar la puerta: “Recepción está por allí.”',0,'Delores: “Señalar deja al huésped solo. De noche, lo acompañas tú.”'],
      ['Aparcar primero y dejar al huésped en la acera.',0,'Delores: “El coche puede esperar. Un huésped solo en la acera de noche, no.”']]}},
-  summaryNight:'{name} ya está dentro, y las maletas vinieron en el carrito. De noche, el mayordomo hizo cada paso.'
+  summaryNight:'{name} ya está dentro, y las maletas vinieron en el carrito. De noche, el mayordomo hizo cada paso.',
+  fiveStar:'⭐ Detalles de cinco estrellas: recibir el coche en un momento, sonreír y mirar a los ojos, usar el nombre del huésped y ofrecer una botella de agua fría tras un largo viaje.'
  }
 };
 const VA=VA_TEXT[profile.lang]||VA_TEXT.en;
@@ -12723,7 +12727,7 @@ function vaRender(){
   $('va-say').textContent=va.say;
   const box=$('va-body');
   if(va.done){
-    box.innerHTML='<div class="joy-panel va-done"><b>✨ '+esc(VA.done)+' · '+esc(ht(VA.score,{n:va.best,t:order.length}))+'</b><p>'+esc(ht(va.shift==='night'?VA.summaryNight:VA.summary,{name:first}))+'</p></div>';
+    box.innerHTML='<div class="joy-panel va-done"><b>✨ '+esc(VA.done)+' · '+esc(ht(VA.score,{n:va.best,t:order.length}))+'</b><p>'+esc(ht(va.shift==='night'?VA.summaryNight:VA.summary,{name:first}))+'</p><p class="va-five">'+esc(VA.fiveStar)+'</p></div>';
     const b=document.createElement('button');b.type='button';b.className='primary-button va-next';b.textContent=VA.next;b.onclick=()=>{vaNew();vaRender();};box.append(b);
   }else if(k==='file'){
     const ro=va.rooming;ro[va.room]=[va.name];
@@ -12737,7 +12741,7 @@ function vaRender(){
       dr.append(b);}
   }else{
     const Q=va.shift==='night'&&VA.night[k]||VA.q[k];
-    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(Q.t)+'</p>'+(k==='greet'?'<p class="joy-hint">📋 '+esc(VA.arrivals)+': '+esc(va.name)+' · '+esc(VA.arrNote)+'</p>':'')+'<div class="va-opts"></div>';
+    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(Q.t)+'</p>'+(k==='greet'?'<p class="va-gate">'+esc(ht(va.portal?VA.gatePortal:VA.gate,{name:va.name}))+'</p><p class="joy-hint">📋 '+esc(VA.arrivals)+': '+esc(va.name)+' · '+esc(VA.arrNote)+'</p>':'')+'<div class="va-opts"></div>';
     const opts=box.querySelector('.va-opts'),tried=va.picked[k]||[];
     Q.o.forEach(([t,sc,why],i)=>{const b=document.createElement('button');b.type='button';b.className='choice va-opt'+(tried.includes(i)?(sc===2?' right':' wrong'):'');b.textContent=ht(t,{title:va.title});
       b.onclick=()=>{const first2=!(va.picked[k]||[]).length;va.picked[k]=[...(va.picked[k]||[]),i];va.say=why;
@@ -12766,7 +12770,7 @@ function vaRender(){
 .va-steps{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;padding:0;list-style:none;counter-reset:va}
 .va-steps li{counter-increment:va;padding:4px 10px;border-radius:99px;border:1px solid #e0cf9e;background:#fffaf0;font:12px Arial,sans-serif;color:#6b6450}
 .va-steps li::before{content:counter(va)'. '}.va-steps li.now{border-color:#c9952f;background:#fff3c4;color:#23493f;font-weight:bold}.va-steps li.done{background:#effbe9;border-color:#6cc25a;color:#2f5d50}
-.va-q{margin:8px 0}.va-opts{display:grid;gap:6px}.va-opt.right{border-color:#6cc25a;background:#effbe9}.va-opt.wrong{border-color:#f09a74;background:#fff1ea}
+.va-q{margin:8px 0}.va-five{margin:6px 0 0;font:13px/1.45 Arial,sans-serif;color:#6b4e12}.va-gate{margin:4px 0;padding:8px 12px;border-radius:12px;background:#eef3fb;border:1px solid #b5c7e6;line-height:1.45}.va-opts{display:grid;gap:6px}.va-opt.right{border-color:#6cc25a;background:#effbe9}.va-opt.wrong{border-color:#f09a74;background:#fff1ea}
 .va-say:empty{display:none}
 .va-file{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .va-drawer{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px;padding:8px;border-radius:12px;background:#6b4a2e;box-shadow:inset 0 0 0 3px #4b2f1c}

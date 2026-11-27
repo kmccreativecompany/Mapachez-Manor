@@ -127,7 +127,7 @@ In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) r
 
 ## Valet arrival (VALET v1)
 - Map: a striped canopy (covered drive-through) and a waiting car just outside the front entrance; cars never come inside. Tap the 🚗 Valet stand to greet the next arrival.
-- Five steps with Delores's why: greet by name from the arrivals list and open the door; bags onto the cart, tagged with name + departure date (never the room number); tag the car key + matching claim ticket; introduce the guest to Jasper the bellman; after check-in, file the key in the valet drawer by room number, checked against the staff-only rooming list.
-- Overnight (11 PM to 7 AM real time, or the practice button): the butler, Theo Mbatha, does every step (valet, bellman, escort).
+- Five steps with Delores's why: security at the gate radios the guest's name ahead (arrivals list as backup), then greet by name and open the door; bags onto the cart, tagged with name + departure date (never the room number); tag the car key + matching claim ticket; introduce the guest to Jasper the bellman; after check-in, file the key in the valet drawer by room number, checked against the staff-only rooming list.
+- Overnight (11 PM to 7 AM real time, or the practice button): the butler, Theo Mbatha, does every step (valet, bellman, front desk agent, concierge, chef and everything else; he walks the guest in himself).
 - Every 6th arrival steps out of a portal with their own cart: no car, no key.
 - Tests: tests/test_valet.py.

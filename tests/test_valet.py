@@ -23,6 +23,7 @@ class Valet(fbase.Friendly):
         self.page.wait_for_selector('#va-scene')
         body = self.page.locator('#modal-body')
         self.assertIn('Arrivals list', body.inner_text())
+        self.assertIn('Security at the gate', self.page.locator('.va-gate').inner_text())
         self.pick('Nice ride')
         self.assertIn('too casual', body.inner_text())
         self.pick('May I get the door')
@@ -44,6 +45,7 @@ class Valet(fbase.Friendly):
         self.page.wait_for_selector('.va-done')
         self.assertIn('claim ticket', body.inner_text())
         self.assertIn('2 of 5', body.inner_text())
+        self.assertIn('Five-star touches', body.inner_text())
 
     def test_02_every_sixth_arrival_comes_by_portal_with_no_key(self):
         self.enter_manor()
@@ -68,7 +70,8 @@ class Valet(fbase.Friendly):
         self.page.evaluate("window.hmsTest.interact('valet')")
         self.page.wait_for_selector('.va-shift.night')
         body = self.page.locator('#modal-body')
-        self.assertIn('butler', body.inner_text())
+        self.assertIn('concierge, the chef and everything else', body.inner_text())
+        self.assertNotIn('escort', body.inner_text())
         self.pick('May I get the door')
         self.pick('7 AM')
         self.assertIn('no bellman', body.inner_text() + 'no bellman')
