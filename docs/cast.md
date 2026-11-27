@@ -14,7 +14,7 @@ The whole cast uses it:
 - **Raccoons** (Delores, her family and the default player): mask, pink inner ears, ringed tail, cheek fluff and whiskers.
 - **People**: short, long, bun or curly hair, skirts or trousers, glasses.
 - **Folklore beings**: pointed ears, antlers, leaf crowns with a flower, fairy wings, goat horns with hooves, or a soft glow.
-- **Monsters**: a wolf with ears, muzzle and tail; a stitched monster with a flat top and neck bolts; a horned imp with a tail; a mummy with wraps and glowing eyes. Which one a monster is comes from its recipe.
+- **Monsters**: a wolf with ears, muzzle and tail; a stitched monster with a flat top and neck bolts; a horned imp with a tail. Which one a monster is comes from its recipe. (A mummy with wraps was switched off on 2026-11-27 because it felt unsanitary; the drawing is kept behind `CAST_MUMMY` and those monsters now get one of the other looks.)
 - **Aliens**: antennae with glowing bulbs or head tentacles, with one, two or three eyes.
 - **Robots**: a screen face with lamp eyes and a little antenna.
 - **Muffin**: drawn small, given crisp edges and the same soft outline, so she matches everyone else.

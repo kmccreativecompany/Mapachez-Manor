@@ -112,3 +112,32 @@ computer's home links to it as "Big practice lab →" for later.
 ## Tests
 
 `tests/test_hms.py` (run with `CHROMIUM_PATH=/opt/pw-browsers/chromium python tests/test_hms.py`).
+
+## Room wait (ROOM WAIT v1)
+In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) room for a waiting guest opens a help card instead of a dead end:
+- 📻 Radio or 💬 text Evelyn, the housekeeping supervisor, to inspect it (or ask housekeeping for a rush clean on a 🧹 room). A short sped-up wait runs, the room turns ✨, and check-in carries on.
+- While the guest waits: offer a seat and a drink, keep their luggage in a secure (locked) luggage room, text them when the room is ready (mobile with area code, which also puts the phone on file), a garden stroll, or the best one, an honest time estimate with a promise to update. "One sec!" is the gentle miss.
+- Any 🔍 or 🧹 room card also has the radio and text buttons; the quick buttons stay. Tests: tests/test_room_wait.py.
+
+## Luggage room, 4 PM and guest programs (LUGGAGE v1)
+- 🔒 Luggage room as its own walled room in the foyer's south-west corner on the manor map, by the front entrance and a new valet stand (shelves of tagged bags, the luggage cart, a locked door with keypad facing the entrance; walk up and press E): opens with the master key or the door code (4-1-6, "4 PM is 16:00"). The valet loads bags on a cart and tags each piece with the guest's name and departure date, never the room number. A desk-check line under each tag shows whether the guest is still waiting; deliver bags once they have keys ("Bell service").
+- 🕐 Practice clock starts at 1:00 PM. Standard check-in is 4 PM because housekeeping needs the day to clean and inspect. Early rooms are a bonus; past 4 PM a waiting guest is urgent.
+- Impatient guests: best answer is sorry + why + honest time. Snag: the second inspection finds a dripping faucet; update the guest first.
+- Two invented consortia: Opal Card Stays (card-member, 12 PM early check-in subject to availability, guaranteed 4 PM late check-out, welcome letter) and Compass Circle (travel-advisor network, perks when available, no guaranteed late check-out). Lesson + 3-question quiz. Tests: tests/test_luggage.py.
+
+## Valet arrival (VALET v1)
+- Map: a striped canopy (covered drive-through) and a waiting car just outside the front entrance; cars never come inside. Tap the 🚗 Valet stand to greet the next arrival.
+- Five steps with Delores's why: security at the gate radios the guest's name ahead (arrivals list as backup), then greet by name and open the door; bags onto the cart, tagged with name + departure date (never the room number); tag the car key + matching claim ticket; introduce the guest to Jasper the bellman; after check-in, file the key in the valet drawer by room number, checked against the staff-only rooming list.
+- Overnight (11 PM to 7 AM real time, or the practice button): the butler, Theo Mbatha, does every step (valet, bellman, front desk agent, concierge, chef and everything else; he walks the guest in himself).
+- Every 6th arrival steps out of a portal with their own cart: no car, no key.
+- Tests: tests/test_valet.py.
+
+### The valet team
+
+- Day shift: valets **Kofi Mensah** and **Zara Hussein** take turns with each car (the valet who greets the guest also parks the car and files the key). **Jasper Lane** is the bellman.
+- Gate security radios the guest's name ahead: **Leilani Kahale** by day, **Oskar Berg** overnight. The gate officer shows in a little radio box in the picture.
+- Overnight, butler **Theo Mbatha** does everything, and he gets to keep all the tips to himself.
+
+### Overnight arrival order (Theo)
+
+Overnight the butler follows the guest-first order: 1. greet the guest by name; 2. load the bags on the cart; 3. check them in on the system; 4. take them to their room (they step in first); 5. a short room tour of anything not obvious, if there is anything; 6. then park the car; 7. then store the key in the drawer by room number. The car waits safely under the canopy with the key in the butler's pocket until the guest is settled.
