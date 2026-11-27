@@ -12159,7 +12159,7 @@ body.reduce-motion .ph-tile.rw-calling{animation:none}
      waiting guest becomes truly urgent.
    - Some guests are impatient: four answers, the best is empathy + the why + an honest time.
    - Sometimes the supervisor finds a snag; the best move is to update the guest first.
-   - Two invented programs (both called consortia): Velvet Card Stays (card-member, 12 PM early
+   - Two invented programs (both called consortia): Opal Card Stays (card-member, 12 PM early
      check-in subject to availability, guaranteed 4 PM late check-out) and Compass Circle
      (travel-advisor network, perks when available, no guaranteed late check-out). Nothing real. */
 const LG_TEXT={
@@ -12168,7 +12168,7 @@ const LG_TEXT={
   late:'⏰ Past 4 PM. Anyone still waiting is now urgent.',
   why4:'Delores: “Check-in is 4 PM so housekeeping has the whole day to clean and inspect every room after the morning check-outs. An early room is a lovely bonus. We ask kindly, and we never rush them.”',
   tNote:{early:'🕓 It is {t}. Standard check-in is 4 PM, because housekeeping needs that time to clean and inspect every room. An early room is a lovely bonus, so ask kindly and never rush them.',
-         velvet:'⭐ {name} booked Velvet Card Stays: 12 PM early check-in, subject to availability. Offer it out loud even if no room is ready, and kindly ask housekeeping to do this room first.',
+         opal:'⭐ {name} booked Opal Card Stays: 12 PM early check-in, subject to availability. Offer it out loud even if no room is ready, and kindly ask housekeeping to do this room first.',
          late:'⏰ It is {t}, past 4 PM. Now the wait is on us: apologize, offer a drink on the house, and keep updating {name} until they are in.'},
   impHead:'{name} looks impatient:',impSays:'“I have been waiting forever. Why is my room not ready?”',
   imp:{
@@ -12203,21 +12203,21 @@ const LG_TEXT={
    back:'Delores: “Bags handed back with a smile. Check the tag twice so they go to the right person.”',
    bagsWaiting:' Their bags are in the luggage room. Deliver them next.'},
   bagChip:'🏷️ Bags stored',
-  prog:{velvet:['⭐','Velvet Card Stays'],compass:['🧭','Compass Circle']},
+  prog:{opal:['⭐','Opal Card Stays'],compass:['🧭','Compass Circle']},
   progAsk:'Share their program benefits',progSaid:'Shared ✓',
   progScript:{
-   velvet:'“Welcome to the manor, {name}. We are delighted to welcome you through Velvet Card Stays. May I share your benefits? You have breakfast for two each morning, a $100 experience credit, complimentary Wi-Fi, and guaranteed 4 PM late check-out. Early check-in at 12 PM depends on availability, and I will always do my best. Here is your welcome letter.”',
+   opal:'“Welcome to the manor, {name}. We are delighted to welcome you through Opal Card Stays. May I share your benefits? You have breakfast for two each morning, a $100 experience credit, complimentary Wi-Fi, and guaranteed 4 PM late check-out. Early check-in at 12 PM depends on availability, and I will always do my best. Here is your welcome letter.”',
    compass:'“Welcome to the manor, {name}. We are delighted to host you through your travel advisor and the Compass Circle. Your stay includes breakfast for two each morning and a $100 credit. An upgrade, early check-in and late check-out are offered whenever we have availability.”'},
   progWhy:'Delores: “Program benefits are promised to the guest, so we share every one without being asked. And we never mix the two programs up.”',
   lesson:'📘 Guest programs: don’t mix them up',
   lessonIntro:'Both of these are called consortia: groups that send guests to many hotels with special perks. They look alike, but they are not the same. Every hotel has its own list, so always check yours.',
   cols:{
-   velvet:['A card-member program, booked through the card’s travel service.',['12 PM early check-in, subject to availability. Offer it out loud even when it is not available.','Room upgrade, one category, when available.','Breakfast for two every day.','A $100 experience credit per stay.','Free Wi-Fi.','✅ Guaranteed 4 PM late check-out. Always honor it, and set the keys to work until 4 PM.','A welcome letter, every time.']],
+   opal:['A card-member program, booked through the card’s travel service.',['12 PM early check-in, subject to availability. Offer it out loud even when it is not available.','Room upgrade, one category, when available.','Breakfast for two every day.','A $100 experience credit per stay.','Free Wi-Fi.','✅ Guaranteed 4 PM late check-out. Always honor it, and set the keys to work until 4 PM.','A welcome letter, every time.']],
    compass:['A travel-advisor network, booked by the guest’s travel advisor.',['Room upgrade when available.','Breakfast for two every day.','A $100 credit per stay.','Early check-in when available.','Late check-out when available.','❌ No guaranteed 4 PM late check-out.']]},
   lessonTips:['Tell every benefit without being asked.','At check-out, check the bill: no early check-in or late check-out fees, and the credit is applied.','Keep their details private. Never ask them to book direct instead.'],
   quiz:[
-   {q:'A Compass Circle guest asks for their guaranteed 4 PM late check-out. What do you say?',opts:[['“Late check-out is not a guaranteed Compass benefit, but I would be glad to check what we can offer you.”',1],['“Of course, it is guaranteed!”',0],['“No late check-outs, sorry.”',0]],why:'Only Velvet Card Stays guarantees 4 PM. Compass gets it when available, and we still try.'},
-   {q:'A Velvet Card guest arrives at 1 PM and no room is ready. Best move?',opts:[['Mention their 12 PM early check-in benefit, explain it depends on availability, keep their bags safe, and text when the room is ready.',1],['Say nothing about early check-in, since it is not available.',0],['Ask housekeeping to skip the inspection.',0]],why:'The benefit is offered out loud even when it is not available, and the inspection never gets skipped.'},
+   {q:'A Compass Circle guest asks for their guaranteed 4 PM late check-out. What do you say?',opts:[['“Late check-out is not a guaranteed Compass benefit, but I would be glad to check what we can offer you.”',1],['“Of course, it is guaranteed!”',0],['“No late check-outs, sorry.”',0]],why:'Only Opal Card Stays guarantees 4 PM. Compass gets it when available, and we still try.'},
+   {q:'A Opal Card guest arrives at 1 PM and no room is ready. Best move?',opts:[['Mention their 12 PM early check-in benefit, explain it depends on availability, keep their bags safe, and text when the room is ready.',1],['Say nothing about early check-in, since it is not available.',0],['Ask housekeeping to skip the inspection.',0]],why:'The benefit is offered out loud even when it is not available, and the inspection never gets skipped.'},
    {q:'What are programs like these called?',opts:[['Consortia',1],['Loyalty points',0],['Walk-ins',0]],why:'Both are consortia. Same family, different perks.'}],
   right:'✨ Right!',again:'🌱 Not quite.'
  },
@@ -12226,7 +12226,7 @@ const LG_TEXT={
   late:'⏰ Pasadas las 4 PM. Quien siga esperando ya es urgente.',
   why4:'Delores: “El registro es a las 4 PM para que limpieza tenga todo el día para limpiar e inspeccionar cada habitación tras las salidas de la mañana. Una habitación temprano es un regalo. Pedimos con amabilidad y nunca les metemos prisa.”',
   tNote:{early:'🕓 Son las {t}. El registro estándar es a las 4 PM, porque limpieza necesita ese tiempo para limpiar e inspeccionar cada habitación. Una habitación temprano es un regalo, así que pide con amabilidad y nunca metas prisa.',
-         velvet:'⭐ {name} reservó con Velvet Card Stays: registro temprano a las 12 PM, según disponibilidad. Ofrécelo en voz alta aunque no haya habitación lista, y pide con amabilidad que hagan esta primero.',
+         opal:'⭐ {name} reservó con Opal Card Stays: registro temprano a las 12 PM, según disponibilidad. Ofrécelo en voz alta aunque no haya habitación lista, y pide con amabilidad que hagan esta primero.',
          late:'⏰ Son las {t}, pasadas las 4 PM. Ahora la espera es cosa nuestra: discúlpate, ofrece una bebida por cuenta de la casa y sigue informando a {name} hasta que entre.'},
   impHead:'{name} parece impaciente:',impSays:'“Llevo una eternidad esperando. ¿Por qué no está lista mi habitación?”',
   imp:{
@@ -12261,21 +12261,21 @@ const LG_TEXT={
    back:'Delores: “Maletas devueltas con una sonrisa. Revisa la etiqueta dos veces para dárselas a la persona correcta.”',
    bagsWaiting:' Sus maletas están en el cuarto de equipaje. Llévalas a continuación.'},
   bagChip:'🏷️ Maletas guardadas',
-  prog:{velvet:['⭐','Velvet Card Stays'],compass:['🧭','Compass Circle']},
+  prog:{opal:['⭐','Opal Card Stays'],compass:['🧭','Compass Circle']},
   progAsk:'Contarle los beneficios de su programa',progSaid:'Contado ✓',
   progScript:{
-   velvet:'“Bienvenido a la mansión, {name}. Es un placer recibirle a través de Velvet Card Stays. ¿Me permite contarle sus beneficios? Tiene desayuno para dos cada mañana, un crédito de $100 para experiencias, wifi gratis y salida tardía garantizada a las 4 PM. El registro temprano a las 12 PM depende de la disponibilidad, y siempre haré lo posible. Aquí tiene su carta de bienvenida.”',
+   opal:'“Bienvenido a la mansión, {name}. Es un placer recibirle a través de Opal Card Stays. ¿Me permite contarle sus beneficios? Tiene desayuno para dos cada mañana, un crédito de $100 para experiencias, wifi gratis y salida tardía garantizada a las 4 PM. El registro temprano a las 12 PM depende de la disponibilidad, y siempre haré lo posible. Aquí tiene su carta de bienvenida.”',
    compass:'“Bienvenido a la mansión, {name}. Es un placer recibirle a través de su agente de viajes y Compass Circle. Su estancia incluye desayuno para dos cada mañana y un crédito de $100. La mejora de habitación, el registro temprano y la salida tardía se ofrecen cuando hay disponibilidad.”'},
   progWhy:'Delores: “Los beneficios del programa se le prometen al huésped, así que se los contamos todos sin que pregunte. Y nunca confundimos los dos programas.”',
   lesson:'📘 Programas de huéspedes: no los confundas',
   lessonIntro:'Los dos se llaman consorcios: grupos que envían huéspedes a muchos hoteles con beneficios especiales. Se parecen, pero no son iguales. Cada hotel tiene su lista, así que revisa siempre la tuya.',
   cols:{
-   velvet:['Un programa para titulares de tarjeta, reservado por el servicio de viajes de la tarjeta.',['Registro temprano a las 12 PM, según disponibilidad. Ofrécelo en voz alta aunque no esté disponible.','Mejora de una categoría, según disponibilidad.','Desayuno para dos cada día.','Un crédito de $100 para experiencias por estancia.','Wifi gratis.','✅ Salida tardía garantizada a las 4 PM. Respétala siempre y programa las llaves hasta las 4 PM.','Una carta de bienvenida, siempre.']],
+   opal:['Un programa para titulares de tarjeta, reservado por el servicio de viajes de la tarjeta.',['Registro temprano a las 12 PM, según disponibilidad. Ofrécelo en voz alta aunque no esté disponible.','Mejora de una categoría, según disponibilidad.','Desayuno para dos cada día.','Un crédito de $100 para experiencias por estancia.','Wifi gratis.','✅ Salida tardía garantizada a las 4 PM. Respétala siempre y programa las llaves hasta las 4 PM.','Una carta de bienvenida, siempre.']],
    compass:['Una red de agentes de viajes, reservado por el agente del huésped.',['Mejora de habitación según disponibilidad.','Desayuno para dos cada día.','Un crédito de $100 por estancia.','Registro temprano según disponibilidad.','Salida tardía según disponibilidad.','❌ Sin salida tardía garantizada a las 4 PM.']]},
   lessonTips:['Cuenta cada beneficio sin que lo pidan.','Al salir, revisa la cuenta: sin cargos por registro temprano o salida tardía, y con el crédito aplicado.','Guarda sus datos en privado. Nunca les pidas reservar directo en su lugar.'],
   quiz:[
-   {q:'Un huésped de Compass Circle pide su salida tardía garantizada a las 4 PM. ¿Qué dices?',opts:[['“La salida tardía no es un beneficio garantizado de Compass, pero con gusto reviso qué podemos ofrecerle.”',1],['“¡Claro, está garantizada!”',0],['“No hay salidas tardías, lo siento.”',0]],why:'Solo Velvet Card Stays garantiza las 4 PM. Compass la tiene según disponibilidad, y aun así lo intentamos.'},
-   {q:'Un huésped de Velvet Card llega a la 1 PM y no hay habitación lista. ¿Qué haces?',opts:[['Mencionar su registro temprano a las 12 PM, explicar que depende de la disponibilidad, guardar sus maletas a salvo y escribirle cuando esté lista.',1],['No decir nada del registro temprano, ya que no está disponible.',0],['Pedir a limpieza que se salte la inspección.',0]],why:'El beneficio se ofrece en voz alta aunque no esté disponible, y la inspección nunca se salta.'},
+   {q:'Un huésped de Compass Circle pide su salida tardía garantizada a las 4 PM. ¿Qué dices?',opts:[['“La salida tardía no es un beneficio garantizado de Compass, pero con gusto reviso qué podemos ofrecerle.”',1],['“¡Claro, está garantizada!”',0],['“No hay salidas tardías, lo siento.”',0]],why:'Solo Opal Card Stays garantiza las 4 PM. Compass la tiene según disponibilidad, y aun así lo intentamos.'},
+   {q:'Un huésped de Opal Card llega a la 1 PM y no hay habitación lista. ¿Qué haces?',opts:[['Mencionar su registro temprano a las 12 PM, explicar que depende de la disponibilidad, guardar sus maletas a salvo y escribirle cuando esté lista.',1],['No decir nada del registro temprano, ya que no está disponible.',0],['Pedir a limpieza que se salte la inspección.',0]],why:'El beneficio se ofrece en voz alta aunque no esté disponible, y la inspección nunca se salta.'},
    {q:'¿Cómo se llaman programas como estos?',opts:[['Consorcios',1],['Puntos de fidelidad',0],['Clientes sin reserva',0]],why:'Los dos son consorcios. Misma familia, beneficios distintos.'}],
   right:'✨ ¡Correcto!',again:'🌱 Casi.'
  }
@@ -12294,7 +12294,7 @@ function lgRefresh(){const o=$('ph-panel')&&phRender();return o;}
 {
   /* Guests: some book through a program, some are impatient. */
   const guest0=phGuest;
-  phGuest=function(k){const g=guest0(k);g.prog=k%5===1?'velvet':k%5===3?'compass':'';g.imp=k%4===2?1:0;return g;};
+  phGuest=function(k){const g=guest0(k);g.prog=k%5===1?'opal':k%5===3?'compass':'';g.imp=k%4===2?1:0;return g;};
   /* Undo also takes back bags and the clock. */
   const snap0=phSnap;
   phSnap=function(){lgState();snap0();const i=ph.undo.length-1,o=JSON.parse(ph.undo[i]);o.lg={bags:ph.bags,clock:ph.clock,snagUp:ph.snagUp||''};ph.undo[i]=JSON.stringify(o);};
@@ -12336,7 +12336,7 @@ function lgRefresh(){const o=$('ph-panel')&&phRender();return o;}
   rwHelpCard=function(r,g){
     lgState();const card=help0(r,g),first=g?g.name.split(' ')[0]:'';
     const note=document.createElement('p');note.className='lg-note'+(ph.clock>=16*60?' late':'');
-    note.textContent=ph.clock>=16*60?ht(LG.tNote.late,{t:lgT(ph.clock),name:first||'…'}):g&&g.prog==='velvet'?ht(LG.tNote.velvet,{name:first}):ht(LG.tNote.early,{t:lgT(ph.clock)});
+    note.textContent=ph.clock>=16*60?ht(LG.tNote.late,{t:lgT(ph.clock),name:first||'…'}):g&&g.prog==='opal'?ht(LG.tNote.opal,{name:first}):ht(LG.tNote.early,{t:lgT(ph.clock)});
     card.querySelector('b').after(note);
     if(g&&ph.snagUp===g.id){const b=document.createElement('button');b.type='button';b.className='primary-button hms-glow lg-update';b.textContent=ht(LG.update,{name:first});
       b.onclick=()=>{phSnap();ph.snagUp='';if(!g.care)g.care=[];if(!g.care.includes('update'))g.care.push('update');ph.rwYou=LG.updated;ph.say=LG.updatedTip;joySound('coin',1);phRender();};
@@ -12450,7 +12450,7 @@ function lgLesson(){
   const d=document.createElement('details');d.className='hms-more lg-lesson';d.id='lg-lesson';if(ph.lessonOpen)d.open=true;
   d.ontoggle=()=>{ph.lessonOpen=d.open;};
   const col=k=>{const [ic,name]=LG.prog[k],[who,list]=LG.cols[k];return '<div class="lg-col '+k+'"><b>'+ic+' '+esc(name)+'</b><small>'+esc(who)+'</small><ul>'+list.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';};
-  d.innerHTML='<summary>'+esc(LG.lesson)+'</summary><p>'+esc(LG.lessonIntro)+'</p><div class="lg-cols">'+col('velvet')+col('compass')+'</div><ul class="lg-tips">'+LG.lessonTips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><div class="lg-quiz"></div>';
+  d.innerHTML='<summary>'+esc(LG.lesson)+'</summary><p>'+esc(LG.lessonIntro)+'</p><div class="lg-cols">'+col('opal')+col('compass')+'</div><ul class="lg-tips">'+LG.lessonTips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><div class="lg-quiz"></div>';
   const qz=d.querySelector('.lg-quiz');ph.lgQ=ph.lgQ||{};
   LG.quiz.forEach((Q,qi)=>{const box=document.createElement('div');box.className='lg-q';box.innerHTML='<b>'+esc(Q.q)+'</b>';
     Q.opts.forEach(([t,ok],oi)=>{const b=document.createElement('button');b.type='button';b.className='choice lg-opt'+(ph.lgQ[qi]===oi?(ok?' right':' wrong'):'');b.textContent=t;
@@ -12469,7 +12469,7 @@ function lgLesson(){
 .lg-imp{display:grid;gap:6px;padding:8px 10px;border-radius:12px;background:#fff6f0;border:1px solid #f3c3a8}
 .lg-said{margin:0;font-style:italic}.lg-imp-opts{display:grid;gap:6px}
 .lg-badge,.lg-chip{display:inline-block;margin:2px 4px 0 0;padding:1px 8px;border-radius:99px;font:bold 11px Arial,sans-serif}
-.lg-badge.velvet{background:#efe4fb;color:#5b3a86;border:1px solid #c7b0e8}.lg-badge.compass{background:#e3f1fb;color:#1f5577;border:1px solid #9cc7e6}
+.lg-badge.opal{background:#efe4fb;color:#5b3a86;border:1px solid #c7b0e8}.lg-badge.compass{background:#e3f1fb;color:#1f5577;border:1px solid #9cc7e6}
 .lg-chip{background:#fff3c4;color:#7a5a12;border:1px solid #e8c34a}
 .lg-room{margin-top:6px}.lg-count{font:bold 13px Arial,sans-serif;background:#fff3c4;border:1px solid #e8c34a;border-radius:99px;padding:2px 8px;vertical-align:middle}
 .lg-door{display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:center;padding:10px;border-radius:16px;background:#f6efe1;border:2px solid #b89a6a}
@@ -12486,7 +12486,7 @@ function lgLesson(){
 .lg-desk{grid-column:1/-1;margin:0;font:12px Arial,sans-serif;color:#2f5d50}
 .lg-bag .ph-acts button,.lg-lock{min-height:46px}.lg-lock{margin-top:8px}
 .lg-lesson p{margin:6px 0}.lg-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.lg-col{padding:10px;border-radius:14px;border:2px solid}.lg-col.velvet{background:#f6f0fd;border-color:#c7b0e8}.lg-col.compass{background:#eef6fc;border-color:#9cc7e6}
+.lg-col{padding:10px;border-radius:14px;border:2px solid}.lg-col.opal{background:#f6f0fd;border-color:#c7b0e8}.lg-col.compass{background:#eef6fc;border-color:#9cc7e6}
 .lg-col b{display:block;font:bold 16px Georgia,serif}.lg-col small{display:block;font:12px Arial,sans-serif;color:#5b5444}.lg-col ul,.lg-tips{margin:6px 0 0;padding-left:18px;line-height:1.45}
 .lg-quiz{display:grid;gap:10px;margin-top:8px}.lg-q{display:grid;gap:6px}.lg-opt.right{border-color:#6cc25a;background:#effbe9}.lg-opt.wrong{border-color:#f09a74;background:#fff1ea}
 @media(max-width:520px){.lg-cols{grid-template-columns:1fr}.lg-door{grid-template-columns:64px 1fr}.lg-door-art{height:100px}}
