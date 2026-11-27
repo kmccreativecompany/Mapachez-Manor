@@ -1120,6 +1120,8 @@ const CAST_BODY={round:{hy:-9,fw:9,top:-20,neck:-2,aw:12},tall:{hy:-17,fw:7,top:
 const CAST_CACHE=new Map(),CAST_TAU=Math.PI*2;
 function castShade(hex,f){const n=parseInt(String(hex).slice(1,7),16)||0,t=f<0?0:255,p=Math.abs(f),m=v=>Math.round(v+(t-v)*p);return '#'+((1<<24)|(m(n>>16)<<16)|(m(n>>8&255)<<8)|m(n&255)).toString(16).slice(1);}
 function castKey(p){return p?String(p.cast||p.id||p.name||''):'';}
+/* The mummy look is switched off for now (the person found wraps unsanitary). Blob monsters become a wolf, stitched or imp look by their extras. Set true to bring it back. */
+const CAST_MUMMY=false;
 function castLook(key,base={}){
   const id=String(key),ck=id+'|'+(base.color||'')+'|'+(base.skin||'')+'|'+(base.hair||'');
   const hit=CAST_CACHE.get(ck);if(hit)return hit;
@@ -1730,7 +1732,7 @@ function pxPaint(r,dir,blink,frame,mood=''){
   else{
     /* People, folklore beings, monsters and aliens share the chibi body; species show in head, skin and extras. */
     const fae=k==='fae',alien=k==='alien',mon=k==='monster',hy=16;
-    const type=mon?(r.body==='blob'?'wraps':ex.includes('horns')||ex.includes('tail')?'imp':ex.includes('ears')||ex.includes('fur')?'wolf':ex.includes('spots')?'stitch':'imp'):alien?(ex.includes('tentacles')?'squid':'ant'):fae?'fae':'human';
+    const type=mon?(r.body==='blob'&&CAST_MUMMY?'wraps':ex.includes('horns')||ex.includes('tail')?'imp':ex.includes('ears')||ex.includes('fur')?'wolf':ex.includes('spots')?'stitch':'imp'):alien?(ex.includes('tentacles')?'squid':'ant'):fae?'fae':'human';
     const goat=ex.includes('goat'),skirt=!goat&&(k==='human'||fae)&&bit(1),wings=ex.includes('wings');
     if(wings&&!back){E(6,26,4.5,5.5,'#e3f2ff','w');E(27,26,4.5,5.5,'#e3f2ff','w');E(7.5,33,3,3,'#d5eafc','w');E(25.5,33,3,3,'#d5eafc','w');for(const y of [24,27])mirror([[5,y],[6,y+1]],'#b6d4ee','w');}
     if(type==='imp'&&!back){for(const [x,y] of [[23,33],[25,32],[26,30],[27,28],[27,27]])P(x,y,skin,skin);P(28,26,'#c0404a');P(27,26,'#c0404a');P(28,27,'#c0404a');}
@@ -12552,7 +12554,7 @@ const VA_TEXT={
   kicker:'Valet arrival',title:'The drive-through',mapName:'Valet · a guest is arriving',
   arriving:'🚗 {name} is pulling into the covered drive-through.',portal:'🌀 A portal opens in the drive-through, and {name} steps out with a cart!',
   arrivals:'Arrivals list',arrNote:'Security radios the name when they open the gate. The arrivals list is the backup.',
-  gate:'📻 Security at the gate: “Gate to valet. A car is coming up the drive now. The guest’s name is {name}.”',gatePortal:'📻 Security at the gate: “Gate to valet. Um. A portal just opened in the drive. The traveler says her name is {name}.”',gateWhy:'Delores: “Security radios the name ahead, so the valet can welcome every guest by name before they even open the door.”',
+  gate:'📻 {guard}, security at the gate: “Gate to valet. A car is coming up the drive now. The guest’s name is {name}.”',gatePortal:'📻 {guard}, security at the gate: “Gate to valet. Um. A portal just opened in the drive. The traveler says her name is {name}.”',gateWhy:'Delores: “Security radios the name ahead, so the valet can welcome every guest by name before they even open the door.”',
   steps:['Greet the guest','Unload and tag the bags','The car key','Hand them to the bellman','File the key'],
   step:'Step {n} of {t}',
   q:{
@@ -12585,7 +12587,7 @@ const VA_TEXT={
   done:'All done!',summary:'{name} is inside with Jasper. The bags go to the room, or to the locked luggage room if the room is not ready yet.',
   next:'🚗 Greet the next arrival',close:'Back to the manor',
   score:'{n} of {t} best answers',
-  shift:{night:'🌙 Overnight shift · our butler, Theo Mbatha, does every step. Overnight he is also the valet, the bellman, the front desk agent, the concierge, the chef and everything else. He says he enjoys the variety.',day:'☀️ Day shift · the valet parks, and Jasper the bellman handles the bags.'},
+  shift:{night:'🌙 Overnight shift · our butler, Theo Mbatha, does every step. Overnight he is also the valet, the bellman, the front desk agent, the concierge, the chef and everything else. He says he enjoys the variety, and he gets to keep all the tips to himself.',day:'☀️ Day shift · our valets, Kofi Mensah and Zara Hussein, take turns: one greets the guest and parks, the other files the keys. Jasper, the bellman, handles the bags.'},
   swap:{night:'☀️ Practice the day shift',day:'🌙 Practice the overnight shift'},
   stepWalk:'Walk them inside',
   night:{
@@ -12604,7 +12606,7 @@ const VA_TEXT={
   kicker:'Llegada al aparcacoches',title:'La entrada cubierta',mapName:'Aparcacoches · llega un huésped',
   arriving:'🚗 {name} entra en la entrada cubierta.',portal:'🌀 ¡Se abre un portal en la entrada cubierta y {name} sale con un carrito!',
   arrivals:'Lista de llegadas',arrNote:'Seguridad dice el nombre por radio al abrir la verja. La lista de llegadas es el respaldo.',
-  gate:'📻 Seguridad en la verja: “Verja a aparcacoches. Sube un coche por el camino. El huésped se llama {name}.”',gatePortal:'📻 Seguridad en la verja: “Verja a aparcacoches. Eh. Acaba de abrirse un portal en el camino. La viajera dice que se llama {name}.”',gateWhy:'Delores: “Seguridad avisa el nombre por radio, para que el aparcacoches dé la bienvenida a cada huésped por su nombre antes de abrir la puerta.”',
+  gate:'📻 {guard}, seguridad en la verja: “Verja a aparcacoches. Sube un coche por el camino. El huésped se llama {name}.”',gatePortal:'📻 {guard}, seguridad en la verja: “Verja a aparcacoches. Eh. Acaba de abrirse un portal en el camino. La viajera dice que se llama {name}.”',gateWhy:'Delores: “Seguridad avisa el nombre por radio, para que el aparcacoches dé la bienvenida a cada huésped por su nombre antes de abrir la puerta.”',
   steps:['Saludar','Bajar y etiquetar las maletas','La llave del coche','Presentar al botones','Guardar la llave'],
   step:'Paso {n} de {t}',
   q:{
@@ -12637,7 +12639,7 @@ const VA_TEXT={
   done:'¡Listo!',summary:'{name} ya está dentro con Jasper. Las maletas van a la habitación, o al cuarto de equipaje cerrado si la habitación aún no está lista.',
   next:'🚗 Recibir a la siguiente llegada',close:'Volver a la mansión',
   score:'{n} de {t} mejores respuestas',
-  shift:{night:'🌙 Turno de noche · nuestro mayordomo, Theo Mbatha, hace cada paso. De noche también es aparcacoches, botones, recepcionista, conserje, chef y todo lo demás. Dice que le encanta la variedad.',day:'☀️ Turno de día · el aparcacoches aparca y Jasper, el botones, se ocupa de las maletas.'},
+  shift:{night:'🌙 Turno de noche · nuestro mayordomo, Theo Mbatha, hace cada paso. De noche también es aparcacoches, botones, recepcionista, conserje, chef y todo lo demás. Dice que le encanta la variedad, y además se queda con todas las propinas.',day:'☀️ Turno de día · nuestros aparcacoches, Kofi Mensah y Zara Hussein, se turnan: uno recibe al huésped y aparca, la otra archiva las llaves. Jasper, el botones, se ocupa de las maletas.'},
   swap:{night:'☀️ Practicar el turno de día',day:'🌙 Practicar el turno de noche'},
   stepWalk:'Acompañarlo adentro',
   night:{
@@ -12674,6 +12676,9 @@ function vaNew(){
   const hr=new Date().getHours(),shift=va&&va.forceShift||(hr>=23||hr<7?'night':'day');
   va={forceShift:va&&va.forceShift||'',shift,name:first+' '+last,title:portal?first+' '+last:title+' '+last,portal,col,room,step:0,picked:{},best:0,filed:false,say:'',rooming};
 }
+/* Who works the gate and the valet stand. Named beings, so the arrival feels like a real team. */
+const VA_TEAM={guardDay:'Leilani Kahale',guardNight:'Oskar Berg',valet:'Kofi Mensah',valet2:'Zara Hussein'};
+function vaGuard(){return va&&va.shift==='night'?VA_TEAM.guardNight:VA_TEAM.guardDay;}
 function vaOrder(){return va.portal?['greet','bags','keyPortal','intro']:['greet','bags','key','intro','file'];}
 /* The little drive-through picture. */
 function vaScene(cv){
@@ -12700,8 +12705,13 @@ function vaScene(cv){
   const guestX=done('greet')?134:va.portal?92:96;
   drawPerson(c,guestX,118,{cast:va.name},0,'down',false,.9);
   if(va.shift==='night'){ellipse(c,330,20,9,9,'#f6ecc8');ellipse(c,334,17,8,8,'#1f3b33');drawPerson(c,done('intro')?150:176,118,{cast:'Theo Mbatha',color:'#1d2a3a',skin:'#7a4f33',hair:'#1b1b1b'},0,'down',false,.9);}
-  else{drawPerson(c,done('intro')?250:168,118,{cast:'Valet attendant',color:'#2c6152',skin:'#e0b48f',hair:'#3a2a1d'},0,'down',false,.9);
+  else{drawPerson(c,done('intro')?250:168,118,{cast:VA_TEAM.valet,color:'#2c6152'},0,'down',false,.9);
+  drawPerson(c,312,118,{cast:VA_TEAM.valet2,color:'#2c6152'},0,'down',false,.9);
   drawPerson(c,done('intro')?264:206,118,{cast:'Jasper Lane'},0,'down',false,.9);}
+  /* Security at the gate, on the radio. */
+  c.fillStyle='rgba(15,35,30,.85)';c.beginPath();c.roundRect(150,48,92,38,8);c.fill();c.strokeStyle='#c9952f';c.lineWidth=1;c.stroke();
+  c.save();c.beginPath();c.roundRect(150,48,92,38,8);c.clip();drawPerson(c,174,84,{cast:vaGuard(),color:'#2a3550'},0,'down',false,.6);c.restore();
+  text(c,'📻 '+(profile.lang==='es'?'Verja':'Gate'),216,64,8,'#f3e3b2');text(c,vaGuard().split(' ')[0],216,77,7,'#bfe0e6');
   /* The luggage cart, filling up. */
   const kx=222,ky=140;c.strokeStyle='#c9952f';c.lineWidth=2;c.beginPath();c.moveTo(kx-14,ky);c.lineTo(kx+14,ky);c.moveTo(kx-14,ky);c.lineTo(kx-14,ky-18);c.quadraticCurveTo(kx,ky-26,kx+14,ky-18);c.lineTo(kx+14,ky);c.stroke();
   ellipse(c,kx-10,ky+3,2.4,2.4,'#111');ellipse(c,kx+10,ky+3,2.4,2.4,'#111');
@@ -12741,7 +12751,7 @@ function vaRender(){
       dr.append(b);}
   }else{
     const Q=va.shift==='night'&&VA.night[k]||VA.q[k];
-    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(Q.t)+'</p>'+(k==='greet'?'<p class="va-gate">'+esc(ht(va.portal?VA.gatePortal:VA.gate,{name:va.name}))+'</p><p class="joy-hint">📋 '+esc(VA.arrivals)+': '+esc(va.name)+' · '+esc(VA.arrNote)+'</p>':'')+'<div class="va-opts"></div>';
+    box.innerHTML='<p class="va-q"><b>'+esc(ht(VA.step,{n:va.step+1,t:order.length}))+'</b> '+esc(Q.t)+'</p>'+(k==='greet'?'<p class="va-gate">'+esc(ht(va.portal?VA.gatePortal:VA.gate,{name:va.name,guard:vaGuard()}))+'</p><p class="joy-hint">📋 '+esc(VA.arrivals)+': '+esc(va.name)+' · '+esc(VA.arrNote)+'</p>':'')+'<div class="va-opts"></div>';
     const opts=box.querySelector('.va-opts'),tried=va.picked[k]||[];
     Q.o.forEach(([t,sc,why],i)=>{const b=document.createElement('button');b.type='button';b.className='choice va-opt'+(tried.includes(i)?(sc===2?' right':' wrong'):'');b.textContent=ht(t,{title:va.title});
       b.onclick=()=>{const first2=!(va.picked[k]||[]).length;va.picked[k]=[...(va.picked[k]||[]),i];va.say=why;

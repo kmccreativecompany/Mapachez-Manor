@@ -131,3 +131,9 @@ In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) r
 - Overnight (11 PM to 7 AM real time, or the practice button): the butler, Theo Mbatha, does every step (valet, bellman, front desk agent, concierge, chef and everything else; he walks the guest in himself).
 - Every 6th arrival steps out of a portal with their own cart: no car, no key.
 - Tests: tests/test_valet.py.
+
+### The valet team
+
+- Day shift: valets **Kofi Mensah** and **Zara Hussein** take turns (one greets and parks, the other files the keys). **Jasper Lane** is the bellman.
+- Gate security radios the guest's name ahead: **Leilani Kahale** by day, **Oskar Berg** overnight. The gate officer shows in a little radio box in the picture.
+- Overnight, butler **Theo Mbatha** does everything, and he gets to keep all the tips to himself.

@@ -23,7 +23,8 @@ class Valet(fbase.Friendly):
         self.page.wait_for_selector('#va-scene')
         body = self.page.locator('#modal-body')
         self.assertIn('Arrivals list', body.inner_text())
-        self.assertIn('Security at the gate', self.page.locator('.va-gate').inner_text())
+        self.assertIn('Leilani Kahale, security at the gate', self.page.locator('.va-gate').inner_text())
+        self.assertIn('Kofi Mensah and Zara Hussein', body.inner_text())
         self.pick('Nice ride')
         self.assertIn('too casual', body.inner_text())
         self.pick('May I get the door')
@@ -72,6 +73,8 @@ class Valet(fbase.Friendly):
         body = self.page.locator('#modal-body')
         self.assertIn('concierge, the chef and everything else', body.inner_text())
         self.assertNotIn('escort', body.inner_text())
+        self.assertIn('keep all the tips to himself', body.inner_text())
+        self.assertIn('Oskar Berg, security at the gate', self.page.locator('.va-gate').inner_text())
         self.pick('May I get the door')
         self.pick('7 AM')
         self.assertIn('no bellman', body.inner_text() + 'no bellman')
@@ -81,6 +84,15 @@ class Valet(fbase.Friendly):
         self.assertIn('Valet key drawer', body.inner_text())
         self.page.locator('#va-swap').click()
         self.page.wait_for_selector('.va-shift.day')
+
+
+    def test_04_no_mummy_look_for_now(self):
+        self.enter_manor()
+        self.assertFalse(self.page.evaluate("phEval('CAST_MUMMY')"))
+        # Jasper rolled the old wraps look; the switch keeps his recipe but draws another monster style.
+        look = self.page.evaluate("phEval(\"castLook('Jasper Lane')\")")
+        self.assertEqual((look['kind'], look['body']), ('monster', 'blob'))
+        self.assertIn("r.body==='blob'&&CAST_MUMMY?'wraps'", self.page.evaluate("phEval('drawPerson').toString()+document.documentElement.innerHTML"))
 
 
 if __name__ == '__main__':
