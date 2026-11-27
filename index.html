@@ -3457,15 +3457,16 @@ class ManorWorld {
        into an offscreen layer at the current zoom and reused every frame. */
     const k=this.scale*this.dpr;
     if(!this.layer||this.layerK!==k+'/'+LABELS){const o=this.layer||document.createElement('canvas');o.width=Math.ceil(W*k);o.height=Math.ceil(H*k);const g=o.getContext('2d');g.setTransform(k,0,0,k,0,0);
-      paintGrounds(g);
+      paintGrounds(g);wingSeaView(g);
       softShadow(g,()=>rect(g,32,44,1216,722,AN.walnut,14),30,10,.55);
       rect(g,32,44,1216,722,AN.walnut,14);rect(g,40,52,1200,706,'#1f4a3a',9);stroke(g,45,57,1190,696,AN.gold,2.5,7);stroke(g,51,63,1178,684,'#c9a45c55',1,5);
       softShadow(g,()=>{for(const x of rooms)rect(g,x-76,72,152,261,AN.walnut,6);rect(g,52,339,1175,122,'#ece0c2');for(const r of [[55,475,379,278],[473,475,344,278],[853,476,371,276]])rect(g,...r,AN.walnut,6);},18,7,.5);
-      vineFlourish(g,104,332,250,false);vineFlourish(g,1180,332,250,true);
+      /* WING PLAN v1: the end vines now climb the stair and elevator at each end of the wing (paintWingPlan). */
       rect(g,52,339,1175,122,'#ece0c2');rect(g,65,376,1148,41,'#2a5a46');stroke(g,65,376,1148,41,AN.gold,2,3);stroke(g,70,381,1138,31,'#c9a45c55',1,2);
       g.strokeStyle='#d9bd7cb0';g.lineWidth=1.3;g.beginPath();g.moveTo(80,396);for(let x=80;x<1196;x+=56)g.bezierCurveTo(x+14,384,x+42,408,x+56,396);g.stroke();
       for(let x=80,k=0;x<1196;x+=56,k++){leaf(g,x+14,390,9,-2.4,'#8fb08a');leaf(g,x+42,402,9,.8,'#8fb08a');if(k%2)ellipse(g,x+28,396,2.4,2.4,'#f3e3b2');}
-      g.letterSpacing='3px';text(g,'EAST WING',124,368,9,'#7a5a2e','Georgia');g.letterSpacing='0px';
+      g.letterSpacing='3px';text(g,'EAST WING',640,368,9,'#7a5a2e','Georgia');g.letterSpacing='0px';
+      paintWingPlan(g);
       rooms.forEach((x,i)=>room(g,x,201+i,GUESTS.find(g=>g.room===String(201+i))));
       for(const x of rooms)windowLight(g,x);
       if(COZY_FOYER){cozyFloor(g,{x:60,y:479,w:369,h:268},'THE GRAND FOYER');cozyRug(g,245,606,150,44);}else roomFloor(g,{x:60,y:479,w:369,h:268},'#e8d8b6','THE GRAND FOYER');
@@ -13436,6 +13437,111 @@ PINS.push(
 );
 renderGrowth();checkPins();
 /* ==== end LIVING MANOR v1 ==== */
+
+/* ==== WING PLAN v1: ideas borrowed from real hotel floor plans, drawn our own way ====
+   - The six guest rooms (201 to 206) all face the view: a strip of sea and garden behind them.
+   - A stair and an elevator at each end of the east wing.
+   - Two small meeting rooms off the hall, with names of our own: the Willow Room and the Iris Room.
+   Each spot teaches one short hotel lesson with a quick question. Code-drawn, nothing to download. */
+const WING_TEXT={
+ en:{view:'S E A   V I E W',lift:'Stairs & elevator',lift2:'Stairs & elevator',willow:'Willow Room',iris:'Iris Room',
+  kicker:'THE EAST WING',right:'That’s it.',again:'Try the other one.',
+  liftTitle:'Stairs and elevator',
+  liftText:['Delores: “Every wing has a stair and an elevator at each end, so nobody is ever far from either.”','Delores: “When a guest has bags, a stroller or a cane, we offer the elevator and walk them to it. We offer, we never assume.”'],
+  liftAsk:'The fire alarm rings. Which way do you guide guests out?',
+  liftOpts:[['The stairs, calmly','Elevators can stop or open onto smoke. Stairs are the safe way down.',true],['The elevator, it’s faster','Never in a fire: elevators can stop between floors.',false]],
+  willowTitle:'The Willow Room',
+  willowText:['Delores: “This is the Willow Room, our little boardroom. Ten chairs around one long table, for small meetings and family talks.”','Delores: “Check a meeting room thirty minutes before it starts: chairs, water and glasses, pens and pads, the screen, and the temperature. Then the host walks into a room that is already right.”'],
+  willowAsk:'A host asks for twelve chairs all facing a screen. Which setup is that?',
+  willowOpts:[['Theater','Rows of chairs facing the front, like a little cinema.',true],['Boardroom','That is everyone around one long table.',false]],
+  irisTitle:'The Iris Room',
+  irisText:['Delores: “The Iris Room is our cozy meeting room by the garden. Book clubs love it, and so does a certain fern.”','Delores: “A U-shape is tables in the shape of a U, so everyone can see each other and the speaker can walk in the middle.”'],
+  irisAsk:'The book club leaves at 3 PM. What do you do first?',
+  irisOpts:[['Reset the room for the next group','Clear, wipe, set water and chairs, then tell the front desk it is ready.',true],['Lock it and reset tomorrow','The next group might arrive tonight. Reset it right away.',false]]},
+ es:{view:'V I S T A   A L   M A R',lift:'Escalera y ascensor',lift2:'Escalera y ascensor',willow:'Sala Sauce',iris:'Sala Iris',
+  kicker:'EL ALA ESTE',right:'¡Eso es!',again:'Prueba la otra.',
+  liftTitle:'Escalera y ascensor',
+  liftText:['Delores: “Cada ala tiene una escalera y un ascensor en cada extremo, para que nadie quede lejos de ninguno.”','Delores: “Si un huésped lleva maletas, un cochecito o un bastón, le ofrecemos el ascensor y lo acompañamos. Ofrecemos, nunca suponemos.”'],
+  liftAsk:'Suena la alarma de incendios. ¿Por dónde guías a los huéspedes?',
+  liftOpts:[['Por la escalera, con calma','Los ascensores pueden detenerse o abrirse al humo. La escalera es el camino seguro.',true],['Por el ascensor, es más rápido','Nunca en un incendio: el ascensor puede quedarse entre pisos.',false]],
+  willowTitle:'La Sala Sauce',
+  willowText:['Delores: “Esta es la Sala Sauce, nuestra pequeña sala de juntas. Diez sillas alrededor de una mesa larga, para reuniones pequeñas y charlas en familia.”','Delores: “Revisa la sala treinta minutos antes: sillas, agua y vasos, bolígrafos y libretas, la pantalla y la temperatura. Así el anfitrión entra a una sala que ya está perfecta.”'],
+  willowAsk:'Un anfitrión pide doce sillas mirando a una pantalla. ¿Qué montaje es?',
+  willowOpts:[['Teatro','Filas de sillas mirando al frente, como un cine pequeño.',true],['Sala de juntas','Eso es todos alrededor de una mesa larga.',false]],
+  irisTitle:'La Sala Iris',
+  irisText:['Delores: “La Sala Iris es nuestra sala acogedora junto al jardín. Al club de lectura le encanta, y a cierto helecho también.”','Delores: “Un montaje en U son mesas en forma de U, para que todos se vean y quien habla pueda caminar por el centro.”'],
+  irisAsk:'El club de lectura se va a las 3 PM. ¿Qué haces primero?',
+  irisOpts:[['Preparar la sala para el siguiente grupo','Recoger, limpiar, poner agua y sillas, y avisar a recepción que está lista.',true],['Cerrarla y prepararla mañana','El siguiente grupo podría llegar esta noche. Prepárala enseguida.',false]]}
+};
+const WT=WING_TEXT[profile.lang]||WING_TEXT.en;
+const WING_SPOTS={'wing-west':{x:123,y:352},'wing-east':{x:1187,y:352},willow:{x:300,y:446},iris:{x:1000,y:446}};
+/* The view the rooms face: a soft strip of sea above the wing, outdoors. */
+function wingSeaView(g){
+  const sea=g.createLinearGradient(0,0,0,44);sea.addColorStop(0,'#bfe0de');sea.addColorStop(1,'#7fb5b8');
+  g.fillStyle=sea;g.beginPath();g.roundRect(150,2,980,36,14);g.fill();
+  g.strokeStyle='#eef7f2';g.lineWidth=1.2;g.lineCap='round';
+  for(let i=0;i<34;i++){const x=170+(i*29)%940,y=10+(i*7)%22;g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+5,y-3,x+10,y);g.stroke();}
+  /* a tiny sailboat and two gulls */
+  g.fillStyle='#fbf4e1';g.beginPath();g.moveTo(905,24);g.lineTo(905,9);g.lineTo(915,24);g.closePath();g.fill();rect(g,898,24,22,4,'#8a6240',2);
+  g.strokeStyle='#fbf4e1';g.lineWidth=1;for(const [x,y] of [[360,12],[374,16]]){g.beginPath();g.moveTo(x-4,y);g.quadraticCurveTo(x-2,y-3,x,y);g.quadraticCurveTo(x+2,y-3,x+4,y);g.stroke();}
+  g.letterSpacing='2px';text(g,WT.view,640,26,9,'#2f5f5c','Georgia');g.letterSpacing='0px';
+}
+/* One end of the wing: an elevator above, a stair below, with a little vine climbing the side. */
+function wingEnd(g,cx,flip){
+  const L=cx-31,w=62;
+  /* elevator */
+  rect(g,L-3,92,w+6,112,AN.walnut,6);rect(g,L+2,97,w-4,102,'#efe4c6',3);
+  g.fillStyle='#e0c98f';g.beginPath();g.arc(cx,112,13,Math.PI,0);g.fill();g.strokeStyle=AN.walnutDk;g.lineWidth=1;g.stroke();
+  for(let i=0;i<5;i++){const a=Math.PI+i*Math.PI/4;ellipse(g,cx+Math.cos(a)*10,112+Math.sin(a)*10,1.2,1.2,AN.walnutDk);}
+  g.strokeStyle='#7a2e2e';g.lineWidth=1.5;g.beginPath();g.moveTo(cx,112);g.lineTo(cx-7,105);g.stroke();
+  const dg=g.createLinearGradient(L+8,0,L+w-8,0);dg.addColorStop(0,'#b89350');dg.addColorStop(.5,'#ecd296');dg.addColorStop(1,'#b89350');
+  rect(g,L+8,120,w-16,74,dg,2);rect(g,cx-.6,120,1.2,74,AN.walnutDk);
+  for(const dx of [-12,12]){g.strokeStyle='#8d6c33';g.lineWidth=1;g.beginPath();g.moveTo(cx+dx,132);g.quadraticCurveTo(cx+dx*1.4,150,cx+dx,168);g.quadraticCurveTo(cx+dx*.6,180,cx+dx,186);g.stroke();lily(g,cx+dx,140,.35,0);}
+  const bx=flip?L+4:L+w-4;rect(g,bx-3,150,6,14,'#8d6c33',2);ellipse(g,bx,154,1.6,1.6,'#f6e3ad');ellipse(g,bx,160,1.6,1.6,'#f6e3ad');
+  /* stair: steps rising toward the top, with a curling banister */
+  rect(g,L-3,214,w+6,118,AN.walnut,6);rect(g,L+2,219,w-4,108,'#e6d7b2',3);
+  for(let i=0;i<9;i++){const y=322-i*11,inset=i*1.6;rect(g,L+6+inset,y-8,w-12-inset*2,9,i%2?'#d8c39a':'#cdb68a',1);rect(g,L+6+inset,y-8,w-12-inset*2,1.4,'#f3e6c4');}
+  g.strokeStyle=AN.walnutDk;g.lineWidth=2.4;g.lineCap='round';const sx=flip?L+w-6:L+6,dir=flip?-1:1;
+  g.beginPath();g.moveTo(sx,326);g.bezierCurveTo(sx,290,sx+dir*6,250,sx+dir*10,226);g.stroke();
+  g.beginPath();g.arc(sx-dir*2,330,4,0,Math.PI*2);g.stroke();
+  /* a small vine along the outer edge, ending in a lily */
+  const vx=flip?L+w+6:L-6;g.strokeStyle=AN.gold;g.lineWidth=1.4;g.beginPath();g.moveTo(vx,332);g.bezierCurveTo(vx-dir*10,280,vx+dir*6,220,vx-dir*4,160);g.bezierCurveTo(vx-dir*10,120,vx,96,vx+dir*6,86);g.stroke();
+  for(const [y,a] of [[300,-2.4],[250,-.7],[200,-2.2],[140,-.8]])leaf(g,vx,y,11,flip?Math.PI-a:a,'#5f8a62');
+  lily(g,vx+dir*6,84,.6,0);
+}
+/* A small meeting room door in the hall's garden-side wall, with its name plate. */
+function wingMeetingDoor(g,x,name,hue){
+  rect(g,x-24,414,48,52,AN.walnut,5);rect(g,x-20,418,40,48,'#efe4c6',3);
+  g.fillStyle=hue;g.beginPath();g.moveTo(x-13,466);g.lineTo(x-13,436);g.arc(x,436,13,Math.PI,0);g.lineTo(x+13,466);g.closePath();g.fill();
+  g.strokeStyle=AN.walnutDk;g.lineWidth=1;g.stroke();
+  g.strokeStyle='#ffffff66';g.beginPath();g.moveTo(x-8,462);g.lineTo(x-8,438);g.arc(x,438,8,Math.PI,0);g.lineTo(x+8,462);g.stroke();
+  ellipse(g,x+9,452,1.6,1.6,'#e8cd8e');rect(g,x-10,425,20,6,'#fbf4e1',2);stroke(g,x-10,425,20,6,AN.gold,.8,2);
+  rect(g,x-26,466,52,6,'#b59c6b',2);
+  plaque(g,name,x,406);
+}
+function paintWingPlan(g){
+  wingEnd(g,123,false);wingEnd(g,1187,true);
+  wingMeetingDoor(g,WING_SPOTS.willow.x,WT.willow,'#7fa77a');wingMeetingDoor(g,WING_SPOTS.iris.x,WT.iris,'#9a8bc6');
+  plaque(g,WT.lift,123,352);plaque(g,WT.lift2,1187,352);
+}
+const wingExtras=world.options.extras;
+world.options.extras=()=>{const list=wingExtras();if(state&&!festivalActive&&!titleVisible){
+  list.push({id:'wing-west',...WING_SPOTS['wing-west'],name:WT.lift},{id:'wing-east',...WING_SPOTS['wing-east'],name:WT.lift2},
+    {id:'willow',...WING_SPOTS.willow,name:WT.willow},{id:'iris',...WING_SPOTS.iris,name:WT.iris});}return list;};
+function wingLesson(key){
+  const T=WT[key+'Title'],text=WT[key+'Text'],ask=WT[key+'Ask'],opts=WT[key+'Opts'];
+  scene({title:T,kicker:WT.kicker,speaker:'delores',text});
+  const q=document.createElement('p');q.className='wing-ask';q.innerHTML='<b>'+esc(ask)+'</b>';body.append(q);
+  const out=document.createElement('p');out.className='wing-out';out.setAttribute('role','status');
+  choices(opts.map(([label,why,right])=>({text:label,run:()=>{out.textContent=(right?'✨ '+WT.right+' ':WT.again+' ')+why;out.classList.toggle('right',right);if(right)body.querySelectorAll('.choices .choice').forEach(b=>b.disabled=true);narrativeText=body.innerText;}})),'wing-'+key);
+  body.append(out);narrativeText=body.innerText;
+}
+const wingInteract=interact;interact=function(id){
+  if(id==='wing-west'||id==='wing-east'){wingLesson('lift');return;}
+  if(id==='willow'||id==='iris'){wingLesson(id);return;}
+  return wingInteract.apply(this,arguments);};
+{const st=document.createElement('style');st.textContent='.wing-ask{margin:14px 0 4px}.wing-out{min-height:1.5em;margin:10px 0 0;font:italic 16px/1.5 Georgia,serif;color:#7a4a2e}.wing-out.right{color:#2f6a46}';document.head.append(st);}
+/* ==== end WING PLAN v1 ==== */
 
 /* Opening a credential link (?cert=...) shows that certificate. Kept last, after every course registers. */
 {const d=certParse(location.search);if(d)setTimeout(()=>certView(d),0);}
