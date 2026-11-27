@@ -11992,7 +11992,7 @@ const RW_TEXT={
   you:'You:',
   care:{
    seat:['🛋️','Offer a seat in the lobby and a drink','“Please make yourself comfortable in the lobby. May I bring you tea, coffee or some sparkling water while you wait?”','Delores: “Lovely. A comfy chair and a warm cup turn a wait into a welcome.”',1],
-   bags:['🧳','Offer to keep their luggage in a secure place','“May I store your luggage for you? We keep it in our locked luggage room, and we will bring it straight to your room the moment it is ready.”','Delores: “Hands free, heart light. And they never have to wonder where their bags went, because they are locked up safe.”',1],
+   bags:['🧳','Offer to keep their luggage in a secure place','“May I store your luggage for you? We will tag it with your name and keep it in our locked luggage room, and we will bring it straight to your room the moment it is ready.”','Delores: “Hands free, heart light. And they never have to wonder where their bags went, because they are locked up safe.”',1],
    text:['📱','Offer to text them when the room is ready','“May I text you the moment your room is ready? Could I have your mobile number, with the area code, please?”','Delores: “Now they can relax anywhere. Always the area code. And look, their phone is already on file for check-in.”',1],
    garden:['🌿','Offer a stroll in the garden','“Would you like to enjoy our garden while you wait? The roses are lovely this evening, and I will find you as soon as your room is ready.”','Delores: “A wait in the roses is barely a wait at all. Just remember where you sent them.”',1],
    honest:['⏱️','Give an honest time, and promise updates','“Thank you so much for your patience. Your room is being inspected now and should be ready in about ten minutes. I will update you the moment I hear.”','Delores: “That is the best one ⭐. An honest time and a promise to update. Guests forgive a wait. They do not forgive being forgotten.”',2],
@@ -12074,7 +12074,7 @@ function rwHelpCard(r,g){
     for(const [by,label,cls] of [['radio',rush?RW.radioRush:RW.radio,'primary-button'],['text',rush?RW.textRush:RW.text,'secondary-button']]){
       const b=document.createElement('button');b.type='button';b.className=cls+' rw-'+by;b.textContent=label;b.onclick=()=>rwCall(r,by);calls.append(b);}}
   if(g){
-    const first=g.name.split(' ')[0],care=g.care||[],good=care.reduce((n,k)=>n+RW.care[k][4],0);
+    const first=g.name.split(' ')[0],care=g.care||[],good=care.reduce((n,k)=>n+(RW.care[k]?RW.care[k][4]:k==='calm'?2:1),0);
     const box=document.createElement('div');box.className='rw-care';
     box.innerHTML='<b>'+esc(ht(RW.careHead,{name:first}))+'</b><p class="rw-mood">'+esc(ht(RW.mood,{name:first}))+' <span aria-hidden="true">'+('💛'.repeat(Math.min(5,good))+'🤍'.repeat(Math.max(0,5-good)))+'</span></p><div class="rw-opts"></div>'+
       (ph.rwYou&&care.length?'<p class="ph-why rw-you"><b>'+esc(RW.you)+'</b> '+esc(ph.rwYou)+'</p>':'');
@@ -12149,6 +12149,349 @@ body.reduce-motion .ph-tile.rw-calling{animation:none}
 @media(max-width:520px){.rw-opts{grid-template-columns:1fr}}
 `;document.head.append(st);}
 /* ==== end ROOM WAIT v1 ==== */
+/* ==== LUGGAGE v1: a locked luggage room, a practice clock with 4 PM check-in, impatient guests,
+   "something went wrong" moments, and two make-believe luxury programs ====
+   - The luggage room sits behind the front desk. Only the master key or the door code opens it.
+     Bags carry tags; the player matches tags to the room board, sends updates, helps the guest in,
+     and delivers bags once they have their keys.
+   - A practice clock starts at 1:00 PM. Standard check-in is 4 PM, because housekeeping needs the
+     day to clean and inspect. An early room is a bonus, never a reason to rush anyone. After 4 PM a
+     waiting guest becomes truly urgent.
+   - Some guests are impatient: four answers, the best is empathy + the why + an honest time.
+   - Sometimes the supervisor finds a snag; the best move is to update the guest first.
+   - Two invented programs (both called consortia): Velvet Card Stays (card-member, 12 PM early
+     check-in subject to availability, guaranteed 4 PM late check-out) and Compass Circle
+     (travel-advisor network, perks when available, no guaranteed late check-out). Nothing real. */
+const LG_TEXT={
+ en:{
+  clock:'🕐 Practice clock: {t}',std:'Standard check-in is 4 PM',pass:'⏩ Let 30 minutes pass',
+  late:'⏰ Past 4 PM. Anyone still waiting is now urgent.',
+  why4:'Delores: “Check-in is 4 PM so housekeeping has the whole day to clean and inspect every room after the morning check-outs. An early room is a lovely bonus. We ask kindly, and we never rush them.”',
+  tNote:{early:'🕓 It is {t}. Standard check-in is 4 PM, because housekeeping needs that time to clean and inspect every room. An early room is a lovely bonus, so ask kindly and never rush them.',
+         velvet:'⭐ {name} booked Velvet Card Stays: 12 PM early check-in, subject to availability. Offer it out loud even if no room is ready, and kindly ask housekeeping to do this room first.',
+         late:'⏰ It is {t}, past 4 PM. Now the wait is on us: apologize, offer a drink on the house, and keep updating {name} until they are in.'},
+  impHead:'{name} looks impatient:',impSays:'“I have been waiting forever. Why is my room not ready?”',
+  imp:{
+   calm:['💛','“I am so sorry for the wait, and I understand. Our check-in time is 4 PM so every room can be cleaned and inspected, and I have asked our supervisor to put yours first. I will update you within ten minutes.”','Delores: “That is the one ⭐. You said sorry, you said why, and you gave an honest time. Impatient guests mostly want to feel heard.”',2],
+   blame:['🙊','“Housekeeping is really slow today.”','Delores: “Never blame a teammate in front of a guest. We are one team, and they are working hard up there.”',0],
+   fake:['🤞','“It will be ready in two minutes, I promise!”','Delores: “Only promise a time you know. A broken promise turns impatient into upset.”',0],
+   rule:['📏','“Check-in is at 4 PM. Please come back then.”','Delores: “True, but chilly. Explain why, then make the wait nice: a seat, a drink, their bags kept safe.”',0]},
+  calmed:'{name}: “Thank you for being honest with me. A cup of tea would be lovely.”',
+  snag:'📻 Evelyn: “I found a dripping faucet in {r}. Maintenance is on the way, so about fifteen more minutes. I am sorry.”',
+  snagTip:'Delores: “Things go wrong. That is normal. What matters is that the guest hears it from us first, with a new honest time.”',
+  update:'📣 Update {name} with the new time',
+  updated:'“I have an update for you. Our supervisor found a small issue with the faucet, and maintenance is fixing it now. It should be about fifteen more minutes. Thank you so much for your patience.”',
+  updatedTip:'Delores: “Perfect. Bad news told early feels like good service. Bad news found out later feels like a secret.”',
+  onWayFix:'🔧 Maintenance is fixing {r}, then Evelyn checks it again · about 15 minutes',
+  doneFix:'📻 Evelyn: “The faucet is fixed, and Room {r} is inspected and ready.” ✨',
+  room:'🔒 Luggage room · behind the front desk',
+  locked:'Locked. Only staff with the master key or the door code may go in, so every guest’s bags stay safe.',
+  key:'🗝️ Use the master key',code:'🔢 Enter the door code',
+  codeHint:'Delores: “The code is 4-1-6, like 4 PM is 16:00. Never say it out loud in the lobby.”',
+  codeWrong:'🌱 Not quite. The code is on your shift note: 4-1-6.',
+  opened:{key:'Delores: “Master key in, door open. Lock it behind you every time.”',code:'Delores: “Code accepted. Lock it behind you every time.”'},
+  lock:'🔒 Lock the door',lockedSay:'Delores: “Locked. Bags safe, heart calm.”',
+  empty:'No bags in here yet. When a guest is waiting, offer to keep their luggage safe.',
+  shelf:'Tagged bags',
+  tag:{wait:'Desk check: still in the lobby · their room is {st}',waitNo:'Desk check: still in the lobby · no room picked yet',in:'Desk check: checked in · bags still here!',gone:'Desk check: booking cancelled · bags still here'},
+  stored:'Stored at {t}',departs:'Departs {d}',tagRule:'Tags show the guest’s name and departure date, never the room number.',
+  valet:'Delores: “The valet loads the bags on a luggage cart and tags every piece with the guest’s name and departure date. Never the room number: nobody passing by should learn where a guest sleeps, and the guest should see their room for the first time when they walk in. Then the bags go into the locked luggage room.”',
+  act:{text:'📱 Text an update',help:'🛎️ Help them now',deliver:'🛎️ Deliver to Room {r}',back:'🤲 Hand the bags back'},
+  said:{
+   text:'💬 You text {name}: “Hello from the front desk. Your room is being prepared now, and I will text you the moment it is ready. Your bags are safe with us.”',
+   deliver:'Delores: “Bags delivered to {r}. Knock, say ‘Bell service’, and set them on the luggage rack. Now {name} is truly home.”',
+   back:'Delores: “Bags handed back with a smile. Check the tag twice so they go to the right person.”',
+   bagsWaiting:' Their bags are in the luggage room. Deliver them next.'},
+  bagChip:'🏷️ Bags stored',
+  prog:{velvet:['⭐','Velvet Card Stays'],compass:['🧭','Compass Circle']},
+  progAsk:'Share their program benefits',progSaid:'Shared ✓',
+  progScript:{
+   velvet:'“Welcome to the manor, {name}. We are delighted to welcome you through Velvet Card Stays. May I share your benefits? You have breakfast for two each morning, a $100 experience credit, complimentary Wi-Fi, and guaranteed 4 PM late check-out. Early check-in at 12 PM depends on availability, and I will always do my best. Here is your welcome letter.”',
+   compass:'“Welcome to the manor, {name}. We are delighted to host you through your travel advisor and the Compass Circle. Your stay includes breakfast for two each morning and a $100 credit. An upgrade, early check-in and late check-out are offered whenever we have availability.”'},
+  progWhy:'Delores: “Program benefits are promised to the guest, so we share every one without being asked. And we never mix the two programs up.”',
+  lesson:'📘 Guest programs: don’t mix them up',
+  lessonIntro:'Both of these are called consortia: groups that send guests to many hotels with special perks. They look alike, but they are not the same. Every hotel has its own list, so always check yours.',
+  cols:{
+   velvet:['A card-member program, booked through the card’s travel service.',['12 PM early check-in, subject to availability. Offer it out loud even when it is not available.','Room upgrade, one category, when available.','Breakfast for two every day.','A $100 experience credit per stay.','Free Wi-Fi.','✅ Guaranteed 4 PM late check-out. Always honor it, and set the keys to work until 4 PM.','A welcome letter, every time.']],
+   compass:['A travel-advisor network, booked by the guest’s travel advisor.',['Room upgrade when available.','Breakfast for two every day.','A $100 credit per stay.','Early check-in when available.','Late check-out when available.','❌ No guaranteed 4 PM late check-out.']]},
+  lessonTips:['Tell every benefit without being asked.','At check-out, check the bill: no early check-in or late check-out fees, and the credit is applied.','Keep their details private. Never ask them to book direct instead.'],
+  quiz:[
+   {q:'A Compass Circle guest asks for their guaranteed 4 PM late check-out. What do you say?',opts:[['“Late check-out is not a guaranteed Compass benefit, but I would be glad to check what we can offer you.”',1],['“Of course, it is guaranteed!”',0],['“No late check-outs, sorry.”',0]],why:'Only Velvet Card Stays guarantees 4 PM. Compass gets it when available, and we still try.'},
+   {q:'A Velvet Card guest arrives at 1 PM and no room is ready. Best move?',opts:[['Mention their 12 PM early check-in benefit, explain it depends on availability, keep their bags safe, and text when the room is ready.',1],['Say nothing about early check-in, since it is not available.',0],['Ask housekeeping to skip the inspection.',0]],why:'The benefit is offered out loud even when it is not available, and the inspection never gets skipped.'},
+   {q:'What are programs like these called?',opts:[['Consortia',1],['Loyalty points',0],['Walk-ins',0]],why:'Both are consortia. Same family, different perks.'}],
+  right:'✨ Right!',again:'🌱 Not quite.'
+ },
+ es:{
+  clock:'🕐 Reloj de práctica: {t}',std:'El registro de entrada estándar es a las 4 PM',pass:'⏩ Dejar pasar 30 minutos',
+  late:'⏰ Pasadas las 4 PM. Quien siga esperando ya es urgente.',
+  why4:'Delores: “El registro es a las 4 PM para que limpieza tenga todo el día para limpiar e inspeccionar cada habitación tras las salidas de la mañana. Una habitación temprano es un regalo. Pedimos con amabilidad y nunca les metemos prisa.”',
+  tNote:{early:'🕓 Son las {t}. El registro estándar es a las 4 PM, porque limpieza necesita ese tiempo para limpiar e inspeccionar cada habitación. Una habitación temprano es un regalo, así que pide con amabilidad y nunca metas prisa.',
+         velvet:'⭐ {name} reservó con Velvet Card Stays: registro temprano a las 12 PM, según disponibilidad. Ofrécelo en voz alta aunque no haya habitación lista, y pide con amabilidad que hagan esta primero.',
+         late:'⏰ Son las {t}, pasadas las 4 PM. Ahora la espera es cosa nuestra: discúlpate, ofrece una bebida por cuenta de la casa y sigue informando a {name} hasta que entre.'},
+  impHead:'{name} parece impaciente:',impSays:'“Llevo una eternidad esperando. ¿Por qué no está lista mi habitación?”',
+  imp:{
+   calm:['💛','“Lamento mucho la espera, y lo entiendo. Nuestro registro es a las 4 PM para que cada habitación se limpie e inspeccione, y ya pedí a la supervisora que haga la suya primero. Le informo en diez minutos.”','Delores: “Esa es ⭐. Pediste disculpas, explicaste el porqué y diste un tiempo honesto. Un huésped impaciente sobre todo quiere sentirse escuchado.”',2],
+   blame:['🙊','“Limpieza va muy lenta hoy.”','Delores: “Nunca culpes a un compañero delante de un huésped. Somos un equipo, y arriba están trabajando mucho.”',0],
+   fake:['🤞','“¡Estará lista en dos minutos, lo prometo!”','Delores: “Promete solo un tiempo que conozcas. Una promesa rota convierte la impaciencia en enfado.”',0],
+   rule:['📏','“El registro es a las 4 PM. Vuelva entonces, por favor.”','Delores: “Cierto, pero frío. Explica el porqué y haz la espera agradable: un asiento, una bebida, sus maletas a salvo.”',0]},
+  calmed:'{name}: “Gracias por ser honesto conmigo. Un té sería estupendo.”',
+  snag:'📻 Evelyn: “Encontré un grifo que gotea en la {r}. Mantenimiento viene en camino, unos quince minutos más. Lo siento.”',
+  snagTip:'Delores: “Las cosas fallan. Es normal. Lo importante es que el huésped lo sepa por nosotros primero, con un nuevo tiempo honesto.”',
+  update:'📣 Informar a {name} del nuevo tiempo',
+  updated:'“Tengo novedades. Nuestra supervisora encontró un pequeño problema con el grifo y mantenimiento lo está arreglando. Serán unos quince minutos más. Muchas gracias por su paciencia.”',
+  updatedTip:'Delores: “Perfecto. Una mala noticia dada a tiempo se siente como buen servicio. Descubierta después, se siente como un secreto.”',
+  onWayFix:'🔧 Mantenimiento arregla la {r} y Evelyn la revisa otra vez · unos 15 minutos',
+  doneFix:'📻 Evelyn: “El grifo está arreglado y la {r} está inspeccionada y lista.” ✨',
+  room:'🔒 Cuarto de equipaje · detrás de recepción',
+  locked:'Cerrado con llave. Solo el personal con la llave maestra o el código puede entrar, para que las maletas de cada huésped estén seguras.',
+  key:'🗝️ Usar la llave maestra',code:'🔢 Marcar el código',
+  codeHint:'Delores: “El código es 4-1-6, como las 4 PM son las 16:00. Nunca lo digas en voz alta en el vestíbulo.”',
+  codeWrong:'🌱 Casi. El código está en tu nota de turno: 4-1-6.',
+  opened:{key:'Delores: “Llave maestra, puerta abierta. Ciérrala siempre al salir.”',code:'Delores: “Código correcto. Ciérrala siempre al salir.”'},
+  lock:'🔒 Cerrar con llave',lockedSay:'Delores: “Cerrado. Maletas a salvo, corazón tranquilo.”',
+  empty:'Aún no hay maletas. Cuando un huésped espere, ofrécele guardar su equipaje a salvo.',
+  shelf:'Maletas con etiqueta',
+  tag:{wait:'Nota de recepción: sigue en el vestíbulo · su habitación está {st}',waitNo:'Nota de recepción: sigue en el vestíbulo · aún sin habitación',in:'Nota de recepción: registrado · ¡sus maletas siguen aquí!',gone:'Nota de recepción: reserva cancelada · sus maletas siguen aquí'},
+  stored:'Guardadas a las {t}',departs:'Sale el {d}',tagRule:'Las etiquetas llevan el nombre del huésped y la fecha de salida, nunca el número de habitación.',
+  valet:'Delores: “El aparcacoches sube las maletas a un carrito y etiqueta cada una con el nombre del huésped y su fecha de salida. Nunca el número de habitación: nadie que pase debe saber dónde duerme un huésped, y el huésped debe ver su habitación por primera vez al entrar. Luego las maletas van al cuarto de equipaje cerrado con llave.”',
+  act:{text:'📱 Enviar novedades',help:'🛎️ Atenderle ahora',deliver:'🛎️ Llevar a la {r}',back:'🤲 Devolver las maletas'},
+  said:{
+   text:'💬 Escribes a {name}: “Hola, le escribimos desde recepción. Estamos preparando su habitación y le escribo en cuanto esté lista. Sus maletas están seguras con nosotros.”',
+   deliver:'Delores: “Maletas entregadas en la {r}. Llama, di ‘Servicio de botones’ y déjalas en el portamaletas. Ahora {name} está de verdad en casa.”',
+   back:'Delores: “Maletas devueltas con una sonrisa. Revisa la etiqueta dos veces para dárselas a la persona correcta.”',
+   bagsWaiting:' Sus maletas están en el cuarto de equipaje. Llévalas a continuación.'},
+  bagChip:'🏷️ Maletas guardadas',
+  prog:{velvet:['⭐','Velvet Card Stays'],compass:['🧭','Compass Circle']},
+  progAsk:'Contarle los beneficios de su programa',progSaid:'Contado ✓',
+  progScript:{
+   velvet:'“Bienvenido a la mansión, {name}. Es un placer recibirle a través de Velvet Card Stays. ¿Me permite contarle sus beneficios? Tiene desayuno para dos cada mañana, un crédito de $100 para experiencias, wifi gratis y salida tardía garantizada a las 4 PM. El registro temprano a las 12 PM depende de la disponibilidad, y siempre haré lo posible. Aquí tiene su carta de bienvenida.”',
+   compass:'“Bienvenido a la mansión, {name}. Es un placer recibirle a través de su agente de viajes y Compass Circle. Su estancia incluye desayuno para dos cada mañana y un crédito de $100. La mejora de habitación, el registro temprano y la salida tardía se ofrecen cuando hay disponibilidad.”'},
+  progWhy:'Delores: “Los beneficios del programa se le prometen al huésped, así que se los contamos todos sin que pregunte. Y nunca confundimos los dos programas.”',
+  lesson:'📘 Programas de huéspedes: no los confundas',
+  lessonIntro:'Los dos se llaman consorcios: grupos que envían huéspedes a muchos hoteles con beneficios especiales. Se parecen, pero no son iguales. Cada hotel tiene su lista, así que revisa siempre la tuya.',
+  cols:{
+   velvet:['Un programa para titulares de tarjeta, reservado por el servicio de viajes de la tarjeta.',['Registro temprano a las 12 PM, según disponibilidad. Ofrécelo en voz alta aunque no esté disponible.','Mejora de una categoría, según disponibilidad.','Desayuno para dos cada día.','Un crédito de $100 para experiencias por estancia.','Wifi gratis.','✅ Salida tardía garantizada a las 4 PM. Respétala siempre y programa las llaves hasta las 4 PM.','Una carta de bienvenida, siempre.']],
+   compass:['Una red de agentes de viajes, reservado por el agente del huésped.',['Mejora de habitación según disponibilidad.','Desayuno para dos cada día.','Un crédito de $100 por estancia.','Registro temprano según disponibilidad.','Salida tardía según disponibilidad.','❌ Sin salida tardía garantizada a las 4 PM.']]},
+  lessonTips:['Cuenta cada beneficio sin que lo pidan.','Al salir, revisa la cuenta: sin cargos por registro temprano o salida tardía, y con el crédito aplicado.','Guarda sus datos en privado. Nunca les pidas reservar directo en su lugar.'],
+  quiz:[
+   {q:'Un huésped de Compass Circle pide su salida tardía garantizada a las 4 PM. ¿Qué dices?',opts:[['“La salida tardía no es un beneficio garantizado de Compass, pero con gusto reviso qué podemos ofrecerle.”',1],['“¡Claro, está garantizada!”',0],['“No hay salidas tardías, lo siento.”',0]],why:'Solo Velvet Card Stays garantiza las 4 PM. Compass la tiene según disponibilidad, y aun así lo intentamos.'},
+   {q:'Un huésped de Velvet Card llega a la 1 PM y no hay habitación lista. ¿Qué haces?',opts:[['Mencionar su registro temprano a las 12 PM, explicar que depende de la disponibilidad, guardar sus maletas a salvo y escribirle cuando esté lista.',1],['No decir nada del registro temprano, ya que no está disponible.',0],['Pedir a limpieza que se salte la inspección.',0]],why:'El beneficio se ofrece en voz alta aunque no esté disponible, y la inspección nunca se salta.'},
+   {q:'¿Cómo se llaman programas como estos?',opts:[['Consorcios',1],['Puntos de fidelidad',0],['Clientes sin reserva',0]],why:'Los dos son consorcios. Misma familia, beneficios distintos.'}],
+  right:'✨ ¡Correcto!',again:'🌱 Casi.'
+ }
+};
+const LG=LG_TEXT[profile.lang]||LG_TEXT.en;
+RW.onWay.fix=LG.onWayFix;RW.done.fix=LG.doneFix;
+const LG_START=13*60;
+function lgT(m){m=Math.min(m,23*60+59);const h=Math.floor(m/60),mm=m%60;return (h%12||12)+':'+String(mm).padStart(2,'0')+' '+(h<12?'AM':'PM');}
+function lgDepart(n){const d=new Date();d.setDate(d.getDate()+n);try{return d.toLocaleDateString(profile.lang==='es'?'es':'en-US',{weekday:'short',month:'short',day:'numeric'});}catch(e){return d.toDateString();}}
+function lgState(){if(ph.clock==null)ph.clock=LG_START;if(!ph.bags)ph.bags=[];if(!ph.lug)ph.lug={open:false,code:''};return ph;}
+function lgWhere(gid){
+  if(ph.waiting.some(g=>g.id===gid))return {wait:1};
+  const r=Object.keys(ph.rooms).find(k=>ph.rooms[k].g&&ph.rooms[k].g.id===gid);return r?{r}:{gone:1};
+}
+function lgRefresh(){const o=$('ph-panel')&&phRender();return o;}
+{
+  /* Guests: some book through a program, some are impatient. */
+  const guest0=phGuest;
+  phGuest=function(k){const g=guest0(k);g.prog=k%5===1?'velvet':k%5===3?'compass':'';g.imp=k%4===2?1:0;return g;};
+  /* Undo also takes back bags and the clock. */
+  const snap0=phSnap;
+  phSnap=function(){lgState();snap0();const i=ph.undo.length-1,o=JSON.parse(ph.undo[i]);o.lg={bags:ph.bags,clock:ph.clock,snagUp:ph.snagUp||''};ph.undo[i]=JSON.stringify(o);};
+  const fresh0=phFresh;
+  phFresh=function(){fresh0();ph.clock=LG_START;ph.bags=[];ph.lug={open:false,code:''};ph.snagged=0;ph.inspects=0;ph.snagUp='';};
+  const open0=openPracticeHotel;
+  openPracticeHotel=function(opt={}){
+    if(ph)lgState();
+    const out=open0(opt);lgState();
+    const u=$('ph-undo');
+    if(u){const undo0=u.onclick;u.onclick=()=>{const s=ph.undo[ph.undo.length-1];if(!s)return;const o=JSON.parse(s);undo0();if(o.lg){ph.bags=o.lg.bags;ph.clock=o.lg.clock;ph.snagUp=o.lg.snagUp;phRender();}};}
+    return out;
+  };
+  /* Bags go to the luggage room when the guest says yes. */
+  const care0=rwCare;
+  rwCare=function(g,k){
+    const had=(g.care||[]).includes(k);care0(g,k);
+    if(k==='bags'&&!had){lgState();if(!ph.bags.some(b=>b.gid===g.id))ph.bags.push({gid:g.id,name:g.name,nights:g.nights,room:ph.mode&&ph.mode.wait||'',at:ph.clock});ph.say=LG.valet;phRender();}
+  };
+  /* A snag on the second inspection: the guest should hear it first. */
+  const done0=rwDone;
+  rwDone=function(r,tok){
+    const c=ph&&ph.calls&&ph.calls[r];
+    if(c&&c.tok===tok){
+      lgState();ph.clock+=c.kind==='clean'?25:c.kind==='fix'?15:10;
+      if(c.kind==='inspect'){ph.inspects=(ph.inspects||0)+1;
+        if(ph.inspects===2&&!ph.snagged&&(ph.rooms[r].st==='clean')){
+          ph.snagged=1;const t2=++rwTok;ph.calls[r]={kind:'fix',by:c.by,t0:Date.now(),dur:4000,tok:t2};setTimeout(()=>rwDone(r,t2),4000);
+          ph.rwScript='';ph.say=ht(LG.snag,{r})+'\n'+LG.snagTip;
+          const m=ph.mode;if(m&&m.wait===r&&m.pick)ph.snagUp=m.pick;
+          if($('ph-board')){joySound('boop');phRender();}return;}}
+    }
+    done0(r,tok);
+    if(ph.snagUp&&!(ph.calls&&ph.calls[r]))ph.snagUp='';
+    if($('ph-board'))phRender();
+  };
+  /* Help card: the time of day, impatient guests and the snag update. */
+  const help0=rwHelpCard;
+  rwHelpCard=function(r,g){
+    lgState();const card=help0(r,g),first=g?g.name.split(' ')[0]:'';
+    const note=document.createElement('p');note.className='lg-note'+(ph.clock>=16*60?' late':'');
+    note.textContent=ph.clock>=16*60?ht(LG.tNote.late,{t:lgT(ph.clock),name:first||'…'}):g&&g.prog==='velvet'?ht(LG.tNote.velvet,{name:first}):ht(LG.tNote.early,{t:lgT(ph.clock)});
+    card.querySelector('b').after(note);
+    if(g&&ph.snagUp===g.id){const b=document.createElement('button');b.type='button';b.className='primary-button hms-glow lg-update';b.textContent=ht(LG.update,{name:first});
+      b.onclick=()=>{phSnap();ph.snagUp='';if(!g.care)g.care=[];if(!g.care.includes('update'))g.care.push('update');ph.rwYou=LG.updated;ph.say=LG.updatedTip;joySound('coin',1);phRender();};
+      note.after(b);}
+    const box=card.querySelector('.rw-care');
+    if(g&&g.imp&&box){
+      const im=document.createElement('div');im.className='lg-imp';
+      if(g.calm){im.innerHTML='<p class="lg-said">'+esc(ht(LG.calmed,{name:first}))+'</p>';}
+      else{im.innerHTML='<b>'+esc(ht(LG.impHead,{name:first}))+'</b><p class="lg-said">'+esc(LG.impSays)+'</p><div class="lg-imp-opts"></div>';
+        for(const k of Object.keys(LG.imp)){const [i,line,tip,sc]=LG.imp[k],b=document.createElement('button');b.type='button';b.dataset.imp=k;
+          b.className='rw-opt'+((g.impTried||[]).includes(k)?' miss':'');b.innerHTML='<span aria-hidden="true">'+i+'</span><span>'+esc(line)+'</span><span></span>';
+          b.onclick=()=>{phSnap();if(sc){g.calm=1;g.care=g.care||[];g.care.push('calm');}else{g.impTried=[...(g.impTried||[]),k];}ph.rwYou=line;ph.say=tip;joySound(sc?'coin':'boop',sc?1:0);phRender();};
+          im.querySelector('.lg-imp-opts').append(b);}}
+      box.querySelector('b').after(im);
+    }
+    /* Hearts also count the calm answer and the update. */
+    const mood=card.querySelector('.rw-mood span');
+    if(g&&mood){const care=g.care||[],good=care.reduce((n,k)=>n+(RW.care[k]?RW.care[k][4]:k==='calm'?2:1),0);mood.textContent='💛'.repeat(Math.min(5,good))+'🤍'.repeat(Math.max(0,5-good));}
+    if(g&&box&&ph.rwYou&&!box.querySelector('.rw-you')&&(g.care||[]).length){const p=document.createElement('p');p.className='ph-why rw-you';p.innerHTML='<b>'+esc(RW.you)+'</b> '+esc(ph.rwYou);box.append(p);}
+    return card;
+  };
+  /* Check-in card: program guests get their benefits shared. */
+  const panel0=phPanel;
+  phPanel=function(){
+    panel0();lgState();
+    const m=ph.mode;if(!m||!m.info)return;const g=phFind(m.info);if(!g)return;
+    const asks=$('ph-panel').querySelector('.ph-asks');
+    if(g.prog&&asks){const [i,l]=LG.prog[g.prog],b=document.createElement('button');b.type='button';b.className='ph-ask lg-prog'+(g.progSaid?' got':' hms-glow');
+      b.innerHTML='<span aria-hidden="true">'+i+'</span><span><b>'+esc(LG.progAsk)+'</b><small>'+esc(l)+(g.progSaid?' · '+esc(LG.progSaid):'')+'</small></span><span aria-hidden="true">'+(g.progSaid?'✓':'')+'</span>';
+      b.onclick=()=>{if(g.progSaid)return;phSnap();g.progSaid=1;ph.say=ht(LG.progScript[g.prog],{name:g.name})+'\n'+LG.progWhy;joySound('coin',1);phRender();};
+      asks.append(b);}
+  };
+  /* The keys line reminds you about bags. */
+  const render0=phRender;
+  phRender=function(){
+    lgState();
+    for(const b of ph.bags){const w=lgWhere(b.gid);if(w.r&&!b.room)b.room=w.r;if(w.r)b.room=w.r;}
+    const pending=ph.bags.find(b=>lgWhere(b.gid).r&&!b.done);
+    if(pending&&ph.say&&ph.say.includes('🔑')===false&&/Keys last|Las llaves/.test(ph.say)&&!ph.say.includes(LG.said.bagsWaiting))ph.say+=LG.said.bagsWaiting;
+    render0();
+    if(!$('ph-board'))return;
+    $('ph-say').textContent=ph.say;
+    for(const id of ['lg-clock','lg-room','lg-lesson'])$(id)?.remove();
+    /* Clock bar above the board. */
+    const head=$('ph-board').previousElementSibling,late=ph.clock>=16*60,anyWait=ph.waiting.length>0;
+    const bar=document.createElement('div');bar.className='lg-clock'+(late&&anyWait?' late':'');bar.id='lg-clock';
+    bar.innerHTML='<span><b>'+esc(ht(LG.clock,{t:lgT(ph.clock)}))+'</b><small>'+esc(late&&anyWait?LG.late:LG.std)+'</small></span>';
+    const why=document.createElement('button');why.type='button';why.className='secondary-button lg-why';why.textContent='❔';why.setAttribute('aria-label',LG.std);
+    why.onclick=()=>{ph.say=LG.why4;phRender();};
+    const pass=document.createElement('button');pass.type='button';pass.className='secondary-button lg-pass';pass.textContent=LG.pass;
+    pass.onclick=()=>{phSnap();ph.clock=Math.min(23*60+30,ph.clock+30);joySound('pop');phRender();};
+    bar.append(why,pass);head.before(bar);
+    /* Program badges and bag chips on waiting guests. */
+    $('ph-wait').querySelectorAll('.ph-guest').forEach((row,i)=>{const g=ph.waiting[i];if(!g)return;const s=row.querySelector('span');
+      if(g.prog){const [ic,l]=LG.prog[g.prog];s.insertAdjacentHTML('beforeend','<small class="lg-badge '+g.prog+'">'+ic+' '+esc(l)+'</small>');}
+      if(ph.bags.some(b=>b.gid===g.id&&!b.done))s.insertAdjacentHTML('beforeend','<small class="lg-chip">'+esc(LG.bagChip)+'</small>');});
+    lgRoom();
+    lgLesson();
+    narrativeText=body.innerText;
+  };
+}
+function lgRoom(){
+  const wait=$('ph-wait');if(!wait)return;
+  const sec=document.createElement('section');sec.className='lg-room'+(ph.lug.open?' open':'');sec.id='lg-room';
+  const live=ph.bags.filter(b=>!b.done);
+  sec.innerHTML='<h3 class="pins-heading">'+esc(LG.room)+(live.length?' <span class="lg-count">🧳 '+live.length+'</span>':'')+'</h3>';
+  if(!ph.lug.open){
+    const door=document.createElement('div');door.className='lg-door';
+    door.innerHTML='<div class="lg-door-art" aria-hidden="true"><i></i><span>🔒</span></div><div class="lg-door-side"><p>'+esc(LG.locked)+'</p><div class="ph-acts"></div><div class="lg-pad" hidden></div></div>';
+    const acts=door.querySelector('.ph-acts'),pad=door.querySelector('.lg-pad');
+    const kb=document.createElement('button');kb.type='button';kb.className='primary-button lg-key';kb.textContent=LG.key;
+    kb.onclick=()=>{ph.lug.open=true;ph.say=LG.opened.key;joySound('open',1);phRender();};
+    const cb=document.createElement('button');cb.type='button';cb.className='secondary-button lg-code';cb.textContent=LG.code;
+    cb.onclick=()=>{ph.lug.code='';ph.lug.pad=true;ph.say=LG.codeHint;phRender();};
+    acts.append(kb,cb);
+    if(ph.lug.pad){pad.hidden=false;
+      pad.innerHTML='<output class="lg-shown">'+(ph.lug.code.replace(/./g,'●')||'· · ·')+'</output><div class="lg-keys"></div>';
+      for(const d of ['1','2','3','4','5','6','7','8','9','0']){const b=document.createElement('button');b.type='button';b.className='lg-digit';b.textContent=d;b.dataset.d=d;
+        b.onclick=()=>{ph.lug.code+=d;if(ph.lug.code.length>=3){if(ph.lug.code==='416'){ph.lug.open=true;ph.lug.pad=false;ph.say=LG.opened.code;joySound('open',1);}else{ph.lug.code='';ph.say=LG.codeWrong;joySound('boop');}}else joySound('pop');phRender();};
+        pad.querySelector('.lg-keys').append(b);}}
+    sec.append(door);
+  }else{
+    const rule=document.createElement('p');rule.className='joy-hint lg-rule';rule.textContent='🏷️ '+LG.tagRule;sec.append(rule);
+    const shelf=document.createElement('div');shelf.className='lg-shelf';
+    if(!live.length)shelf.innerHTML='<p class="joy-hint">'+esc(LG.empty)+'</p>';
+    for(const b of live){
+      const w=lgWhere(b.gid),first=b.name.split(' ')[0],R=b.room&&ph.rooms[b.room];
+      const tagLine=w.wait?(b.room&&R?ht(LG.tag.wait,{st:HF.st[R.st][0]+' '+HF.st[R.st][1]}):LG.tag.waitNo):w.r?LG.tag.in:LG.tag.gone;
+      const dep=lgDepart(b.nights||1);
+      const bag=document.createElement('div');bag.className='lg-bag'+(w.r?' due':'')+(w.gone?' gone':'');bag.dataset.gid=b.gid;
+      bag.innerHTML='<span class="lg-suitcase" aria-hidden="true">🧳</span><div class="lg-tag"><b>🏷️ '+esc(b.name)+'</b><small class="lg-dep">'+esc(ht(LG.departs,{d:dep}))+'</small></div><p class="lg-desk">'+esc(tagLine)+' · '+esc(ht(LG.stored,{t:lgT(b.at)}))+'</p><div class="ph-acts"></div>';
+      const acts=bag.querySelector('.ph-acts');
+      const add=(label,cls,run)=>{const x=document.createElement('button');x.type='button';x.className=cls;x.textContent=label;x.onclick=run;acts.append(x);};
+      if(w.wait){
+        add(LG.act.text,'secondary-button lg-text',()=>{ph.say=ht(LG.said.text,{name:first});joySound('pop');phRender();});
+        add(LG.act.help,'primary-button lg-help',()=>{const g=phFind(b.gid);ph.mode={pick:g.id};if(b.room&&ph.rooms[b.room].st!=='ready'&&ph.rooms[b.room].st!=='guest')ph.mode.wait=b.room;ph.sel='';ph.say=ht(HF.pickFor,{name:g.name});joySound('pop');phRender();$('ph-board').scrollIntoView({block:'center',behavior:'smooth'});});
+      }else if(w.r){
+        add(ht(LG.act.deliver,{r:w.r}),'primary-button hms-glow lg-deliver',()=>{phSnap();b.done=1;ph.say=ht(LG.said.deliver,{r:w.r,name:first});joySound('hop',1);phRender();phPop($('ph-board').querySelector('[data-r="'+w.r+'"]'),'🧳');});
+      }else add(LG.act.back,'secondary-button lg-back',()=>{phSnap();b.done=1;ph.say=LG.said.back;joySound('pop');phRender();});
+      shelf.append(bag);
+    }
+    sec.append(shelf);
+    const lk=document.createElement('button');lk.type='button';lk.className='secondary-button lg-lock';lk.textContent=LG.lock;
+    lk.onclick=()=>{ph.lug.open=false;ph.lug.pad=false;ph.say=LG.lockedSay;joySound('boop');phRender();};
+    sec.append(lk);
+  }
+  wait.after(sec);
+}
+function lgLesson(){
+  const room=$('lg-room');if(!room)return;
+  const d=document.createElement('details');d.className='hms-more lg-lesson';d.id='lg-lesson';if(ph.lessonOpen)d.open=true;
+  d.ontoggle=()=>{ph.lessonOpen=d.open;};
+  const col=k=>{const [ic,name]=LG.prog[k],[who,list]=LG.cols[k];return '<div class="lg-col '+k+'"><b>'+ic+' '+esc(name)+'</b><small>'+esc(who)+'</small><ul>'+list.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';};
+  d.innerHTML='<summary>'+esc(LG.lesson)+'</summary><p>'+esc(LG.lessonIntro)+'</p><div class="lg-cols">'+col('velvet')+col('compass')+'</div><ul class="lg-tips">'+LG.lessonTips.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><div class="lg-quiz"></div>';
+  const qz=d.querySelector('.lg-quiz');ph.lgQ=ph.lgQ||{};
+  LG.quiz.forEach((Q,qi)=>{const box=document.createElement('div');box.className='lg-q';box.innerHTML='<b>'+esc(Q.q)+'</b>';
+    Q.opts.forEach(([t,ok],oi)=>{const b=document.createElement('button');b.type='button';b.className='choice lg-opt'+(ph.lgQ[qi]===oi?(ok?' right':' wrong'):'');b.textContent=t;
+      b.onclick=()=>{ph.lgQ[qi]=oi;joySound(ok?'coin':'boop',ok?1:0);phRender();};box.append(b);});
+    if(ph.lgQ[qi]!=null){const ok=Q.opts[ph.lgQ[qi]][1];const p=document.createElement('p');p.className='ph-why';p.textContent=(ok?LG.right:LG.again)+' '+Q.why;box.append(p);}
+    qz.append(box);});
+  room.after(d);
+}
+{const st=document.createElement('style');st.textContent=`
+.lg-clock{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 0;padding:8px 12px;border-radius:14px;border:2px solid #b5d8c4;background:#effbf3}
+.lg-clock>span{flex:1 1 180px}.lg-clock b{display:block;font:bold 16px Georgia,serif;color:var(--ink)}.lg-clock small{font:12px Arial,sans-serif;color:#2f5d50}
+.lg-clock.late{border-color:#f09a74;background:#fff1ea}.lg-clock.late small{color:#9a3d1c;font-weight:bold}
+.lg-clock button{min-height:44px}.lg-why{min-width:44px;padding:0 10px}
+.lg-note{margin:0;padding:8px 12px;border-radius:12px;background:#effbf3;border:1px solid #b5d8c4;line-height:1.45}.lg-note.late{background:#fff1ea;border-color:#f09a74}
+.lg-update{min-height:50px}
+.lg-imp{display:grid;gap:6px;padding:8px 10px;border-radius:12px;background:#fff6f0;border:1px solid #f3c3a8}
+.lg-said{margin:0;font-style:italic}.lg-imp-opts{display:grid;gap:6px}
+.lg-badge,.lg-chip{display:inline-block;margin:2px 4px 0 0;padding:1px 8px;border-radius:99px;font:bold 11px Arial,sans-serif}
+.lg-badge.velvet{background:#efe4fb;color:#5b3a86;border:1px solid #c7b0e8}.lg-badge.compass{background:#e3f1fb;color:#1f5577;border:1px solid #9cc7e6}
+.lg-chip{background:#fff3c4;color:#7a5a12;border:1px solid #e8c34a}
+.lg-room{margin-top:6px}.lg-count{font:bold 13px Arial,sans-serif;background:#fff3c4;border:1px solid #e8c34a;border-radius:99px;padding:2px 8px;vertical-align:middle}
+.lg-door{display:grid;grid-template-columns:86px 1fr;gap:12px;align-items:center;padding:10px;border-radius:16px;background:#f6efe1;border:2px solid #b89a6a}
+.lg-door-art{position:relative;height:118px;border-radius:40px 40px 6px 6px;background:linear-gradient(90deg,#6b4a2e,#8a6240 50%,#6b4a2e);border:3px solid #4b2f1c;box-shadow:inset 0 0 0 5px #7c5634}
+.lg-door-art i{position:absolute;left:14px;right:14px;top:18px;height:40px;border-radius:26px 26px 4px 4px;border:2px solid #c9952f88}
+.lg-door-art span{position:absolute;right:8px;top:56px;font-size:20px}
+.lg-door-side{display:grid;gap:8px}.lg-door-side p{margin:0}.lg-door-side button{min-height:48px}
+.lg-pad{display:grid;gap:6px}.lg-shown{font:bold 22px 'Courier New',monospace;letter-spacing:6px;padding:4px 10px;border-radius:10px;background:#1f3b33;color:#bff3d6;text-align:center}
+.lg-keys{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.lg-digit{min-height:44px;border-radius:10px;border:1px solid #b89a6a;background:#fffaf0;font:bold 18px Arial,sans-serif;color:var(--ink);cursor:pointer}
+.lg-room.open .lg-shelf{display:grid;gap:8px;padding:10px;border-radius:16px;background:#efe3c8;border:2px solid #b89a6a;box-shadow:inset 0 -6px 0 #b89a6a}
+.lg-bag{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;padding:8px 10px;border-radius:14px;background:#fffdf7;border:1px solid #e0cf9e}
+.lg-bag .ph-acts{grid-column:1/-1}.lg-bag.due{border:2px solid #6cc25a;background:#effbe9}.lg-bag.gone{border-style:dashed}
+.lg-suitcase{font-size:34px}.lg-tag{justify-self:start;padding:4px 12px 4px 10px;border-radius:4px 10px 10px 4px;background:#fff3c4;border:1px solid #c9952f;box-shadow:1px 1px 0 #c9952f55}.lg-tag b{display:block}.lg-tag small{display:block;font:12px Arial,sans-serif;color:#5b5444}
+.lg-desk{grid-column:1/-1;margin:0;font:12px Arial,sans-serif;color:#2f5d50}
+.lg-bag .ph-acts button,.lg-lock{min-height:46px}.lg-lock{margin-top:8px}
+.lg-lesson p{margin:6px 0}.lg-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lg-col{padding:10px;border-radius:14px;border:2px solid}.lg-col.velvet{background:#f6f0fd;border-color:#c7b0e8}.lg-col.compass{background:#eef6fc;border-color:#9cc7e6}
+.lg-col b{display:block;font:bold 16px Georgia,serif}.lg-col small{display:block;font:12px Arial,sans-serif;color:#5b5444}.lg-col ul,.lg-tips{margin:6px 0 0;padding-left:18px;line-height:1.45}
+.lg-quiz{display:grid;gap:10px;margin-top:8px}.lg-q{display:grid;gap:6px}.lg-opt.right{border-color:#6cc25a;background:#effbe9}.lg-opt.wrong{border-color:#f09a74;background:#fff1ea}
+@media(max-width:520px){.lg-cols{grid-template-columns:1fr}.lg-door{grid-template-columns:64px 1fr}.lg-door-art{height:100px}}
+`;document.head.append(st);}
+/* ==== end LUGGAGE v1 ==== */
 /* ==== SPLIT v1: the manor and the desk computer side by side ====
    - When the desk computer (HMS) opens during play, the manor stays on screen: the HMS slides up
      as a drawer over the bottom half (centered, never wider than 860px), with the manor showing
