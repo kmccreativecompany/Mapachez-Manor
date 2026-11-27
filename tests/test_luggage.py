@@ -108,5 +108,14 @@ class Luggage(fbase.Friendly):
         self.assertIn('Right', self.page.locator('.lg-q').first.inner_text())
 
 
+    def test_07_luggage_room_is_on_the_manor_map_by_the_front_desk(self):
+        self.enter_manor()
+        self.assertIn('luggage', self.page.evaluate('window.hmsTest.extras'))
+        self.page.evaluate("window.hmsTest.interact('luggage')")
+        self.page.wait_for_selector('#lg-room')
+        self.assertIn('right by the front desk', self.say())
+        self.assertIn('Locked', self.page.locator('#lg-room').inner_text())
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

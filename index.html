@@ -12151,7 +12151,7 @@ body.reduce-motion .ph-tile.rw-calling{animation:none}
 /* ==== end ROOM WAIT v1 ==== */
 /* ==== LUGGAGE v1: a locked luggage room, a practice clock with 4 PM check-in, impatient guests,
    "something went wrong" moments, and two make-believe luxury programs ====
-   - The luggage room sits behind the front desk. Only the master key or the door code opens it.
+   - The luggage room sits by the front desk (west wall of the foyer on the map). Only the master key or the door code opens it.
      Bags carry tags; the player matches tags to the room board, sends updates, helps the guest in,
      and delivers bags once they have their keys.
    - A practice clock starts at 1:00 PM. Standard check-in is 4 PM, because housekeeping needs the
@@ -12184,7 +12184,7 @@ const LG_TEXT={
   updatedTip:'Delores: “Perfect. Bad news told early feels like good service. Bad news found out later feels like a secret.”',
   onWayFix:'🔧 Maintenance is fixing {r}, then Evelyn checks it again · about 15 minutes',
   doneFix:'📻 Evelyn: “The faucet is fixed, and Room {r} is inspected and ready.” ✨',
-  room:'🔒 Luggage room · behind the front desk',
+  room:'🔒 Luggage room · by the front desk',
   locked:'Locked. Only staff with the master key or the door code may go in, so every guest’s bags stay safe.',
   key:'🗝️ Use the master key',code:'🔢 Enter the door code',
   codeHint:'Delores: “The code is 4-1-6, like 4 PM is 16:00. Never say it out loud in the lobby.”',
@@ -12242,7 +12242,7 @@ const LG_TEXT={
   updatedTip:'Delores: “Perfecto. Una mala noticia dada a tiempo se siente como buen servicio. Descubierta después, se siente como un secreto.”',
   onWayFix:'🔧 Mantenimiento arregla la {r} y Evelyn la revisa otra vez · unos 15 minutos',
   doneFix:'📻 Evelyn: “El grifo está arreglado y la {r} está inspeccionada y lista.” ✨',
-  room:'🔒 Cuarto de equipaje · detrás de recepción',
+  room:'🔒 Cuarto de equipaje · junto a recepción',
   locked:'Cerrado con llave. Solo el personal con la llave maestra o el código puede entrar, para que las maletas de cada huésped estén seguras.',
   key:'🗝️ Usar la llave maestra',code:'🔢 Marcar el código',
   codeHint:'Delores: “El código es 4-1-6, como las 4 PM son las 16:00. Nunca lo digas en voz alta en el vestíbulo.”',
@@ -12491,6 +12491,41 @@ function lgLesson(){
 .lg-quiz{display:grid;gap:10px;margin-top:8px}.lg-q{display:grid;gap:6px}.lg-opt.right{border-color:#6cc25a;background:#effbe9}.lg-opt.wrong{border-color:#f09a74;background:#fff1ea}
 @media(max-width:520px){.lg-cols{grid-template-columns:1fr}.lg-door{grid-template-columns:64px 1fr}.lg-door-art{height:100px}}
 `;document.head.append(st);}
+/* ---------- The luggage room on the manor map: a locked door by the front desk, with the cart ---------- */
+const LUG_SPOT={x:100,y:676};
+const LUG_MAP={
+ en:{name:'Luggage room',hello:'Delores: “This is our luggage room, right by the front desk. It stays locked, and only staff with the master key or the code go in. Every bag is tagged with a name and a departure date, never a room number.”'},
+ es:{name:'Cuarto de equipaje',hello:'Delores: “Este es nuestro cuarto de equipaje, junto a recepción. Siempre está cerrado con llave, y solo entra el personal con la llave maestra o el código. Cada maleta lleva el nombre y la fecha de salida, nunca el número de habitación.”'}
+}[profile.lang]||null;
+const LM=LUG_MAP||{name:'Luggage room',hello:''};
+function drawLuggageRoom(c,time,calm){
+  if(festivalActive||!state)return;
+  /* The door, set into the foyer's west wall. */
+  const x=62,y=632,w=26,h=42;
+  c.fillStyle='#4b2f1c';c.beginPath();c.roundRect(x-2,y-2,w+4,h+4,[12,12,2,2]);c.fill();
+  const g=c.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#6b4a2e');g.addColorStop(.5,'#8a6240');g.addColorStop(1,'#6b4a2e');
+  c.fillStyle=g;c.beginPath();c.roundRect(x,y,w,h,[10,10,1,1]);c.fill();
+  c.strokeStyle='rgba(201,149,47,.55)';c.lineWidth=1;c.beginPath();c.roundRect(x+5,y+6,w-10,14,[6,6,1,1]);c.stroke();c.strokeRect(x+5,y+24,w-10,14);
+  /* Brass keypad and lock. */
+  c.fillStyle='#c9952f';c.fillRect(x+w-9,y+19,6,9);c.fillStyle='#1f3b33';for(let i=0;i<3;i++)c.fillRect(x+w-8,y+20+i*2.6,4,1.4);
+  ellipse(c,x+w-6,y+32,2,2,'#e8c34a');
+  const blink=calm?1:.55+.45*Math.sin(time/500);ellipse(c,x+w-6,y+17,1.4,1.4,'rgba(220,60,60,'+blink+')');
+  /* The luggage cart, with tagged bags. */
+  const cx=110,cy=664;
+  c.strokeStyle='#c9952f';c.lineWidth=2;c.beginPath();c.moveTo(cx-16,cy+12);c.lineTo(cx+18,cy+12);c.moveTo(cx-16,cy+12);c.lineTo(cx-16,cy-14);c.quadraticCurveTo(cx+1,cy-24,cx+18,cy-14);c.lineTo(cx+18,cy+12);c.stroke();
+  ellipse(c,cx-12,cy+15,2.6,2.6,'#3b2a1d');ellipse(c,cx+14,cy+15,2.6,2.6,'#3b2a1d');
+  const bags=[['#5b8fd1',-13,-6,12,16],['#c86f5a',0,-2,11,13],['#7a9a5a',11,-8,9,19]];
+  for(const [col,dx,dy,bw,bh] of bags){c.fillStyle=col;c.beginPath();c.roundRect(cx+dx-bw/2,cy+dy,bw,bh,2);c.fill();c.fillStyle='rgba(0,0,0,.25)';c.fillRect(cx+dx-bw/2+2,cy+dy+2,1.2,bh-4);
+    c.fillStyle='#fff3c4';c.fillRect(cx+dx+bw/2-2,cy+dy+3,4,5);}
+  if(LABELS)plaque(c,'🔒 '+LM.name,x+w/2+6,y-12);
+}
+const lugExtras=world.options.extras;
+world.options.extras=()=>{const list=lugExtras();if(state&&!festivalActive&&!titleVisible)list.push({id:'luggage',...LUG_SPOT,name:LM.name});return list;};
+const lugDrawExtras=world.options.drawExtras;
+world.options.drawExtras=(c,time,calm)=>{lugDrawExtras(c,time,calm);drawLuggageRoom(c,time,calm);};
+const lugInteract=interact;interact=function(id){
+  if(id==='luggage'){openPracticeHotel();if(ph){ph.say=LM.hello;phRender();}setTimeout(()=>$('lg-room')?.scrollIntoView({block:'center'}),80);return;}
+  return lugInteract.apply(this,arguments);};
 /* ==== end LUGGAGE v1 ==== */
 /* ==== SPLIT v1: the manor and the desk computer side by side ====
    - When the desk computer (HMS) opens during play, the manor stays on screen: the HMS slides up
