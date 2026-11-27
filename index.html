@@ -11963,6 +11963,192 @@ body.reduce-motion .hms-next{animation:none}
 @media(max-width:520px){.ph-tile{min-height:104px}.ph-ic{font-size:26px}.hms-tile{min-height:88px}}
 `;document.head.append(st);}
 /* ==== end HMS FRIENDLY v1 ==== */
+/* ==== ROOM WAIT v1: ask housekeeping for help, and care for the guest while they wait ====
+   - In the practice hotel, tapping a 🔍 or 🧹 room while picking a room for a guest no longer
+     dead-ends. A card opens: 📻 radio or 💬 text Evelyn, the housekeeping supervisor (or ask for a
+     rush clean). A short sped-up wait runs, then the room turns ✨ and check-in carries on.
+   - While the guest waits, six choices teach real practice: a seat and a drink, luggage kept in
+     a secure place, a text when the room is ready (mobile with area code), a garden stroll, and
+     the best one, an honest time estimate with a promise to update. One casual miss for contrast.
+   - The same radio and text buttons also show on any 🔍 or 🧹 room card. Nothing is removed. */
+const RW_TEXT={
+ en:{
+  headClean:'🔍 Room {r} needs an inspection first',headTidy:'🧹 Room {r} needs cleaning and an inspection first',
+  ask:'Ask housekeeping for help',
+  radio:'📻 Radio the housekeeping supervisor',text:'💬 Text the housekeeping supervisor',
+  radioRush:'📻 Radio housekeeping for a rush clean',textRush:'💬 Text housekeeping for a rush clean',
+  orReady:'Or tap a glowing ✨ room instead.',noReady:'No room is ✨ ready yet. Tap a 🔍 or 🧹 room, and ask housekeeping for help.',
+  onWay:{inspect:'📻 Evelyn is on the way to inspect {r} · about 10 minutes (sped up for practice)',clean:'📻 Housekeeping is rushing {r}, then Evelyn inspects it · about 25 minutes (sped up for practice)'},
+  script:{
+   radio:{inspect:'You, on the radio: “Front desk to housekeeping supervisor. Could you please inspect Room {r}? A guest is waiting for it. Thank you.”\n📻 Evelyn: “Copy that. On my way to {r}. About ten minutes.”',
+          clean:'You, on the radio: “Front desk to housekeeping. Could Room {r} please be cleaned next? A guest is waiting for it. Thank you.”\n📻 Housekeeping: “Copy that. Cleaning {r} now, and Evelyn will inspect it right after. About twenty-five minutes.”'},
+   text:{inspect:'💬 You text: “Hello Evelyn, could you please inspect Room {r} when you are able? A guest is waiting for it. Thank you!”\n💬 Evelyn: “On my way. About ten minutes.”',
+         clean:'💬 You text: “Hello, could Room {r} please be cleaned next? A guest is waiting for it. Thank you!”\n💬 Housekeeping: “Starting {r} now. Evelyn will inspect it right after.”'}},
+  howTip:'Delores: “Radio is fastest on a busy night. A text leaves a note they can read between rooms. Both are polite, and both say a guest is waiting.”',
+  done:{inspect:'📻 Evelyn: “Room {r} is inspected and ready. Every corner is perfect.” ✨',clean:'📻 Evelyn: “Room {r} is cleaned, inspected and ready. Even the sock drawer is empty.” ✨'},
+  goOn:' Let’s finish checking in {name}.',textedBack:' 💬 We text {name}: “Wonderful news, your room is ready!”',
+  moveOn:' Now tap {r} to finish the move.',
+  careHead:'While {name} waits, you could…',mood:'{name}’s mood',best:'⭐ Best',
+  you:'You:',
+  care:{
+   seat:['🛋️','Offer a seat in the lobby and a drink','“Please make yourself comfortable in the lobby. May I bring you tea, coffee or some sparkling water while you wait?”','Delores: “Lovely. A comfy chair and a warm cup turn a wait into a welcome.”',1],
+   bags:['🧳','Offer to keep their luggage in a secure place','“May I store your luggage for you? We keep it in our locked luggage room, and we will bring it straight to your room the moment it is ready.”','Delores: “Hands free, heart light. And they never have to wonder where their bags went, because they are locked up safe.”',1],
+   text:['📱','Offer to text them when the room is ready','“May I text you the moment your room is ready? Could I have your mobile number, with the area code, please?”','Delores: “Now they can relax anywhere. Always the area code. And look, their phone is already on file for check-in.”',1],
+   garden:['🌿','Offer a stroll in the garden','“Would you like to enjoy our garden while you wait? The roses are lovely this evening, and I will find you as soon as your room is ready.”','Delores: “A wait in the roses is barely a wait at all. Just remember where you sent them.”',1],
+   honest:['⏱️','Give an honest time, and promise updates','“Thank you so much for your patience. Your room is being inspected now and should be ready in about ten minutes. I will update you the moment I hear.”','Delores: “That is the best one ⭐. An honest time and a promise to update. Guests forgive a wait. They do not forgive being forgotten.”',2],
+   sec:['😬','Say “One sec!” and vanish','“One sec!” (and then you are gone for ten minutes)','Delores: “Oof. A one-second promise that lasts ten minutes feels like forever. Give a real time, then check back.”',0]},
+  missMood:'🌱'
+ },
+ es:{
+  headClean:'🔍 La {r} necesita una inspección primero',headTidy:'🧹 La {r} necesita limpieza e inspección primero',
+  ask:'Pide ayuda a limpieza',
+  radio:'📻 Llamar por radio a la supervisora',text:'💬 Escribir a la supervisora',
+  radioRush:'📻 Pedir por radio una limpieza urgente',textRush:'💬 Escribir para una limpieza urgente',
+  orReady:'O toca una habitación ✨ que brille.',noReady:'Aún no hay ninguna habitación ✨ lista. Toca una 🔍 o 🧹 y pide ayuda a limpieza.',
+  onWay:{inspect:'📻 Evelyn va a inspeccionar la {r} · unos 10 minutos (acelerado para practicar)',clean:'📻 Limpieza prepara la {r} y luego Evelyn la inspecciona · unos 25 minutos (acelerado para practicar)'},
+  script:{
+   radio:{inspect:'Tú, por radio: “Recepción a supervisora de limpieza. ¿Podría inspeccionar la habitación {r}, por favor? Un huésped la espera. Gracias.”\n📻 Evelyn: “Recibido. Voy a la {r}. Unos diez minutos.”',
+          clean:'Tú, por radio: “Recepción a limpieza. ¿Podrían limpiar la habitación {r} a continuación, por favor? Un huésped la espera. Gracias.”\n📻 Limpieza: “Recibido. Limpiamos la {r} ahora y Evelyn la inspecciona enseguida. Unos veinticinco minutos.”'},
+   text:{inspect:'💬 Escribes: “Hola, Evelyn. ¿Podría inspeccionar la habitación {r} cuando pueda? Un huésped la espera. ¡Gracias!”\n💬 Evelyn: “Voy para allá. Unos diez minutos.”',
+         clean:'💬 Escribes: “Hola. ¿Podrían limpiar la habitación {r} a continuación? Un huésped la espera. ¡Gracias!”\n💬 Limpieza: “Empezamos la {r} ahora. Evelyn la inspecciona enseguida.”'}},
+  howTip:'Delores: “La radio es lo más rápido en una noche ajetreada. Un mensaje deja una nota que pueden leer entre habitaciones. Las dos son amables, y las dos dicen que un huésped espera.”',
+  done:{inspect:'📻 Evelyn: “La {r} está inspeccionada y lista. Cada rincón está perfecto.” ✨',clean:'📻 Evelyn: “La {r} está limpia, inspeccionada y lista. Hasta el cajón de los calcetines está vacío.” ✨'},
+  goOn:' Terminemos el registro de {name}.',textedBack:' 💬 Escribimos a {name}: “¡Buenas noticias, su habitación está lista!”',
+  moveOn:' Ahora toca la {r} para terminar el cambio.',
+  careHead:'Mientras {name} espera, podrías…',mood:'Ánimo de {name}',best:'⭐ La mejor',
+  you:'Tú:',
+  care:{
+   seat:['🛋️','Ofrecer asiento en el vestíbulo y una bebida','“Por favor, póngase cómodo en el vestíbulo. ¿Le traigo un té, un café o agua con gas mientras espera?”','Delores: “Precioso. Un sillón cómodo y una taza caliente convierten la espera en una bienvenida.”',1],
+   bags:['🧳','Ofrecer guardar su equipaje en un lugar seguro','“¿Me permite guardar su equipaje? Lo tenemos en nuestro cuarto de equipaje con llave, y se lo llevamos a su habitación en cuanto esté lista.”','Delores: “Manos libres, corazón ligero. Y nunca se preguntan dónde están sus maletas, porque están bajo llave.”',1],
+   text:['📱','Ofrecer un mensaje cuando la habitación esté lista','“¿Le escribo en cuanto su habitación esté lista? ¿Me da su número de móvil, con el código de área, por favor?”','Delores: “Así pueden relajarse en cualquier lugar. Siempre el código de área. Y mira, su teléfono ya está en la ficha para el registro.”',1],
+   garden:['🌿','Ofrecer un paseo por el jardín','“¿Le gustaría disfrutar de nuestro jardín mientras espera? Las rosas están preciosas esta noche, y le buscaré en cuanto su habitación esté lista.”','Delores: “Una espera entre rosas apenas es espera. Solo recuerda adónde lo enviaste.”',1],
+   honest:['⏱️','Dar un tiempo honesto y prometer avisos','“Muchas gracias por su paciencia. Están inspeccionando su habitación ahora y estará lista en unos diez minutos. Le aviso en cuanto sepa algo.”','Delores: “Esa es la mejor ⭐. Un tiempo honesto y la promesa de avisar. Los huéspedes perdonan una espera. No perdonan que los olviden.”',2],
+   sec:['😬','Decir “¡Un segundo!” y desaparecer','“¡Un segundo!” (y desapareces diez minutos)','Delores: “Uy. Un segundo que dura diez minutos se siente eterno. Da un tiempo real y vuelve a avisar.”',0]},
+  missMood:'🌱'
+ }
+};
+const RW=RW_TEXT[profile.lang]||RW_TEXT.en;
+const RW_MS={inspect:5000,clean:8000};
+let rwTok=0;
+function rwCalls(){if(!ph.calls)ph.calls={};return ph.calls;}
+function rwCall(r,by){
+  const R=ph.rooms[r];if(!R||(R.st!=='clean'&&R.st!=='tidy')||rwCalls()[r])return;
+  const kind=R.st==='tidy'?'clean':'inspect',tok=++rwTok,dur=RW_MS[kind];
+  ph.calls[r]={kind,by,t0:Date.now(),dur,tok};
+  ph.rwScript=ht(RW.script[by][kind],{r});ph.say=RW.howTip;joySound('pop');phRender();
+  phPop($('ph-board')?.querySelector('[data-r="'+r+'"]'),by==='radio'?'📻':'💬');
+  setTimeout(()=>rwDone(r,tok),dur);
+}
+function rwDone(r,tok){
+  if(!ph||!ph.calls)return;const c=ph.calls[r];if(!c||c.tok!==tok)return;delete ph.calls[r];
+  const R=ph.rooms[r];if(!R||(R.st!=='clean'&&R.st!=='tidy'))return;
+  phSnap();ph.rooms[r]={st:'ready'};ph.rwScript='';
+  let say=ht(RW.done[c.kind],{r});
+  const m=ph.mode;
+  if(m&&m.wait===r&&m.pick){const g=phFind(m.pick);
+    if(g){const first=g.name.split(' ')[0];if(g.care&&g.care.includes('text'))say+=ht(RW.textedBack,{name:first});say+=ht(RW.goOn,{name:first});ph.mode={info:g.id,room:r};ph.sel=r;}}
+  else if(m&&m.wait===r&&m.move){delete m.wait;say+=ht(RW.moveOn,{r});}
+  ph.say=say;
+  if(!$('ph-board'))return;
+  joySound('open',1);phRender();
+  const t=$('ph-board').querySelector('[data-r="'+r+'"]');if(t&&t.isConnected){const [x,y]=centerOf(t);burst(x,y,1,{});floatText(x,y-30,'✨',{size:24});}
+}
+function rwCare(g,k){
+  if(!g.care)g.care=[];if(g.care.includes(k))return;phSnap();g.care.push(k);
+  const C=RW.care[k];ph.rwYou=C[2];ph.say=C[3];
+  if(k==='text')g.got.phone=1;
+  joySound(C[4]?'coin':'boop',C[4]?1:0);phRender();
+  const b=$('ph-panel')?.querySelector('[data-care="'+k+'"]');if(b&&C[4])phPop(b,C[4]>1?'⭐':C[0]);
+}
+/* The help card: shown under the board while a guest waits for a room that isn't ready. */
+function rwHelpCard(r,g){
+  const R=ph.rooms[r],c=rwCalls()[r],card=document.createElement('div');card.className='joy-panel ph-act rw-card';
+  let h='<b>'+esc(ht(R.st==='tidy'?RW.headTidy:RW.headClean,{r}))+'</b>';
+  if(c){const left=Math.max(0,c.dur-(Date.now()-c.t0));
+    h+='<p class="rw-way">'+esc(ht(RW.onWay[c.kind],{r}))+'</p><div class="rw-bar"><i style="animation-duration:'+c.dur+'ms;animation-delay:-'+(c.dur-left)+'ms"></i></div>';}
+  else h+='<small class="rw-ask">'+esc(RW.ask)+'</small><div class="ph-acts rw-calls"></div>';
+  if(ph.rwScript)h+='<p class="rw-script">'+esc(ph.rwScript).replace(/\n/g,'<br>')+'</p>';
+  card.innerHTML=h;
+  const calls=card.querySelector('.rw-calls');
+  if(calls){const rush=R.st==='tidy';
+    for(const [by,label,cls] of [['radio',rush?RW.radioRush:RW.radio,'primary-button'],['text',rush?RW.textRush:RW.text,'secondary-button']]){
+      const b=document.createElement('button');b.type='button';b.className=cls+' rw-'+by;b.textContent=label;b.onclick=()=>rwCall(r,by);calls.append(b);}}
+  if(g){
+    const first=g.name.split(' ')[0],care=g.care||[],good=care.reduce((n,k)=>n+RW.care[k][4],0);
+    const box=document.createElement('div');box.className='rw-care';
+    box.innerHTML='<b>'+esc(ht(RW.careHead,{name:first}))+'</b><p class="rw-mood">'+esc(ht(RW.mood,{name:first}))+' <span aria-hidden="true">'+('💛'.repeat(Math.min(5,good))+'🤍'.repeat(Math.max(0,5-good)))+'</span></p><div class="rw-opts"></div>'+
+      (ph.rwYou&&care.length?'<p class="ph-why rw-you"><b>'+esc(RW.you)+'</b> '+esc(ph.rwYou)+'</p>':'');
+    const opts=box.querySelector('.rw-opts');
+    for(const k of Object.keys(RW.care)){const [i,l,,,score]=RW.care[k],on=care.includes(k),b=document.createElement('button');
+      b.type='button';b.dataset.care=k;b.className='rw-opt'+(on?(score?' got':' miss'):'');
+      b.innerHTML='<span aria-hidden="true">'+i+'</span><span>'+esc(l)+(on&&score>1?' <em>'+esc(RW.best)+'</em>':'')+'</span><span aria-hidden="true">'+(on?(score?'✓':RW.missMood):'')+'</span>';
+      b.onclick=()=>rwCare(g,k);opts.append(b);}
+    card.append(box);
+  }
+  const anyReady=Object.values(ph.rooms).some(x=>x.st==='ready');
+  if(anyReady){const p=document.createElement('p');p.className='joy-hint';p.textContent=RW.orReady;card.append(p);}
+  return card;
+}
+/* Wrap the room-board tap and the panel so dead ends become a help card. */
+{
+  const tile0=phTile;
+  phTile=function(r,el){
+    const m=ph.mode,R=ph.rooms[r];
+    if(m&&(m.pick||m.move)&&R&&(R.st==='clean'||R.st==='tidy')){
+      tile0(r,el);m.wait=r;ph.rwYou='';if(!rwCalls()[r])ph.rwScript='';return phRender();}
+    return tile0(r,el);
+  };
+  const panel0=phPanel;
+  phPanel=function(){
+    const m=ph.mode;
+    if(m&&(m.pick||m.move)&&m.wait&&ph.rooms[m.wait]&&ph.rooms[m.wait].st!=='ready'&&ph.rooms[m.wait].st!=='guest'){
+      const p=$('ph-panel');p.innerHTML='';p.append(rwHelpCard(m.wait,m.pick?phFind(m.pick):null));return;}
+    panel0();
+    const p=$('ph-panel');
+    if(m&&(m.pick||m.move)&&!m.info&&!Object.values(ph.rooms).some(x=>x.st==='ready')){
+      const q=document.createElement('p');q.className='hms-say rw-none';q.textContent=RW.noReady;p.append(q);}
+    /* A 🔍 or 🧹 room card also gets the radio and text buttons (the quick buttons stay too). */
+    const r=ph.sel,R=r&&ph.rooms[r],acts=p.querySelector('.ph-act .ph-acts');
+    if(!m&&R&&(R.st==='clean'||R.st==='tidy')&&acts){
+      const c=rwCalls()[r];
+      if(c){const w=document.createElement('p');w.className='rw-way';w.textContent=ht(RW.onWay[c.kind],{r});acts.before(w);}
+      else for(const [by,label] of [['radio',R.st==='tidy'?RW.radioRush:RW.radio],['text',R.st==='tidy'?RW.textRush:RW.text]]){
+        const b=document.createElement('button');b.type='button';b.className='secondary-button rw-'+by;b.textContent=label;b.onclick=()=>rwCall(r,by);acts.append(b);}
+      if(ph.rwScript){const s=document.createElement('p');s.className='rw-script';s.innerHTML=esc(ph.rwScript).replace(/\n/g,'<br>');acts.after(s);}
+    }
+  };
+  const render0=phRender;
+  phRender=function(){
+    render0();
+    const calls=ph&&ph.calls;if(!calls||!$('ph-board'))return;
+    for(const r of Object.keys(calls)){const t=$('ph-board').querySelector('[data-r="'+r+'"]');if(t){t.classList.add('rw-calling');t.insertAdjacentHTML('beforeend','<span class="rw-badge" aria-hidden="true">'+(calls[r].by==='radio'?'📻':'💬')+'</span>');}}
+  };
+  const fresh0=phFresh;
+  phFresh=function(){fresh0();ph.calls={};ph.rwScript='';ph.rwYou='';};
+}
+{const st=document.createElement('style');st.textContent=`
+.rw-card{border:2px solid #e8c34a;background:#fffbe8}
+.rw-ask{font:bold 12px Arial,sans-serif;letter-spacing:.04em;color:#8a6420;text-transform:uppercase}
+.rw-calls button{min-height:50px;flex:1 1 220px}
+.rw-way{margin:0;font-weight:bold;color:#23493f}
+.rw-bar{height:12px;border-radius:99px;background:#efe6c8;overflow:hidden;border:1px solid #d8c68e}
+.rw-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9fd38c,#6cc25a);animation:rwFill linear forwards}
+@keyframes rwFill{to{width:100%}}
+.rw-script{margin:0;padding:8px 12px;border-radius:12px;background:#eef3fb;border:1px solid #b5c7e6;line-height:1.45}
+.rw-care{display:grid;gap:6px;margin-top:4px;padding-top:8px;border-top:1px dashed #e0cf9e}
+.rw-mood{margin:0;font:13px Arial,sans-serif;color:#5b5444}.rw-mood span{letter-spacing:2px}
+.rw-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.rw-opt{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;min-height:52px;padding:8px 10px;border-radius:14px;border:2px dashed #c9952f;background:#fffaf0;color:var(--ink);text-align:left;cursor:pointer;font:15px/1.3 Georgia,serif}
+.rw-opt>span:first-child{font-size:22px}.rw-opt em{font:bold 11px Arial,sans-serif;font-style:normal;color:#8a6420;background:#ffe89a;border-radius:99px;padding:1px 7px;white-space:nowrap}
+.rw-opt.got{border-style:solid;border-color:#6cc25a;background:#effbe9}.rw-opt.miss{border-style:solid;border-color:#f09a74;background:#fff1ea}
+.rw-you{margin:0}
+.ph-tile.rw-calling{animation:rwPulse 1.4s ease-in-out infinite}
+.rw-badge{position:absolute;top:4px;right:6px;font-size:18px}
+@keyframes rwPulse{50%{box-shadow:0 0 0 4px #ffd84d99}}
+body.reduce-motion .ph-tile.rw-calling{animation:none}
+@media(max-width:520px){.rw-opts{grid-template-columns:1fr}}
+`;document.head.append(st);}
+/* ==== end ROOM WAIT v1 ==== */
 /* ==== SPLIT v1: the manor and the desk computer side by side ====
    - When the desk computer (HMS) opens during play, the manor stays on screen: the HMS slides up
      as a drawer over the bottom half (centered, never wider than 860px), with the manor showing

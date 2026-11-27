@@ -112,3 +112,9 @@ computer's home links to it as "Big practice lab →" for later.
 ## Tests
 
 `tests/test_hms.py` (run with `CHROMIUM_PATH=/opt/pw-browsers/chromium python tests/test_hms.py`).
+
+## Room wait (ROOM WAIT v1)
+In the practice hotel, picking a 🔍 (cleaned, not inspected) or 🧹 (dirty) room for a waiting guest opens a help card instead of a dead end:
+- 📻 Radio or 💬 text Evelyn, the housekeeping supervisor, to inspect it (or ask housekeeping for a rush clean on a 🧹 room). A short sped-up wait runs, the room turns ✨, and check-in carries on.
+- While the guest waits: offer a seat and a drink, keep their luggage in a secure (locked) luggage room, text them when the room is ready (mobile with area code, which also puts the phone on file), a garden stroll, or the best one, an honest time estimate with a promise to update. "One sec!" is the gentle miss.
+- Any 🔍 or 🧹 room card also has the radio and text buttons; the quick buttons stay. Tests: tests/test_room_wait.py.
