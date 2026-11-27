@@ -113,7 +113,7 @@ class Luggage(fbase.Friendly):
         self.assertIn('luggage', self.page.evaluate('window.hmsTest.extras'))
         self.page.evaluate("window.hmsTest.interact('luggage')")
         self.page.wait_for_selector('#lg-room')
-        self.assertIn('right by the front desk', self.say())
+        self.assertIn('valet stand', self.say())
         self.assertIn('Locked', self.page.locator('#lg-room').inner_text())
 
 

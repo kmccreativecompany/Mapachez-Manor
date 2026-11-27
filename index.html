@@ -3476,7 +3476,7 @@ class ManorWorld {
       ellipse(g,173,678,43,37,'#ad9c77');ellipse(g,173,675,35,29,'#c8dbba');ellipse(g,173,673,27,22,'#9ab7a1');
       ellipse(g,173,669,17,13,'#d7c9a1');rect(g,169,646,8,25,'#b6a278');ellipse(g,173,646,15,6,'#d6bf8a');ellipse(g,173,643,11,4,'#b6d0b2');
       rect(g,77,575,58,50,'#a37f6b',8);rect(g,82,582,48,33,'#c7a587',6);rect(g,91,581,12,30,'#d6be9a',4);
-      for(const p of [[81,COZY_FOYER?540:500,1.1],[389,521,1.2],COZY_FOYER?[410,716,1.2]:[358,705,1.3],[80,722,1],[483,714,1]])plant(g,...p);
+      for(const p of [[81,COZY_FOYER?540:500,1.1],[389,521,1.2],COZY_FOYER?[410,716,1.2]:[358,705,1.3],[324,742,.85],[483,714,1]])plant(g,...p);
       if(COZY_FOYER)cozyTea(g,364,700);
       rect(g,504,539,106,52,'#9ba788',3);rect(g,508,539,98,42,'#f4eddb',3);stroke(g,514,544,86,31,'#c2c9b0');
       for(let i=0;i<3;i++){ellipse(g,527+i*27,561,10,7,'#c4aa70');ellipse(g,527+i*27,560,7,5,'#f4ecd6');}
@@ -12184,7 +12184,7 @@ const LG_TEXT={
   updatedTip:'Delores: “Perfect. Bad news told early feels like good service. Bad news found out later feels like a secret.”',
   onWayFix:'🔧 Maintenance is fixing {r}, then Evelyn checks it again · about 15 minutes',
   doneFix:'📻 Evelyn: “The faucet is fixed, and Room {r} is inspected and ready.” ✨',
-  room:'🔒 Luggage room · by the front desk',
+  room:'🔒 Luggage room · by the front entrance',
   locked:'Locked. Only staff with the master key or the door code may go in, so every guest’s bags stay safe.',
   key:'🗝️ Use the master key',code:'🔢 Enter the door code',
   codeHint:'Delores: “The code is 4-1-6, like 4 PM is 16:00. Never say it out loud in the lobby.”',
@@ -12242,7 +12242,7 @@ const LG_TEXT={
   updatedTip:'Delores: “Perfecto. Una mala noticia dada a tiempo se siente como buen servicio. Descubierta después, se siente como un secreto.”',
   onWayFix:'🔧 Mantenimiento arregla la {r} y Evelyn la revisa otra vez · unos 15 minutos',
   doneFix:'📻 Evelyn: “El grifo está arreglado y la {r} está inspeccionada y lista.” ✨',
-  room:'🔒 Cuarto de equipaje · junto a recepción',
+  room:'🔒 Cuarto de equipaje · junto a la entrada',
   locked:'Cerrado con llave. Solo el personal con la llave maestra o el código puede entrar, para que las maletas de cada huésped estén seguras.',
   key:'🗝️ Usar la llave maestra',code:'🔢 Marcar el código',
   codeHint:'Delores: “El código es 4-1-6, como las 4 PM son las 16:00. Nunca lo digas en voz alta en el vestíbulo.”',
@@ -12492,32 +12492,44 @@ function lgLesson(){
 @media(max-width:520px){.lg-cols{grid-template-columns:1fr}.lg-door{grid-template-columns:64px 1fr}.lg-door-art{height:100px}}
 `;document.head.append(st);}
 /* ---------- The luggage room on the manor map: a locked door by the front desk, with the cart ---------- */
-const LUG_SPOT={x:100,y:676};
+const LUG_SPOT={x:148,y:716};
 const LUG_MAP={
- en:{name:'Luggage room',hello:'Delores: “This is our luggage room, right by the front desk. It stays locked, and only staff with the master key or the code go in. Every bag is tagged with a name and a departure date, never a room number.”'},
- es:{name:'Cuarto de equipaje',hello:'Delores: “Este es nuestro cuarto de equipaje, junto a recepción. Siempre está cerrado con llave, y solo entra el personal con la llave maestra o el código. Cada maleta lleva el nombre y la fecha de salida, nunca el número de habitación.”'}
+ en:{name:'Luggage room',valet:'Valet',hello:'Delores: “This is our luggage room, right by the front entrance and the valet stand. It stays locked, and only staff with the master key or the code go in. Every bag is tagged with a name and a departure date, never a room number.”'},
+ es:{name:'Cuarto de equipaje',valet:'Aparcacoches',hello:'Delores: “Este es nuestro cuarto de equipaje, junto a la entrada y al puesto del aparcacoches. Siempre está cerrado con llave, y solo entra el personal con la llave maestra o el código. Cada maleta lleva el nombre y la fecha de salida, nunca el número de habitación.”'}
 }[profile.lang]||null;
-const LM=LUG_MAP||{name:'Luggage room',hello:''};
+const LM=LUG_MAP||{name:'Luggage room',valet:'Valet',hello:''};
 function drawLuggageRoom(c,time,calm){
   if(festivalActive||!state)return;
-  /* The door, set into the foyer's west wall. */
-  const x=62,y=632,w=26,h=42;
-  c.fillStyle='#4b2f1c';c.beginPath();c.roundRect(x-2,y-2,w+4,h+4,[12,12,2,2]);c.fill();
-  const g=c.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#6b4a2e');g.addColorStop(.5,'#8a6240');g.addColorStop(1,'#6b4a2e');
-  c.fillStyle=g;c.beginPath();c.roundRect(x,y,w,h,[10,10,1,1]);c.fill();
-  c.strokeStyle='rgba(201,149,47,.55)';c.lineWidth=1;c.beginPath();c.roundRect(x+5,y+6,w-10,14,[6,6,1,1]);c.stroke();c.strokeRect(x+5,y+24,w-10,14);
-  /* Brass keypad and lock. */
-  c.fillStyle='#c9952f';c.fillRect(x+w-9,y+19,6,9);c.fillStyle='#1f3b33';for(let i=0;i<3;i++)c.fillRect(x+w-8,y+20+i*2.6,4,1.4);
-  ellipse(c,x+w-6,y+32,2,2,'#e8c34a');
-  const blink=calm?1:.55+.45*Math.sin(time/500);ellipse(c,x+w-6,y+17,1.4,1.4,'rgba(220,60,60,'+blink+')');
-  /* The luggage cart, with tagged bags. */
-  const cx=110,cy=664;
-  c.strokeStyle='#c9952f';c.lineWidth=2;c.beginPath();c.moveTo(cx-16,cy+12);c.lineTo(cx+18,cy+12);c.moveTo(cx-16,cy+12);c.lineTo(cx-16,cy-14);c.quadraticCurveTo(cx+1,cy-24,cx+18,cy-14);c.lineTo(cx+18,cy+12);c.stroke();
-  ellipse(c,cx-12,cy+15,2.6,2.6,'#3b2a1d');ellipse(c,cx+14,cy+15,2.6,2.6,'#3b2a1d');
-  const bags=[['#5b8fd1',-13,-6,12,16],['#c86f5a',0,-2,11,13],['#7a9a5a',11,-8,9,19]];
-  for(const [col,dx,dy,bw,bh] of bags){c.fillStyle=col;c.beginPath();c.roundRect(cx+dx-bw/2,cy+dy,bw,bh,2);c.fill();c.fillStyle='rgba(0,0,0,.25)';c.fillRect(cx+dx-bw/2+2,cy+dy+2,1.2,bh-4);
-    c.fillStyle='#fff3c4';c.fillRect(cx+dx+bw/2-2,cy+dy+3,4,5);}
-  if(LABELS)plaque(c,'🔒 '+LM.name,x+w/2+6,y-12);
+  /* Its own little room in the foyer's south-west corner, by the front entrance and the valet stand. */
+  const L=60,T=656,R=130,B=747,dy0=694,dy1=734;
+  c.fillStyle='#d8c29b';c.fillRect(L,T,R-L,B-T);
+  c.strokeStyle='rgba(122,90,46,.28)';c.lineWidth=1;for(let y=T+9;y<B;y+=9){c.beginPath();c.moveTo(L,y);c.lineTo(R,y);c.stroke();}
+  /* Shelves on the back wall, with tagged bags. */
+  const shelf=(y)=>{c.fillStyle='#7c5634';c.fillRect(L+3,y,40,3);};
+  shelf(T+26);shelf(T+52);
+  const bag=(x,y,w,h,col)=>{c.fillStyle=col;c.beginPath();c.roundRect(x,y-h,w,h,2);c.fill();c.fillStyle='rgba(0,0,0,.22)';c.fillRect(x+2,y-h+2,1.2,h-4);c.fillStyle='#fff3c4';c.fillRect(x+w-3,y-h+2,4,4);};
+  bag(L+5,T+26,10,13,'#5b8fd1');bag(L+17,T+26,9,10,'#c86f5a');bag(L+28,T+26,12,15,'#7a9a5a');
+  bag(L+6,T+52,12,11,'#9279ac');bag(L+21,T+52,9,15,'#d1af6b');
+  /* The luggage cart, parked inside. */
+  const cx=L+26,cy=B-14;
+  c.strokeStyle='#c9952f';c.lineWidth=2;c.beginPath();c.moveTo(cx-14,cy+6);c.lineTo(cx+14,cy+6);c.moveTo(cx-14,cy+6);c.lineTo(cx-14,cy-12);c.quadraticCurveTo(cx,cy-20,cx+14,cy-12);c.lineTo(cx+14,cy+6);c.stroke();
+  ellipse(c,cx-10,cy+8,2.2,2.2,'#3b2a1d');ellipse(c,cx+10,cy+8,2.2,2.2,'#3b2a1d');
+  bag(cx-11,cy+5,9,12,'#5b8fd1');bag(cx-1,cy+5,10,9,'#c86f5a');
+  /* Walls: top and the side facing the entrance, with a doorway. */
+  c.fillStyle='#5b3b22';c.fillRect(L,T-4,R-L+4,5);c.fillRect(R,T-4,5,dy0-T+4);c.fillRect(R,dy1,5,B-dy1);
+  c.fillStyle='#c9952f';c.fillRect(L,T-4,R-L+4,1.2);
+  /* The locked door with its keypad. */
+  const g=c.createLinearGradient(R-2,0,R+7,0);g.addColorStop(0,'#6b4a2e');g.addColorStop(1,'#8a6240');
+  c.fillStyle=g;c.fillRect(R-1,dy0,8,dy1-dy0);c.strokeStyle='#4b2f1c';c.lineWidth=1;c.strokeRect(R-1,dy0,8,dy1-dy0);
+  c.fillStyle='#c9952f';c.fillRect(R+8,dy0+10,5,8);c.fillStyle='#1f3b33';for(let i=0;i<3;i++)c.fillRect(R+9,dy0+11+i*2.4,3,1.2);
+  const blink=calm?1:.55+.45*Math.sin(time/500);ellipse(c,R+10.5,dy0+7,1.4,1.4,'rgba(220,60,60,'+blink+')');
+  ellipse(c,R+5,dy0+22,1.6,1.6,'#e8c34a');
+  /* The valet stand at the front entrance, a few steps away. */
+  const vx=214,vy=724;
+  c.fillStyle='#5b3b22';c.beginPath();c.roundRect(vx-9,vy-12,18,18,2);c.fill();c.fillStyle='#c9952f';c.fillRect(vx-11,vy-14,22,3);
+  c.fillStyle='#f3e9cf';c.fillRect(vx-6,vy-9,12,7);c.fillStyle='#23493f';c.fillRect(vx-4,vy-7,8,1.2);c.fillRect(vx-4,vy-4.5,5,1.2);
+  for(let i=0;i<3;i++){c.fillStyle=i===1?'#c9952f':'#e8c34a';c.fillRect(vx+12,vy-11+i*5,3,3);}
+  if(LABELS){plaque(c,'🔒 '+LM.name,(L+R)/2+4,T-14);plaque(c,'🚗 '+LM.valet,vx,vy+16);}
 }
 const lugExtras=world.options.extras;
 world.options.extras=()=>{const list=lugExtras();if(state&&!festivalActive&&!titleVisible)list.push({id:'luggage',...LUG_SPOT,name:LM.name});return list;};
